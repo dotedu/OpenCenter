@@ -1,0 +1,70 @@
+<!--     <notempty name="_extra_menu">
+                                   {// 动态扩展菜单 //}
+                                   {:extra_menu($_extra_menu,$__MENU__)}
+                               </notempty>-->
+<volist name="__MENU__.child" id="sub_menu">
+    <!-- 子导航 -->
+    <notempty name="sub_menu">
+        <li class="show">
+            <a href="#">
+                <notempty name="key">{$key}</notempty>
+            </a>
+            <ul class="nav">
+                <volist name="sub_menu" id="menu">
+                    <li>
+                        <a href="{$menu.url|U}">{$menu.title}</a>
+                    </li>
+                </volist>
+            </ul>
+        </li>
+    </notempty>
+    <!-- /子导航 -->
+</volist>
+<li class="show">
+    <a href="#">
+        个人中心
+    </a>
+    <ul class="nav">
+        <li
+        <eq name="Think.ACTION_NAME" value="mydocument">class="active"</eq>
+        ><a class="item" href="{:U('article/mydocument')}">我的文档</a>
+</li>
+<eq name="show_draftbox" value="1">
+    <li
+    <eq name="Think.ACTION_NAME" value="draftbox">class="active"</eq>
+    ><a class="item" href="{:U('article/draftbox')}">草稿箱</a></li>
+</eq>
+<li
+<eq name="Think.ACTION_NAME" value="examine">class="active"</eq>><a class="item"
+                                                                    href="{:U('article/examine')}">待审核</a></li>
+</ul>
+</li>
+<volist name="nodes" id="sub_menu">
+    <present name="sub_menu">
+        <li class="show">
+            <a href="{$sub_menu.url|U}">
+                {$sub_menu.title}
+
+            </a>
+            <notempty name="sub_menu._child">
+            <ul class="nav">
+                <volist name="sub_menu['_child']" id="menu">
+                    <li <if condition="$menu['id'] eq $cate_id or $menu['current'] eq 1">class="active"</if>>
+                        <a href="{$menu.url|U}">{$menu.title}</a>
+                    </li>
+                </volist>
+            </ul>
+
+
+        </notempty>
+
+        </li>
+    </present>
+</volist>
+<eq name="show_recycle" value="1">
+<li
+        <eq name="Think.ACTION_NAME" value="recycle">class="active"</eq>
+        >
+    <a href="{:U('article/recycle')}"><i class="icon-trash"></i> 回收站</a>
+</li>
+</eq>

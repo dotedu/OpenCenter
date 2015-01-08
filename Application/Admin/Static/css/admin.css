@@ -1,0 +1,112 @@
+body {
+  font-family: "Microsoft Yahei", "宋体";
+}
+.admin-bar {
+  border-radius: 0;
+}
+.pager span {
+  padding: 5px 12px;
+  display: inline-block;
+}
+.form-input-width {
+  width: 400px;
+}
+.form-text-area-size {
+  width: 400px;
+  height: 400px;
+}
+.form-select-size {
+  width: auto;
+}
+.panel-menu {
+  position: absolute;
+  top: 51px;
+  left: 0;
+  width: 100px;
+  bottom: 0;
+  background: #e7e8e9;
+  z-index: 13;
+  border-right: 1px solid #cccccc;
+}
+.panel-menu .nav-primary > li.active > a,
+.panel-menu .nav-primary > li.active > a:hover,
+.panel-menu .nav-primary > li.active > a:focus {
+  background: #4f8ad0;
+}
+.panel-menu .nav-stacked.nav-primary > li:last-child > a {
+  border-radius: 0;
+}
+.panel-menu .nav-stacked.nav-primary > li,
+.panel-menu .nav-stacked.nav-primary > li > a {
+  border-radius: 0;
+}
+.panel-menu .nav-primary > li.active > a,
+.panel-menu .nav-primary > li.active > a:hover,
+.panel-menu .nav-primary > li.active > a:focus {
+  border: none;
+}
+.panel-menu .nav-primary > li > a {
+  border-right: none;
+}
+.panel-menu i {
+  font-size: 28px;
+}
+.panel-main {
+  position: absolute;
+  top: 51px;
+  left: 101px;
+  bottom: 0;
+  right: 0;
+  z-index: 12;
+  overflow: scroll;
+}
+.panel-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  z-index: 14;
+  min-width: 1024px;
+  border-bottom: 1px solid #618fc2;
+  background: #4f8ad0;
+}
+.panel-header .navbar-header {
+  line-height: 50px;
+}
+.panel-header .navbar-inverse {
+  background: #4f8ad0;
+  border-bottom: 1px solid #618fc2;
+  height: 50px;
+}
+.panel-header .navbar-nav > li > a {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.panel-header .navbar-inverse .navbar-nav > .active > a,
+.panel-header .navbar-inverse .navbar-nav > .active > a:hover,
+.panel-header .navbar-inverse .navbar-nav > .active > a:focus,
+.panel-header .navbar-inverse .navbar-nav > li > a:hover,
+.panel-header .navbar-inverse .navbar-nav > li > a:focus {
+  background: #5799e6;
+}
+.panel-header .navbar-brand {
+  margin-top: 5px;
+  color: white;
+}
+.panel-header .logo {
+  width: 32px;
+  float: left;
+  margin-top: -10px;
+  margin-left: 0;
+  margin-right: 10px;
+}
+.panel-header .admin-title {
+  color: white;
+  margin-left: 10px;
+  font-size: 16px;
+}
+.panel-header .admin-title a {
+  color: white;
+  text-decoration: none;
+}
