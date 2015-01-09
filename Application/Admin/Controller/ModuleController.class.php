@@ -32,6 +32,7 @@ class ModuleController extends Controller
         $modules = $this->moduleModel->getAll();
 
         foreach ($modules as &$m) {
+            $m['alias']='<i class="icon-'.$m['icon'].'"></i> '.$m['alias'];
             if ($m['is_setup']) {
                 $m['name'] = '<i class="icon-ok" style="color: green;"></i> ' . $m['name'];
                 if ($m['can_uninstall'])
@@ -52,9 +53,9 @@ class ModuleController extends Controller
         $listBuilder->title('模块管理');
 
 
-        $listBuilder->keyId()->keyText('name', '模块名')->keyText('alias', '模块中文名')->keyText('summary', '模块介绍')
+        $listBuilder->keyId()->keyHtml('alias', '模块名')->keyText('name', '模块英文名')->keyText('summary', '模块介绍')
             ->keyText('version', '版本号')->keyText('is_com', '商业模块')
-            ->keyLink('developer', '开发者', '{$website}')->keyText('entry', '前台入口')
+            ->keyLink('developer', '开发者', '{$website}')->keyText('entry', '前台入口')->keyText('admin_entry','后台入口')
             ->keyText('do', '操作');
         $listBuilder->display();
     }

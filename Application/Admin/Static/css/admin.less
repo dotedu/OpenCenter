@@ -28,7 +28,7 @@ body{
 
 .panel-menu {
   position: absolute;
-  top: 51px;
+  top: 50px;
   left: 0;
   width: 100px;
   bottom: 0;
@@ -54,16 +54,20 @@ body{
 
     font-size: 28px;
   }
+
 }
 
 .panel-main {
   position: absolute;
-  top: 51px;
-  left: 101px;
+  top: 50px;
+  left: 100px;
   bottom: 0;
   right: 0;
   z-index: 12;
-  overflow: scroll;
+  overflow: hidden;
+  .nav-parent>a{
+    font-size: 17px;
+  }
 }
 
 .panel-header {
@@ -116,3 +120,52 @@ body{
     }
   }
 }
+
+.sub_menu_wrapper{
+  .menu > .nav > li:first-child > a, .menu > .nav > li:first-child.nav-heading{
+    border-top: none;
+  }
+  border-right: 1px solid rgb(221, 221, 221);
+  .menu > .nav > li.show > a, .menu > .nav > li.show > a:hover, .menu > .nav > li.show > a:focus,.menu > .nav > li:first-child > a, .menu > .nav > li:first-child.nav-heading,.nav-primary > li > a,.menu > .nav > li:last-child > a{
+    border-right: none;
+    border-left: none;
+    border-radius: 0;
+  }
+  .menu > .nav > li.show:last-child > .nav > li:last-child > a{
+    border-right: none;
+    border-left: none;
+    border-radius: 0;
+  }
+  .menu > .nav > li > .nav > li > a{
+    border-right: none;
+    border-left: none;
+  }
+  .menu > .nav > li > .nav{
+    background: white;
+  }
+  .nav > li > a{
+
+  }
+  .menu > .nav > li > .nav > li.active > a, .menu > .nav > li > .nav > li.active > a:hover, .menu > .nav > li > .nav > li.active > a:focus{
+    background: rgb(241, 242, 243);
+    color: #333;
+  }
+  .menu > .nav > li > .nav > li > a{
+    border: none;
+  }
+  nav{
+    border-bottom:1px solid rgb(221, 221, 221);
+  }
+}
+.count{
+  >div>a{
+    background: rgb(111, 167, 206);
+    display: block;
+    color: white;
+  }
+  a,i{
+    font-size: 32px;
+    text-decoration: none;
+  }
+}
+

@@ -1,4 +1,74 @@
 <extend name="Public/base"/>
+
+<block name="script">
+    <script type="text/javascript" src="__ZUI__/lib/chartjs/chart.min.js"></script>
+</block>
 <block name="body">
-    <div class="container dashboard">{:hook('AdminIndex')}</div>
+    <div class="with-padding-lg">
+        <div class="count clearfix">
+            <div class="col-xs-4 text-center">
+                <a class="with-padding-lg bg-special">
+                    <i class="icon-tasks"></i>
+                    36
+                    <br/>
+                    今日用户行为
+                </a>
+            </div>
+            <div class="col-xs-4 text-center">
+                <a class="with-padding-lg bg-info"><i class="icon-user"></i> 15 <br/>
+                    今日新增</a>
+            </div>
+            <div class="col-xs-4 text-center">
+                <a class="with-padding-lg bg-danger" style="background: rgb(96, 210, 149)" href="{:U('user/index')}">
+                    <i class="icon-group">
+                    </i>
+                    3000
+                    <br/>
+                    总用户数
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="with-padding-lg">
+        <canvas id="myChart" height="400"></canvas>
+    </div>
+    <div class="clearfix">
+        <div class="col-xs-4">
+
+        </div>
+        <div class="col-xs-4">
+
+        </div>
+        <div class="col-xs-4">
+
+        </div>
+
+    </div>
+    <script>
+        $('#main-content').css('left',0);
+        $(function(){
+            $(window).resize(
+                 function(){
+                     $('#myChart').attr('width',$('#myChart').parent().width());
+                     var data = {
+                         labels: ["1-08", "1-04", "1-05", "1-06", "1-07", "1-08", "1-09"],
+                         datasets: [
+                             {
+                                 fillColor: "rgba(151,187,205,0.5)",
+                                 strokeColor: "rgba(151,187,205,1)",
+                                 pointColor: "rgba(151,187,205,1)",
+                                 pointStrokeColor: "#fff",
+                                 data: [1, 3, 5, 23, 96, 27, 100]
+                             }
+                         ]
+                     };
+                     var ctx = document.getElementById("myChart").getContext("2d");
+                     new Chart(ctx).Line(data,{scaleShowLabels :true});
+
+                 }
+            )
+
+        })
+
+    </script>
 </block>

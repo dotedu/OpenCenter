@@ -99,7 +99,11 @@ class ModuleModel extends Model
         $module = $this->where(array('name' => $name))->find();
         if (!$module) {
             $m = $this->getInfo($name);
-            $m['is_setup'] = 1;//默认设为已安装，防止已安装的模块反复安装。
+            if($m['can_uninstall']){
+                $m['is_setup'] = 0;//默认设为已安装，防止已安装的模块反复安装。
+            }else{
+                $m['is_setup']=1;
+            }
             $m['id'] = $this->add($m);
             return $m;
         } else {

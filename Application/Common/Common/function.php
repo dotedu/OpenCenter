@@ -51,7 +51,7 @@ function CheckPermission($uids)
     return false;
 }
 
-function check_auth($rule, $type = AuthRuleModel::RULE_URL )
+function check_auth($rule, $type = AuthRuleModel::RULE_URL)
 {
     if (is_administrator()) {
         return true;//管理员允许访问任何页面
@@ -1129,6 +1129,24 @@ function op_t($text)
     return $text;
 }
 
+/**过滤函数，别名函数，op_t的别名
+ * @param $text
+ * @auth 陈一枭
+ */
+function text($text)
+{
+    return op_t($text);
+}
+
+/**过滤函数，别名函数，op_h的别名
+ * @param $text
+ * @auth 陈一枭
+ */
+function html($text)
+{
+    return op_h($text);
+}
+
 /**
  * h函数用于过滤不安全的html标签，输出安全的html
  * @param string $text 待过滤的字符串
@@ -1364,7 +1382,6 @@ function tox_get_headers($url)
     }
     return $r;
 }
-
 
 
 require_once(APP_PATH . 'Common/Conf/config_ucenter.php');
