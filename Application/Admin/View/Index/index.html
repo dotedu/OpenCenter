@@ -4,20 +4,20 @@
     <script type="text/javascript" src="__ZUI__/lib/highchart/highcharts.js"></script>
 </block>
 <block name="body">
- <!--   <div class="with-padding-lg">
-        <div class="col-xs-6">
-            <div class="alert alert-info with-icon">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <div class="content"><strong>Hi!</strong> 主模块有新的更新。</div>
-            </div>
-        </div>
-       <div class="col-xs-6">
-           <div class="alert alert-info with-icon">
-               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-               <div class="content"><strong>Hi!</strong> 微博模块有新的更新内容。</div>
+    <!--   <div class="with-padding-lg">
+           <div class="col-xs-6">
+               <div class="alert alert-info with-icon">
+                   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                   <div class="content"><strong>Hi!</strong> 主模块有新的更新。</div>
+               </div>
            </div>
-       </div>
-    </div>-->
+          <div class="col-xs-6">
+              <div class="alert alert-info with-icon">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                  <div class="content"><strong>Hi!</strong> 微博模块有新的更新内容。</div>
+              </div>
+          </div>
+       </div>-->
 
     <div class="with-padding-lg">
         <div class="count clearfix">
@@ -30,7 +30,8 @@
                 </a>
             </div>
             <div class="col-xs-4 text-center">
-                <a class="with-padding-lg bg-info" href="{:U('user/index')}"><i class="icon-user"></i> {$count.today_user} <br/>
+                <a class="with-padding-lg bg-info" href="{:U('user/index')}"><i class="icon-user"></i>
+                    {$count.today_user} <br/>
                     今日新增用户数</a>
             </div>
             <div class="col-xs-4 text-center">
@@ -44,9 +45,16 @@
             </div>
         </div>
     </div>
-    <div class="with-padding-lg">
+
+    <div class="with-padding-lg" style="position: relative">
+        <button class="btn  pull-right" data-toggle="modal" data-target="#settingCount"
+                style="position: absolute;right: 15px;z-index: 999">
+            <i class="icon-cog"></i>
+            设置
+        </button>
         <div id="myChart" height="400"></div>
     </div>
+
     <div class="clearfix">
         <div class="col-xs-4">
 
@@ -58,9 +66,6 @@
 
         </div>
 
-        <php>
-
-        </php>
     </div>
     <script>
         $('#main-content').css('left', 0);
@@ -101,5 +106,42 @@
         });
 
 
+    </script>
+
+</block>
+<block name="modal">
+    <div class="modal fade" id="settingCount">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                            class="sr-only">关闭</span></button>
+                    <h4 class="modal-title">设置统计图</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="with-padding">
+                        <label>默认展示天数 </label><input class="form-control" name="count_day" value="{$count.count_day}">
+
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn " data-role="saveCountSetting">
+                        <i class="icon-ok"></i> 保存
+                    </button>
+                    <button class="btn " data-dismiss="modal">
+                        <i class="icon-remove"></i> 取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('[data-role=saveCountSetting]').click(function () {
+            $.post("__SELF__", {count_day: $('[name=count_day]').val()}, function (msg) {
+                handleAjax(msg);
+            });
+        })
     </script>
 </block>

@@ -31,9 +31,9 @@ $(function () {
             $.get(target).success(function (data) {
                 if (data.status == 1) {
                     if (data.url) {
-                        updateAlert(data.info + ' 页面即将自动跳转~', 'alert-success');
+                        updateAlert(data.info + ' 页面即将自动跳转~', 'success');
                     } else {
-                        updateAlert(data.info, 'alert-success');
+                        updateAlert(data.info, 'success');
                     }
                     setTimeout(function () {
                         if (data.url) {
@@ -110,9 +110,9 @@ $(function () {
             $.post(target, query).success(function (data) {
                 if (data.status == 1) {
                     if (data.url) {
-                        updateAlert(data.info + ' 页面即将自动跳转~', 'alert-success');
+                        updateAlert(data.info + ' 页面即将自动跳转~', 'success');
                     } else {
-                        updateAlert(data.info, 'alert-success');
+                        updateAlert(data.info, 'success');
                     }
                     setTimeout(function () {
                         if (data.url) {
@@ -149,24 +149,14 @@ $(function () {
     });
 
     window.updateAlert = function (text, c) {
-        text = text || 'default';
-        c = c || false;
-        if (text != 'default') {
-            top_alert.find('.alert-content').text(text);
-            if (top_alert.hasClass('block')) {
-            } else {
-                top_alert.addClass('block').slideDown(200);
-                // content.animate({paddingTop:'+=55'},200);
-            }
-        } else {
-            if (top_alert.hasClass('block')) {
-                top_alert.removeClass('block').slideUp(200);
-                // content.animate({paddingTop:'-=55'},200);
-            }
+
+        if(typeof c !='undefined')
+        {
+            var msg = $.messager.show(text, {placement: 'bottom',type:c});
+        }else {
+            var msg = $.messager.show(text, {placement: 'bottom'})
         }
-        if (c != false) {
-            top_alert.removeClass('alert-error alert-warn alert-info alert-success').addClass(c);
-        }
+        msg.show();
     };
 
 
@@ -306,9 +296,9 @@ function handleAjax(msg) {
 
     //弹出提示消息
     if (msg.status) {
-        updateAlert(msg.info, 'alert-success');
+        updateAlert(msg.info, 'success');
     } else {
-        updateAlert(msg.info, 'alert-error');
+        updateAlert(msg.info, 'error');
     }
 
     //需要跳转的话就跳转
