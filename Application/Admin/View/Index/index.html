@@ -1,28 +1,43 @@
 <extend name="Public/base"/>
 
 <block name="script">
-    <script type="text/javascript" src="__ZUI__/lib/chartjs/chart.min.js"></script>
+    <script type="text/javascript" src="__ZUI__/lib/highchart/highcharts.js"></script>
 </block>
 <block name="body">
+ <!--   <div class="with-padding-lg">
+        <div class="col-xs-6">
+            <div class="alert alert-info with-icon">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <div class="content"><strong>Hi!</strong> 主模块有新的更新。</div>
+            </div>
+        </div>
+       <div class="col-xs-6">
+           <div class="alert alert-info with-icon">
+               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+               <div class="content"><strong>Hi!</strong> 微博模块有新的更新内容。</div>
+           </div>
+       </div>
+    </div>-->
+
     <div class="with-padding-lg">
         <div class="count clearfix">
             <div class="col-xs-4 text-center">
-                <a class="with-padding-lg bg-special">
+                <a href="{:U('action/actionlog')}" class="with-padding-lg bg-special">
                     <i class="icon-tasks"></i>
-                    36
+                    {$count.today_action_log}
                     <br/>
                     今日用户行为
                 </a>
             </div>
             <div class="col-xs-4 text-center">
-                <a class="with-padding-lg bg-info"><i class="icon-user"></i> 15 <br/>
-                    今日新增</a>
+                <a class="with-padding-lg bg-info" href="{:U('user/index')}"><i class="icon-user"></i> {$count.today_user} <br/>
+                    今日新增用户数</a>
             </div>
             <div class="col-xs-4 text-center">
                 <a class="with-padding-lg bg-danger" style="background: rgb(96, 210, 149)" href="{:U('user/index')}">
                     <i class="icon-group">
                     </i>
-                    3000
+                    {$count.total_user}
                     <br/>
                     总用户数
                 </a>
@@ -30,7 +45,7 @@
         </div>
     </div>
     <div class="with-padding-lg">
-        <canvas id="myChart" height="400"></canvas>
+        <div id="myChart" height="400"></div>
     </div>
     <div class="clearfix">
         <div class="col-xs-4">
@@ -43,32 +58,48 @@
 
         </div>
 
+        <php>
+
+        </php>
     </div>
     <script>
-        $('#main-content').css('left',0);
-        $(function(){
-            $(window).resize(
-                 function(){
-                     $('#myChart').attr('width',$('#myChart').parent().width());
-                     var data = {
-                         labels: ["1-08", "1-04", "1-05", "1-06", "1-07", "1-08", "1-09"],
-                         datasets: [
-                             {
-                                 fillColor: "rgba(151,187,205,0.5)",
-                                 strokeColor: "rgba(151,187,205,1)",
-                                 pointColor: "rgba(151,187,205,1)",
-                                 pointStrokeColor: "#fff",
-                                 data: [1, 3, 5, 23, 96, 27, 100]
-                             }
-                         ]
-                     };
-                     var ctx = document.getElementById("myChart").getContext("2d");
-                     new Chart(ctx).Line(data,{scaleShowLabels :true});
+        $('#main-content').css('left', 0);
+        $(function () {
+            $('#myChart').highcharts({
+                chart: {
+                    type: "spline",
+                    style: {
+                        fontFamily: '"Microsoft Yahei", "宋体"'
+                    }
+                },
+                title: {
+                    text: '最近{$count.count_day}天用户增长数',
+                    x: -20 //center
+                },
+                xAxis: {
+                    categories: eval('{$count.last_day.days}'),
+                    title: {
+                        text: '当天新注册会员',
+                        enabled: false
+                    }
+                },
+                yAxis: {
+                    title: ''
+                },
+                legend: {
+                    layout: 'vertical',
+                    verticalAlign: 'middle',
+                    borderWidth: 0,
+                    enabled: false
+                },
+                series: [{
+                    name: '当天新注册会员',
+                    data: eval('{$count.last_day.data}'),
+                    enable: true
+                }], credits: {enabled: false}
+            });
+        });
 
-                 }
-            )
-
-        })
 
     </script>
 </block>
