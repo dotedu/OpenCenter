@@ -29,9 +29,13 @@ class IndexController extends AdminController
 
             if(IS_POST){
                 $count_day=I('post.count_day', C('COUNT_DAY'),'intval');
-                M('Config')->where(array('name'=>'COUNT_DAY'))->setField('value',$count_day);
-                S('DB_CONFIG_DATA',null);
-                $this->success('设置成功。','refresh');
+                if(M('Config')->where(array('name'=>'COUNT_DAY'))->setField('value',$count_day)===false){
+                    $this->error('设置失败。');
+                }else{
+                   S('DB_CONFIG_DATA',null);
+                    $this->success('设置成功。','refresh');
+                }
+
             }else{
                 $this->meta_title = '管理首页';
                 $today = date('Y-m-d', time());

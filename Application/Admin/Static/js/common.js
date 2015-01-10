@@ -73,6 +73,7 @@ $(function () {
                 form = $('.hide-data');
                 query = form.serialize();
             } else if (form.get(0) == undefined) {
+                updateAlert('没有可操作数据。','danger');
                 return false;
             } else if (form.get(0).nodeName == 'FORM') {
                 if ($(this).hasClass('confirm')) {
@@ -298,7 +299,7 @@ function handleAjax(msg) {
     if (msg.status) {
         updateAlert(msg.info, 'success');
     } else {
-        updateAlert(msg.info, 'error');
+        updateAlert(msg.info, 'danger');
     }
 
     //需要跳转的话就跳转
