@@ -2,11 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>ThinkOX跳转提示</title>
+<title>跳转提示</title>
 <style type="text/css">
 *{ padding: 0; margin: 0; }
-body{ background: #290C0C; font-family: '微软雅黑'; color: #fff; font-size: 16px; }
-.system-message{ padding: 24px 48px; }
+body{ background: rgb(79, 138, 208); font-family: '微软雅黑'; color: #fff; font-size: 16px;text-align: center; }
+.system-message{position: fixed;left: 50%;top: 50%;margin-left: -222px;margin-top: -230px}
 .system-message h1{ font-size: 80px; font-weight: normal; line-height: 120px; margin-bottom: 12px }
 .system-message .jump{ padding-top: 10px;margin-bottom:20px}
 .system-message .jump a{ color: #333;}
@@ -24,16 +24,18 @@ body{ background: #290C0C; font-family: '微软雅黑'; color: #fff; font-size: 
     vertical-align: middle;
     cursor: pointer;
     border: 0 none;
-    background-color: #8B0000;
+    background-color: white;
     padding: 10px 20px;
-    color: #fff;
+    color: rgb(79, 138, 208);
+    border-radius: 3px;
     font-weight: bold;
     border-color: transparent;
     text-decoration:none;
 }
 
 #btn-stop:hover,#href:hover{
-    background-color: #ff0000;
+    color: rgba(79, 138, 208,0.9);
+    background: rgba(255,255,255,0.9);
 }
 </style>
 </head>
