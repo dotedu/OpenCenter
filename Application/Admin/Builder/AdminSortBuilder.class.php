@@ -16,6 +16,7 @@ class AdminSortBuilder extends AdminBuilder {
 
     public function title($title) {
         $this->title = $title;
+        $this->meta_title=$title;
         return $this;
     }
 

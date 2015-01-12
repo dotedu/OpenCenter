@@ -25,6 +25,7 @@ class AdminTreeListBuilder extends AdminBuilder
     public function title($title)
     {
         $this->_title = $title;
+        $this->meta_title=$title;
         return $this;
     }
 

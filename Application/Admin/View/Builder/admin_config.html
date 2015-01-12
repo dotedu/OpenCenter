@@ -49,8 +49,8 @@
                                     $checked = $field['value']==$key ? 'checked' : '';
                                     $inputId = "id_$field[name]_$key";
                                 </php>
-                                <input id="{$inputId}" name="{$field.name}" value="{$key}" type="radio" {$checked}/>
-                                <label for="{$inputId}">{$option|htmlspecialchars}</label>
+                                <label for="{$inputId}"> <input id="{$inputId}" name="{$field.name}" value="{$key}" type="radio" {$checked}/>
+                                {$option|htmlspecialchars}</label>
                             </volist>
                         </case>
                         <case value="image">
@@ -112,8 +112,8 @@
                                     $checked = in_array($key,$field['value_array']) ? 'checked' : '';
                                     $inputId = "id_$field[name]_$key";
                                 </php>
-                                <input type="checkbox" value="{$key}" id="{$inputId}" class="oneplus-checkbox" data-field-name="{$field.name}" {$checked}/>
-                                <label for="{$inputId}">{$option|htmlspecialchars}</label>
+                                <label for="{$inputId}"> <input type="checkbox" value="{$key}" id="{$inputId}" class="oneplus-checkbox" data-field-name="{$field.name}" {$checked}/>
+                                {$option|htmlspecialchars}</label>
                                 <input type="hidden" name="{$field.name}" class="oneplus-checkbox-hidden" data-field-name="{$field.name}" value="{$field.value}"/>
                             </volist>
                         </case>
