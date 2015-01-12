@@ -173,7 +173,9 @@ class Dispatcher {
         }
 
         if(!defined('__APP__')){
+            C(api('Config/lists'));//合并入后台设置
 	        $urlMode        =   C('URL_MODEL');
+            //dump($urlMode);exit;
 	        if($urlMode == URL_COMPAT ){// 兼容模式判断
 	            define('PHP_FILE',_PHP_FILE_.'?'.$varPath.'=');
 	        }elseif($urlMode == URL_REWRITE ) {
