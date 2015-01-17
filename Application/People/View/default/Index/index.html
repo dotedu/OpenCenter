@@ -6,15 +6,13 @@
 
 <block name="body">
     <include file="Public/mod_header"/>
-    <div class="row">
+    <div class="clearfix common_block_border with-padding">
         <div class="col-md-12 ">
             <div class="row">
                 <volist name="lists.data" id="vo">
-                    <include file="Public/item" />
-
+                    <include file="Public/item"/>
                 </volist>
             </div>
-
         </div>
 
         <if condition="$lists['count'] eq 0">
@@ -25,10 +23,6 @@
     <div class="pull-right">
         {$lists.html}
     </div>
-    <div>
-
-    </div>
-
 
 </block>
 
@@ -38,5 +32,4 @@
             bindSupport();
         })
     </script>
-
 </block>

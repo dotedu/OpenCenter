@@ -99,10 +99,10 @@ class ModuleModel extends Model
         $module = $this->where(array('name' => $name))->find();
         if (!$module) {
             $m = $this->getInfo($name);
-            if($m['can_uninstall']){
+            if ($m['can_uninstall']) {
                 $m['is_setup'] = 0;//默认设为已安装，防止已安装的模块反复安装。
-            }else{
-                $m['is_setup']=1;
+            } else {
+                $m['is_setup'] = 1;
             }
             $m['id'] = $this->add($m);
             return $m;
@@ -113,8 +113,13 @@ class ModuleModel extends Model
 
     private function getInfo($name)
     {
-        $module = require(APP_PATH . '/' . $name . '/Info/info.php');
-        return $module;
+        if (file_exists(APP_PATH . '/' . $name . '/Info/info.php')) {
+            $module = require(APP_PATH . '/' . $name . '/Info/info.php');
+            return $module;
+        } else {
+            return array();
+        }
+
     }
 
     /**
@@ -147,5 +152,16 @@ class ModuleModel extends Model
         return $files;
 
 
+    }
+
+
+    public function isInstalled($name)
+    {
+        $module = $this->getModule($name);
+        if ($module['is_setup']) {
+            return true;
+        } else {
+            return false;
+        }
     }
 } 

@@ -24,6 +24,7 @@ return array(
         '__IMG__' => __ROOT__ . '/Public/' . MODULE_NAME . '/images',
         '__CSS__' => __ROOT__ . '/Public/' . MODULE_NAME . '/css',
         '__JS__' => __ROOT__ . '/Public/' . MODULE_NAME . '/js',
+
     ),
     /* URL配置 */
     'URL_MODEL' => 3, //URL模式

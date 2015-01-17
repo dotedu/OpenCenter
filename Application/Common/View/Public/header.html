@@ -1,5 +1,5 @@
 <include file="Public/right_chat_panel"/>
-<php> D('Home/Member')->need_login();</php>
+<php> //D('Home/Member')->need_login();</php>
 <!--[if lt IE 8]>
 <div class="alert alert-danger" style="margin-bottom: 0">您正在使用 <strong>过时的</strong> 浏览器. 是时候 <a target="_blank" href="http://browsehappy.com/">更换一个更好的浏览器</a> 来提升用户体验.</div>
 <![endif]-->
@@ -7,11 +7,20 @@
 <php>
     $unreadMessage=D('Common/Message')->getHaventReadMeassageAndToasted(is_login());
 </php>
-<div id="nav_bar" class="nav_bar " style="margin-bottom: 25px;">
+<div id="nav_bar" class="nav_bar">
     <nav class="container" id="nav_bar_container" role="navigation">
-        <div class="collapse navbar-collapse " id="nav_bar_main">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">打开下拉菜单</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{:U('Home/Index/index')}">Open Center <sub>开源用户中心</sub></a>
 
-            <ul class="nav navbar-nav  " style="font-size: 16px">
+        </div>
+        <div class="collapse navbar-collapse " id="nav_bar_main">
+            <ul class="nav navbar-nav">
                 <think:nav name="nav">
                     <eq name="nav.pid" value="0">
                         <php>
@@ -19,7 +28,7 @@
                             if($children){
                         </php>
                         <li class="dropdown">
-                            <a class="dropdown-toggle nav_item" data-toggle="dropdown" href="#" style="color:{$nav.color}">
+                            <a class="dropdown-toggle nav_item" data-toggle="dropdown" href="#" style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i>
 
                                 {$nav.title} <span class="caret"></span><neq name="nav.band_text" value="" > <span class="badge" style="background: {$nav.band_color}">{$nav.band_text}</span></neq>
                             </a>
@@ -35,7 +44,7 @@
                         <php>}else{</php>
                         <li class="<eq name='nav.url|get_nav_active' value='1'>active<else/></eq>">
                             <a href="{$nav.url|get_nav_url}"
-                               target="<eq name='nav.target' value='1'>_blank<else/>_self</eq>" style="color:{$nav.color}">{$nav.title}<neq name="nav.band_text" value="" >  <span class="badge" style="background: {$nav.band_color}">{$nav.band_text}</span></neq></a>
+                               target="<eq name='nav.target' value='1'>_blank<else/>_self</eq>" style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i> {$nav.title}<neq name="nav.band_text" value="" >  <span class="badge" style="background: {$nav.band_color}">{$nav.band_text}</span></neq></a>
                         </li>
                         <php>}</php>
                     </eq>
@@ -52,7 +61,7 @@
                     <li class="dropdown op_nav_ico hidden-xs hidden-sm">
                         <div></div>
                         <a id="nav_info" class="dropdown-toggle text-left" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon-bell"></span>
+                            <span class="icon-bell-alt"></span>
                             <span id="nav_bandage_count"
                             <if condition="count($unreadMessage) eq 0"> style="display: none"</if>
                             class="badge pull-right">{:count($unreadMessage)}</span>
@@ -96,15 +105,15 @@
                                 </div>
                             </li>
                             <li class="external">
-                                <a href="{:U('Usercenter/Message/message')}">
-                                    消息中心 <i class="glyphicon glyphicon-circle-arrow-right"></i>
+                                <a href="{:U('ucenter/Message/message')}">
+                                    消息中心 <i class="icon-message"></i>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a style="margin-right: 15px;" title="修改资料" href="{:U('Usercenter/Config/index')}"><i
-                                class="glyphicon glyphicon-cog"></i></a>
+                        <a style="margin-right: 15px;" title="修改资料" href="{:U('ucenter/Config/index')}"><i
+                                class="icon-cog"></i></a>
                     </li>
                     <li class="top_spliter hidden-xs"></li>
                     <li class="dropdown">
@@ -113,20 +122,20 @@
                         </php>
                         <a role="button" class="dropdown-toggle dropdown-toggle-avatar" data-toggle="dropdown">
                             {$common_header_user.nickname}&nbsp;<i style="font-size: 12px"
-                                                                   class="glyphicon glyphicon-chevron-down"></i>
+                                                                   class="icon-chevron-down"></i>
                         </a>
                         <ul class="dropdown-menu text-left" role="menu">
-                            <li><a href="{:U('UserCenter/Index/index')}"><span
+                            <li><a href="{:U('ucenter/Index/index')}"><span
                                     class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;个人主页</a>
                             </li>
-                            <li><a href="{:U('Usercenter/message/message')}"><span
+                            <li><a href="{:U('ucenter/message/message')}"><span
                                     class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;消息中心</a>
                             </li>
-                            <li><a href="{:U('Usercenter/Collection/index')}"><span
+                            <li><a href="{:U('ucenter/Collection/index')}"><span
                                     class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;我的收藏</a>
                             </li>
 
-                            <li><a href="{:U('Usercenter/Index/rank')}"><span
+                            <li><a href="{:U('ucenter/Index/rank')}"><span
                                     class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;我的头衔</a>
                             </li>
                             {:hook('personalMenus')}
@@ -143,10 +152,10 @@
                     <else/>
                     <li class="top_spliter hidden-xs"></li>
                     <li class="hidden-xs">
-                        <a href="{:U('Home/User/login')}">登录</a>
+                        <a href="{:U('Ucenter/Member/login')}">登录</a>
                     </li>
                     <li class="hidden-xs">
-                        <a href="{:U('Home/User/register')}">注册</a>
+                        <a href="{:U('Ucenter/Member/register')}">注册</a>
                     </li>
                     <li class="spliter hidden-xs"></li>
                 </if>

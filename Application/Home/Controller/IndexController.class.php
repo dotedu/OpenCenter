@@ -9,7 +9,6 @@
 
 namespace Home\Controller;
 
-use OT\DataDictionary;
 
 /**
  * 前台首页控制器
@@ -22,14 +21,13 @@ class IndexController extends HomeController
     public function index()
     {
         hook('homeIndex');
-        $default_url=C('DEFUALT_HOME_URL');//获得配置，如果为空则显示聚合，否则跳转
-        if($default_url!=''){
+        $default_url = C('DEFUALT_HOME_URL');//获得配置，如果为空则显示聚合，否则跳转
+        if ($default_url != '') {
             redirect(get_nav_url($default_url));
         }
 
         $this->display();
     }
-
 
 
     /**
@@ -38,7 +36,7 @@ class IndexController extends HomeController
     public function getSmile()
     {
         //这段代码不是测试代码，请勿删除
-        exit(json_encode(D('Common/Expression')->getAllExpression()));
+        exit(json_encode(D('Common/ ')->getAllExpression()));
     }
 
 }

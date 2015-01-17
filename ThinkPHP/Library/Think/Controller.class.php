@@ -65,6 +65,14 @@ abstract class Controller
      */
     public function __construct()
     {
+        /*读取站点配置*/
+        $config = api('Config/lists');
+        C($config); //添加配置
+
+        if (!C('WEB_SITE_CLOSE') && strtolower(MODULE_NAME) != 'admin') {
+            header("Content-Type: text/html; charset=utf-8");
+            exit('站点已经关闭，请稍后访问~');
+        }
         if (strtolower(MODULE_NAME) != 'install') {
             $moduleModel = D('Common/Module');
             $moduleModel->checkCanVisit(MODULE_NAME);

@@ -94,7 +94,7 @@ function query_user($fields = null, $uid = null)
 
     //读取等级数据
     if (in_array('title', $fields)) {
-        $titleModel = D('Usercenter/Title');
+        $titleModel = D('Title');
         $title = $titleModel->getTitle($uid);
         $result['title'] = $title;
     }
@@ -108,7 +108,7 @@ function query_user($fields = null, $uid = null)
     //获取个人中心地址
     $spaceUrlResult = array();
     if (in_array('space_url', $fields)) {
-        $result['space_url'] = U('UserCenter/Index/index', array('uid' => $uid));
+        $result['space_url'] = U('Ucenter/Index/index', array('uid' => $uid));
     }
 
     if (in_array('nickname', $fields)) {
@@ -121,7 +121,7 @@ function query_user($fields = null, $uid = null)
             $res=query_user(array('nickname'),$uid);
             $ucenterResult['nickname']=$res['nickname'];
         }
-        $result['space_link'] = '<a ucard="' . $uid . '" target="_blank" href="' . U('UserCenter/Index/index', array('uid' => $uid)) . '">' . $ucenterResult['nickname'] . '</a>';
+        $result['space_link'] = '<a ucard="' . $uid . '" target="_blank" href="' . U('Ucenter/Index/index', array('uid' => $uid)) . '">' . $ucenterResult['nickname'] . '</a>';
     }
     
     //获取用户头衔链接
