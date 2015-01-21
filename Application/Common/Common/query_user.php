@@ -94,7 +94,7 @@ function query_user($fields = null, $uid = null)
 
     //读取等级数据
     if (in_array('title', $fields)) {
-        $titleModel = D('Title');
+        $titleModel = D('Ucenter/Title');
         $title = $titleModel->getTitle($uid);
         $result['title'] = $title;
     }
@@ -206,6 +206,7 @@ function query_user($fields = null, $uid = null)
         $result['is_followed'] = $follow ? true : false;
     }
 
+    //TODO 在此加入扩展字段的处理钩子
     //↑↑↑ 新增字段应该写在在这行注释以上 ↑↑↑
 
     //合并结果，不包括缓存

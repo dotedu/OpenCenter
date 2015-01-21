@@ -31,8 +31,7 @@ class SystemController extends BaseController
     public function logout()
     {
         //调用退出登录的API
-        $result = callApi('Public/logout');
-        $this->ensureApiSuccess($result);
+        D('Member')->logout();
         $html='';
         if(UC_SYNC && is_login() != 1){
             include_once './api/uc_client/client.php';
@@ -40,7 +39,7 @@ class SystemController extends BaseController
         }
 
 
-        exit(json_encode(array('message' => $result['message'], 'url' => U('Home/Index/index'),'html'=>$html)));
+        exit(json_encode(array('message' =>'退出登陆成功。','url' => U('Home/Index/index'),'html'=>$html)));
         //显示页面
         //$this->success($result['message'], U('Home/Index/index'));
     }

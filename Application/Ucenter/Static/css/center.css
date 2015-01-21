@@ -42,24 +42,6 @@
   height: 18px;
   vertical-align: middle;
 }
-.ucenter_tab {
-  padding-left: 20px;
-}
-.ucenter_tab li {
-  float: left;
-}
-.ucenter_tab li a {
-  background: none;
-  font-size: 16px;
-  margin-right: 1em;
-}
-.ucenter_tab li a:hover {
-  border-bottom: 3px solid #03ae87;
-}
-.ucenter_tab .active a {
-  color: #666 !important;
-  border-bottom: 3px solid #03ae87;
-}
 .expandinfo-noticeinfo {
   margin-left: 30px;
   color: #A59F9F;
