@@ -171,17 +171,16 @@ class AvatarAddon extends Addon
             return $path = $upload['image']['path']; //sae上最终取图方式
 
         } else {
-            return $upload['image']['url']?$upload['image']['url']:$upload['image']['savepath'] . $upload['image']['savename'];
+            return $upload['image']['url'] ? $upload['image']['url'] : $upload['image']['savepath'] . $upload['image']['savename'];
         }
 
     }
 
     private function getFullPath($path)
     {
-        if(is_bool(strpos($path,'http://'))){
+        if (is_bool(strpos($path, 'http://'))) {
             return "./Uploads/Avatar/$path";
-        }
-        else{
+        } else {
             return $path;
         }
 
@@ -246,7 +245,7 @@ class AvatarAddon extends Addon
 
             //返回新文件的路径
             return $returnPath;
-        } elseif(strtolower(C('PICTURE_UPLOAD_DRIVER'))  == 'sae') {
+        } elseif (strtolower(C('PICTURE_UPLOAD_DRIVER')) == 'sae') {
             //sae
             //载入临时头像
             $f = new \SaeFetchurl();
@@ -277,24 +276,24 @@ class AvatarAddon extends Addon
                 return false;
             }
 
-            $img->crop($x / $img_attr[0], ($x+$width) / $img_attr[0], ($y) / $img_attr[1], ($y+$height) /  $img_attr[1]);
+            $img->crop($x / $img_attr[0], ($x + $width) / $img_attr[0], ($y) / $img_attr[1], ($y + $height) / $img_attr[1]);
             $new_data = $img->exec();
             $storage = new \SaeStorage();
             $thumbFilePath = str_replace(C('UPLOAD_SAE_CONFIG.rootPath'), '', dirname($savePath) . '/' . basename($savePath));
             $thumbed = $storage->write(C('UPLOAD_SAE_CONFIG.domain'), $thumbFilePath, $new_data);
             //返回新文件的路径
             return $thumbed;
-        } elseif(strtolower(C('PICTURE_UPLOAD_DRIVER'))== 'qiniu') {
+        } elseif (strtolower(C('PICTURE_UPLOAD_DRIVER')) == 'qiniu') {
 
-            $imageInfo = file_get_contents( $fullPath.'?imageInfo');
+            $imageInfo = file_get_contents($fullPath . '?imageInfo');
             $imageInfo = json_decode($imageInfo);
 
             //生成将单位换算成为像素
             $x = $x * $imageInfo->width;
             $y = $y * $imageInfo->height;
             $width = $width * $imageInfo->width;
-            $height = $height *$imageInfo->height;
-            $new_img = $fullPath. '?imageMogr2/crop/!'.$width.'x'.$height.'a'.$x.'a'.$y;
+            $height = $height * $imageInfo->height;
+            $new_img = $fullPath . '?imageMogr2/crop/!' . $width . 'x' . $height . 'a' . $x . 'a' . $y;
             //返回新文件的路径
             return $new_img;
         }
@@ -313,7 +312,7 @@ class AvatarAddon extends Addon
         return getRootUrl() . $path;
     }
 
-    public function getAvatarPath($uid,$avatarSize=256)
+    public function getAvatarPath($uid, $avatarSize = 256)
     {
         $model = D('Addons://Avatar/Avatar');
         $avatar = $model->getAvatar($uid);
@@ -321,24 +320,24 @@ class AvatarAddon extends Addon
 
         if ($avatar) {
             if (is_sae()) {
-                $avatar_path=$avatar;
+                $avatar_path = $avatar;
 
-            }else{
-                if(!is_bool(strpos($avatar,'http://'))){
-                    return $avatar.'/thumbnail/'.$avatarSize.'x'.$avatarSize.'!';
-                }
-                else{
-                    $avatar_path="/Uploads/Avatar/$avatar";
+            } else {
+                if (!is_bool(strpos($avatar, 'http://'))) {
+                    return $avatar . '/thumbnail/' . $avatarSize . 'x' . $avatarSize . '!';
+                } else {
+                    $avatar_path = "/Uploads/Avatar/$avatar";
                 }
 
             }
-           return getImageUrlByPath($avatar_path,$avatarSize);
-        }else{
+            return getImageUrlByPath($avatar_path, $avatarSize);
+        } else {
             //如果没有头像，返回默认头像
-            if($avatarSize!=0){
-                return getRootUrl()."Addons/Avatar/default_".$avatarSize."_".$avatarSize.".jpg";
-            }else{
-                return getRootUrl()."Addons/Avatar/default.jpg";
+            if ($avatarSize != 0) {
+                $default_avatar = getRootUrl() . "Addons/Avatar/default.jpg";
+                return getImageUrlByPath($default_avatar, $avatarSize);
+            } else {
+                return getRootUrl() . "Addons/Avatar/default.jpg";
             }
 
         }
@@ -353,15 +352,14 @@ class AvatarAddon extends Addon
         $avatar = $model->getTempAvatar($uid);
 
         if ($avatar) {
-            if (!is_bool(strpos($avatar,'http://'))) {
+            if (!is_bool(strpos($avatar, 'http://'))) {
                 return $avatar;
             }
-            return getRootUrl()."Uploads/Avatar/$avatar";
+            return getRootUrl() . "Uploads/Avatar/$avatar";
         }
 
         return '';
     }
-
 
 
     /**
