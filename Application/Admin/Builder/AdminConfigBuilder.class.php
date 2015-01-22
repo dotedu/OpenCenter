@@ -15,6 +15,7 @@ class AdminConfigBuilder extends AdminBuilder
     private $_data = array();
     private $_buttonList = array();
     private $_savePostUrl = array();
+    private $_group = array();
 
     public function title($title)
     {
@@ -190,11 +191,27 @@ class AdminConfigBuilder extends AdminBuilder
         }
 
         //显示页面
+        $this->assign('group', $this->_group);
         $this->assign('title', $this->_title);
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('savePostUrl', $this->_savePostUrl);
         parent::display('admin_config');
+    }
+
+
+
+    public function group($name,$list = array()){
+        !is_array($list) && $list = explode(',',$list);
+        $this->_group[$name] = $list;
+        return $this;
+    }
+
+    public function groups($list = array()){
+        foreach($list as $key =>$v){
+            $this->_group[$key] =  is_array($v) ? $v :explode(',',$v);
+        }
+        return $this;
     }
 
     /**自动处理配置存储事件，配置项必须全大写

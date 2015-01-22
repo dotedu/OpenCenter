@@ -69,7 +69,7 @@ abstract class Controller
         $config = api('Config/lists');
         C($config); //添加配置
 
-        if (!C('WEB_SITE_CLOSE') && strtolower(MODULE_NAME) != 'admin') {
+        if (!C('WEB_SITE_CLOSE') && strtolower(MODULE_NAME) != 'admin' && strtolower(MODULE_NAME) != 'install') {
             header("Content-Type: text/html; charset=utf-8");
             exit('站点已经关闭，请稍后访问~');
         }
