@@ -235,23 +235,7 @@ class AuthManagerController extends AdminController
         $this->display();
     }
 
-    /**
-     * 将分类添加到用户组的编辑页面
-     * @author 朱亚杰 <zhuyajie@topthink.net>
-     */
-    public function category()
-    {
-        $auth_group = M('AuthGroup')->where(array('status' => array('egt', '0'), 'module' => 'admin', 'type' => AuthGroupModel::TYPE_ADMIN))
-            ->getfield('id,id,title,rules');
-        $group_list = D('Category')->getTree();
-        $authed_group = AuthGroupModel::getCategoryOfGroup(I('group_id'));
-        $this->assign('authed_group', implode(',', (array)$authed_group));
-        $this->assign('group_list', $group_list);
-        $this->assign('auth_group', $auth_group);
-        $this->assign('this_group', $auth_group[(int)$_GET['group_id']]);
-        $this->meta_title = '分类授权';
-        $this->display();
-    }
+
 
     public function tree($tree = null)
     {

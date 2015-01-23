@@ -45,6 +45,8 @@ class WeiboController extends AdminController
         $attr0 = $attr;
         $attr0['url'] = $builder->addUrlParam(U('setWeiboTop'), array('top' => 0));
 
+
+
         $builder->title('微博管理')
             ->setStatusUrl(U('setWeiboStatus'))->buttonEnable()->buttonDisable()->buttonDelete()->button('置顶', $attr1)->button('取消置顶', $attr0)
             ->keyId()->keyLink('content', '内容', 'comment?weibo_id=###')->keyUid()->keyCreateTime()->keyStatus()
