@@ -21,6 +21,80 @@
 <div id="center">
     <div id="center_base">
         <div class="with-padding">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div id="center_account">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h4 onclick="center_toggle('account')"><i class="icon-list-alt"></i>&nbsp;账户资料
+
+                        <a class="pull-right" id="toggle_account"
+                                >
+                            编辑
+                            <i id="account_toggle_right" title="展开" class="center_arrow_right"></i>
+                            <i id="account_toggle_bottom" title="收起" class="center_arrow_bottom"
+                               style="display: none"></i>
+                        </a>
+                    </h4>
+                    <hr class="center_line"/>
+                </div>
+            </div>
+
+            <div id="account_panel" class="row center_panel" >
+                <div class="col-md-8 center_info form-horizontal">
+
+
+                        <div class="form-group">
+                            <label for="aUsername" class="col-sm-2 control-label">用户名</label>
+
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="aUsername"   value=""  placeholder="用户名">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aEmail" class="col-sm-2 control-label">邮箱</label>
+
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control" id="aEmail" placeholder="邮箱" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aMobile" class="col-sm-2 control-label">手机</label>
+
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="aMobile" placeholder="手机">
+                            </div>
+                        </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
             <div class="row">
                 <div class="col-xs-12">
                     <h4 onclick="center_toggle('base')"><i class="icon-list-alt"></i>&nbsp;基本资料
@@ -36,7 +110,7 @@
                 </div>
             </div>
 
-            <div class="row center_panel" id="base_panel">
+            <div class="row center_panel" id="base_panel" style="display: none">
                 <div class="col-md-8">
                     <form class="form-horizontal center_info ajax-form" role="form"
                           action="{:U('Ucenter/Config/index')}" method="post">

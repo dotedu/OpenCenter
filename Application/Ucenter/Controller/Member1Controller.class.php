@@ -18,38 +18,25 @@ class MemberController extends Controller
 {
 
     /* 注册页面 */
-    public function register()
+    public function register($username = '', $nickname = '', $password = '', $email = '', $verify = '', $type = 'start')
     {
-        //获取参数
-        $aUsername = I('post.username','','op_t');
-        $aNickname= I('post.nickname','','op_t');
-        $aPassword = I('post.password','','op_t');
-        $aVerify = I('post.verify','','op_t');
-        $aUnType = I('post.untype',0,'intval');
-        $aType = I('get.type','start','op_t');
-
-
-        if (! modC('REG_SWITCH','','USERCONFIG')) {
+        $type = op_t($type);
+        if (!C('USER_ALLOW_REGISTER')) {
             $this->error('注册已关闭');
         }
         if (IS_POST) { //注册用户
             /* 检测验证码 */
-/*            if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
-                if (!check_verify($aVerify)) {
+            if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
+                if (!check_verify($verify)) {
                     $this->error('验证码输入错误。');
                 }
-            }*/
+            }
 
-
-            $aUnType = $aUnType > 2 && $aUnType< 0 ?  0 : $aUnType;
-
-            //获取注册类型
-            check_username($aUsername,$email,$mobile,$aUnType);
-            /* 注册用户 */
-            $uid = D('User/UcenterMember')->register($aUsername, $aNickname, $aPassword, $email,$mobile,$aUnType);
-
+            /* 调用注册接口注册用户 */
+            $User = new UserApi;
+            $uid = $User->register($username, $nickname, $password, $email);
             if (0 < $uid) { //注册成功
-                $uid = D('User/UcenterMember')->login($aUsername, $aPassword,$aUnType);//通过账号密码取到uid
+                $uid = $User->login($username, $password);//通过账号密码取到uid
                 D('Member')->login($uid, false);//登陆
                 $reg_weibo = C('USER_REG_WEIBO_CONTENT');//用户注册的微博内容
                 if ($reg_weibo != '') {//为空不发微博
@@ -64,7 +51,7 @@ class MemberController extends Controller
             if (is_login()) {
                 redirect(U('Weibo/Index/index'));
             }
-            $this->assign('type', $aType);
+            $this->assign('type', $type);
             $this->display();
         }
     }
@@ -96,32 +83,25 @@ class MemberController extends Controller
     }
 
     /* 登录页面 */
-    public function login()
+    public function login($username = '', $password = '', $verify = '', $remember = '')
     {
         $this->setTitle('用户登录');
-
-        $aUsername = $username = I('post.username','','op_t');
-        $aPassword = I('post.password','','op_t');
-        $aVerify = I('post.verify','','op_t');
-        $aRemember = I('post.remember',0,'intval');
-
-
 
         if (IS_POST) { //登录验证
             /* 检测验证码 */
             if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 3) {
-                if (!check_verify($aVerify)) {
+                if (!check_verify($verify)) {
                     $this->error('验证码输入错误。');
                 }
             }
 
             /* 调用UC登录接口登录 */
-            check_username($aUsername,$email,$mobile,$aUnType);
-            $uid = D('User/UcenterMember')->login($username, $aPassword,$aUnType);
+            $user = new UserApi;
+            $uid = $user->login($username, $password);
             if (0 < $uid) { //UC登录成功
                 /* 登录用户 */
                 $Member = D('Member');
-                if ($Member->login($uid, $aRemember == 'on')) { //登录用户
+                if ($Member->login($uid, $remember == 'on')) { //登录用户
                     //TODO:跳转到登录前页面
 
                     if (UC_SYNC && $uid != 1) {

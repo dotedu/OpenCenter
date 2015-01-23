@@ -22,42 +22,42 @@ class ConfigController extends BaseController
 
     }
 
-    public function index($uid = null, $tab = '', $nickname = '', $sex = 0, $email = '', $signature = ''
-        , $community = 0, $district = 0, $city = 0, $province = 0)
+    public function index($uid = null, $tab = '', $nickname = '', $sex = 0, $email = '', $signature = '' , $community = 0, $district = 0, $city = 0, $province = 0)
     {
 
+        $aUid = I('get.uid',is_login(),'intval');
+        $aTab = I('get.tab','','op_t');
+        $aNickname = I('post.nickname','','op_t');
+        $aSex = I('post.sex',0,'intval');
+        $aEmail = I('post.email','','op_t');
+        $aSignature = I('post.signature','','op_t');
+        $aCommunity = I('post.community',0,'intval');
+        $aDistrict = I('post.district',0,'intval');
+        $aCity = I('post.city',0,'intval');
+        $aProvince = I('post.province',0,'intval');
+
         if (IS_POST) {
-            $nickname = op_t(trim($nickname));
-            $signature = op_t(trim($signature));
-            $sex = intval($sex);
-            $email = op_t(trim($email));
-            $province = intval(trim($province));
-            $city = intval(trim($city));
-            $community = intval(trim($community));
-            $district = intval(trim($district));
+            $this->checkNickname($aNickname);
+            $this->checkSex($aSex);
+            $this->checkEmail($aEmail);
+            $this->checkSignature($aSignature);
 
 
-            $this->checkNickname($nickname);
-            $this->checkSex($sex);
-            $this->checkEmail($email);
-            $this->checkSignature($signature);
+            $user['pos_province'] = $aProvince;
+            $user['pos_city'] = $aCity;
+            $user['pos_district'] = $aDistrict;
+            $user['pos_community'] = $aCommunity;
 
-
-            $user['pos_province'] = $province;
-            $user['pos_city'] = $city;
-            $user['pos_district'] = $district;
-            $user['pos_community'] = $community;
-
-            $user['nickname'] = $nickname;
-            $user['sex'] = intval($sex);
-            $user['signature'] = $signature;
+            $user['nickname'] = $aNickname;
+            $user['sex'] = $aSex;
+            $user['signature'] = $aSignature;
             $user['uid'] = get_uid();
 
-            $rs_member = D('Home/Member')->save($user);
+            $rs_member = D('Member')->save($user);
 
             $ucuser['id'] = get_uid();
-            $ucuser['email'] = $email;
-            $rs_ucmember = D('UcenterMember')->save($ucuser);
+            $ucuser['email'] = $aEmail;
+            $rs_ucmember = D('User/UcenterMember')->save($ucuser);
             clean_query_user_cache(get_uid(), array('nickname', 'sex', 'signature', 'email', 'pos_province', 'pos_city', 'pos_district', 'pos_community'));
 
             //TODO tox 清空缓存
@@ -71,11 +71,15 @@ class ConfigController extends BaseController
         } else {
             //调用API获取基本信息
             //TODO tox 获取省市区数据
-            $user = query_user(array('nickname', 'signature', 'email', 'mobile', 'avatar128', 'rank_link', 'sex', 'pos_province', 'pos_city', 'pos_district', 'pos_community'), $uid);
+            $user = query_user(array('nickname', 'signature', 'email', 'mobile', 'avatar128', 'rank_link', 'sex', 'pos_province', 'pos_city', 'pos_district', 'pos_community'), $aUid);
             //显示页面
             $this->assign('user', $user);
-            $tab = op_t($tab);
-            $this->assign('tab', $tab);
+
+
+
+
+
+            $this->assign('tab', $aTab);
             $this->getExpandInfo();
             $this->display();
         }
