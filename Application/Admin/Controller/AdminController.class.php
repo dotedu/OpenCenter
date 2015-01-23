@@ -475,4 +475,7 @@ class AdminController extends Controller
         return $model->field($field)->select();
     }
 
+    public function  _empty(){
+        $this->error('zhaoibuda');
+    }
 }

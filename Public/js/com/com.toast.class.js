@@ -8,66 +8,24 @@ var toast = {
      * @param text 内容
      * @param title 标题
      */
-    success: function (text, title) {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "positionClass": "toast-center",
-            "onclick": null,
-            "showDuration": "1000",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        }
-        toastr.success(text, title);
+    success: function (text) {
+       $.messager.show(text, {placement: 'bottom',type:'success'});
     },
     /**
      * 失败提示
      * @param text 内容
      * @param title 标题
      */
-    error: function (text, title) {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "positionClass": "toast-center",
-            "onclick": null,
-            "showDuration": "1000",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        }
-        toastr.error(text, title);
+    error: function (text) {
+       $.messager.show(text, {placement: 'bottom',type:'error'});
     },
     /**
      * 信息提示
      * @param text 内容
      * @param title 标题
      */
-    info: function (text, title) {
-        toastr.options = {
-            "closeButton": false,
-            "debug": false,
-            "positionClass": "toast-center",
-            "onclick": null,
-            "showDuration": "1000",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        }
-        toastr.info(text, title);
+    info: function (text) {
+        $.messager.show(text, {placement: 'bottom',type:'info'});
     },
     /**
      * 警告提示
@@ -75,20 +33,6 @@ var toast = {
      * @param title 标题
      */
     warning: function (text, title) {
-        toastr.options = {
-            "closeButton": false,
-            "debug": false,
-            "positionClass": "toast-center",
-            "onclick": null,
-            "showDuration": "1000",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        }
-        toastr.warning(text, title);
+        $.messager.show(text, {placement: 'bottom',type:'warning'});
     }
 }

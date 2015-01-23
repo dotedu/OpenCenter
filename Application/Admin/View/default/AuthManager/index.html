@@ -11,8 +11,8 @@
         <a url="{:U('changestatus',array('method'=>'forbidGroup'))}" class="btn ajax-post" target-form="ids" >禁 用</a>
         <a url="{:U('changestatus',array('method'=>'deleteGroup'))}" class="btn ajax-post confirm" target-form="ids" >删 除</a>
         &nbsp; &nbsp; &nbsp; &nbsp;
-        <a class="btn" href="{:U('Admin/menu/add')}">新增后台菜单</a>
-        <a class="btn" href="{:U('addNode')}">新增前台权限节点</a>
+        <a target="_blank" class="btn" href="{:U('Admin/menu/add')}">新增后台菜单（后台权限节点）</a>
+        <a target="_blank" class="btn" href="{:U('addNode')}">新增前台权限节点</a>
     </div>
 	<!-- 数据列表 -->
 	<div class="data-table with-padding">
@@ -37,8 +37,8 @@
 			<td><span>{:mb_strimwidth($vo['description'],0,60,"...","utf-8")}</span></td>
 
 
-			<td><a href="{:U('AuthManager/access?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >访问授权</a>
-			<a href="{:U('AuthManager/category?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >分类授权</a>
+			<td><a href="{:U('AuthManager/access?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >后台管理授权</a>
+                <a href="{:U('AuthManager/accessuser?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >前台访问授权</a>
 			<a href="{:U('AuthManager/user?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >成员授权</a>
 			</td>
 			<td>{$vo.status_text}</td>
