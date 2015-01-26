@@ -49,7 +49,7 @@ class UcenterMemberModel extends Model
         array('email', '', -8, self::EXISTS_VALIDATE, 'unique'), //邮箱被占用
 
         /* 验证手机号码 */
-        array('mobile', '//', -9, self::EXISTS_VALIDATE), //手机格式不正确 TODO:
+        array('mobile', '/^(1[3|4|5|8])[0-9]{9}$/', -9, self::EXISTS_VALIDATE), //手机格式不正确 TODO:
         array('mobile', 'checkDenyMobile', -10, self::EXISTS_VALIDATE, 'callback'), //手机禁止注册
         array('mobile', '', -11, self::EXISTS_VALIDATE, 'unique'), //手机号被占用
     );
@@ -127,28 +127,29 @@ class UcenterMemberModel extends Model
      * @param  string $mobile 用户手机号码
      * @return integer          注册成功-用户信息，注册失败-错误编号
      */
-    public function register($username, $nickname, $password, $email, $mobile)
+    public function register($username, $nickname, $password, $email, $mobile,$type)
     {
+
         $data = array(
             'username' => $username,
             'password' => $password,
             'email' => $email,
             'mobile' => $mobile,
+            'type'=>$type,
         );
 
         //验证手机
         if (empty($data['mobile'])) unset($data['mobile']);
+        if (empty($data['username'])) unset($data['username']);
+        if (empty($data['email'])) unset($data['email']);
 
         /* 添加用户 */
         $usercenter_member = $this->create($data);
-
         if ($usercenter_member) {
-
-            $result = D('Home/Member')->registerMember($nickname);
+            $result = D('Member')->registerMember($nickname);
             if ($result > 0) {
                 $usercenter_member['id'] = $result;
                 $uid = $this->add($usercenter_member);
-
                 $this->setDefaultGroup($uid);//设置默认用户组
                 return $uid ? $uid : 0; //0-未知错误，大于0-注册成功
             } else {
@@ -185,6 +186,12 @@ class UcenterMemberModel extends Model
      */
     public function login($username, $password, $type = 1)
     {
+
+        if(UC_SYNC && $username != get_username(1) && $type==1){
+            return $this->ucLogin($username, $password);
+        }
+
+
         $map = array();
         switch ($type) {
             case 1:
@@ -216,6 +223,64 @@ class UcenterMemberModel extends Model
         } else {
             return -1; //用户不存在或被禁用
         }
+    }
+
+
+    public function ucLogin($username,$password){
+        include_once './api/uc_client/client.php';
+        //Ucenter 内数据
+        $uc_user = uc_user_login($username,$password,0);
+        //关联表内数据
+        $uc_user_ref = tox_get_ucenter_user_ref('',$uc_user['0'],'');
+        //登录
+        if($uc_user_ref['uid'] && $uc_user_ref['uc_uid'] && $uc_user[0] > 0 ){
+            return $uc_user_ref['uid'];
+        }
+        //本地帐号信息
+        $tox_user = $this->model->getLocal($username,$password);
+        // 关联表无、UC有、本地无的
+        if( $uc_user[0] > 0 && !$tox_user['id'] ){
+            $uid = $this->register($uc_user[1],$uc_user[1],$uc_user[2],$uc_user[3],'',1);
+            if($uid<=0){
+                return A('Home/User')->showRegError($uid);
+            }
+            $result = tox_add_ucenter_user_ref($uid,$uc_user[0],$uc_user[1],$uc_user[3]);
+            if(!$result){
+                return '用户不存在或密码错误';
+            }
+            return $uid;
+        }
+        // 关联表无、UC有、本地有的
+        if( $uc_user[0] > 0 && $tox_user['id'] > 0 ){
+            $result = tox_add_ucenter_user_ref($tox_user['id'],$uc_user[0],$uc_user[1],$uc_user[3]);
+            if(!$result){
+                return '用户不存在或密码错误';
+            }
+            return  $tox_user['id'];
+        }
+        // 关联表无、UC无、本地有
+        if( $uc_user[0] < 0 && $tox_user['id'] > 0 ){
+            //写入UC
+            $uc_uid = uc_user_register($tox_user['username'], $password, $tox_user['email'],'','', get_client_ip());
+            if($uc_uid <= 0 ){
+                return 'UC帐号注册失败，请联系管理员';
+            }
+            //写入关联表
+            if( M('ucenter_user_link')->where(array('uid'=>$tox_user['id']))->find()){
+                $result = tox_update_ucenter_user_ref($tox_user['id'],$uc_uid,$tox_user['username'],$tox_user['email']);
+            }
+            else{
+                $result = tox_add_ucenter_user_ref($tox_user['id'],$uc_uid,$tox_user['username'],$tox_user['email']);
+            }
+            if(!$result){
+                return '用户不存在或密码错误';
+            }
+            return $tox_user['id'];
+        }
+
+        //关联表无、UC无、本地无的
+        return '用户不存在';
+
     }
 
 

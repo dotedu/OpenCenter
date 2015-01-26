@@ -1298,6 +1298,7 @@ require_once(APP_PATH . '/Common/Common/type.php');
 require_once(APP_PATH . '/Common/Common/cache.php');
 require_once(APP_PATH . '/Common/Common/vendors.php');
 require_once(APP_PATH . '/Common/Common/parse.php');
+require_once(APP_PATH . '/Common/Common/user.php');
 /*require_once(APP_PATH . '/Common/Common/extend.php');*/
 function tox_addons_url($url, $param)
 {
@@ -1383,6 +1384,18 @@ function tox_get_headers($url)
     return $r;
 }
 
+
+
+/**
+ * 生成系统AUTH_KEY
+ * @author 麦当苗儿 <zuojiazi@vip.qq.com>
+ */
+function build_auth_key(){
+    $chars  = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    // $chars .= '`~!@#$%^&*()_+-=[]{};:"|,.<>/?';
+    $chars  = str_shuffle($chars);
+    return substr($chars, 0, 40);
+}
 
 require_once(APP_PATH . 'Common/Conf/config_ucenter.php');
 
