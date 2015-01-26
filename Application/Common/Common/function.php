@@ -1340,15 +1340,26 @@ function getSubByKey($pArray, $pKey = "", $pCondition = "")
     }
 }
 
+
 /**
- * create_rand  随机生成一个字符串
- * @param int $length 字符串的长度
+ * create_rand随机生成一个字符串
+ * @param int $length  字符串的长度
+ * @param string $type  类型
  * @return string
- * @author:xjw129xjt xjt@ourstu.com
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
  */
-function create_rand($length = 8)
+function create_rand($length = 8,$type='all')
 {
-    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $num = '0123456789';
+    $letter = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if($type == 'num'){
+        $chars = $num;
+    }elseif($type=='letter'){
+        $chars = $letter;
+    }else{
+        $chars = $letter.$num;
+    }
+
     $str = '';
     for ($i = 0; $i < $length; $i++) {
         $str .= $chars[mt_rand(0, strlen($chars) - 1)];
@@ -1399,4 +1410,19 @@ function build_auth_key(){
 
 require_once(APP_PATH . 'Common/Conf/config_ucenter.php');
 
+
+/**
+ * get_some_day  获取n天前0点的时间戳
+ * @param int $some  n天
+ * @param null $day   当前时间
+ * @return int|null
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
+function get_some_day($some=30,$day=null){
+    $time = $day?$day:time();
+    $some_day = $time-60*60*24*$some;
+    $btime = date('Y-m-d'.' 00:00:00',$some_day);
+    $some_day = strtotime($btime);
+    return $some_day;
+}
 

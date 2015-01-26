@@ -22,19 +22,19 @@ class ConfigController extends BaseController
 
     }
 
-    public function index($uid = null, $tab = '', $nickname = '', $sex = 0, $email = '', $signature = '' , $community = 0, $district = 0, $city = 0, $province = 0)
+    public function index($uid = null, $tab = '', $nickname = '', $sex = 0, $email = '', $signature = '', $community = 0, $district = 0, $city = 0, $province = 0)
     {
 
-        $aUid = I('get.uid',is_login(),'intval');
-        $aTab = I('get.tab','','op_t');
-        $aNickname = I('post.nickname','','op_t');
-        $aSex = I('post.sex',0,'intval');
-        $aEmail = I('post.email','','op_t');
-        $aSignature = I('post.signature','','op_t');
-        $aCommunity = I('post.community',0,'intval');
-        $aDistrict = I('post.district',0,'intval');
-        $aCity = I('post.city',0,'intval');
-        $aProvince = I('post.province',0,'intval');
+        $aUid = I('get.uid', is_login(), 'intval');
+        $aTab = I('get.tab', '', 'op_t');
+        $aNickname = I('post.nickname', '', 'op_t');
+        $aSex = I('post.sex', 0, 'intval');
+        $aEmail = I('post.email', '', 'op_t');
+        $aSignature = I('post.signature', '', 'op_t');
+        $aCommunity = I('post.community', 0, 'intval');
+        $aDistrict = I('post.district', 0, 'intval');
+        $aCity = I('post.city', 0, 'intval');
+        $aProvince = I('post.province', 0, 'intval');
 
         if (IS_POST) {
             $this->checkNickname($aNickname);
@@ -75,9 +75,7 @@ class ConfigController extends BaseController
             //显示页面
             $this->assign('user', $user);
 
-
-
-
+            $this->accountInfo();
 
             $this->assign('tab', $aTab);
             $this->getExpandInfo();
@@ -488,5 +486,143 @@ class ConfigController extends BaseController
         }
     }
 
+    /**
+     * accountInfo   账户信息
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    private function accountInfo()
+    {
+        $info = D('User/UcenterMember')->field('id,username,email,mobile,type')->find(is_login());
+        $this->assign('accountInfo', $info);
+    }
+
+    /**
+     * saveUsername  修改用户名
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function saveUsername()
+    {
+        $aUsername = I('post.username', '', 'op_t');
+        //判断是否登录
+        if (!is_login()) {
+            $this->error('请登录后操作！');
+        }
+        //判断提交的用户名是否为空
+        if (empty($aUsername)) {
+            $this->error('用户名不能为空！');
+        }
+        //验证用户名是否是字母和数字
+        preg_match("/^[a-zA-Z0-9_]{1,30}$/", $aUsername, $match);
+        if (!$match) {
+            $this->error('用户名只允许英文字母和数字');
+        }
+
+        $uid = get_uid();
+        $mUcenter = D('User/UcenterMember');
+        //判断用户是否已设置用户名
+        $username = $mUcenter->where(array('id' => $uid))->getField('username');
+        if (empty($username)) {
+            //判断修改的用户名是否已存在
+            $id = $mUcenter->where(array('username' => $aUsername))->getField('id');
+            if ($id) {
+                $this->error('该用户名已经存在！');
+            } else {
+                //修改用户名
+                $rs = $mUcenter->where(array('id' => $uid))->save(array('username' => $aUsername));
+                if (!$rs) {
+                    $this->error('设置失败！');
+                }
+                $this->success('设置成功！', 'refresh');
+            }
+        }
+        $this->error('用户名已经确定不允许修改！');
+    }
+
+    /**
+     * changeaccount  修改帐号信息
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function changeAccount()
+    {
+        $aTag = I('get.tag', '', 'op_t');
+        $aTag = $aTag == 'mobile' ? 'mobile' : 'email';
+        $this->assign('cName', $aTag == 'mobile' ? '手机' : '邮箱');
+        $this->assign('type', $aTag);
+        $this->display();
+
+    }
+
+    /**
+     * sendVerify 发送验证码
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function sendVerify()
+    {
+        $aAccount = $cUsername = I('post.account', '', 'op_t');
+        $aType = I('post.type', '', 'op_t');
+        $aType = $aType == 'mobile' ? 'mobile' : 'email';
+        if (empty($aAccount)) {
+            $this->error('帐号不能为空');
+        }
+        check_username($cUsername, $cEmail, $cMobile);
+
+        if ($aType == 'email' && empty($cEmail)) {
+            $this->error('请验证邮箱格式是否正确');
+        }
+        if ($aType == 'mobile' && empty($cMobile)) {
+            $this->error('请验证手机格式是否正确');
+        }
+
+        $checkIsExist =D('User/UcenterMember')->where(array($aType => $aAccount))->find();
+        if($checkIsExist){
+            $str = $aType=='mobile'?'手机':'邮箱';
+            $this->error('该'.$str.'已被其他用户使用！');
+        }
+
+        $verify = D('Verify')->addVerify($aAccount, $aType);
+        if (!$verify) {
+            $this->error('发送失败！');
+        }
+
+        switch ($aType) {
+            case 'mobile':
+                //TODO 手机短信验证
+                break;
+            case 'email':
+                //发送验证邮箱
+                $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/config/checkVerify?account=' . $aAccount . '&verify=' . $verify . '&type=email&uid=' . is_login());
+                $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
+                $content = str_replace('{$callback_url}', $url, $content);
+                send_mail($aAccount, C('WEB_SITE') . '邮箱验证', $content);
+                break;
+        }
+
+        $this->success('发送成功，请查收');
+    }
+
+    /**
+     * checkVerify  验证验证码
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function checkVerify()
+    {
+
+        $aAccount = I('account', '', 'op_t');
+        $aType = I('type', '', 'op_t');
+        $aVerify = I('verify', '', 'op_t');
+        $aUid = I('uid', 0, 'intval');
+        if (!is_login() || $aUid != is_login()) {
+            $this->error('验证失败');
+        }
+        $aType = $aType == 'mobile' ? 'mobile' : 'email';
+        $res = D('Verify')->checkVerify($aAccount, $aType, $aVerify, $aUid);
+        if (!$res) {
+            $url = $aType == 'mobile' ? '' : U('ucenter/config/index');
+            $this->error('验证失败', $url);
+        }
+        D('User/UcenterMember')->where(array('id' => $aUid))->save(array($aType => $aAccount));
+        $this->success('验证成功', U('ucenter/config/index'));
+
+    }
 
 }

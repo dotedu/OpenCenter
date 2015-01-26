@@ -20,7 +20,7 @@
 function check_username(&$username, &$email, &$mobile, &$type = 0)
 {
 
-    if($type){
+    if ($type) {
         switch ($type) {
             case 2:
                 $email = $username;
@@ -40,24 +40,23 @@ function check_username(&$username, &$email, &$mobile, &$type = 0)
                 $type = 1;
                 break;
         }
-    }else{
+    } else {
         $check_email = preg_match("/[a-z0-9_\-\.]+@[a-z0-9]+[_\-]?\.+[a-z]{2,3}/i", $username, $match_email);
         $check_mobile = preg_match("/^(1[3|4|5|8])[0-9]{9}$/", $username, $match_mobile);
-        if($check_email){
+        if ($check_email) {
             $email = $username;
             $username = '';
             $mobile = '';
             $type = 2;
-        }
-        elseif($check_mobile){
+        } elseif ($check_mobile) {
             $mobile = $username;
             $username = '';
             $email = '';
             $type = 3;
-        }else{
+        } else {
             $mobile = '';
             $email = '';
-            $type = 1 ;
+            $type = 1;
         }
     }
 

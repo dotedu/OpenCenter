@@ -35,7 +35,7 @@
 #center_password input[type=email],
 .center_info [type=password],
 #center_password [type=password] {
-  max-width: 200px;
+  max-width: 250px;
 }
 .usercenter-verify-icon-list img {
   width: 18px;
@@ -79,4 +79,8 @@
   color: #BBB3B5;
   font-weight: 200;
   margin-left: 10px;
+}
+.lh32 {
+  line-height: 32px;
+  height: 32px;
 }
