@@ -25,6 +25,7 @@ class UserConfigController extends AdminController {
 
         $admin_config->title('用户配置')
            ->keyCheckBox('REG_SWITCH','注册开关','允许使用的注册选项,全不选即为关闭注册',array('username'=>'用户名','email'=>'邮箱','mobile'=>'手机'))
+            ->keyRadio('EMAIL_VERIFY_TYPE','邮箱验证类型','邮箱验证的类型',array(0=>'注册前发送验证邮件',1=>'注册后发送激活邮件'))
             ->buttonSubmit('', '保存')->data($data);
         $admin_config->display();
     }

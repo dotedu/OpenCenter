@@ -565,59 +565,22 @@ class ConfigController extends BaseController
 
     }
 
-    /**
-     * sendVerify 发送验证码
-     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
-     */
-    public function sendVerify()
-    {
-        $aAccount = $cUsername = I('post.account', '', 'op_t');
-        $aType = I('post.type', '', 'op_t');
-        $aType = $aType == 'mobile' ? 'mobile' : 'email';
-
-        if(!check_reg_type($aType)){
-            $str = $aType=='mobile'?'手机':'邮箱';
-            $this->error($str.'选项已关闭！');
-        }
-
-
-        if (empty($aAccount)) {
-            $this->error('帐号不能为空');
-        }
-        check_username($cUsername, $cEmail, $cMobile);
-
-        if ($aType == 'email' && empty($cEmail)) {
-            $this->error('请验证邮箱格式是否正确');
-        }
-        if ($aType == 'mobile' && empty($cMobile)) {
-            $this->error('请验证手机格式是否正确');
-        }
-
-        $checkIsExist =D('User/UcenterMember')->where(array($aType => $aAccount))->find();
-        if($checkIsExist){
-            $str = $aType=='mobile'?'手机':'邮箱';
-            $this->error('该'.$str.'已被其他用户使用！');
-        }
-
-        $verify = D('Verify')->addVerify($aAccount, $aType);
-        if (!$verify) {
-            $this->error('发送失败！');
-        }
-
-        switch ($aType) {
+    public function doSendVerify($account,$verify,$type){
+        switch ($type) {
             case 'mobile':
                 //TODO 手机短信验证
+                return true;
                 break;
             case 'email':
                 //发送验证邮箱
-                $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/config/checkVerify?account=' . $aAccount . '&verify=' . $verify . '&type=email&uid=' . is_login());
+                $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/config/checkVerify?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . is_login());
                 $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
                 $content = str_replace('{$callback_url}', $url, $content);
-                send_mail($aAccount, C('WEB_SITE') . '邮箱验证', $content);
+                $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
+                return $res;
                 break;
         }
 
-        $this->success('发送成功，请查收');
     }
 
     /**

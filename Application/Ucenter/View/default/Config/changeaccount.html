@@ -33,7 +33,7 @@
                     <label for="verify" class="col-sm-2 control-label">验证码</label>
 
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="verify" placeholder="验证码" name="verify">
+                        <input type="text" class="form-control" id="verify" placeholder="验证码" name="verify">
                     </div>
                 </div>
 
@@ -56,7 +56,7 @@
         $("[data-row='getVerify']").click(function () {
             var account = $(this).parents('.center_info').find('#account').val();
             var type = $(this).parents('.center_info').find('[name="type"]').val();
-            $.post("{:U('ucenter/config/sendVerify')}", {account: account, type: type}, function (res) {
+            $.post("{:U('ucenter/verify/sendVerify')}", {account: account, type: type,action:'config'}, function (res) {
                 if(res.status){
                     toast.success(res.info);
                 }

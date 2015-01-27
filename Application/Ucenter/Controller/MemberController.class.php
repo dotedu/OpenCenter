@@ -40,8 +40,8 @@ class MemberController extends Controller
                 }
             }
 
-
-            $aUnType = $aUnType > 2 && $aUnType< 0 ?  0 : $aUnType;
+            $aUnType = 0;
+            $aUnType = $aUnType > 3 || $aUnType< 0 ?  0 : $aUnType;
 
             //获取注册类型
             check_username($aUsername,$email,$mobile,$aUnType);
@@ -388,5 +388,22 @@ class MemberController extends Controller
         }
     }
 
+    public function doSendVerify($account,$verify,$type){
+        switch ($type) {
+            case 'mobile':
+                //TODO 手机短信验证
+                return true;
+                break;
+            case 'email':
+                //发送验证邮箱
+                $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/checkVerify?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . is_login());
+                $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
+                $content = str_replace('{$callback_url}', $url, $content);
+                $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
+                return $res;
+                break;
+        }
+
+    }
 
 }
