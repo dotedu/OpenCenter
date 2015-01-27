@@ -59,8 +59,27 @@ function check_username(&$username, &$email, &$mobile, &$type = 0)
             $type = 1;
         }
     }
-
     return true;
 }
 
+/**
+ * check_reg_type  验证注册格式是否开启
+ * @param $type
+ * @return bool
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
+function check_reg_type($type){
+    $t[1] = $t['username'] ='username';
+    $t[2] = $t['email'] ='email';
+    $t[3] = $t['mobile'] ='mobile';
 
+    $switch = modC('REG_SWITCH','','USERCONFIG');
+    if($switch){
+        $switch = explode(',',$switch);
+        if(in_array($t[$type],$switch)){
+           return true;
+        }
+    }
+    return false;
+
+}

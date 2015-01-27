@@ -1,7 +1,8 @@
+<php>if(check_reg_type($type)){</php>
 <div class="modal-body">
     <switch name="type">
         <case value="email">
-            <div class="form-horizontal  center_info ">
+             <div class="form-horizontal  center_info ">
                 <div class="form-group">
                     <label for="account" class="col-sm-2 control-label">请输入{$cName}</label>
 
@@ -14,10 +15,8 @@
 
                 <input type="hidden" class="form-control" name="type" value="{$type}">
             </div>
-
         </case>
         <case value="mobile">
-
             <form class="form-horizontal center_info ajax-form" role="form"
                   action="{:U('ucenter/config/checkVerify')}" method="post">
                 <div class="form-group">
@@ -52,7 +51,6 @@
     </switch>
 </div>
 
-
 <script>
     $(function () {
         $("[data-row='getVerify']").click(function () {
@@ -65,7 +63,6 @@
                 else{
                     toast.error(res.info);
                 }
-
             })
         })
 
@@ -74,3 +71,4 @@
         })
     })
 </script>
+<php>}</php>

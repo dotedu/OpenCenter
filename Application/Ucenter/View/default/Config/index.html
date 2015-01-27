@@ -43,7 +43,7 @@
     <div id="account_panel" class="row center_panel">
         <div class="col-md-8 center_info form-horizontal">
 
-
+    <php>if(check_reg_type('username')){</php>
             <div class="form-group">
                 <label for="aUsername" class="col-sm-2 control-label">用户名</label>
 
@@ -74,6 +74,9 @@
                 </div>
             </div>
 
+            <php>}</php>
+
+            <php>if(check_reg_type('email')){</php>
             <div class="form-group">
                 <label for="aEmail" class="col-sm-2 control-label">邮箱</label>
 
@@ -81,10 +84,10 @@
                     <input type="email" class="form-control pull-left" id="aEmail" placeholder="邮箱" value="{$accountInfo.email}">
                     <a class="pull-left lh32 " style="margin-left: 10px" data-remote="{:U('ucenter/config/changeaccount',array('tag'=>'email'))}" data-toggle="modal">修改邮箱</a>
                 </div>
-
-
-
             </div>
+            <php>}</php>
+
+            <php>if(check_reg_type('mobile')){</php>
 
             <div class="form-group">
                 <label for="aMobile" class="col-sm-2 control-label">手机</label>
@@ -94,7 +97,7 @@
                     <a class="pull-left lh32 " style="margin-left: 10px" data-remote="{:U('ucenter/config/changeaccount',array('tag'=>'mobile'))}" data-toggle="modal">修改手机</a>
                 </div>
             </div>
-
+            <php>}</php>
         </div>
 
     </div>

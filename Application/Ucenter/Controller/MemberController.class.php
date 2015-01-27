@@ -34,17 +34,22 @@ class MemberController extends Controller
         }
         if (IS_POST) { //注册用户
             /* 检测验证码 */
-/*            if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
+           if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
                 if (!check_verify($aVerify)) {
                     $this->error('验证码输入错误。');
                 }
-            }*/
+            }
 
 
             $aUnType = $aUnType > 2 && $aUnType< 0 ?  0 : $aUnType;
 
             //获取注册类型
             check_username($aUsername,$email,$mobile,$aUnType);
+
+            if(!check_reg_type($aUnType)){
+                $this->error('该类型未开放注册。');
+            }
+
             /* 注册用户 */
             $uid = D('User/UcenterMember')->register($aUsername, $aNickname, $aPassword, $email,$mobile,$aUnType);
 
@@ -117,6 +122,11 @@ class MemberController extends Controller
 
             /* 调用UC登录接口登录 */
             check_username($aUsername,$email,$mobile,$aUnType);
+
+            if(!check_reg_type($aUnType)){
+                $this->error('该类型未开放登录。');
+            }
+
             $uid = D('User/UcenterMember')->login($username, $aPassword,$aUnType);
             if (0 < $uid) { //UC登录成功
                 /* 登录用户 */

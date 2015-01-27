@@ -22,7 +22,7 @@ class ConfigController extends BaseController
 
     }
 
-    public function index($uid = null, $tab = '', $nickname = '', $sex = 0, $email = '', $signature = '', $community = 0, $district = 0, $city = 0, $province = 0)
+    public function index()
     {
 
         $aUid = I('get.uid', is_login(), 'intval');
@@ -502,7 +502,13 @@ class ConfigController extends BaseController
      */
     public function saveUsername()
     {
-        $aUsername = I('post.username', '', 'op_t');
+        $aUsername = $cUsername  = I('post.username', '', 'op_t');
+
+        if(!check_reg_type('username')){
+            $this->error('用户名选项已关闭！');
+        }
+
+
         //判断是否登录
         if (!is_login()) {
             $this->error('请登录后操作！');
@@ -511,6 +517,13 @@ class ConfigController extends BaseController
         if (empty($aUsername)) {
             $this->error('用户名不能为空！');
         }
+        check_username($cUsername, $cEmail, $cMobile);
+        if(empty($cUsername)){
+            !empty($cEmail) && $str = '邮箱';
+            !empty($cMobile) && $str = '手机';
+            $this->error('用户名不能为'.$str);
+        }
+
         //验证用户名是否是字母和数字
         preg_match("/^[a-zA-Z0-9_]{1,30}$/", $aUsername, $match);
         if (!$match) {
@@ -561,6 +574,13 @@ class ConfigController extends BaseController
         $aAccount = $cUsername = I('post.account', '', 'op_t');
         $aType = I('post.type', '', 'op_t');
         $aType = $aType == 'mobile' ? 'mobile' : 'email';
+
+        if(!check_reg_type($aType)){
+            $str = $aType=='mobile'?'手机':'邮箱';
+            $this->error($str.'选项已关闭！');
+        }
+
+
         if (empty($aAccount)) {
             $this->error('帐号不能为空');
         }

@@ -24,7 +24,7 @@ class UserConfigController extends AdminController {
         $data = $admin_config->handleConfig();
 
         $admin_config->title('用户配置')
-           ->keyCheckBox('REG_SWITCH','注册开关','允许使用的注册选项,全不选即为关闭注册',array('username'=>'用户名','mobile'=>'手机','email'=>'邮箱'))
+           ->keyCheckBox('REG_SWITCH','注册开关','允许使用的注册选项,全不选即为关闭注册',array('username'=>'用户名','email'=>'邮箱','mobile'=>'手机'))
             ->buttonSubmit('', '保存')->data($data);
         $admin_config->display();
     }
