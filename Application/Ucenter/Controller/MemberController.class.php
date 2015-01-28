@@ -17,51 +17,61 @@ require_once APP_PATH . 'User/Conf/config.php';
 class MemberController extends Controller
 {
 
-    /* 注册页面 */
+    /**
+     * register  注册页面
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
     public function register()
     {
         //获取参数
-        $aUsername = I('post.username','','op_t');
-        $aNickname= I('post.nickname','','op_t');
-        $aPassword = I('post.password','','op_t');
-        $aVerify = I('post.verify','','op_t');
-        $aUnType = I('post.untype',0,'intval');
-        $aType = I('get.type','start','op_t');
+        $aUsername = I('post.username', '', 'op_t');
+        $aNickname = I('post.nickname', '', 'op_t');
+        $aPassword = I('post.password', '', 'op_t');
+        $aVerify = I('post.verify', '', 'op_t');
+        $aRegVerify = I('post.reg_verify', 0, 'intval');
+        $aRegType = I('post.reg_type', '', 'op_t');
+        $aType = I('get.type', 'start', 'op_t');
 
 
-        if (! modC('REG_SWITCH','','USERCONFIG')) {
+        if (!modC('REG_SWITCH', '', 'USERCONFIG')) {
             $this->error('注册已关闭');
         }
         if (IS_POST) { //注册用户
+
             /* 检测验证码 */
-           if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
+            if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
                 if (!check_verify($aVerify)) {
                     $this->error('验证码输入错误。');
                 }
             }
-
+            if ($aRegType == 'mobile' || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 0 && $aRegType == 'email')) {
+                if (!D('Verify')->checkVerify($aUsername, $aRegType, $aRegVerify, 0)) {
+                    $str = $aRegType == 'mobile' ? '手机' : '邮箱';
+                    $this->error($str . '验证失败');
+                }
+            }
             $aUnType = 0;
-            $aUnType = $aUnType > 3 || $aUnType< 0 ?  0 : $aUnType;
-
             //获取注册类型
-            check_username($aUsername,$email,$mobile,$aUnType);
+            check_username($aUsername, $email, $mobile, $aUnType);
+            if ($aRegType == 'email' && $aUnType != 2) {
+                $this->error('邮箱格式不正确');
+            }
+            if ($aRegType == 'mobile' && $aUnType != 3) {
+                $this->error('手机格式不正确');
+            }
 
-            if(!check_reg_type($aUnType)){
+            if (!check_reg_type($aUnType)) {
                 $this->error('该类型未开放注册。');
             }
 
             /* 注册用户 */
-            $uid = D('User/UcenterMember')->register($aUsername, $aNickname, $aPassword, $email,$mobile,$aUnType);
+            $uid = D('User/UcenterMember')->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
 
             if (0 < $uid) { //注册成功
-                $uid = D('User/UcenterMember')->login($aUsername, $aPassword,$aUnType);//通过账号密码取到uid
-                D('Member')->login($uid, false);//登陆
-                $reg_weibo = C('USER_REG_WEIBO_CONTENT');//用户注册的微博内容
-                if ($reg_weibo != '') {//为空不发微博
-                    D('Weibo/Weibo')->addWeibo($uid, $reg_weibo);
-                }
+                $uid = D('User/UcenterMember')->login($aUsername, $aPassword, $aUnType); //通过账号密码取到uid
+                D('Member')->login($uid, false); //登陆
 
-                $this->success('', U('Home/User/step2'));
+                $this->success('', U('Ucenter/member/step2'));
             } else { //注册失败，显示错误信息
                 $this->error($this->showRegError($uid));
             }
@@ -69,6 +79,10 @@ class MemberController extends Controller
             if (is_login()) {
                 redirect(U('Weibo/Index/index'));
             }
+
+            $regSwitch = modC('REG_SWITCH', '', 'USERCONFIG');
+            $regSwitch = explode(',', $regSwitch);
+            $this->assign('regSwitch', $regSwitch);
             $this->assign('type', $aType);
             $this->display();
         }
@@ -89,7 +103,7 @@ class MemberController extends Controller
         $this->ensureApiSuccess($result);
 
         //显示成功消息
-        $this->success($result['message'], U('Home/User/step3'));
+        $this->success($result['message'], U('Ucenter/member/step3'));
     }
 
     /* 注册页面step3 */
@@ -105,11 +119,10 @@ class MemberController extends Controller
     {
         $this->setTitle('用户登录');
 
-        $aUsername = $username = I('post.username','','op_t');
-        $aPassword = I('post.password','','op_t');
-        $aVerify = I('post.verify','','op_t');
-        $aRemember = I('post.remember',0,'intval');
-
+        $aUsername = $username = I('post.username', '', 'op_t');
+        $aPassword = I('post.password', '', 'op_t');
+        $aVerify = I('post.verify', '', 'op_t');
+        $aRemember = I('post.remember', 0, 'intval');
 
 
         if (IS_POST) { //登录验证
@@ -121,13 +134,13 @@ class MemberController extends Controller
             }
 
             /* 调用UC登录接口登录 */
-            check_username($aUsername,$email,$mobile,$aUnType);
+            check_username($aUsername, $email, $mobile, $aUnType);
 
-            if(!check_reg_type($aUnType)){
+            if (!check_reg_type($aUnType)) {
                 $this->error('该类型未开放登录。');
             }
 
-            $uid = D('User/UcenterMember')->login($username, $aPassword,$aUnType);
+            $uid = D('User/UcenterMember')->login($username, $aPassword, $aUnType);
             if (0 < $uid) { //UC登录成功
                 /* 登录用户 */
                 $Member = D('Member');
@@ -389,7 +402,8 @@ class MemberController extends Controller
         }
     }
 
-    public function doSendVerify($account,$verify,$type){
+    public function doSendVerify($account, $verify, $type)
+    {
         switch ($type) {
             case 'mobile':
                 //TODO 手机短信验证
