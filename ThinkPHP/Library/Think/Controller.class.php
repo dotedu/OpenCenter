@@ -66,7 +66,7 @@ abstract class Controller
     public function __construct()
     {
 
-        if (is_file('/Conf/user.php')) {//已经安装了
+        if (is_file('./Conf/user.php')) {//已经安装了
             /*读取站点配置*/
             $config = api('Config/lists');
             C($config); //添加配置

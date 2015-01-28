@@ -26,7 +26,7 @@ function check_env(){
 
 	//PHP环境检测
 	if($items['php'][3] < $items['php'][1]){
-		$items['php'][4] = 'error';
+		$items['php'][4] = 'remove';
 		session('error', true);
 	}
 
@@ -47,7 +47,7 @@ function check_env(){
 	$tmp = function_exists('gd_info') ? gd_info() : array();
 	if(empty($tmp['GD Version'])){
 		$items['gd'][3] = '未安装';
-		$items['gd'][4] = 'error';
+		$items['gd'][4] = 'remove';
 		session('error', true);
 	} else {
 		$items['gd'][3] = $tmp['GD Version'];
@@ -72,8 +72,8 @@ function check_dirfile(){
 		array('dir',  '可写', 'ok', './Uploads/Picture'),
 		array('dir',  '可写', 'ok', './Uploads/Editor'),
 		array('dir',  '可写', 'ok', './Runtime'),
-		array('dir', '可写', 'ok', './Application/User/Conf'),
-		array('file', '可写', 'ok', './Application/Common/Conf/config.php'),
+		array('file', '可写', 'ok', './Conf/user.php'),
+		array('file', '可写', 'ok', './Conf/common.php'),
 
 	);
 
@@ -82,12 +82,12 @@ function check_dirfile(){
 			if(!is_writable(INSTALL_APP_PATH . $val[3])) {
 				if(is_dir($items[1])) {
 					$val[1] = '可读';
-					$val[2] = 'error';
-					session('remove', true);
+					$val[2] = 'remove';
+					session('error', true);
 				} else {
 					$val[1] = '不存在';
-					$val[2] = 'error';
-					session('remove', true);
+					$val[2] = 'remove';
+					session('error', true);
 				}
 			}
 		} else {
@@ -95,13 +95,13 @@ function check_dirfile(){
 				if(!is_writable(INSTALL_APP_PATH . $val[3])) {
 					$val[1] = '不可写';
 					$val[2] = 'remove';
-					session('remove', true);
+					session('error', true);
 				}
 			} else {
 				if(!is_writable(dirname(INSTALL_APP_PATH . $val[3]))) {
 					$val[1] = '不存在';
 					$val[2] = 'remove';
-					session('remove', true);
+					session('error', true);
 				}
 			}
 		}
@@ -153,13 +153,13 @@ function write_config($config, $auth){
 
 		//写入应用配置文件
 		if(!IS_WRITE){
-			return '由于您的环境不可写，请复制下面的配置文件内容覆盖到相关的配置文件，然后再登录后台。<p>'.realpath(APP_PATH).'/Common/Conf/config.php</p>
+			return '由于您的环境不可写，请复制下面的配置文件内容覆盖到相关的配置文件，然后再登录后台。<p>'.realpath('').'./Conf/common.php</p>
 			<textarea name="" style="width:650px;height:185px">'.$conf.'</textarea>
-			<p>'.realpath(APP_PATH).'/User/Conf/config.php</p>
+			<p>'.realpath('').'./Conf/user.php</p>
 			<textarea name="" style="width:650px;height:125px">'.$user.'</textarea>';
 		}else{
-			if(file_put_contents(APP_PATH . 'Common/Conf/config.php', $conf) &&
-			   file_put_contents(APP_PATH . 'User/Conf/config.php', $user)){
+			if(file_put_contents('./Conf/common.php', $conf) &&
+			   file_put_contents('./Conf/user.php', $user)){
 				show_msg('配置文件写入成功');
 			} else {
 				show_msg('配置文件写入失败！', 'error');
@@ -185,13 +185,14 @@ function create_tables($db, $prefix = ''){
 	$orginal = C('ORIGINAL_TABLE_PREFIX');
 	$sql = str_replace(" `{$orginal}", " `{$prefix}", $sql);
 
+
 	//开始安装
 	show_msg('开始安装数据库...');
 	foreach ($sql as $value) {
 		$value = trim($value);
 		if(empty($value)) continue;
 		if(substr($value, 0, 12) == 'CREATE TABLE') {
-			$name = preg_replace("/^CREATE TABLE `(\w+)` .*/s", "\\1", $value);
+			$name = preg_replace("/^CREATE TABLE IF NOT EXISTS `(\w+)` .*/s", "\\1", $value);
 			$msg  = "创建数据表{$name}";
 			if(false !== $db->execute($value)){
 				show_msg($msg . '...成功');
@@ -202,13 +203,13 @@ function create_tables($db, $prefix = ''){
 		} else {
 			$db->execute($value);
 		}
-
 	}
+
 }
 
 function register_administrator($db, $prefix, $admin, $auth){
 	show_msg('开始注册创始人帐号...');
-	$sql = "INSERT INTO `[PREFIX]ucenter_member` VALUES " .
+	$sql = "REPLACE INTO `[PREFIX]ucenter_member` VALUES " .
 		   "('1', '[NAME]', '[PASS]', '[EMAIL]', '', '[TIME]', '[IP]', 0, 0, '[TIME]', '1')";
 
 	$password = user_md5($admin['password'], $auth);
@@ -219,7 +220,7 @@ function register_administrator($db, $prefix, $admin, $auth){
 	//执行sql
 	$db->execute($sql);
 
-	$sql = "INSERT INTO `[PREFIX]member` VALUES ".
+	$sql = "REPLACE INTO `[PREFIX]member` VALUES ".
 		   "('1', '[NAME]', '0', '0', '', '0', '1', '0', '[TIME]', '0', '[TIME]', '1','',0,0,0,0,0);";
 	$sql = str_replace(
 		array('[PREFIX]', '[NAME]', '[TIME]'),
@@ -235,8 +236,10 @@ function register_administrator($db, $prefix, $admin, $auth){
  */
 function show_msg($msg, $class = ''){
 	echo "<script type=\"text/javascript\">showmsg(\"{$msg}\", \"{$class}\")</script>";
-	flush();
-	ob_flush();
+    ob_flush();
+    flush();
+
+
 }
 
 
