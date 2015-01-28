@@ -65,19 +65,23 @@ abstract class Controller
      */
     public function __construct()
     {
-        /*读取站点配置*/
-        $config = api('Config/lists');
-        C($config); //添加配置
 
-        if (!C('WEB_SITE_CLOSE') && strtolower(MODULE_NAME) != 'admin' && strtolower(MODULE_NAME) != 'install') {
-            header("Content-Type: text/html; charset=utf-8");
-            exit('站点已经关闭，请稍后访问~');
-        }
-        if (strtolower(MODULE_NAME) != 'install') {
-            $moduleModel = D('Common/Module');
-            $moduleModel->checkCanVisit(MODULE_NAME);
-        }
+        if (is_file('/Conf/user.php')) {//已经安装了
+            /*读取站点配置*/
+            $config = api('Config/lists');
+            C($config); //添加配置
+            if (strtolower(MODULE_NAME) != 'install' && strtolower(MODULE_NAME) != 'admin') {
+                if (!C('WEB_SITE_CLOSE')) {
+                    header("Content-Type: text/html; charset=utf-8");
+                    exit('站点已经关闭，请稍后访问~');
+                }
 
+                if (strtolower(MODULE_NAME) != 'install' && strtolower(MODULE_NAME) != 'admin') {
+                    $moduleModel = D('Common/Module');
+                    $moduleModel->checkCanVisit(MODULE_NAME);
+                }
+            }
+        }
 
         Hook::listen('action_begin', $this->config);
         //实例化视图类

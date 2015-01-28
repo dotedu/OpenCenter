@@ -14,10 +14,10 @@ use Think\Storage;
 class IndexController extends Controller{
     //安装首页
     public function index(){
-        if(is_file(APP_PATH . 'User/Conf/config.php')){
+       if(is_file( '/Conf/user.php')){
             // 已经安装过了 执行更新程序
             //session('update',true);
-            $msg = '请删除install.lock文件后再运行升级!';
+            $msg = '请删除install.lock文件后再运行安装程序!';
         }else{
             $msg = '已经成功安装了OneThink，请不要重复安装!';
         }

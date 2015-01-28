@@ -68,12 +68,12 @@ function check_env(){
  */
 function check_dirfile(){
 	$items = array(
-		array('dir',  '可写', 'success', './Uploads/Download'),
-		array('dir',  '可写', 'success', './Uploads/Picture'),
-		array('dir',  '可写', 'success', './Uploads/Editor'),
-		array('dir',  '可写', 'success', './Runtime'),
-		array('dir', '可写', 'success', './Application/User/Conf'),
-		array('file', '可写', 'success', './Application/Common/Conf/config.php'),
+		array('dir',  '可写', 'ok', './Uploads/Download'),
+		array('dir',  '可写', 'ok', './Uploads/Picture'),
+		array('dir',  '可写', 'ok', './Uploads/Editor'),
+		array('dir',  '可写', 'ok', './Runtime'),
+		array('dir', '可写', 'ok', './Application/User/Conf'),
+		array('file', '可写', 'ok', './Application/Common/Conf/config.php'),
 
 	);
 
@@ -83,25 +83,25 @@ function check_dirfile(){
 				if(is_dir($items[1])) {
 					$val[1] = '可读';
 					$val[2] = 'error';
-					session('error', true);
+					session('remove', true);
 				} else {
 					$val[1] = '不存在';
 					$val[2] = 'error';
-					session('error', true);
+					session('remove', true);
 				}
 			}
 		} else {
 			if(file_exists(INSTALL_APP_PATH . $val[3])) {
 				if(!is_writable(INSTALL_APP_PATH . $val[3])) {
 					$val[1] = '不可写';
-					$val[2] = 'error';
-					session('error', true);
+					$val[2] = 'remove';
+					session('remove', true);
 				}
 			} else {
 				if(!is_writable(dirname(INSTALL_APP_PATH . $val[3]))) {
 					$val[1] = '不存在';
-					$val[2] = 'error';
-					session('error', true);
+					$val[2] = 'remove';
+					session('remove', true);
 				}
 			}
 		}
@@ -116,15 +116,15 @@ function check_dirfile(){
  */
 function check_func(){
 	$items = array(
-		array('mysql_connect',     '支持', 'success'),
-		array('file_get_contents', '支持', 'success'),
-		array('mb_strlen',		   '支持', 'success'),
+		array('mysql_connect',     '支持', 'ok'),
+		array('file_get_contents', '支持', 'ok'),
+		array('mb_strlen',		   '支持', 'ok'),
 	);
 
 	foreach ($items as &$val) {
 		if(!function_exists($val[0])){
 			$val[1] = '不支持';
-			$val[2] = 'error';
+			$val[2] = 'remove';
 			$val[3] = '开启';
 			session('error', true);
 		}
@@ -239,16 +239,6 @@ function show_msg($msg, $class = ''){
 	ob_flush();
 }
 
-/**
- * 生成系统AUTH_KEY
- * @author 麦当苗儿 <zuojiazi@vip.qq.com>
- */
-function build_auth_key(){
-	$chars  = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	$chars .= '`~!@#$%^&*()_+-=[]{};:"|,.<>/?';
-	$chars  = str_shuffle($chars);
-	return substr($chars, 0, 40);
-}
 
 /**
  * 系统非常规MD5加密方法
