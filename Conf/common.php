@@ -16,7 +16,7 @@ return array(
     /* 模块相关配置 */
     'AUTOLOAD_NAMESPACE' => array('Addons' => ONETHINK_ADDON_PATH), //扩展模块列表
     'DEFAULT_MODULE' => 'Home',
-    'MODULE_DENY_LIST' => array('Common'),
+    'MODULE_DENY_LIST' => array('Common', 'User'),
 //'MODULE_ALLOW_LIST'  => array('Home','Admin'),
 
     /* 系统数据加密设置 */
@@ -41,9 +41,9 @@ return array(
     /* 数据库配置 */
     'DB_TYPE' => 'mysqli', // 数据库类型
     'DB_HOST' => '127.0.0.1', // 服务器地址
-    'DB_NAME' => 'oc', // 数据库名
+    'DB_NAME' => 'open_center', // 数据库名
     'DB_USER' => 'root', // 用户名
-    'DB_PWD' => 'root',  // 密码
+    'DB_PWD' => '', // 密码
     'DB_PORT' => '3306', // 端口
     'DB_PREFIX' => 'thinkox_', // 数据库表前缀
 
@@ -103,10 +103,9 @@ return array(
         'hash' => true, //是否生成hash编码
         'callback' => false, //检测文件是否存在回调函数，如果存在返回文件信息数组
     ),
-    'DEFAULT_THEME' => 'default', // 默认模板主题名称
-    /* 模板相关配置 */
+
     'TMPL_PARSE_STRING' => array(
         '__STATIC__' => __ROOT__ . '/Public/static',
-        '__ZUI__'=>__ROOT__.'/Public/zui'
+        '__ZUI__' => __ROOT__ . '/Public/zui'
     ),
 );
