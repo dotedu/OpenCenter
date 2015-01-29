@@ -84,7 +84,12 @@ function check_reg_type($type){
 
 }
 
-
+/**
+ * get_next_step  获取注册流程下一步
+ * @param string $now_step
+ * @return string
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
 function get_next_step($now_step =''){
     $step = modC('REG_STEP', '', 'USERCONFIG');
     $step = explode(',',$step);
@@ -98,4 +103,18 @@ function get_next_step($now_step =''){
         $return = 'finish';
     }
     return $return;
+}
+
+
+/**
+ * set_user_status   设置用户状态
+ * @param $uid
+ * @param $status
+ * @return bool
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
+function set_user_status($uid,$status){
+    D('Member')->where(array('uid'=>$uid))->setField('status',$status);
+    D('UcenterMember')->where(array('id'=>$uid))->setField('status',$status);
+    return true;
 }

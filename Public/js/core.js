@@ -569,3 +569,15 @@ function bind_weibo_managment() {
     })
 
 }
+
+
+
+var loading = {
+    add: function (text) {
+        $('body').append('<div class="big_loading"><img src="'+ThinkPHP.PUBLIC+'/images/big_loading.gif"/></div>');
+    },
+    remove: function (text) {
+        $('div').remove('.big_loading');
+    }
+
+}

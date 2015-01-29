@@ -24,7 +24,7 @@ class MemberController extends Controller
     public function register()
     {
         //获取参数
-        $aUsername = I('post.username', '', 'op_t');
+        $aUsername= $username = I('post.username', '', 'op_t');
         $aNickname = I('post.nickname', '', 'op_t');
         $aPassword = I('post.password', '', 'op_t');
         $aVerify = I('post.verify', '', 'op_t');
@@ -68,10 +68,21 @@ class MemberController extends Controller
             $uid = D('User/UcenterMember')->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
 
             if (0 < $uid) { //注册成功
-                $uid = D('User/UcenterMember')->login($aUsername, $aPassword, $aUnType); //通过账号密码取到uid
+
+                if(modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType==2){
+                    set_user_status($uid,3);
+                    $verify = D('Verify')->addVerify($email, 'email',$uid);
+                    //TODO 邮件发送模版
+                    $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/doActivate?account=' . $email . '&verify=' . $verify . '&type=email&uid=' . $uid);
+                    $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
+                    $content = str_replace('{$callback_url}', $url, $content);
+                    $res = send_mail($email, C('WEB_SITE') . '激活信', $content);
+
+                   // $this->success('注册成功，请登录邮箱进行激活');
+                }
+
+                $uid = D('User/UcenterMember')->login($username, $aPassword, $aUnType); //通过账号密码取到uid
                 D('Member')->login($uid, false); //登陆
-
-
                 $this->success('', U('Ucenter/member/step',array('step'=>get_next_step('start'))));
             } else { //注册失败，显示错误信息
                 $this->error($this->showRegError($uid));
@@ -107,13 +118,7 @@ class MemberController extends Controller
         $this->success($result['message'], U('Ucenter/member/step3'));
     }
 
-    /* 注册页面step3 */
-    public function step3($type = 'finish')
-    {
-        $type = op_t($type);
-        $this->assign('type', $type);
-        $this->display('register');
-    }
+
 
     /* 登录页面 */
     public function login()
@@ -145,6 +150,7 @@ class MemberController extends Controller
             if (0 < $uid) { //UC登录成功
                 /* 登录用户 */
                 $Member = D('Member');
+
                 if ($Member->login($uid, $aRemember == 'on')) { //登录用户
                     //TODO:跳转到登录前页面
 
@@ -412,6 +418,7 @@ class MemberController extends Controller
                 break;
             case 'email':
                 //发送验证邮箱
+                //TODO 邮箱发送模版
                 $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/checkVerify?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . is_login());
                 $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
                 $content = str_replace('{$callback_url}', $url, $content);
@@ -420,6 +427,76 @@ class MemberController extends Controller
                 break;
         }
 
+    }
+
+    /**
+     * activate  提示激活页面
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function activate(){
+
+       // $aUid = I('get.uid',0,'intval');
+        $aUid = session('temp_login_uid');
+        $status = D('UcenterMember')->where(array('id'=>$aUid))->getField('status');
+        if($status != 3){
+            redirect(U('ucenter/member/login'));
+        }
+        $info = query_user(array('uid','nickname','email'),$aUid);
+        $this->assign($info);
+        $this->display();
+    }
+
+
+    public function reSend(){
+        $res =$this->activateVerify();
+        if($res === true){
+            $this->success('发送成功','refresh');
+        }else{
+            $this->error('发送失败，请稍候再试！'.$res,'refresh');
+        }
+
+    }
+
+
+    public function changeEmail(){
+        $aEmail = I('post.email','','op_t');
+        $aUid = session('temp_login_uid');
+        $mUcenterMember = D('UcenterMember');
+        $mUcenterMember->where(array('id'=>$aUid))->getField('status');
+        if($mUcenterMember->where(array('id'=>$aUid))->getField('status') !=3){
+            $this->error('权限不足！');
+        }
+        $mUcenterMember->where(array('id'=>$aUid))->setField('email',$aEmail);
+        clean_query_user_cache($aUid,'email');
+        $res = $this->activateVerify();
+        $this->success('更换成功，请登录邮箱进行激活！如没收到激活信请稍候再试！','refresh');
+    }
+
+    /**
+     * activateVerify 添加激活验证
+     * @return bool|string
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    private function activateVerify(){
+        $aUid = session('temp_login_uid');
+        $email =D('UcenterMember')->where(array('id'=>$aUid))->getField('email');
+        $verify = D('Verify')->addVerify($email, 'email',$aUid);
+        $res = $this->sendActivateEmail($email,$verify); //发送激活邮件
+        return $res;
+    }
+    /**
+     * sendActivateEmail   发送激活邮件
+     * @param $account
+     * @param $verify
+     * @return bool|string
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    private function sendActivateEmail($account,$verify){
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/checkVerify?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . is_login());
+        $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
+        $content = str_replace('{$callback_url}', $url, $content);
+        $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
+        return $res;
     }
 
 }

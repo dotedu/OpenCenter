@@ -190,8 +190,6 @@ class UcenterMemberModel extends Model
         if(UC_SYNC && $username != get_username(1) && $type==1){
             return $this->ucLogin($username, $password);
         }
-
-
         $map = array();
         switch ($type) {
             case 1:
@@ -209,7 +207,6 @@ class UcenterMemberModel extends Model
             default:
                 return 0; //参数错误
         }
-
         /* 获取用户数据 */
         $user = $this->where($map)->find();
         if (is_array($user) && $user['status']) {
