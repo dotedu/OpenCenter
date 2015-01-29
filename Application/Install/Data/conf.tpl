@@ -103,4 +103,10 @@ return array(
 'hash'     => true, //是否生成hash编码
 'callback' => false, //检测文件是否存在回调函数，如果存在返回文件信息数组
 ),
+'DEFAULT_THEME' => 'default', // 默认模板主题名称
+/* 模板相关配置 */
+'TMPL_PARSE_STRING' => array(
+'__STATIC__' => __ROOT__ . '/Public/static',
+'__ZUI__'=>__ROOT__.'/Public/zui'
+),
 );

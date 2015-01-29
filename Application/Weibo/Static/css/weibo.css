@@ -25,7 +25,6 @@
 .weibo_content {
   background-color: #ffffff;
   padding: 15px;
-  border: 1px solid #ddd;
   -moz-border-radius: 3px;
   /*仅Firefox支持，实现圆角效果*/
   -webkit-border-radius: 3px;

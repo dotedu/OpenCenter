@@ -49,7 +49,7 @@ define ('APP_DEBUG', true);
  */
 define ('APP_PATH', './Application/');
 
-if (!is_file(APP_PATH . 'User/Conf/config.php')) {
+if (!is_file( 'Conf/user.php')) {
     header('Location: ./install.php');
     exit;
 }

@@ -41,10 +41,10 @@ class Dispatcher {
                 define('APP_DOMAIN',$_SERVER['HTTP_HOST']); // 当前完整域名
                 $rule = $rules[APP_DOMAIN];
             }else{
-                if(strpos(C('APP_DOMAIN_SUFFIX'),'.')){ // com.cn net.cn 
+                if(strpos(C('APP_DOMAIN_SUFFIX'),'.')){ // com.cn net.cn
                     $domain = array_slice(explode('.', $_SERVER['HTTP_HOST']), 0, -3);
                 }else{
-                    $domain = array_slice(explode('.', $_SERVER['HTTP_HOST']), 0, -2);                    
+                    $domain = array_slice(explode('.', $_SERVER['HTTP_HOST']), 0, -2);
                 }
                 if(!empty($domain)) {
                     $subDomain = implode('.', $domain);
@@ -62,7 +62,7 @@ class Dispatcher {
                         $rule      = $rules['*'];
                         $panDomain = $domain2;
                     }
-                }                
+                }
             }
 
             if(!empty($rule)) {
@@ -87,8 +87,8 @@ class Dispatcher {
                         if(false !== $pos) {
                             // 泛域名作为参数
                             $parms[$pos] = $panDomain;
-                        }                         
-                    }                   
+                        }
+                    }
                     $_GET   =  array_merge($_GET,$parms);
                 }
             }
@@ -119,7 +119,7 @@ class Dispatcher {
             define('__INFO__',trim($_SERVER['PATH_INFO'],'/'));
             // URL后缀
             define('__EXT__', strtolower(pathinfo($_SERVER['PATH_INFO'],PATHINFO_EXTENSION)));
-            $_SERVER['PATH_INFO'] = __INFO__;     
+            $_SERVER['PATH_INFO'] = __INFO__;
             if (__INFO__ && !defined('BIND_MODULE') && C('MULTI_MODULE')){ // 获取模块名
                 $paths      =   explode($depr,__INFO__,2);
                 $allowList  =   C('MODULE_ALLOW_LIST'); // 允许的模块列表
@@ -128,7 +128,7 @@ class Dispatcher {
                     $_GET[$varModule]       =   $module;
                     $_SERVER['PATH_INFO']   =   isset($paths[1])?$paths[1]:'';
                 }
-            }                   
+            }
         }
 
         // URL常量
@@ -136,7 +136,7 @@ class Dispatcher {
 
         // 获取模块名称
         define('MODULE_NAME', defined('BIND_MODULE')? BIND_MODULE : self::getModule($varModule));
-        
+
         // 检测模块是否存在
         if( MODULE_NAME && (defined('BIND_MODULE') || !in_array_case(MODULE_NAME,C('MODULE_DENY_LIST')) ) && is_dir(APP_PATH.MODULE_NAME)){
             // 定义当前模块路径
@@ -173,7 +173,10 @@ class Dispatcher {
         }
 
         if(!defined('__APP__')){
-            C(api('Config/lists'));//合并入后台设置
+            if(is_file( '/Conf/user.php'))
+            {
+                C(api('Config/lists'));//合并入后台设置
+            }
 	        $urlMode        =   C('URL_MODEL');
             //dump($urlMode);exit;
 	        if($urlMode == URL_COMPAT ){// 兼容模式判断
@@ -200,7 +203,7 @@ class Dispatcher {
                 send_http_status(404);
                 exit;
             }
-            
+
             // 去除URL后缀
             $_SERVER['PATH_INFO'] = preg_replace(C('URL_HTML_SUFFIX')? '/\.('.trim(C('URL_HTML_SUFFIX'),'.').')$/i' : '/\.'.__EXT__.'$/i', '', $_SERVER['PATH_INFO']);
 
@@ -302,7 +305,7 @@ class Dispatcher {
                     }else{
                         return $maps[ACTION_ALIAS];
                     }
-                    
+
                 }elseif(array_search(strtolower($action),$maps)){
                     // 禁止访问原始操作
                     return   '';

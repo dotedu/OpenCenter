@@ -154,6 +154,7 @@ class MemberController extends Controller
                         $html = '';
                         $html = uc_user_synlogin($ref['uc_uid']);
                     }
+
                     $this->success($html, get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
                 } else {
                     $this->error($Member->getError());
