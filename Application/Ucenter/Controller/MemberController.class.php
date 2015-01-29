@@ -30,7 +30,7 @@ class MemberController extends Controller
         $aVerify = I('post.verify', '', 'op_t');
         $aRegVerify = I('post.reg_verify', 0, 'intval');
         $aRegType = I('post.reg_type', '', 'op_t');
-        $aType = I('get.type', 'start', 'op_t');
+        $aStep = I('get.step', 'start', 'op_t');
 
 
         if (!modC('REG_SWITCH', '', 'USERCONFIG')) {
@@ -71,7 +71,8 @@ class MemberController extends Controller
                 $uid = D('User/UcenterMember')->login($aUsername, $aPassword, $aUnType); //通过账号密码取到uid
                 D('Member')->login($uid, false); //登陆
 
-                $this->success('', U('Ucenter/member/step2'));
+
+                $this->success('', U('Ucenter/member/step',array('step'=>get_next_step('start'))));
             } else { //注册失败，显示错误信息
                 $this->error($this->showRegError($uid));
             }
@@ -83,16 +84,16 @@ class MemberController extends Controller
             $regSwitch = modC('REG_SWITCH', '', 'USERCONFIG');
             $regSwitch = explode(',', $regSwitch);
             $this->assign('regSwitch', $regSwitch);
-            $this->assign('type', $aType);
+            $this->assign('step', $aStep);
             $this->display();
         }
     }
 
-    /* 注册页面step2 */
-    public function step2($type = 'upload')
+
+    public function step()
     {
-        $type = op_t($type); //显示上传头像页面
-        $this->assign('type', $type);
+        $aStep = I('get.step', '', 'op_t');
+        $this->assign('type', $aStep);
         $this->display('register');
     }
 

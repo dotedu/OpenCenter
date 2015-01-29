@@ -7,7 +7,7 @@
  * @author 郑钟良<zzl@ourstu.com>
  */
 
-namespace Usercenter\Widget;
+namespace Ucenter\Widget;
 use Think\Action;
 
 /**input类型输入渲染

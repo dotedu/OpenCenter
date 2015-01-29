@@ -83,3 +83,19 @@ function check_reg_type($type){
     return false;
 
 }
+
+
+function get_next_step($now_step =''){
+    $step = modC('REG_STEP', '', 'USERCONFIG');
+    $step = explode(',',$step);
+    if(empty($now_step) || $now_step == 'start'){
+        $return = $step[0];
+    }else{
+        $now_key = array_search($now_step,$step);
+        $return = $step[$now_key+1];
+    }
+    if(!in_array($return,A('Ucenter/RegStep','Widget')->step) || empty($return)){
+        $return = 'finish';
+    }
+    return $return;
+}

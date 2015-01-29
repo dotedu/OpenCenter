@@ -12,7 +12,7 @@
                     display: inline-block;
                 }
             </style>
-            <if condition="$type eq 'start'">
+            <if condition="$step eq 'start'">
 
 
                 <div class="col-xs-12 col-md-6">
@@ -174,10 +174,10 @@
 
 
             </if>
-            <if condition="$type eq 'upload'">
-                <include file="Member/changeavatar"/>
+            <if condition="$step neq 'start' and $step neq 'finish'">
+                {:W('RegStep/view',array('step'=>$step))}
             </if>
-            <if condition="$type eq 'finish'">
+            <if condition="$step eq 'finish'">
                 <div class="col-xs-12" style="font-size: 16px;margin-top: 30px;">
                     <span>感谢您注册 {:C('WEB_SITE')} ，希望你玩的愉快！ <a href="{:U('Ucenter/Config/index')}" title="">完善个人资料</a> 或 <a
                             href="{:U('Weibo/Index/index')}" title="">前往首页</a></span>
@@ -244,35 +244,37 @@
                     }
                 });
             });
-        }
-    </script>
 
-    <script>
-        $(function () {
-            $("[data-row='getVerify']").click(function () {
-                var account = $(this).parents('.tab-pane').find('[name="username"]').val();
-                var type = $(this).parents('.tab-pane').find('[name="reg_type"]').val();
-                $.post("{:U('ucenter/verify/sendVerify')}", {account: account, type: type, action: 'member'}, function (res) {
-                    if (res.status) {
-                        toast.success(res.info);
-                    }
-                    else {
-                        toast.error(res.info);
-                    }
+
+
+            $(function () {
+                $("[data-row='getVerify']").click(function () {
+                    var account = $(this).parents('.tab-pane').find('[name="username"]').val();
+                    var type = $(this).parents('.tab-pane').find('[name="reg_type"]').val();
+                    $.post("{:U('ucenter/verify/sendVerify')}", {account: account, type: type, action: 'member'}, function (res) {
+                        if (res.status) {
+                            toast.success(res.info);
+                        }
+                        else {
+                            toast.error(res.info);
+                        }
+                    })
+                })
+
+
+                $('#reg_nav li a').click(function(){
+                    $('.tab-pane').find('input').attr('disabled',true);
+                    $('.tab-pane').eq($("#reg_nav li a").index(this)).find('input').attr('disabled',false);
+
+                })
+
+                $("[type='submit']").click(function () {
+                    $(this).parents('form').submit();
                 })
             })
 
-
-            $('#reg_nav li a').click(function(){
-                $('.tab-pane').find('input').attr('disabled',true);
-                $('.tab-pane').eq($("#reg_nav li a").index(this)).find('input').attr('disabled',false);
-
-            })
-
-            $("[type='submit']").click(function () {
-                $(this).parents('form').submit();
-            })
-        })
+        }
     </script>
+
 
 </block>
