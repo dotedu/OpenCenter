@@ -6,43 +6,10 @@
         }
     </style>
 </block>
-        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" style="margin-top: 20px">
-            <div class="thumbnail" style="padding: 16px;">
-                <img src="{$user.avatar128}" class="avatar-img" style="width: 128px;height: 128px"/>
-            </div>
-        </div>
-        <div class="col-xs-8 col-lg-offset-1" style="margin-top: 20px;">
-            <p class="text-warning">设置新头像</p>
 
-            <p class="text-muted">支持jpg，png，gif，bmp等格式，可以在大照片中裁剪比较满意的部分</p>
 
-            <form action="{:U('Ucenter/Config/doUploadAvatar')}" id="avatar_form" method="post"
-                  enctype="multipart/form-data">
-                <if condition="is_ie()">
-                    <input type="file" class="btn btn-default" name="image"/>
-                    <else/>
-                    <p class="hide">
-                        <input type="file" name="image"/>
-                    </p>
+{:W('Ucenter/UploadAvatar/render',array(array('id'=>'aa','name'=>'aa','value'=>'123','args'=>'aaaa')))}
 
-                    <div class="btn btn-primary" id="select_file_button">选择文件</div>
-                </if>
-                <p class="text-error" id="submitTip"></p>
-            </form>
-            <p id="upload_tip" class="text-danger"></p>
-
-            <div id="uploaded_image_div" style="display: none;">
-                <div class="thumbnail" style="width: 410px;">
-                    <img id="uploaded_image" style="width: 100%;" class="thumbnails"/>
-                </div>
-                <p class="text-danger" id="save_avatar_tip"></p>
-                <p>
-                    <a class="btn btn-primary" id="save_avatar_button" data-url="{:U('Ucenter/member/doCropAvatar')}">选区裁剪后保存头像</a>
-                </p>
-            </div>
-        </div>
-        <div class="clearfix visible-md-block"></div>
-        <div class="col-xs-4"><a class="btn btn-default" href="{:U('Ucenter/member/step3')}" title="">跳过此步骤</a></div>
 
 
 <block name="script">

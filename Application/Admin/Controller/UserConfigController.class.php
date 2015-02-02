@@ -25,7 +25,7 @@ class UserConfigController extends AdminController {
         $admin_config = new AdminConfigBuilder();
         $data = $admin_config->handleConfig();
 
-        $step = A('Ucenter/RegStep','Widget')->step;
+        $step = A('Ucenter/RegStep','Widget')->mStep;
         $step_str = '';
         foreach($step as $key=>$val){
             $step_str .= $key.'（'.$val.'），';

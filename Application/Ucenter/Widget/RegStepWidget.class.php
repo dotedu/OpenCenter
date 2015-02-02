@@ -19,7 +19,7 @@ use Think\Action;
 class RegStepWidget extends Action
 {
 
-    public $step = array(
+    public $mStep = array(
         'change_avatar'=>'修改头像',
         'account_info'=>'帐号信息',
         'base_info'=>'基本信息',
@@ -36,7 +36,11 @@ class RegStepWidget extends Action
     }
 
     private function change_avatar(){
-        dump(get_next_step('change_avatar'));
         $this->assign('user',query_user(array('avatar128')));
+    }
+
+    private function account_info(){
+        $aStep = I('get.step','','op_t');
+
     }
 } 

@@ -168,4 +168,68 @@ class FileController extends HomeController
         $this->ajaxReturn($return);
     }
 
+
+
+    public function uploadAvatar(){
+
+
+
+        $pic_driver = C('PICTURE_UPLOAD_DRIVER');
+        $files = $_FILES;
+        $setting  = C('PICTURE_UPLOAD');
+        $driver =  C('PICTURE_UPLOAD_DRIVER');
+        $config = C("UPLOAD_{$pic_driver}_CONFIG");
+
+
+        /* 上传文件 */
+
+        $setting['rootPath'] = './Uploads/Avatar/';
+        $setting['saveName'] = 'uid_1'.'_orange';
+        $setting['savepath'] = '';
+        $setting['subName'] = '';
+        $setting['replace'] = true;
+
+        //sae下
+        if (strtolower(C('PICTURE_UPLOAD_DRIVER'))  == 'sae') {
+            // $config[]
+            C(require_once(APP_PATH . 'Common/Conf/config_sae.php'));
+
+            $Upload = new \Think\Upload($setting,C('PICTURE_UPLOAD_DRIVER'), array(C('UPLOAD_SAE_CONFIG')));
+            $info = $Upload->upload($files);
+
+            $config=C('UPLOAD_SAE_CONFIG');
+            if ($info) { //文件上传成功，记录文件信息
+                foreach ($info as $key => &$value) {
+                    $value['path'] = $config['rootPath'] . 'Avatar/' . $value['savepath'] . $value['savename']; //在模板里的url路径
+
+                }
+
+
+                /* 设置文件保存位置 */
+                $this->_auto[] = array('location', 'Ftp' === $driver ? 1 : 0, self::MODEL_INSERT);
+
+                if ($info) { //文件上传成功，不记录文件
+                    // dump($info);exit;
+                    return $info;
+                } else {
+                    $this->error = $Upload->getError();
+                    return false;
+                }
+            }
+        }else{
+
+            $Upload = new \Think\Upload($setting, $driver, $config);
+            $info = $Upload->upload($files);
+
+
+            if ($info) { //文件上传成功，不记录文件
+                return $info;
+            } else {
+                $this->error = $Upload->getError();
+                return false;
+            }
+
+        }
+    }
+
 }

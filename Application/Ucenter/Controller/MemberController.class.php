@@ -161,6 +161,8 @@ class MemberController extends Controller
                         $html = uc_user_synlogin($ref['uc_uid']);
                     }
 
+
+
                     $this->success($html, get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
                 } else {
                     $this->error($Member->getError());
@@ -437,7 +439,7 @@ class MemberController extends Controller
 
        // $aUid = I('get.uid',0,'intval');
         $aUid = session('temp_login_uid');
-        $status = D('UcenterMember')->where(array('id'=>$aUid))->getField('status');
+        $status = D('User/UcenterMember')->where(array('id'=>$aUid))->getField('status');
         if($status != 3){
             redirect(U('ucenter/member/login'));
         }
@@ -461,12 +463,12 @@ class MemberController extends Controller
     public function changeEmail(){
         $aEmail = I('post.email','','op_t');
         $aUid = session('temp_login_uid');
-        $mUcenterMember = D('UcenterMember');
-        $mUcenterMember->where(array('id'=>$aUid))->getField('status');
-        if($mUcenterMember->where(array('id'=>$aUid))->getField('status') !=3){
+        $ucenterMemberModel = D('User/UcenterMember');
+        $ucenterMemberModel->where(array('id'=>$aUid))->getField('status');
+        if($ucenterMemberModel->where(array('id'=>$aUid))->getField('status') !=3){
             $this->error('权限不足！');
         }
-        $mUcenterMember->where(array('id'=>$aUid))->setField('email',$aEmail);
+        $ucenterMemberModel->where(array('id'=>$aUid))->setField('email',$aEmail);
         clean_query_user_cache($aUid,'email');
         $res = $this->activateVerify();
         $this->success('更换成功，请登录邮箱进行激活！如没收到激活信请稍候再试！','refresh');
@@ -479,7 +481,7 @@ class MemberController extends Controller
      */
     private function activateVerify(){
         $aUid = session('temp_login_uid');
-        $email =D('UcenterMember')->where(array('id'=>$aUid))->getField('email');
+        $email =D('User/UcenterMember')->where(array('id'=>$aUid))->getField('email');
         $verify = D('Verify')->addVerify($email, 'email',$aUid);
         $res = $this->sendActivateEmail($email,$verify); //发送激活邮件
         return $res;

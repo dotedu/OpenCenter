@@ -99,7 +99,7 @@ function get_next_step($now_step =''){
         $now_key = array_search($now_step,$step);
         $return = $step[$now_key+1];
     }
-    if(!in_array($return,A('Ucenter/RegStep','Widget')->step) || empty($return)){
+    if(!in_array($return,array_keys(A('Ucenter/RegStep','Widget')->mStep)) || empty($return)){
         $return = 'finish';
     }
     return $return;

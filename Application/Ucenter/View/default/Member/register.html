@@ -175,7 +175,7 @@
 
             </if>
             <if condition="$step neq 'start' and $step neq 'finish'">
-                {:W('RegStep/view',array('step'=>$step))}
+                {:W('RegStep/view')}
             </if>
             <if condition="$step eq 'finish'">
                 <div class="col-xs-12" style="font-size: 16px;margin-top: 30px;">
@@ -198,6 +198,7 @@
                         $("button:submit").removeClass("log-in").attr("disabled", false);
                     });
             $("form").submit(function () {
+                loading.add();
                 var self = $(this);
                 $.post(self.attr("action"), self.serialize(), success, "json");
                 return false;
@@ -214,6 +215,7 @@
                         //刷新验证码
                         $(".reloadverify").click();
                     }
+                    loading.remove();
                 }
             });
 
@@ -261,19 +263,14 @@
                         }
                     })
                 })
-
-
                 $('#reg_nav li a').click(function(){
                     $('.tab-pane').find('input').attr('disabled',true);
                     $('.tab-pane').eq($("#reg_nav li a").index(this)).find('input').attr('disabled',false);
-
                 })
-
                 $("[type='submit']").click(function () {
                     $(this).parents('form').submit();
                 })
             })
-
         }
     </script>
 
