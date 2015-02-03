@@ -236,7 +236,7 @@ str;
         $list       =   D('Addons')->getList();
         $request    =   (array)I('request.');
         $total      =   $list? count($list) : 1 ;
-        $listRows   =   C('LIST_ROWS') > 0 ? C('LIST_ROWS') : 10;
+        $listRows   =   C('LIST_ROWS') > 0 ? C('LIST_ROWS') : 20;
         $page       =   new \Think\Page($total, $listRows, $request);
         $voList     =   array_slice($list, $page->firstRow, $page->listRows);
         $p          =   $page->show();
