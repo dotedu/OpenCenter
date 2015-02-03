@@ -57,9 +57,9 @@
 
                                             <div class="form-group">
                                                 <label for="username" class=".sr-only col-xs-12" style="display: none"></label>
-                                                <input type="text" id="email" class="form-control"
+                                                <input type="text" id="email" class="form-control" disabled="disabled"
                                                        placeholder="请输入邮箱" value="" name="username">
-                                                <input type="hidden" name="reg_type" value="email">
+                                                <input type="hidden" name="reg_type" value="email" disabled="disabled">
                                                 <span class="help-block">输入邮箱</span>
 
                                                 <div class="clearfix"></div>
@@ -68,7 +68,7 @@
 
                                             <php>if(modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 0){</php>
                                             <div class="form-group">
-                                                <input type="text" class="form-control pull-left" placeholder="验证码" name="reg_verify"
+                                                <input type="text" class="form-control pull-left" placeholder="验证码" disabled="disabled" name="reg_verify"
                                                        style="width: 100px">
 
                                                 <a class="lh32 " data-row="getVerify" style="margin-left: 10px">验证邮箱</a>
@@ -88,18 +88,18 @@
                                             <div class="form-group">
                                                 <label for="username" class=".sr-only col-xs-12" style="display: none"></label>
 
-                                                <input type="text" id="mobile" class="form-control "
+                                                <input type="text" id="mobile" class="form-control " disabled="disabled"
                                                        placeholder="请输入手机号" ajaxurl="/member/checkUserNameUnique.html"
                                                        errormsg="请填写手机号" value="" name="username">
 
-                                                <input type="hidden" name="reg_type" value="mobile">
+                                                <input type="hidden" name="reg_type" value="mobile" disabled="disabled">
                                                 <span class="help-block">输入手机号</span>
 
                                                 <div class="clearfix"></div>
                                             </div>
 
                                             <div class="form-group">
-                                                <input type="text" class="form-control pull-left" placeholder="验证码" name="reg_verify"
+                                                <input type="text" class="form-control pull-left" placeholder="验证码" name="reg_verify" disabled="disabled"
                                                        style="width: 100px">
 
                                                 <a class="lh32 " data-row="getVerify" style="margin-left: 10px">验证手机</a>
@@ -204,6 +204,7 @@
 
                 function success(data) {
                     if (data.status) {
+                        //toast.success(data.info, '温馨提示');
                         setTimeout(function () {
                             window.location.href = data.url
                         }, 10);

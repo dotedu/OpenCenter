@@ -97,12 +97,18 @@ class MemberModel extends Model
     {
         /* 检测是否在当前应用注册 */
         $user = $this->field(true)->find($uid);
+        if( $user['status'] == 3 /*判断是否激活*/ ){
+            session('temp_login_uid', $uid);
+            header('Content-Type:application/json; charset=utf-8');
+            $data['status'] =1;
+            $data['url'] = U('Ucenter/Member/activate');
+            exit(json_encode($data));
+        }
         if (1 != $user['status']) {
+
             $this->error = '用户未激活或已禁用！'; //应用级别禁用
             return false;
         }
-
-
 
 
         /* 登录用户 */

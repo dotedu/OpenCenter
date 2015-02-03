@@ -18,9 +18,9 @@ class VerifyModel extends Model
 
 
 
-    public function addVerify($account,$type)
+    public function addVerify($account,$type,$uid=0)
     {
-
+        $uid = $uid?$uid:is_login();
         if ($type == 'mobile') {
             $verify = create_rand(6, 'num');
         } else {
@@ -30,7 +30,7 @@ class VerifyModel extends Model
         $data['verify'] = $verify;
         $data['account'] = $account;
         $data['type'] = $type;
-        $data['uid'] = is_login();
+        $data['uid'] = $uid;
         $data = $this->create($data);
         $res = $this->add($data);
         if(!$res){
