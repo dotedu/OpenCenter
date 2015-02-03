@@ -123,7 +123,7 @@
 
     <div class="clearfix " style="">
         <notempty name="__MENU__.child">
-            <div class="sub_menu_wrapper" style="background: rgb(245, 246, 247); bottom: -10px;top: 0;position: absolute;width: 180px;">
+            <div class="sub_menu_wrapper" style="background: rgb(245, 246, 247); bottom: -10px;top: 0;position: absolute;width: 180px;overflow: auto">
                 <div>
                     <nav id="sub_menu" class="menu" data-toggle="menu">
                         <ul class="nav nav-primary">
@@ -165,12 +165,12 @@
             <else/>
             <php>$col=12;</php>
         </notempty>
-        <div id="main-content" class="" style="padding-bottom:10px;left: 180px;position:absolute;right: 0;overflow: auto;bottom: 0;top: 0">
+        <div id="main-content" class="" style="padding:10px;padding-left:0;padding-bottom:10px;left: 180px;position:absolute;right: 0;bottom: 0;top: 0;overflow: auto">
             <div id="top-alert" class="fixed alert alert-error" style="display: none;">
                 <button class="close fixed" style="margin-top: 4px;">&times;</button>
                 <div class="alert-content">这是内容</div>
             </div>
-            <div id="main" style="overflow: auto">
+            <div id="main" style="overflow-y:auto;overflow-x:hidden;">
                 <block name="nav">
                     <!-- nav -->
                     <notempty name="_show_nav">
