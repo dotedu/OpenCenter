@@ -584,9 +584,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_field` (
   `createTime` int(11) NOT NULL,
   `changeTime` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=46 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=47 ;
 
-
+INSERT INTO `ocenter_field` (`id`, `uid`, `field_id`, `field_data`, `createTime`, `changeTime`) VALUES
+(46, 1, 36, 'ad', 1423034721, 1423034721);
 
 CREATE TABLE IF NOT EXISTS `ocenter_field_group` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -596,16 +597,12 @@ CREATE TABLE IF NOT EXISTS `ocenter_field_group` (
   `sort` int(11) NOT NULL,
   `visiable` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
-
---
--- 转存表中的数据 `ocenter_field_group`
---
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
 
 INSERT INTO `ocenter_field_group` (`id`, `profile_name`, `status`, `createTime`, `sort`, `visiable`) VALUES
-(1, '个人资料', 1, 1403847366, 0, 1);
-
-
+(1, '个人资料', 1, 1403847366, 0, 1),
+(14, '教育信息', 1, 1423032701, 0, 0),
+(15, '职业信息', 1, 1423037174, 0, 1);
 
 CREATE TABLE IF NOT EXISTS `ocenter_field_setting` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -622,12 +619,12 @@ CREATE TABLE IF NOT EXISTS `ocenter_field_setting` (
   `child_form_type` varchar(25) NOT NULL,
   `input_tips` varchar(100) NOT NULL COMMENT '输入提示',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=37 ;
-
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
 
 INSERT INTO `ocenter_field_setting` (`id`, `field_name`, `profile_group_id`, `visiable`, `required`, `sort`, `form_type`, `form_default_value`, `validation`, `status`, `createTime`, `child_form_type`, `input_tips`) VALUES
-(36, 'qq', 1, 1, 1, 0, 'input', '', '', 1, 1409045825, 'string', '');
+(36, 'QQ', 1, 1, 1, 0, 'input', '', '', 1, 1409045825, 'string', ''),
+(37, '小学', 14, 1, 0, 0, 'input', '', '', 1, 1423034744, 'string', '');
+
 
 
 CREATE TABLE IF NOT EXISTS `ocenter_file` (
@@ -1137,6 +1134,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `status` tinyint(4) DEFAULT '0' COMMENT '用户状态',
   `type` tinyint(4) NOT NULL COMMENT '1为用户名注册，2为邮箱注册，3为手机注册',
+  `step` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `status` (`status`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=60 ;
