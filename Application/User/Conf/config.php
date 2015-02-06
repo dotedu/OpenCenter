@@ -12,4 +12,4 @@
  * 注意：该配置文件请使用常量方式定义
  */
 if (is_file('./Conf/common.php'))
-return require_once('/Conf/user.php');
+return require_once('./Conf/user.php');
