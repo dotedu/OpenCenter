@@ -1107,6 +1107,21 @@ General list for item with image
   background: white;
   z-index: 999;
 }
+.nav_bar .navbar-nav > li > a {
+  line-height: 52px;
+  font-size: 16px;
+  padding: 0 15px;
+  color: #333;
+}
+.nav_bar .navbar-nav > li > a i {
+  font-size: 16px;
+}
+.nav_bar .navbar-header .logo {
+  margin-right: 15px;
+  font-size: 16px;
+  color: #333;
+  line-height: 50px;
+}
 .nav_bar .nav_item {
   position: relative;
 }
