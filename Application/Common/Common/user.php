@@ -99,8 +99,20 @@ function get_next_step($now_step =''){
         $now_key = array_search($now_step,$step);
         $return = $step[$now_key+1];
     }
-    if(!in_array($return,A('Ucenter/RegStep','Widget')->step) || empty($return)){
+    if(!in_array($return,array_keys(A('Ucenter/RegStep','Widget')->mStep)) || empty($return)){
         $return = 'finish';
+    }
+    return $return;
+}
+
+function check_step($now_step=''){
+    $step = modC('REG_STEP', '', 'USERCONFIG');
+    $step = explode(',',$step);
+    if(array_search($now_step,$step)){
+        $return = $now_step;
+    }
+    else{
+        $return = $step[0];
     }
     return $return;
 }

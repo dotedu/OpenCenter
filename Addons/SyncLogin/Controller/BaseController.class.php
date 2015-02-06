@@ -160,8 +160,6 @@ class BaseController extends AddonsController
     public function newAccount()
     {
 
-
-
         $username = I('post.username');
         $nickname = I('post.nickname');
         $email = I('post.email');

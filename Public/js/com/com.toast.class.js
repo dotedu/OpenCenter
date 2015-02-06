@@ -34,5 +34,20 @@ var toast = {
      */
     warning: function (text, title) {
         $.messager.show(text, {placement: 'bottom',type:'warning'});
+    },
+
+    /**
+     *  显示loading
+     * @param text
+     */
+    showLoading: function () {
+        $('body').append('<div class="big_loading"><img src="'+ThinkPHP.PUBLIC+'/images/big_loading.gif"/></div>');
+    },
+    /**
+     * 隐藏loading
+     * @param text
+     */
+    hideLoading: function () {
+        $('div').remove('.big_loading');
     }
 }

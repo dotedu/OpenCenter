@@ -78,10 +78,10 @@ function query_user($fields = null, $uid = null)
 
     //读取头像数据
     $result = array();
-    $avatarAddon = new \Addons\Avatar\AvatarAddon();
+    $avatarObject = new \Ucenter\Widget\UploadAvatarWidget();
     foreach ($avatarFields as $e) {
         $avatarSize = intval(substr($e, 6));
-        $avatarUrl = $avatarAddon->getAvatarPath($uid, $avatarSize);
+        $avatarUrl = $avatarObject->getAvatar($uid, $avatarSize);
         $check= file_exists('./api/uc_login.lock');
         if($check){
             include_once './api/uc_client/client.php';

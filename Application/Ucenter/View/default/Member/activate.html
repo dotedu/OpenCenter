@@ -51,23 +51,23 @@
     <script>
         $(function () {
             $('[data-row="reSend"]').click(function () {
-                loading.add();
+                toast.showLoading();
                 $.post("{:U('ucenter/member/reSend')}", {}, function (res) {
                         if(res.status){
                             toast.success(res.info);
                         }else{
                             toast.error(res.info);
                         }
-                    loading.remove();
+                   toast.hideLoading();
                 })
             })
 
             $('[data-row="changeEmail"]').click(function () {
-                loading.add();
+                toast.showLoading();
                 var email = $(this).parents('#changeEmail').find('#account').val();
                 $.post("{:U('ucenter/member/changeEmail')}", {email:email}, function (res) {
                    handleAjax(res)
-                    loading.remove();
+                    toast.hideLoading();
                 })
             })
 

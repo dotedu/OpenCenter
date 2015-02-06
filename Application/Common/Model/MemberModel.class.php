@@ -74,10 +74,11 @@ class MemberModel extends Model
         return true;
     }
 
-    public function registerMember($nickname=''){
+    public function registerMember($nickname = '')
+    {
         /* 在当前应用中注册用户 */
-        if($user = $this->create(array('nickname' => $nickname, 'status' => 1))){
-            $uid=$this->add($user);
+        if ($user = $this->create(array('nickname' => $nickname, 'status' => 1))) {
+            $uid = $this->add($user);
             if (!$uid) {
                 $this->error = '前台用户信息注册失败，请重试！';
                 return false;
@@ -95,26 +96,35 @@ class MemberModel extends Model
      */
     public function login($uid, $remember = false)
     {
+        session('temp_login_uid', $uid);
         /* 检测是否在当前应用注册 */
         $user = $this->field(true)->find($uid);
-        if( $user['status'] == 3 /*判断是否激活*/ ){
-            session('temp_login_uid', $uid);
+        if ($user['status'] == 3 /*判断是否激活*/) {
             header('Content-Type:application/json; charset=utf-8');
-            $data['status'] =1;
+            $data['status'] = 1;
             $data['url'] = U('Ucenter/Member/activate');
             exit(json_encode($data));
         }
-        if (1 != $user['status']) {
 
+        if (1 != $user['status']) {
             $this->error = '用户未激活或已禁用！'; //应用级别禁用
             return false;
         }
 
+        $step = D('User/UcenterMember')->where(array('id' => $uid))->getField('step');
+        if (!empty($step) && $step != 'finish') {
+            header('Content-Type:application/json; charset=utf-8');
+            $data['status'] = 1;
+            //执行步骤在start的时候执行下一步，否则执行此步骤
+            $go = $step=='start'?get_next_step($step):check_step($step);
+            $data['url'] = U('Ucenter/Member/step',array('step'=>$go));
 
+            exit(json_encode($data));
+        }
         /* 登录用户 */
         $this->autoLogin($user, $remember);
 
-
+        session('temp_login_uid',null);
         //记录行为
         action_log('user_login', 'member', $uid, $uid);
         return true;
