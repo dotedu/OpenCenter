@@ -85,7 +85,8 @@ class AddonsModel extends Model {
                     unset($addons[$value]['status']);
 				}
 			}
-        }dump($list);exit;
+        }
+        //dump($list);exit;
         int_to_string($addons, array('status'=>array(-1=>'损坏', 0=>'禁用', 1=>'启用', null=>'未安装')));
         $addons = list_sort_by($addons,'uninstall','desc');
         return $addons;

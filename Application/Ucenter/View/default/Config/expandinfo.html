@@ -3,13 +3,13 @@
     <form action="{:U('Config/edit_expandinfo')}" method="post" class="ajax-form">
         <input type="hidden" name="profile_group_id" value="{$profile_group_id}">
         <div>
-            <volist name="info_list" id="vl">
+            <volist name="vo.fields" id="vl">
                 <dl>
                     {:W('InputRender/inputRender',array($vl,'personal'))}
                 </dl>
             </volist>
         </div>
-        <if condition="$info_list neq null">
+        <if condition="count($vo['fields']) neq 0">
             <input type="submit" value="保存" id="submit_btn"
                    class="btn btn-primary expandinfo-sumbit">
             <else/>

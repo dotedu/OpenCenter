@@ -3,13 +3,6 @@
   margin-right: 0px;
   border-top: 1px dashed #ccc;
 }
-#center h4 {
-  font-size: 16px;
-  cursor: pointer;
-}
-#center h4 a {
-  font-weight: normal;
-}
 .position select {
   width: auto;
   float: left;
@@ -83,4 +76,16 @@
 .lh32 {
   line-height: 32px;
   height: 32px;
+}
+.user-info-panel {
+  padding: 20px;
+}
+.user-info-panel .nickname {
+  color: #fff !important;
+  font-size: 16px;
+  margin-top: 10px;
+  display: block;
+}
+.user-config .side-menu {
+  background: white;
 }

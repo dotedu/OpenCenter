@@ -1,0 +1,35 @@
+<extend name="Config/base"/>
+
+<block name="body">
+
+<div id="center">
+<div id="center_base">
+
+    <h2>
+        其他设置
+    </h2>
+    <div class="row">
+        {:hook('userConfig')}
+    </div>
+
+
+    <block name="script">
+        <script>
+            //检查两次输入的密码是否一致
+            $(function(){
+                $('#changePasswordForm').submit(function(e){
+                    var newPassword = $('#inputNewPassword').val();
+                    var confirmPassword = $('#inputConfirmPassword').val();
+                    if(newPassword != confirmPassword) {
+                        toast.error('两次输入的密码不一致');
+                        e.stopPropagation();
+                        return false;
+                    }
+                })
+            })
+        </script>
+    </block>
+</div>
+</div>
+
+</block>

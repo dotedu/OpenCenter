@@ -19,7 +19,43 @@ class ConfigController extends BaseController
             $this->error('请登陆后再访问本页面。');
         }
         $this->setTitle('编辑资料');
+        $this->_assignSelf();
 
+    }
+
+    /**关联自己的信息
+     * @auth 陈一枭
+     */
+    private function _assignSelf()
+    {
+        $self = query_user(array('avatar128', 'nickname', 'space_url', 'space_link'));
+        $this->assign('self', $self);
+    }
+
+    private function _setTab($name)
+    {
+        $this->assign('tab', $name);
+    }
+
+    public function password()
+    {
+
+        $this->_setTab('password');
+        $this->display();
+    }
+
+    public function other()
+    {
+
+        $this->_setTab('other');
+        $this->display();
+    }
+
+    public function avatar()
+    {
+
+        $this->_setTab('avatar');
+        $this->display();
     }
 
     public function index()
@@ -79,6 +115,7 @@ class ConfigController extends BaseController
 
             $this->assign('tab', $aTab);
             $this->getExpandInfo();
+            $this->_setTab('info');
             $this->display();
         }
 
@@ -138,6 +175,9 @@ class ConfigController extends BaseController
             $this->assign('profile_group_id', $profile_group_list[0]['id']);
             //dump($info_list);exit;
         }
+        foreach ($profile_group_list as &$v) {
+            $v['fields']=$this->_getExpandInfo($v['id']);
+        }
 
         $this->assign('profile_group_list', $profile_group_list);
     }
@@ -148,20 +188,19 @@ class ConfigController extends BaseController
      * @param null $uid
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function showExpandInfo($profile_group_id = null, $uid = null)
+    public function _getExpandInfo($profile_group_id = null)
     {
         $res = D('field_group')->where(array('id' => $profile_group_id, 'status' => '1'))->find();
         if (!$res) {
-            $this->error('信息出错！');
+           return array();
         }
-        $profile_group_list = $this->_profile_group_list($uid);
-        $info_list = $this->_info_list($profile_group_id, $uid);
+        $info_list = $this->_info_list($profile_group_id);
+
+        return $info_list;
         $this->assign('info_list', $info_list);
         $this->assign('profile_group_id', $profile_group_id);
         //dump($info_list);exit;
         $this->assign('profile_group_list', $profile_group_list);
-        $this->defaultTabHash('expand-info');
-        $this->display('expandinfo');
     }
 
     /**修改用户扩展信息
@@ -502,9 +541,9 @@ class ConfigController extends BaseController
      */
     public function saveUsername()
     {
-        $aUsername = $cUsername  = I('post.username', '', 'op_t');
+        $aUsername = $cUsername = I('post.username', '', 'op_t');
 
-        if(!check_reg_type('username')){
+        if (!check_reg_type('username')) {
             $this->error('用户名选项已关闭！');
         }
 
@@ -518,10 +557,10 @@ class ConfigController extends BaseController
             $this->error('用户名不能为空！');
         }
         check_username($cUsername, $cEmail, $cMobile);
-        if(empty($cUsername)){
+        if (empty($cUsername)) {
             !empty($cEmail) && $str = '邮箱';
             !empty($cMobile) && $str = '手机';
-            $this->error('用户名不能为'.$str);
+            $this->error('用户名不能为' . $str);
         }
 
         //验证用户名是否是字母和数字
@@ -565,7 +604,8 @@ class ConfigController extends BaseController
 
     }
 
-    public function doSendVerify($account,$verify,$type){
+    public function doSendVerify($account, $verify, $type)
+    {
         switch ($type) {
             case 'mobile':
                 //TODO 手机短信验证
