@@ -32,7 +32,7 @@ class UploadAvatarWidget extends Controller
                 if (!is_bool(strpos($avatar, 'http://'))) {
                     return $avatar . '/thumbnail/' . $size . 'x' . $size . '!';
                 } else {
-                    $avatar_path = "/Uploads/Avatar/$avatar";
+                    $avatar_path = "/Uploads/Avatar$avatar";
                 }
             }
             return $this->getImageUrlByPath($avatar_path, $size);

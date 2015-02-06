@@ -114,10 +114,13 @@
             } else {
                // $("#avatar_" + "{$uid}" + "_original img").attr('src', ret.data.file.path );
                 ext = ret.data.file.ext;
-                $("#avatar_" + "{$uid}" + "_original").html('<img src="'+ret.data.file.path+'">');
-                $pimg.attr('src', ret.data.file.path)
-                $pimg_128.attr('src', ret.data.file.path)
-                $pimg_64.attr('src', ret.data.file.path)
+
+                var src = ret.data.file.path+'?time='+ret.data.file.time;
+                $("#avatar_" + "{$uid}" + "_original").html('');
+                $("#avatar_" + "{$uid}" + "_original").html('<img src="'+src+'">');
+                $pimg.attr('src', src)
+                $pimg_128.attr('src', src)
+                $pimg_64.attr('src', src)
                 $("#avatar_" + "{$uid}" + "_original img").load(function () {
                     $("#avatar_" + "{$uid}" + "_original >img").Jcrop({
                         aspectRatio: 1,

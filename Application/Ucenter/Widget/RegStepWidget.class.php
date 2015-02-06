@@ -36,6 +36,9 @@ class RegStepWidget extends Action
 
     private function change_avatar(){
         $aUid = session('temp_login_uid');
+/*        if( empty($aUid)){
+            $this->error('参数错误');
+        }*/
         $this->assign('user',query_user(array('avatar128')));
         $this->assign('uid',$aUid);
     }
