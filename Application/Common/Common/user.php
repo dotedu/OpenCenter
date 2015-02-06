@@ -105,6 +105,18 @@ function get_next_step($now_step =''){
     return $return;
 }
 
+function check_step($now_step=''){
+    $step = modC('REG_STEP', '', 'USERCONFIG');
+    $step = explode(',',$step);
+    if(array_search($now_step,$step)){
+        $return = $now_step;
+    }
+    else{
+        $return = $step[0];
+    }
+    return $return;
+}
+
 
 /**
  * set_user_status   设置用户状态

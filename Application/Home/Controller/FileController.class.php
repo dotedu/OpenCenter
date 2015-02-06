@@ -172,19 +172,18 @@ class FileController extends HomeController
 
     public function uploadAvatar(){
 
+        $aUid = I('get.uid',0,'intval');
 
+        mkdir ("./Uploads/Avatar/".$aUid);
 
         $pic_driver = C('PICTURE_UPLOAD_DRIVER');
         $files = $_FILES;
         $setting  = C('PICTURE_UPLOAD');
         $driver =  C('PICTURE_UPLOAD_DRIVER');
         $config = C("UPLOAD_{$pic_driver}_CONFIG");
-
-
         /* 上传文件 */
-
         $setting['rootPath'] = './Uploads/Avatar/';
-        $setting['saveName'] = 'uid_1'.'_orange';
+        $setting['saveName'] = '/'.$aUid.'/original';
         $setting['savepath'] = '';
         $setting['subName'] = '';
         $setting['replace'] = true;
@@ -203,33 +202,35 @@ class FileController extends HomeController
                     $value['path'] = $config['rootPath'] . 'Avatar/' . $value['savepath'] . $value['savename']; //在模板里的url路径
 
                 }
-
-
                 /* 设置文件保存位置 */
                 $this->_auto[] = array('location', 'Ftp' === $driver ? 1 : 0, self::MODEL_INSERT);
-
-                if ($info) { //文件上传成功，不记录文件
-                    // dump($info);exit;
-                    return $info;
-                } else {
-                    $this->error = $Upload->getError();
-                    return false;
-                }
             }
         }else{
-
             $Upload = new \Think\Upload($setting, $driver, $config);
             $info = $Upload->upload($files);
-
-
-            if ($info) { //文件上传成功，不记录文件
-                return $info;
-            } else {
-                $this->error = $Upload->getError();
-                return false;
+             }
+        if ($info) { //文件上传成功，不记录文件
+            $return['status'] = 1;
+            if ($info['Filedata']) {
+                $return = array_merge($info['Filedata'], $return);
             }
-
+            if ($info['download']) {
+                $return = array_merge($info['download'], $return);
+            }
+            /*适用于自动表单的图片上传方式*/
+            if ($info['file']) {
+                $return['data']['file'] = $info['file'];
+                $return['data']['file']['path'] =getRootUrl() . "Uploads/Avatar/".$info['file']['savename'];
+                $size =  getimagesize("./Uploads/Avatar/".$info['file']['savename']);
+                $return['data']['file']['width'] =$size[0];
+                $return['data']['file']['height'] =$size[1];
+            }
+        } else {
+            $return['status'] = 0;
+            $return['info'] = $Upload->getError();
         }
+
+        $this->ajaxReturn($return);
     }
 
 }

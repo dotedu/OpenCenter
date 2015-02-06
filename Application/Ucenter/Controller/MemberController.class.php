@@ -104,7 +104,13 @@ class MemberController extends Controller
     public function step()
     {
         $aStep = I('get.step', '', 'op_t');
-        $this->assign('type', $aStep);
+        $aUid= session('temp_login_uid');
+        M('UcenterMember')->where('id='.$aUid)->setField('step',$aStep);
+        if($aStep =='finish'){
+            D('Member')->login($aUid, false);
+
+        }
+        $this->assign('step', $aStep);
         $this->display('register');
     }
 
@@ -499,6 +505,36 @@ class MemberController extends Controller
         $content = str_replace('{$callback_url}', $url, $content);
         $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
         return $res;
+    }
+
+    public function saveAvatar(){
+
+        $aCrop = I('post.crop','','op_t');
+        $aUid = session('temp_login_uid') ?session('temp_login_uid'):is_login();
+        $aExt = I('post.ext','','op_t');
+
+        $dir = './Uploads/Avatar/'.$aUid;
+        $dh=opendir($dir);
+        while ($file=readdir($dh)) {
+            if($file!="." && $file!=".." && $file!='original.'.$aExt) {
+                $fullpath=$dir."/".$file;
+                if(!is_dir($fullpath)) {
+                    unlink($fullpath);
+                } else {
+                    deldir($fullpath);
+                }
+            }
+        }
+
+        closedir($dh);
+        A('Ucenter/UploadAvatar','Widget')->cropPicture($aUid, $aCrop,$aExt);
+        $res = M('avatar')->where(array('uid'=>$aUid))->save( array('uid'=>$aUid, 'status'=>1, 'is_temp'=>0,'path'=>"/".$aUid."/crop.".$aExt,'create_time'=>time()));
+        if(!$res){
+            M('avatar')->add( array('uid'=>$aUid, 'status'=>1, 'is_temp'=>0,'path'=>"/".$aUid."/crop.".$aExt,'create_time'=>time()));
+        }
+        clean_query_user_cache($aUid,array('avatar256','avatar128','avatar64'));
+        $this->success('头像更新成功！',session('temp_login_uid')?U('Ucenter/member/step',array('step'=>get_next_step('change_avatar'))):'refresh');
+
     }
 
 }

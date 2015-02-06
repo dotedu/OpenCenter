@@ -36,7 +36,9 @@ class RegStepWidget extends Action
     }
 
     private function change_avatar(){
+        $aUid = session('temp_login_uid');
         $this->assign('user',query_user(array('avatar128')));
+        $this->assign('uid',$aUid);
     }
 
     private function account_info(){

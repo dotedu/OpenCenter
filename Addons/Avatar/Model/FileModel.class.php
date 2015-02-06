@@ -101,8 +101,7 @@ class FileModel extends Model
      * @param  string  $args 回调函数参数
      * @return boolean       false-下载失败，否则输出下载文件
      */
-    public
-    function download($root, $id, $callback = null, $args = null)
+    public  function download($root, $id, $callback = null, $args = null)
     {
         /* 获取下载文件信息 */
         $file = $this->find($id);
