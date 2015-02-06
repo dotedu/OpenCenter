@@ -21,8 +21,7 @@ class RegStepWidget extends Action
 
     public $mStep = array(
         'change_avatar'=>'修改头像',
-        'account_info'=>'帐号信息',
-        'base_info'=>'基本信息',
+
 
     );
     public function  view()
@@ -41,8 +40,4 @@ class RegStepWidget extends Action
         $this->assign('uid',$aUid);
     }
 
-    private function account_info(){
-        $aStep = I('get.step','','op_t');
-
-    }
 } 
