@@ -51,11 +51,11 @@
                 </think:nav>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                 <li>
-                     <!--换肤功能预留-->
+              <!--   <li>
+                     &lt;!&ndash;换肤功能预留&ndash;&gt;
                         <a><i class="icon-magic"></i></a>
-                        <!--换肤功能预留end-->
-                    </li>
+                        &lt;!&ndash;换肤功能预留end&ndash;&gt;
+                    </li>-->
                 <!--登陆面板-->
                 <if condition="is_login()">
                     <li class="dropdown op_nav_ico hidden-xs hidden-sm">
@@ -91,7 +91,7 @@
                                                 <li>
                                                     <a data-url="{$message.url}"
                                                        onclick="readMessage(this,{$message.id})">
-                                                        <i class="glyphicon glyphicon-bell"></i>
+                                                        <i class="icon-bell"></i>
                                                         {$message.title}
                                             <span class="time">
                                             {$message.ctime}
@@ -106,7 +106,7 @@
                             </li>
                             <li class="external">
                                 <a href="{:U('ucenter/Message/message')}">
-                                    消息中心 <i class="icon-message"></i>
+                                    <i class="icon-share"></i> 消息中心
                                 </a>
                             </li>
                         </ul>

@@ -20,9 +20,6 @@
 .usercenter .uc_info {
   margin-top: -64px;
 }
-.usercenter .uc_info .top_img {
-  border: solid 2px #fff;
-}
 .usercenter .uc_info > div > dl dt img {
   margin: 0 auto;
 }

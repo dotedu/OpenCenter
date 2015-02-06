@@ -758,9 +758,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_menu` (
   `icon` varchar(20) NOT NULL COMMENT '导航图标',
   PRIMARY KEY (`id`),
   KEY `pid` (`pid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2332 ;
-
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2341 ;
 
 INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`, `icon`) VALUES
 (1, '首页', 0, 1, 'Index/index', 0, '', '', 0, 'home'),
@@ -775,7 +773,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (24, '禁用会员', 19, 0, 'User/changeStatus?method=forbidUser', 0, '"用户->用户信息"中的禁用', '', 0, ''),
 (25, '启用会员', 19, 0, 'User/changeStatus?method=resumeUser', 0, '"用户->用户信息"中的启用', '', 0, ''),
 (26, '删除会员', 19, 0, 'User/changeStatus?method=deleteUser', 0, '"用户->用户信息"中的删除', '', 0, ''),
-(27, '权限管理', 16, 0, 'AuthManager/index', 0, '', '用户管理', 0, ''),
+(27, '权限管理', 16, 0, 'AuthManager/index', 0, '', '权限管理', 0, ''),
 (28, '删除', 27, 0, 'AuthManager/changeStatus?method=deleteGroup', 0, '删除用户组', '', 0, ''),
 (29, '禁用', 27, 0, 'AuthManager/changeStatus?method=forbidGroup', 0, '禁用用户组', '', 0, ''),
 (30, '恢复', 27, 0, 'AuthManager/changeStatus?method=resumeGroup', 0, '恢复已禁用的用户组', '', 0, ''),
@@ -814,7 +812,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (72, '删除', 70, 0, 'Config/del', 0, '删除配置', '', 0, ''),
 (73, '新增', 70, 0, 'Config/add', 0, '新增配置', '', 0, ''),
 (74, '保存', 70, 0, 'Config/save', 0, '保存配置', '', 0, ''),
-(75, '菜单管理', 68, 5, 'Menu/index', 0, '', '系统设置', 0, ''),
+(75, '菜单管理', 16, 5, 'Menu/index', 0, '', '权限管理', 0, ''),
 (76, '导航管理', 68, 6, 'Channel/index', 0, '', '系统设置', 0, ''),
 (77, '新增', 76, 0, 'Channel/add', 0, '', '', 0, ''),
 (78, '编辑', 76, 0, 'Channel/edit', 0, '', '', 0, ''),
@@ -894,7 +892,15 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (2327, '编辑微博', 2324, 0, 'Weibo/editWeibo', 1, '', '', 0, ''),
 (2326, '回复管理', 2324, 3, 'Weibo/comment', 0, '', '回复', 0, ''),
 (2324, '微博', 0, 8, 'Weibo/weibo', 1, '', '', 0, ''),
-(2325, '微博管理', 2324, 1, 'Weibo/weibo', 0, '', '微博', 0, '');
+(2325, '微博管理', 2324, 1, 'Weibo/weibo', 0, '', '微博', 0, ''),
+(2333, '微博管理', 2332, 1, 'Weibo/weibo', 0, '', '微博', 0, ''),
+(2334, '回复管理', 2332, 3, 'Weibo/comment', 0, '', '回复', 0, ''),
+(2335, '编辑微博', 2332, 0, 'Weibo/editWeibo', 1, '', '', 0, ''),
+(2336, '编辑回复', 2332, 0, 'Weibo/editComment', 1, '', '', 0, ''),
+(2337, '微博回收站', 2332, 2, 'Weibo/weiboTrash', 0, '', '微博', 0, ''),
+(2338, '回复回收站', 2332, 4, 'Weibo/commentTrash', 0, '', '回复', 0, ''),
+(2339, '微博设置', 2332, 0, 'Weibo/config', 0, '微博的基本配置', '设置', 0, ''),
+(2340, '用户注册配置', 16, 0, 'UserConfig/index', 0, '', '注册配置', 0, '');
 
 
 CREATE TABLE IF NOT EXISTS `ocenter_message` (
@@ -1130,10 +1136,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `last_login_ip` bigint(20) NOT NULL DEFAULT '0' COMMENT '最后登录IP',
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `status` tinyint(4) DEFAULT '0' COMMENT '用户状态',
+  `type` tinyint(4) NOT NULL COMMENT '1为用户名注册，2为邮箱注册，3为手机注册',
   PRIMARY KEY (`id`),
   KEY `status` (`status`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=59 ;
-
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=60 ;
 
 
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_setting` (
@@ -1163,3 +1169,12 @@ CREATE TABLE IF NOT EXISTS `ocenter_user_token` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
 
+CREATE TABLE IF NOT EXISTS `ocenter_verify` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `account` varchar(255) NOT NULL,
+  `type` varchar(20) NOT NULL,
+  `verify` varchar(50) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

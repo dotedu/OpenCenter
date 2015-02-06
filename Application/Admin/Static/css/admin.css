@@ -165,3 +165,16 @@ body {
   font-size: 32px;
   text-decoration: none;
 }
+.node-list label[class=checkbox] {
+  padding-top: 0;
+  display: inline-block;
+}
+.node-list input[type=checkbox] {
+  margin-top: 8px;
+}
+label {
+  font-weight: normal;
+}
+.item-label {
+  font-weight: bold;
+}

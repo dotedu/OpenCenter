@@ -12,20 +12,49 @@
 
 <!-- 主体 -->
 <block name="header">
-    <div id="main-container" class="container">
-        <div class="common_block_border">
-            <div class="common_block_title text-center">
-                个人设置
-            </div>
+    <div id="main-container" class="container user-config">
+        <div class="row">
+            <div class="col-xs-12 col-md-3" style="width: 220px">
+                <div>
+                    <div class="user-info-panel bg-primary text-center margin_bottom_10">
+                        <div>
+                            <img class="avatar-img" src="{$self.avatar128}">
+                        </div>
+                        <div>
+                            <a class="nickname" href="{$self.space_url}">{$self.nickname}</a>
+                        </div>
 
-            <div id="usercenter-content-td">
-                <div class="container-fluid">
-                    <block name="body"></block>
+                    </div>
+                </div>
+                <div>
+                    <nav class="menu" data-toggle="menu">
+                        <a class="btn btn-success btn-lg" href="{$self.space_url}"><i class="icon-user"></i> 个人主页</a>
+                        <ul class="nav nav-primary side-menu">
+                            <li id="info" ><a href="{:U('index')}"><i class="icon-th"></i> 资料设置</a></li>
+                            <li id="avatar"><a href="{:U('avatar')}"><i class="icon-user"></i> 头像修改</a></li>
+                            <li id="password"><a href="{:U('password')}"><i class="icon-lock"></i> 密码修改</a></li>
+                            <li id="other"><a href="{:U('other')}"><i class="icon-list-ul"></i> 其他</a></li>
+                        </ul>
+                    </nav>
+                    <script>
+                        $("#{$tab}").addClass('active');
+                    </script>
                 </div>
             </div>
+            <div class="col-xs-12  col-md-9">
+                <div id="usercenter-content-td">
+                    <div class="container-fluid">
+                        <block name="body"></block>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
         </div>
 
+
+
     </div>
+</div>
 
     <script type="text/javascript">
         $(function () {

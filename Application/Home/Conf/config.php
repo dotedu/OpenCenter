@@ -103,5 +103,14 @@ return array(
         'hash'     => true, //是否生成hash编码
         'callback' => false, //检测文件是否存在回调函数，如果存在返回文件信息数组
     ), //附件上传配置（文件上传类配置）
+    /* 模板相关配置 */
+    'TMPL_PARSE_STRING' => array(
+        '__STATIC__' => __ROOT__ . '/Public/static',
+        '__ADDONS__' => __ROOT__ . '/Public/' . MODULE_NAME . '/Addons',
+        '__IMG__' => __ROOT__ . '/Application/Home'   . '/Static/images',
+        '__CSS__' => __ROOT__ . '/Application/Home'   . '/Static/css',
+        '__JS__' => __ROOT__ . '/Application/Home'  . '/Static/js',
+        '__ZUI__' => __ROOT__ . '/Public/zui'
+    ),
 
 );
