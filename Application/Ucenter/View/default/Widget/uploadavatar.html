@@ -187,14 +187,16 @@
 
         $('.avatar_btn').click(function(){
             //检查是否已经裁剪过
-            if (crop.w == undefined || crop.w == 0) {
-                alert('请先选出图片中需要的部分');
-                return;
+            if (typeof (crop) == 'undefined') {
+                crop2='';
+            }
+            else{
+                var crop2 = crop.x / boundx + ',' + crop.y / boundy + ',' + crop.w / boundx + ',' + crop.h / boundy;
             }
             var uid ='{$uid}';
             //提交到服务器
             var url = "{:U('ucenter/member/saveAvatar')}";
-            var crop2 = crop.x / boundx + ',' + crop.y / boundy + ',' + crop.w / boundx + ',' + crop.h / boundy;
+
             $.post(url, {uid: uid, crop: crop2,ext:ext}, function (res) {
                      handleAjax(res);
             });

@@ -21,7 +21,7 @@ class VerifyModel extends Model
     public function addVerify($account,$type,$uid=0)
     {
         $uid = $uid?$uid:is_login();
-        if ($type == 'mobile') {
+        if ($type == 'mobile' || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 0 && $type == 'email')) {
             $verify = create_rand(6, 'num');
         } else {
             $verify = create_rand(32);

@@ -188,3 +188,65 @@ function modC($key, $default = '', $module = '')
     }
     return $result;
 }
+
+
+function sendSMS($mobile,$content,$time='',$mid='')
+{
+    $uid =  modC('SMS_UID', '', 'USERCONFIG');
+    $pwd =  modC('SMS_PWD', '', 'USERCONFIG');
+    $http =  modC('SMS_HTTP', '', 'USERCONFIG');
+    $data = array
+    (
+        'uid'=>$uid,					//用户账号
+        'pwd'=>strtolower(md5($pwd)),	//MD5位32密码
+        'mobile'=>$mobile,				//号码
+        'content'=>$content,			//内容 如果对方是utf-8编码，则需转码iconv('gbk','utf-8',$content); 如果是gbk则无需转码
+        'time'=>$time,		//定时发送
+        'mid'=>$mid,						//子扩展号
+        'encode'=>'utf8',
+    );
+    $re= postSMS($http,$data);			//POST方式提交
+    if( trim($re) == '100' )
+    {
+        return "发送成功!";
+    }
+    else
+    {
+        return "发送失败! 状态：".$re;
+    }
+}
+
+function postSMS($url,$data='')
+{
+    $row = parse_url($url);
+    $host = $row['host'];
+    $port = $row['port'] ? $row['port']:80;
+    $file = $row['path'];
+    $post='';
+    while (list($k,$v) = each($data))
+    {
+        $post .= rawurlencode($k)."=".rawurlencode($v)."&";	//转URL标准码
+    }
+    $post = substr( $post , 0 , -1 );
+    $len = strlen($post);
+    $fp = @fsockopen( $host ,$port, $errno, $errstr, 10);
+    if (!$fp) {
+        return "$errstr ($errno)\n";
+    } else {
+        $receive = '';
+        $out = "POST $file HTTP/1.1\r\n";
+        $out .= "Host: $host\r\n";
+        $out .= "Content-type: application/x-www-form-urlencoded\r\n";
+        $out .= "Connection: Close\r\n";
+        $out .= "Content-Length: $len\r\n\r\n";
+        $out .= $post;
+        fwrite($fp, $out);
+        while (!feof($fp)) {
+            $receive .= fgets($fp, 128);
+        }
+        fclose($fp);
+        $receive = explode("\r\n\r\n",$receive);
+        unset($receive[0]);
+        return implode("",$receive);
+    }
+}

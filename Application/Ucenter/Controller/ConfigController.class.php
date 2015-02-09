@@ -449,26 +449,9 @@ class ConfigController extends BaseController
         $this->display();
     }
 
-    public function doCropAvatar($crop)
-    {
-        //调用上传头像接口改变用户的头像
-        $result = callApi('User/applyAvatar', array($crop));
-        $this->ensureApiSuccess($result);
 
-        //显示成功消息
-        $this->success($result['message'], U('Ucenter/Config/index', array('tab' => 'avatar')));
-    }
 
-    public function doUploadAvatar()
-    {
-        //调用上传头像接口
-        $result = callApi('User/uploadTempAvatar');
 
-        $this->ensureApiSuccess($result);
-
-        //显示成功消息
-        $this->iframeReturn(apiToAjax($result));
-    }
 
     private function iframeReturn($result)
     {
@@ -609,14 +592,20 @@ class ConfigController extends BaseController
         switch ($type) {
             case 'mobile':
                 //TODO 手机短信验证
-                return true;
+                $content = modC('SMS_CONTENT', '{$verify}', 'USERCONFIG');
+                $content = str_replace('{$verify}', $verify, $content);
+                $content = str_replace('{$account}', $account, $content);
+                $res = sendSMS($account,$content);
+                return $res;
                 break;
             case 'email':
                 //发送验证邮箱
-                $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/config/checkVerify?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . is_login());
-                $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
-                $content = str_replace('{$callback_url}', $url, $content);
+
+                $content = modC('REG_EMAIL_VERIFY', '{$verify}', 'USERCONFIG');
+                $content = str_replace('{$verify}', $verify, $content);
+                $content = str_replace('{$account}', $account, $content);
                 $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
+
                 return $res;
                 break;
         }
@@ -632,16 +621,16 @@ class ConfigController extends BaseController
 
         $aAccount = I('account', '', 'op_t');
         $aType = I('type', '', 'op_t');
-        $aVerify = I('verify', '', 'op_t');
+        $aVerify = I('verify', '', 'intval');
         $aUid = I('uid', 0, 'intval');
+
         if (!is_login() || $aUid != is_login()) {
             $this->error('验证失败');
         }
         $aType = $aType == 'mobile' ? 'mobile' : 'email';
         $res = D('Verify')->checkVerify($aAccount, $aType, $aVerify, $aUid);
         if (!$res) {
-            $url = $aType == 'mobile' ? '' : U('ucenter/config/index');
-            $this->error('验证失败', $url);
+           $this->error('验证失败');
         }
         D('User/UcenterMember')->where(array('id' => $aUid))->save(array($aType => $aAccount));
         $this->success('验证成功', U('ucenter/config/index'));
