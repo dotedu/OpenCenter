@@ -24,7 +24,7 @@ class MemberController extends Controller
     public function register()
     {
         //获取参数
-        $aUsername= $username = I('post.username', '', 'op_t');
+        $aUsername = $username = I('post.username', '', 'op_t');
         $aNickname = I('post.nickname', '', 'op_t');
         $aPassword = I('post.password', '', 'op_t');
         $aVerify = I('post.verify', '', 'op_t');
@@ -44,6 +44,7 @@ class MemberController extends Controller
                     $this->error('验证码输入错误。');
                 }
             }
+
             if ($aRegType == 'mobile' || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 0 && $aRegType == 'email')) {
                 if (!D('Verify')->checkVerify($aUsername, $aRegType, $aRegVerify, 0)) {
                     $str = $aRegType == 'mobile' ? '手机' : '邮箱';
@@ -63,27 +64,19 @@ class MemberController extends Controller
             if (!check_reg_type($aUnType)) {
                 $this->error('该类型未开放注册。');
             }
-
             /* 注册用户 */
             $uid = D('User/UcenterMember')->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
-
             if (0 < $uid) { //注册成功
-
-                if(modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType==2){
-                    set_user_status($uid,3);
-                    $verify = D('Verify')->addVerify($email, 'email',$uid);
-                    //TODO 邮件发送模版
-                    $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/doActivate?account=' . $email . '&verify=' . $verify . '&type=email&uid=' . $uid);
-                    $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
-                    $content = str_replace('{$callback_url}', $url, $content);
-                    $res = send_mail($email, C('WEB_SITE') . '激活信', $content);
-
-                   // $this->success('注册成功，请登录邮箱进行激活');
+                if (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType == 2) {
+                    set_user_status($uid, 3);
+                    $verify = D('Verify')->addVerify($email, 'email', $uid);
+                    $res = $this->sendActivateEmail($email, $verify, $uid); //发送激活邮件
+                    // $this->success('注册成功，请登录邮箱进行激活');
                 }
 
                 $uid = D('User/UcenterMember')->login($username, $aPassword, $aUnType); //通过账号密码取到uid
                 D('Member')->login($uid, false); //登陆
-                $this->success('', U('Ucenter/member/step',array('step'=>get_next_step('start'))));
+                $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
             } else { //注册失败，显示错误信息
                 $this->error($this->showRegError($uid));
             }
@@ -104,26 +97,15 @@ class MemberController extends Controller
     public function step()
     {
         $aStep = I('get.step', '', 'op_t');
-        $aUid= session('temp_login_uid');
-        M('UcenterMember')->where('id='.$aUid)->setField('step',$aStep);
-        if($aStep =='finish'){
+        $aUid = session('temp_login_uid');
+        M('UcenterMember')->where('id=' . $aUid)->setField('step', $aStep);
+        if ($aStep == 'finish') {
             D('Member')->login($aUid, false);
 
         }
         $this->assign('step', $aStep);
         $this->display('register');
     }
-
-    public function doCropAvatar($crop)
-    {
-        //调用上传头像接口改变用户的头像
-        $result = callApi('User/applyAvatar', array($crop));
-        $this->ensureApiSuccess($result);
-
-        //显示成功消息
-        $this->success($result['message'], U('Ucenter/member/step3'));
-    }
-
 
 
     /* 登录页面 */
@@ -166,7 +148,6 @@ class MemberController extends Controller
                         $html = '';
                         $html = uc_user_synlogin($ref['uc_uid']);
                     }
-
 
 
                     $this->success($html, get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
@@ -417,6 +398,14 @@ class MemberController extends Controller
         }
     }
 
+    /**
+     * doSendVerify  发送验证码
+     * @param $account
+     * @param $verify
+     * @param $type
+     * @return bool|string
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
     public function doSendVerify($account, $verify, $type)
     {
         switch ($type) {
@@ -427,9 +416,9 @@ class MemberController extends Controller
             case 'email':
                 //发送验证邮箱
                 //TODO 邮箱发送模版
-                $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/checkVerify?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . is_login());
-                $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
-                $content = str_replace('{$callback_url}', $url, $content);
+                $content = modC('REG_EMAIL_VERIFY', '{$verify}', 'USERCONFIG');
+                $content = str_replace('{$verify}', $verify, $content);
+                $content = str_replace('{$account}', $account, $content);
                 $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
                 return $res;
                 break;
@@ -441,43 +430,52 @@ class MemberController extends Controller
      * activate  提示激活页面
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    public function activate(){
+    public function activate()
+    {
 
-       // $aUid = I('get.uid',0,'intval');
+        // $aUid = I('get.uid',0,'intval');
         $aUid = session('temp_login_uid');
-        $status = D('User/UcenterMember')->where(array('id'=>$aUid))->getField('status');
-        if($status != 3){
+        $status = D('User/UcenterMember')->where(array('id' => $aUid))->getField('status');
+        if ($status != 3) {
             redirect(U('ucenter/member/login'));
         }
-        $info = query_user(array('uid','nickname','email'),$aUid);
+        $info = query_user(array('uid', 'nickname', 'email'), $aUid);
         $this->assign($info);
         $this->display();
     }
 
-
-    public function reSend(){
-        $res =$this->activateVerify();
-        if($res === true){
-            $this->success('发送成功','refresh');
-        }else{
-            $this->error('发送失败，请稍候再试！'.$res,'refresh');
+    /**
+     * reSend  重发邮件
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function reSend()
+    {
+        $res = $this->activateVerify();
+        if ($res === true) {
+            $this->success('发送成功', 'refresh');
+        } else {
+            $this->error('发送失败，请稍候再试！' . $res, 'refresh');
         }
 
     }
 
-
-    public function changeEmail(){
-        $aEmail = I('post.email','','op_t');
+    /**
+     * changeEmail  更改邮箱
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function changeEmail()
+    {
+        $aEmail = I('post.email', '', 'op_t');
         $aUid = session('temp_login_uid');
         $ucenterMemberModel = D('User/UcenterMember');
-        $ucenterMemberModel->where(array('id'=>$aUid))->getField('status');
-        if($ucenterMemberModel->where(array('id'=>$aUid))->getField('status') !=3){
+        $ucenterMemberModel->where(array('id' => $aUid))->getField('status');
+        if ($ucenterMemberModel->where(array('id' => $aUid))->getField('status') != 3) {
             $this->error('权限不足！');
         }
-        $ucenterMemberModel->where(array('id'=>$aUid))->setField('email',$aEmail);
-        clean_query_user_cache($aUid,'email');
+        $ucenterMemberModel->where(array('id' => $aUid))->setField('email', $aEmail);
+        clean_query_user_cache($aUid, 'email');
         $res = $this->activateVerify();
-        $this->success('更换成功，请登录邮箱进行激活！如没收到激活信请稍候再试！','refresh');
+        $this->success('更换成功，请登录邮箱进行激活！如没收到激活信请稍候再试！', 'refresh');
     }
 
     /**
@@ -485,13 +483,15 @@ class MemberController extends Controller
      * @return bool|string
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    private function activateVerify(){
+    private function activateVerify()
+    {
         $aUid = session('temp_login_uid');
-        $email =D('User/UcenterMember')->where(array('id'=>$aUid))->getField('email');
-        $verify = D('Verify')->addVerify($email, 'email',$aUid);
-        $res = $this->sendActivateEmail($email,$verify); //发送激活邮件
+        $email = D('User/UcenterMember')->where(array('id' => $aUid))->getField('email');
+        $verify = D('Verify')->addVerify($email, 'email', $aUid);
+        $res = $this->sendActivateEmail($email, $verify, $aUid); //发送激活邮件
         return $res;
     }
+
     /**
      * sendActivateEmail   发送激活邮件
      * @param $account
@@ -499,41 +499,73 @@ class MemberController extends Controller
      * @return bool|string
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    private function sendActivateEmail($account,$verify){
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/checkVerify?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . is_login());
-        $content = modC('EMAIL_VERIFY', '{$callback_url}', 'USERCONFIG');
-        $content = str_replace('{$callback_url}', $url, $content);
-        $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
+    private function sendActivateEmail($account, $verify, $uid)
+    {
+
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/doActivate?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . $uid);
+        $content = modC('REG_EMAIL_ACTIVATE', '{$url}', 'USERCONFIG');
+        $content = str_replace('{$url}', $url, $content);
+        $content = str_replace('{$title}', C('WEB_SITE'), $content);
+        $res = send_mail($account, C('WEB_SITE') . '激活信', $content);
+
+
         return $res;
     }
 
-    public function saveAvatar(){
+    /**
+     * saveAvatar  保存头像
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function saveAvatar()
+    {
 
-        $aCrop = I('post.crop','','op_t');
-        $aUid = session('temp_login_uid') ?session('temp_login_uid'):is_login();
-        $aExt = I('post.ext','','op_t');
-
-        $dir = './Uploads/Avatar/'.$aUid;
-        $dh=opendir($dir);
-        while ($file=readdir($dh)) {
-            if($file!="." && $file!=".." && $file!='original.'.$aExt) {
-                $fullpath=$dir."/".$file;
-                if(!is_dir($fullpath)) {
+        $aCrop = I('post.crop', '', 'op_t');
+         $aUid = session('temp_login_uid') ? session('temp_login_uid') : is_login();
+        $aExt = I('post.ext', '', 'op_t');
+        if(empty($aCrop)){
+            $this->success('保存成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
+        }
+        $dir = './Uploads/Avatar/' . $aUid;
+        $dh = opendir($dir);
+        while ($file = readdir($dh)) {
+            if ($file != "." && $file != ".." && $file != 'original.' . $aExt) {
+                $fullpath = $dir . "/" . $file;
+                if (!is_dir($fullpath)) {
                     unlink($fullpath);
                 } else {
                     deldir($fullpath);
                 }
             }
         }
-
         closedir($dh);
-        A('Ucenter/UploadAvatar','Widget')->cropPicture($aUid, $aCrop,$aExt);
-        $res = M('avatar')->where(array('uid'=>$aUid))->save( array('uid'=>$aUid, 'status'=>1, 'is_temp'=>0,'path'=>"/".$aUid."/crop.".$aExt,'create_time'=>time()));
-        if(!$res){
-            M('avatar')->add( array('uid'=>$aUid, 'status'=>1, 'is_temp'=>0,'path'=>"/".$aUid."/crop.".$aExt,'create_time'=>time()));
+        A('Ucenter/UploadAvatar', 'Widget')->cropPicture($aUid, $aCrop, $aExt);
+        $res = M('avatar')->where(array('uid' => $aUid))->save(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
+        if (!$res) {
+            M('avatar')->add(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         }
-        clean_query_user_cache($aUid,array('avatar256','avatar128','avatar64'));
-        $this->success('头像更新成功！',session('temp_login_uid')?U('Ucenter/member/step',array('step'=>get_next_step('change_avatar'))):'refresh');
+        clean_query_user_cache($aUid, array('avatar256', 'avatar128', 'avatar64'));
+        $this->success('头像更新成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
+
+    }
+
+    /**
+     * doActivate  激活步骤
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function doActivate()
+    {
+        $aAccount = I('get.account', '', 'op_t');
+        $aVerify = I('get.verify', '', 'op_t');
+        $aType = I('get.type', '', 'op_t');
+        $aUid = I('get.uid', 0, 'intval');
+        $check = D('Verify')->checkVerify($aAccount, $aType, $aVerify, $aUid);
+        if ($check) {
+            set_user_status($aUid, 1);
+            $this->success('激活成功',U('Ucenter/member/step', array('step' => get_next_step('start'))));
+        }else{
+            $this->error('激活失败！');
+        }
+
 
     }
 

@@ -1,22 +1,6 @@
 <php>if(check_reg_type($type)){</php>
 <div class="modal-body">
-    <switch name="type">
-        <case value="email">
-             <div class="form-horizontal  center_info ">
-                <div class="form-group">
-                    <label for="account" class="col-sm-2 control-label">请输入{$cName}</label>
 
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control pull-left" id="account" name="account"
-                               placeholder="{$cName}">
-                        <a class="pull-left lh32 " data-row="getVerify" style="margin-left: 10px">发送验证邮件</a>
-                    </div>
-                </div>
-
-                <input type="hidden" class="form-control" name="type" value="{$type}">
-            </div>
-        </case>
-        <case value="mobile">
             <form class="form-horizontal center_info ajax-form" role="form"
                   action="{:U('ucenter/config/checkVerify')}" method="post">
                 <div class="form-group">
@@ -42,15 +26,11 @@
 
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-primary">提交</button>
+                        <button type="submit" data-row="submit" class="btn btn-primary">提交</button>
                     </div>
                 </div>
-
             </form>
-        </case>
-    </switch>
 </div>
-
 <script>
     $(function () {
         $("[data-row='getVerify']").click(function () {
@@ -64,10 +44,6 @@
                     toast.error(res.info);
                 }
             })
-        })
-
-        $("[type='submit']").click(function(){
-            $(this).parents('form').submit();
         })
     })
 </script>

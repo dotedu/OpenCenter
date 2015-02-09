@@ -38,6 +38,20 @@ class UserConfigController extends AdminController {
 
             ->keyText('REG_STEP','注册步骤','注册后需要进行的步骤，根据填写顺序进行，当前可用步骤如下：'.$step_str.'请按顺序填写对应的英文名称，用英文逗号‘,’分隔')
 
+            ->keyEditor('REG_EMAIL_VERIFY','邮箱验证模版','用于进行邮箱的验证')
+            ->keyEditor('REG_EMAIL_ACTIVATE','邮箱激活模版','用于进行用户的激活')
+
+            ->keyText('SMS_HTTP','短信平台HTTP','短信平台HTTP')
+            ->keyText('SMS_UID','短信平台帐号','短信平台帐号')
+            ->keyText('SMS_PWD','短信平台密码','短信平台密码')
+            ->keyTextArea('SMS_CONTENT','短信内容','短信内容')
+
+
+            ->group('基础配置','REG_SWITCH,EMAIL_VERIFY_TYPE,REG_STEP')
+            ->group('邮箱验证模版','REG_EMAIL_VERIFY')
+            ->group('邮箱激活模版','REG_EMAIL_ACTIVATE')
+            ->group('短信配置','SMS_HTTP,SMS_UID,SMS_PWD,SMS_CONTENT')
+
             ->buttonSubmit('', '保存')->data($data);
         $admin_config->display();
     }
