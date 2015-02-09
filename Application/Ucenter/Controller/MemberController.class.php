@@ -84,11 +84,12 @@ class MemberController extends Controller
             if (is_login()) {
                 redirect(U('Weibo/Index/index'));
             }
-
+            $aType = I('get.type', '', 'op_t');
             $regSwitch = modC('REG_SWITCH', '', 'USERCONFIG');
             $regSwitch = explode(',', $regSwitch);
             $this->assign('regSwitch', $regSwitch);
             $this->assign('step', $aStep);
+            $this->assign('type',$aType ==''?'username':$aType);
             $this->display();
         }
     }
@@ -174,6 +175,12 @@ class MemberController extends Controller
             if (is_login()) {
                 redirect(U('Home/Index/index'));
             }
+
+            $ph =array();
+            check_reg_type('username') && $ph[] = '用户名';
+            check_reg_type('email') && $ph[] = '邮箱';
+            check_reg_type('mobile') && $ph[] = '手机号';
+            $this->assign('ph',implode('/',$ph));
             $this->display();
         }
     }

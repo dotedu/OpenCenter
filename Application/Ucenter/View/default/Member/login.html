@@ -25,7 +25,8 @@
                                     <label for="inputEmail" class=".sr-only col-xs-12"></label>
 
                                     <div class="col-xs-12">
-                                        <input type="text" id="inputEmail" class="form-control" placeholder="请输入用户名/邮箱/手机号"
+
+                                        <input type="text" id="inputEmail" class="form-control" placeholder="请输入{$ph}"
                                                ajaxurl="/member/checkUserNameUnique.html" errormsg="请填写1-16位用户名"
                                                nullmsg="请填写用户名"
                                                datatype="*1-16" value="" name="username" autocomplete="off">
@@ -94,9 +95,15 @@
                     <div class="hidden-xs hidden-sm" style="margin: 21px 0 16px 40px;">
 
                         <h2>没有账号？</h2>
-                        <a class="btn btn-block btn-danger btn-lg">用户名注册</a>
-                        <a class="btn btn-block btn-primary btn-lg">邮箱注册</a>
-                        <a class="btn btn-block btn-success btn-lg">手机号注册</a>
+                        <php>if(check_reg_type('username')){</php>
+                        <a href="{:U('ucenter/member/register',array('type'=>'username'))}" class="btn btn-block btn-danger btn-lg">用户名注册</a>
+                        <php>}</php>
+                        <php>if(check_reg_type('email')){</php>
+                        <a href="{:U('ucenter/member/register',array('type'=>'email'))}"  class="btn btn-block btn-primary btn-lg">邮箱注册</a>
+                        <php>}</php>
+                        <php>if(check_reg_type('mobile')){</php>
+                        <a href="{:U('ucenter/member/register',array('type'=>'mobile'))}"  class="btn btn-block btn-success btn-lg">手机号注册</a>
+                        <php>}</php>
                     </div>
 
                     <div style="margin-top: 20px;">
