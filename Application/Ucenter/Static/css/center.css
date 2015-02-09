@@ -141,10 +141,6 @@
   border-radius: 6px;
 }
 .avatar_select {
-  border: 1px rgba(0, 0, 0, 0.4) solid;
-  border-radius: 6px;
-  background-color: white;
-  box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.2);
   padding: 10px;
 }
 .avatar_select p {
