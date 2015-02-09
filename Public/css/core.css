@@ -1279,11 +1279,10 @@ General list for item with image
 }
 .login .lg_center {
   border-left: 1px solid #D8D9DB;
-  border-right: 1px solid #ffffff;
-  float: left;
-  width: 1px;
-  height: 240px;
-  margin: 40px 0 10px -3px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
 .login .lg_middle {
   border-top: 1px solid #D8D9DB;
