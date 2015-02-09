@@ -483,11 +483,14 @@ class ConfigController extends BaseController
     public function doChangePassword($old_password, $new_password)
     {
         //调用接口
-        $result = callApi('User/changePassword', array($old_password, $new_password));
-        $this->ensureApiSuccess($result);
+        $memberModel=D('User/UcenterMember');
+        $res=$memberModel->changePassword($old_password,$new_password);
+        if($res){
+            $this->success('修改密码成功。','refresh');
+        }else{
+            $this->error($memberModel->getErrorMessage());
+        }
 
-        //显示成功信息
-        $this->success($result['message']);
     }
 
     /**

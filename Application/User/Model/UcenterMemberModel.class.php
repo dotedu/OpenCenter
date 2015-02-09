@@ -128,7 +128,7 @@ class UcenterMemberModel extends Model
      * @param  string $mobile 用户手机号码
      * @return integer          注册成功-用户信息，注册失败-错误编号
      */
-    public function register($username, $nickname, $password, $email, $mobile,$type)
+    public function register($username, $nickname, $password, $email, $mobile, $type)
     {
 
         $data = array(
@@ -136,7 +136,7 @@ class UcenterMemberModel extends Model
             'password' => $password,
             'email' => $email,
             'mobile' => $mobile,
-            'type'=>$type,
+            'type' => $type,
         );
 
         //验证手机
@@ -166,7 +166,8 @@ class UcenterMemberModel extends Model
      * @param $uid UID
      * @auth 陈一枭
      */
-    public function setDefaultGroup($uid){
+    public function setDefaultGroup($uid)
+    {
         //将该用户加入用户组
         $defaultGroup = modC('DEFAULT_GROUP', '1', 'User');
         $authGroupAccessModel = M('AuthGroupAccess');
@@ -188,7 +189,7 @@ class UcenterMemberModel extends Model
     public function login($username, $password, $type = 1)
     {
 
-        if(UC_SYNC && $username != get_username(1) && $type==1){
+        if (UC_SYNC && $username != get_username(1) && $type == 1) {
             return $this->ucLogin($username, $password);
         }
         $map = array();
@@ -224,53 +225,53 @@ class UcenterMemberModel extends Model
     }
 
 
-    public function ucLogin($username,$password){
+    public function ucLogin($username, $password)
+    {
         include_once './api/uc_client/client.php';
         //Ucenter 内数据
-        $uc_user = uc_user_login($username,$password,0);
+        $uc_user = uc_user_login($username, $password, 0);
         //关联表内数据
-        $uc_user_ref = tox_get_ucenter_user_ref('',$uc_user['0'],'');
+        $uc_user_ref = tox_get_ucenter_user_ref('', $uc_user['0'], '');
         //登录
-        if($uc_user_ref['uid'] && $uc_user_ref['uc_uid'] && $uc_user[0] > 0 ){
+        if ($uc_user_ref['uid'] && $uc_user_ref['uc_uid'] && $uc_user[0] > 0) {
             return $uc_user_ref['uid'];
         }
         //本地帐号信息
-        $tox_user = $this->model->getLocal($username,$password);
+        $tox_user = $this->model->getLocal($username, $password);
         // 关联表无、UC有、本地无的
-        if( $uc_user[0] > 0 && !$tox_user['id'] ){
-            $uid = $this->register($uc_user[1],$uc_user[1],$uc_user[2],$uc_user[3],'',1);
-            if($uid<=0){
+        if ($uc_user[0] > 0 && !$tox_user['id']) {
+            $uid = $this->register($uc_user[1], $uc_user[1], $uc_user[2], $uc_user[3], '', 1);
+            if ($uid <= 0) {
                 return A('Home/User')->showRegError($uid);
             }
-            $result = tox_add_ucenter_user_ref($uid,$uc_user[0],$uc_user[1],$uc_user[3]);
-            if(!$result){
+            $result = tox_add_ucenter_user_ref($uid, $uc_user[0], $uc_user[1], $uc_user[3]);
+            if (!$result) {
                 return '用户不存在或密码错误';
             }
             return $uid;
         }
         // 关联表无、UC有、本地有的
-        if( $uc_user[0] > 0 && $tox_user['id'] > 0 ){
-            $result = tox_add_ucenter_user_ref($tox_user['id'],$uc_user[0],$uc_user[1],$uc_user[3]);
-            if(!$result){
+        if ($uc_user[0] > 0 && $tox_user['id'] > 0) {
+            $result = tox_add_ucenter_user_ref($tox_user['id'], $uc_user[0], $uc_user[1], $uc_user[3]);
+            if (!$result) {
                 return '用户不存在或密码错误';
             }
-            return  $tox_user['id'];
+            return $tox_user['id'];
         }
         // 关联表无、UC无、本地有
-        if( $uc_user[0] < 0 && $tox_user['id'] > 0 ){
+        if ($uc_user[0] < 0 && $tox_user['id'] > 0) {
             //写入UC
-            $uc_uid = uc_user_register($tox_user['username'], $password, $tox_user['email'],'','', get_client_ip());
-            if($uc_uid <= 0 ){
+            $uc_uid = uc_user_register($tox_user['username'], $password, $tox_user['email'], '', '', get_client_ip());
+            if ($uc_uid <= 0) {
                 return 'UC帐号注册失败，请联系管理员';
             }
             //写入关联表
-            if( M('ucenter_user_link')->where(array('uid'=>$tox_user['id']))->find()){
-                $result = tox_update_ucenter_user_ref($tox_user['id'],$uc_uid,$tox_user['username'],$tox_user['email']);
+            if (M('ucenter_user_link')->where(array('uid' => $tox_user['id']))->find()) {
+                $result = tox_update_ucenter_user_ref($tox_user['id'], $uc_uid, $tox_user['username'], $tox_user['email']);
+            } else {
+                $result = tox_add_ucenter_user_ref($tox_user['id'], $uc_uid, $tox_user['username'], $tox_user['email']);
             }
-            else{
-                $result = tox_add_ucenter_user_ref($tox_user['id'],$uc_uid,$tox_user['username'],$tox_user['email']);
-            }
-            if(!$result){
+            if (!$result) {
                 return '用户不存在或密码错误';
             }
             return $tox_user['id'];
@@ -514,7 +515,7 @@ class UcenterMemberModel extends Model
 
     public function rand_email()
     {
-        $email = $this->create_rand(10) . '@thinkox.com';
+        $email = $this->create_rand(10) . '@ocenter.com';
         if ($this->where(array('email' => $email))->select()) {
             $this->rand_email();
         } else {
@@ -542,5 +543,80 @@ class UcenterMemberModel extends Model
         return $password;
     }
 
+    /**修改密码
+     * @param $old_password
+     * @param $new_password
+     * @return bool
+     * @auth 陈一枭
+     */
+    public function changePassword($old_password, $new_password)
+    {
+        //检查旧密码是否正确
+        if (!$this->verifyUser(get_uid(), $old_password)) {
+            $this->error = -41;
+            return false;
+        }
+        //更新用户信息
+        $model = $this;
+        $data = array('password' => $new_password);
+        $data = $model->create($data);
+        if (!$data) {
+            $this->error = $model->getError();
+            return false;
+        }
+        $model->where(array('id' => get_uid()))->save($data);
+        //返回成功信息
+        clean_query_user_cache(get_uid(), 'password');//删除缓存
+        D('user_token')->where('uid=' . get_uid())->delete();
+        return true;
+    }
 
+    public function getErrorMessage($error_code)
+    {
+        switch ($this->error) {
+            case -1:
+                $error = '用户名长度必须在16个字符以内！';
+                break;
+            case -2:
+                $error = '用户名被禁止注册！';
+                break;
+            case -3:
+                $error = '用户名被占用！';
+                break;
+            case -4:
+                $error = '密码长度必须在6-30个字符之间！';
+                break;
+            case -41:
+                $error = '用户旧密码不正确';
+                break;
+            case -5:
+                $error = '邮箱格式不正确！';
+                break;
+            case -6:
+                $error = '邮箱长度必须在1-32个字符之间！';
+                break;
+            case -7:
+                $error = '邮箱被禁止注册！';
+                break;
+            case -8:
+                $error = '邮箱被占用！';
+                break;
+            case -9:
+                $error = '手机格式不正确！';
+                break;
+            case -10:
+                $error = '手机被禁止注册！';
+                break;
+            case -11:
+                $error = '手机号被占用！';
+                break;
+            case -12:
+                $error = '用户名必须以中文或字母开始，只能包含拼音数字，字母，汉字！';
+                break;
+
+            default:
+                $error = '未知错误';
+        }
+        return $error;
+    }
 }
