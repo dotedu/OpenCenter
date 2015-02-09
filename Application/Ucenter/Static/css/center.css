@@ -154,3 +154,15 @@
   border-radius: 0;
   max-width: none;
 }
+.ucenter-avatar .avatar_256 {
+  left: 460px;
+}
+.ucenter-avatar .avatar_128 {
+  left: 760px;
+}
+.ucenter-avatar .avatar_64 {
+  left: 760px;
+}
+.ucenter-avatar .avatar_btn {
+  left: 460px;
+}
