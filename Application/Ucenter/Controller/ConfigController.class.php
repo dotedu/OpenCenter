@@ -594,7 +594,6 @@ class ConfigController extends BaseController
     {
         switch ($type) {
             case 'mobile':
-                //TODO 手机短信验证
                 $content = modC('SMS_CONTENT', '{$verify}', 'USERCONFIG');
                 $content = str_replace('{$verify}', $verify, $content);
                 $content = str_replace('{$account}', $account, $content);

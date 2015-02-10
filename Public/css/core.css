@@ -1346,3 +1346,58 @@ General list for item with image
   text-align: center;
   bottom: 30px;
 }
+/*提示信息颜色*/
+.tooltip.green .tooltip-inner {
+  background-color: #2ac25f;
+}
+.tooltip.green.top .tooltip-arrow {
+  border-top-color: #2ac25f;
+}
+.tooltip.green.top-left .tooltip-arrow {
+  border-top-color: #2ac25f;
+}
+.tooltip.green.top-right .tooltip-arrow {
+  border-top-color: #2ac25f;
+}
+.tooltip.green.right .tooltip-arrow {
+  border-right-color: #2ac25f;
+}
+.tooltip.green.left .tooltip-arrow {
+  border-left-color: #2ac25f;
+}
+.tooltip.green.bottom .tooltip-arrow {
+  border-bottom-color: #2ac25f;
+}
+.tooltip.green.bottom-left .tooltip-arrow {
+  border-bottom-color: #2ac25f;
+}
+.tooltip.green.bottom-right .tooltip-arrow {
+  border-bottom-color: #2ac25f;
+}
+.tooltip.red .tooltip-inner {
+  background-color: #ee4e2f;
+}
+.tooltip.red.top .tooltip-arrow {
+  border-top-color: #ee4e2f;
+}
+.tooltip.red.top-left .tooltip-arrow {
+  border-top-color: #ee4e2f;
+}
+.tooltip.red.top-right .tooltip-arrow {
+  border-top-color: #ee4e2f;
+}
+.tooltip.red.right .tooltip-arrow {
+  border-right-color: #ee4e2f;
+}
+.tooltip.red.left .tooltip-arrow {
+  border-left-color: #ee4e2f;
+}
+.tooltip.red.bottom .tooltip-arrow {
+  border-bottom-color: #ee4e2f;
+}
+.tooltip.red.bottom-left .tooltip-arrow {
+  border-bottom-color: #ee4e2f;
+}
+.tooltip.red.bottom-right .tooltip-arrow {
+  border-bottom-color: #ee4e2f;
+}

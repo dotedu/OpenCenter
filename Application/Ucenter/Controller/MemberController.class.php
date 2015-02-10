@@ -89,7 +89,7 @@ class MemberController extends Controller
             $regSwitch = explode(',', $regSwitch);
             $this->assign('regSwitch', $regSwitch);
             $this->assign('step', $aStep);
-            $this->assign('type',$aType ==''?'username':$aType);
+            $this->assign('type', $aType == '' ? 'username' : $aType);
             $this->display();
         }
     }
@@ -176,11 +176,11 @@ class MemberController extends Controller
                 redirect(U('Home/Index/index'));
             }
 
-            $ph =array();
+            $ph = array();
             check_reg_type('username') && $ph[] = '用户名';
             check_reg_type('email') && $ph[] = '邮箱';
             check_reg_type('mobile') && $ph[] = '手机号';
-            $this->assign('ph',implode('/',$ph));
+            $this->assign('ph', implode('/', $ph));
             $this->display();
         }
     }
@@ -527,9 +527,9 @@ class MemberController extends Controller
     {
 
         $aCrop = I('post.crop', '', 'op_t');
-         $aUid = session('temp_login_uid') ? session('temp_login_uid') : is_login();
+        $aUid = session('temp_login_uid') ? session('temp_login_uid') : is_login();
         $aExt = I('post.ext', '', 'op_t');
-        if(empty($aCrop)){
+        if (empty($aCrop)) {
             $this->success('保存成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
         }
         $dir = './Uploads/Avatar/' . $aUid;
@@ -568,12 +568,79 @@ class MemberController extends Controller
         $check = D('Verify')->checkVerify($aAccount, $aType, $aVerify, $aUid);
         if ($check) {
             set_user_status($aUid, 1);
-            $this->success('激活成功',U('Ucenter/member/step', array('step' => get_next_step('start'))));
-        }else{
+            $this->success('激活成功', U('Ucenter/member/step', array('step' => get_next_step('start'))));
+        } else {
             $this->error('激活失败！');
         }
 
 
+    }
+
+    /**
+     * checkAccount  ajax验证用户帐号是否符合要求
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function checkAccount()
+    {
+        $aAccount =  I('post.account', '', 'op_t');
+        $aType = I('post.type', '', 'op_t');
+        if(empty($aAccount)){
+            $this->error('不能为空！');
+        }
+        check_username($aAccount, $email, $mobile, $aUnType);
+        $mUcenter = D('User/UcenterMember');
+        switch ($aType) {
+            case 'username':
+                empty($aAccount) && $this->error('用户名格式不正确！');
+                $id = $mUcenter->where(array('username' => $aAccount))->getField('id');
+                if ($id) {
+                    $this->error('该用户名已经存在！');
+                }
+                preg_match("/^[a-zA-Z0-9_]{1,30}$/", $aAccount, $result);
+                if (!$result) {
+                    $this->error('只允许字母和数字和下划线！');
+                }
+                break;
+            case 'email':
+                empty($email) && $this->error('邮箱格式不正确！');
+                $id = $mUcenter->where(array('email' => $email))->getField('id');
+                if ($id) {
+                    $this->error('该邮箱已经存在！');
+                }
+                break;
+            case 'mobile':
+                empty($mobile) && $this->error('手机格式不正确！');
+                $id = $mUcenter->where(array('mobile' => $mobile))->getField('id');
+                if ($id) {
+                    $this->error('该手机号已经存在！');
+                }
+                break;
+        }
+        $this->success('验证成功');
+    }
+
+    /**
+     * checkNickname  ajax验证昵称是否符合要求
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function checkNickname()
+    {
+        $aNickname =  I('post.nickname', '', 'op_t');
+
+        if(empty($aNickname)){
+            $this->error('不能为空！');
+        }
+        $memberModel = D('member');
+        $uid = $memberModel->where(array('nickname' => $aNickname))->getField('uid');
+        if ($uid) {
+            $this->error('该昵称已经存在！');
+        }
+        preg_match('/^(?!_|\s\')[A-Za-z0-9_\x80-\xff\s\']+$/', $aNickname, $result);
+        if (!$result) {
+            $this->error('只允许中文、字母和数字和下划线！');
+        }
+
+        $this->success('验证成功');
     }
 
 }

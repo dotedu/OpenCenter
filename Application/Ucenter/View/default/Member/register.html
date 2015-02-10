@@ -37,11 +37,8 @@
                                         <div class="tab-pane  <if condition='$key eq 0'>active in</if>" id="username_reg">
                                             <div class="form-group">
                                                 <label for="username" class=".sr-only col-xs-12" style="display: none"></label>
-                                                <input type="text" id="username" onblur="setNickname(this);" class="form-control"
-                                                       placeholder="请输入用户名"
-                                                       ajaxurl="/member/checkUserNameUnique.html" errormsg="请填写4-16位用户名"
-                                                       nullmsg="请填写用户名"
-                                                       datatype="*4-16" value="" name="username">
+                                                <input type="text" id="username" onblur="setNickname(this);" class="form-control form_check" check-type="Username" check-url="{:U('ucenter/member/checkAccount')}"
+                                                       placeholder="请输入用户名"  value="" name="username">
 
                                                 <input type="hidden" name="reg_type" value="username">
                                                 <span class="help-block">输入用户名，只允许字母和数字和下划线</span>
@@ -57,7 +54,7 @@
 
                                             <div class="form-group">
                                                 <label for="username" class=".sr-only col-xs-12" style="display: none"></label>
-                                                <input type="text" id="email" class="form-control" <if condition='$key neq 0'>disabled="disabled"</if>
+                                                <input type="text" id="email" class="form-control form_check" check-type="UserEmail" check-url="{:U('ucenter/member/checkAccount')}" <if condition='$key neq 0'>disabled="disabled"</if>
                                                        placeholder="请输入邮箱" value="" name="username">
                                                 <input type="hidden" name="reg_type" value="email" <if condition='$key neq 0'>disabled="disabled"</if>>
                                                 <span class="help-block">输入邮箱</span>
@@ -88,7 +85,7 @@
                                             <div class="form-group">
                                                 <label for="username" class=".sr-only col-xs-12" style="display: none"></label>
 
-                                                <input type="text" id="mobile" class="form-control " <if condition='$key neq 0'>disabled="disabled"</if>
+                                                <input type="text" id="mobile" class="form-control form_check" check-type="UserMobile" check-url="{:U('ucenter/member/checkAccount')}" <if condition='$key neq 0'>disabled="disabled"</if>
                                                        placeholder="请输入手机号" .
                                                 errormsg="请填写手机号" value="" name="username">
 
@@ -118,10 +115,7 @@
 
                             <div class="form-group">
                                 <label for="nickname" class=".sr-only col-xs-12" style="display: none"></label>
-                                <input type="text" id="nickname" class="form-control" placeholder="请输入昵称"
-                                       ajaxurl="/member/checkNickNameUnique.html" errormsg="请填写2-16位昵称"
-                                       nullmsg="请填写昵称"
-                                       datatype="*2-16" value="" name="nickname">
+                                <input type="text" id="nickname" class="form-control form_check" check-type="Nickname" check-url="{:U('ucenter/member/checkNickname')}" placeholder="请输入昵称" value="" name="nickname">
 
                                 <span class="help-block">输入昵称，只允许中文、字母和数字和下划线</span>
 
@@ -129,10 +123,8 @@
                             </div>
 
                             <div class="form-group">
-                                <div class="input-group password_block">
-                                    <input type="password" id="inputPassword" class="form-control"
-                                           placeholder="请输入密码"
-                                           errormsg="密码为6-20位" nullmsg="请填写密码" datatype="*6-20" name="password">
+                                <div class="password_block" style="position: relative;display: table;border-collapse: separate;">
+                                    <input type="password" id="inputPassword" class="form-control" check-length="6,32"  placeholder="请输入密码"  name="password">
 
                                     <div class="input-group-addon">
                                         <a style="width: 100%;height: 100%" href="javascript:void(0);"
@@ -278,6 +270,36 @@
             })
         }
     </script>
+    <script src='__JS__/form_check.js'></script>
+    <script>
+        // 验证密码长度
+        $(function(){
+            $('#inputPassword').after('<div class=" show_info" ></div>');
+            $('#inputPassword').blur(function(){
 
-
+                var obj =$('#inputPassword');
+                var str =  obj.val().replace(/\s+/g, "");
+                var html = '';
+                if (str.length == 0) {
+                    html = '<div class="send red"><div class="arrow"></div>不能为空</div>';
+                } else {
+                    if (typeof (obj.attr('check-length')) != 'undefined') {
+                        var strs = new Array(); //定义一数组
+                        strs = obj.attr('check-length').split(","); //字符分割
+                        if (strs[1]) {
+                            if (strs[1] < str.length || str.length < strs[0]) {
+                                html = '<div class="send red"><div class="arrow"></div>长度不符合要求</div>';
+                            }
+                        }
+                        else {
+                            if (strs[0] < str.length) {
+                                html = '<div class="send red"><div class="arrow"></div>长度不符合要求</div>';
+                            }
+                        }
+                    }
+                    obj.parent().find('.show_info').html(html);
+                }
+            })
+        })
+    </script>
 </block>
