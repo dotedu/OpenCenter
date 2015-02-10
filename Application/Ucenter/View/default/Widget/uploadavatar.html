@@ -56,7 +56,7 @@
 
 
 
-            <input class="btn btn-default avatar_btn"  type="button" value="保存头像"/>
+            <input class="btn btn-default avatar_btn" data-role="avatar_btn"  type="button" value="保存头像"/>
         </div>
 
 
@@ -185,7 +185,7 @@
 
 
 
-        $('.avatar_btn').click(function(){
+        $('[data-role=avatar_btn]').click(function(){
             //检查是否已经裁剪过
             if (typeof (crop) == 'undefined') {
                 crop2='';
