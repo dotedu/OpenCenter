@@ -432,12 +432,7 @@ var checkUsername = function(){
     var type = 'username';
     var url = obj.attr('check-url');
     $.post(url,{account:str,type:type},function(res){
-            if(res.status){
-                check_form.success(res.info);
-
-            }else{
-                check_form.error(res.info);
-            }
+        ajaxRerurn(res);
     },'json')
 
 }
@@ -446,12 +441,7 @@ var checkUserEmail = function(){
     var type = 'email';
     var url = obj.attr('check-url');
     $.post(url,{account:str,type:type},function(res){
-        if(res.status){
-            check_form.success(res.info);
-
-        }else{
-            check_form.error(res.info);
-        }
+        ajaxRerurn(res);
     },'json')
 
 }
@@ -461,12 +451,7 @@ var checkUserMobile = function(){
     var type = 'mobile';
     var url = obj.attr('check-url');
     $.post(url,{account:str,type:type},function(res){
-        if(res.status){
-            check_form.success(res.info);
-
-        }else{
-            check_form.error(res.info);
-        }
+        ajaxRerurn(res);
     },'json')
 
 }
@@ -475,16 +460,21 @@ var checkNickname = function(){
     var str = obj.val();
     var url = obj.attr('check-url');
     $.post(url,{nickname:str},function(res){
-        if(res.status){
-            check_form.success(res.info);
-
-        }else{
-            check_form.error(res.info);
-        }
+        ajaxRerurn(res);
     },'json')
 
 }
 
+var ajaxRerurn = function(res){
+    if(res.status){
+        checkCan[obj.attr('name')] = 1;
+        check_form.success(res.info);
+
+    }else{
+        checkCan[obj.attr('name')] = 0;
+        check_form.error(res.info);
+    }
+}
 
 
 /**

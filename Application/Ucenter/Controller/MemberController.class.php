@@ -45,7 +45,7 @@ class MemberController extends Controller
                 }
             }
 
-            if ($aRegType == 'mobile' || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 0 && $aRegType == 'email')) {
+            if ($aRegType == 'mobile' || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 2 && $aRegType == 'email')) {
                 if (!D('Verify')->checkVerify($aUsername, $aRegType, $aRegVerify, 0)) {
                     $str = $aRegType == 'mobile' ? '手机' : '邮箱';
                     $this->error($str . '验证失败');
