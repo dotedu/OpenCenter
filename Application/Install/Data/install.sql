@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS `ocenter_action` (
   `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态',
   `update_time` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统行为表' AUTO_INCREMENT=17 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统行为表' AUTO_INCREMENT=1 ;
 
 
 INSERT INTO `ocenter_action` ( `name`, `title`, `remark`, `rule`, `log`, `type`, `status`, `update_time`) VALUES
-('user_login', '用户登录', '积分+10，每天一次', 'table:member|field:score|condition:uid={$self} AND status>-1|rule:score+10|cycle:24|max:1;', '[user|get_nickname]在[time|time_format]登录了后台', 1, 1, 1387181220),,
+('user_login', '用户登录', '积分+10，每天一次', 'table:member|field:score|condition:uid={$self} AND status>-1|rule:score+10|cycle:24|max:1;', '[user|get_nickname]在[time|time_format]登录了后台', 1, 1, 1387181220),
 ('update_config', '更新配置', '新增或修改或删除配置', '', '', 1, 1, 1383294988),
 ('update_model', '更新模型', '新增或修改模型', '', '', 1, 1, 1383295057),
 ('update_attribute', '更新属性', '新增或更新或删除属性', '', '', 1, 1, 1383295963),
@@ -62,7 +62,6 @@ INSERT INTO `ocenter_addons` (`id`, `name`, `title`, `description`, `status`, `c
 (2, 'SiteStat', '站点统计信息', '统计站点的基础信息', 1, '{"title":"\\u7cfb\\u7edf\\u4fe1\\u606f","width":"1","display":"1","status":"0"}', 'thinkphp', '0.1', 1379512015, 0),
 (95, 'SystemInfo', '系统环境信息', '用于显示一些服务器的信息', 1, '{"title":"\\u7cfb\\u7edf\\u4fe1\\u606f","width":"6","display":"1"}', 'thinkphp', '0.1', 1420609113, 0),
 (94, 'DevTeam', '开发团队信息', '开发团队成员信息', 1, '{"title":"ThinkOX\\u5f00\\u53d1\\u56e2\\u961f","width":"6","display":"1"}', 'thinkphp', '0.1', 1420609089, 0),
-(16, 'Avatar', '头像插件', '用于头像的上传', 1, '{"random":"1"}', 'caipeichao', '0.1', 1394449710, 1),
 (58, 'SyncLogin', '同步登陆', '同步登陆', 1, '{"type":null,"meta":"","bind":"0","QqKEY":"","QqSecret":"","SinaKEY":"","SinaSecret":""}', 'xjw129xjt', '0.1', 1406598876, 0),
 (41, 'LocalComment', '本地评论', '本地评论插件，不依赖社会化评论平台', 1, '{"can_guest_comment":"1"}', 'caipeichao', '0.1', 1399440324, 0);
 
@@ -801,7 +800,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (55, '插件后台列表', 44, 0, 'Addons/adminList', 0, '', '', 0, ''),
 (56, 'URL方式访问插件', 44, 0, 'Addons/execute', 0, '控制是否有权限通过url访问插件控制器方法', '', 0, ''),
 (57, '钩子管理', 43, 2, 'Addons/hooks', 0, '', '扩展', 0, ''),
-(2263, '模块安装', 2260, 0, 'module/install', 1, '', '云平台', 0, ''),
+(2263, '模块安装', 2260, 0, 'module/install', 1, '', '云市场', 0, ''),
 (68, '系统', 0, 9999, 'Config/group', 0, '', '', 0, 'windows'),
 (69, '网站设置', 68, 1, 'Config/group', 0, '', '系统设置', 0, ''),
 (70, '配置管理', 68, 4, 'Config/index', 0, '', '系统设置', 0, ''),
@@ -866,38 +865,15 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (216, '待审核用户头衔', 16, 0, 'Rank/rankVerify', 0, '', '头衔管理', 0, ''),
 (217, '被驳回的头衔申请', 16, 0, 'Rank/rankVerifyFailure', 0, '', '头衔管理', 0, ''),
 (222, '基础设置', 16, 0, 'User/config', 0, '', '用户管理', 0, ''),
-(2260, '云平台', 0, 999999, 'module/lists', 1, '', '', 0, 'cloud'),
-(2261, '模块管理', 2260, 0, 'module/lists', 0, '', '云平台', 0, ''),
-(2262, '卸载模块', 2260, 0, 'module/uninstall', 1, '', '云平台', 0, ''),
+(2260, '云市场', 0, 999999, 'module/lists', 1, '', '', 0, 'cloud'),
+(2261, '模块管理', 2260, 0, 'module/lists', 0, '', '云市场', 0, ''),
+(2262, '卸载模块', 2260, 0, 'module/uninstall', 1, '', '云市场', 0, ''),
 (2238, '新增权限节点', 27, 0, 'AuthManager/addNode', 1, '', '', 1, ''),
 (2239, '前台权限管理', 27, 0, 'AuthManager/accessUser', 1, '', '权限管理', 0, ''),
 (2240, '转移用户组', 16, 0, 'User/changeGroup', 1, '批量转移用户组', '', 0, ''),
 (2241, '删除权限节点', 27, 0, 'AuthManager/deleteNode', 1, '', '', 0, ''),
-(2298, '内容管理', 2291, 0, 'Issue/contents', 0, '', '内容管理', 0, ''),
-(2296, '内容审核', 2291, 1, 'Issue/verify', 0, '', '内容管理', 0, ''),
-(2297, '内容回收站', 2291, 5, 'Issue/contentTrash', 0, '', '内容管理', 0, ''),
-(2295, '专辑操作', 2291, 0, 'Issue/operate', 1, '', '专辑', 0, ''),
-(2294, '专辑回收站', 2291, 4, 'Issue/issueTrash', 0, '', '专辑', 0, ''),
-(2293, '专辑管理', 2291, 0, 'Issue/issue', 0, '', '专辑', 0, ''),
-(2292, '编辑专辑', 2291, 0, 'Issue/add', 1, '', '专辑', 0, ''),
-(2291, '专辑', 0, 22, 'Issue/issue', 1, '', '', 0, ''),
-(2299, '专辑设置', 2291, 0, 'Issue/config', 0, '', '设置', 0, ''),
-(2330, '回复回收站', 2324, 4, 'Weibo/commentTrash', 0, '', '回复', 0, ''),
-(2331, '微博设置', 2324, 0, 'Weibo/config', 0, '微博的基本配置', '设置', 0, ''),
-(2329, '微博回收站', 2324, 2, 'Weibo/weiboTrash', 0, '', '微博', 0, ''),
-(2328, '编辑回复', 2324, 0, 'Weibo/editComment', 1, '', '', 0, ''),
-(2327, '编辑微博', 2324, 0, 'Weibo/editWeibo', 1, '', '', 0, ''),
-(2326, '回复管理', 2324, 3, 'Weibo/comment', 0, '', '回复', 0, ''),
-(2324, '微博', 0, 8, 'Weibo/weibo', 1, '', '', 0, ''),
-(2325, '微博管理', 2324, 1, 'Weibo/weibo', 0, '', '微博', 0, ''),
-(2333, '微博管理', 2332, 1, 'Weibo/weibo', 0, '', '微博', 0, ''),
-(2334, '回复管理', 2332, 3, 'Weibo/comment', 0, '', '回复', 0, ''),
-(2335, '编辑微博', 2332, 0, 'Weibo/editWeibo', 1, '', '', 0, ''),
-(2336, '编辑回复', 2332, 0, 'Weibo/editComment', 1, '', '', 0, ''),
-(2337, '微博回收站', 2332, 2, 'Weibo/weiboTrash', 0, '', '微博', 0, ''),
-(2338, '回复回收站', 2332, 4, 'Weibo/commentTrash', 0, '', '回复', 0, ''),
-(2339, '微博设置', 2332, 0, 'Weibo/config', 0, '微博的基本配置', '设置', 0, ''),
 (2340, '用户注册配置', 16, 0, 'UserConfig/index', 0, '', '注册配置', 0, '');
+
 
 
 CREATE TABLE IF NOT EXISTS `ocenter_message` (
