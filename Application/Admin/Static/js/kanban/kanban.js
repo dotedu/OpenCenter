@@ -6,14 +6,12 @@
  * ======================================================================== */
 
 
-(function($)
-{
+(function ($) {
     'use strict';
 
     if (!$.fn.droppable) throw new Error('droppable requires for kanbans');
 
-    var Kanban = function(element, options)
-    {
+    var Kanban = function (element, options) {
         this.$ = $(element);
         this.options = this.getOptions(options);
 
@@ -23,41 +21,32 @@
 
     Kanban.DEFAULTS = {
         lang: 'zh-cn',
-        langs:
-        {
-            'zh-cn':
-            {
+        langs: {
+            'zh-cn': {
                 appendToTheEnd: '移动到末尾'
             },
-            'zh-tw':
-            {
+            'zh-tw': {
                 appendToTheEnd: '移动到末尾'
             },
-            'en':
-            {
+            'en': {
                 appendToTheEnd: 'Move to the end.'
             }
         }
     }; // default options
 
-    Kanban.prototype.getOptions = function(options)
-    {
+    Kanban.prototype.getOptions = function (options) {
         options = $.extend(
             {}, Kanban.DEFAULTS, this.$.data(), options);
         return options;
     };
 
-    Kanban.prototype.getLang = function()
-    {
+    Kanban.prototype.getLang = function () {
         var config = window.config;
-        if (!this.options.lang)
-        {
-            if (typeof(config) != 'undefined' && config.clientLang)
-            {
+        if (!this.options.lang) {
+            if (typeof(config) != 'undefined' && config.clientLang) {
                 this.options.lang = config.clientLang;
             }
-            else
-            {
+            else {
                 var hl = $('html').attr('lang');
                 this.options.lang = hl ? hl : 'en';
             }
@@ -66,24 +55,19 @@
         this.lang = this.options.langs[this.options.lang] || this.options.langs[Kanban.DEFAULTS.lang];
     };
 
-    Kanban.prototype.init = function()
-    {
+    Kanban.prototype.init = function () {
         var idSeed = 1;
         var lang = this.lang;
-        this.$.find('.kanban-item:not(".disable-drop"), .kanban:not(".disable-drop")').each(function()
-        {
+        this.$.find('.kanban-item:not(".disable-drop"), .kanban:not(".disable-drop")').each(function () {
             var $this = $(this);
-            if ($this.attr('id'))
-            {
+            if ($this.attr('id')) {
                 $this.attr('data-id', $this.attr('id'));
             }
-            else if (!$this.attr('data-id'))
-            {
+            else if (!$this.attr('data-id')) {
                 $this.attr('data-id', 'kanban' + (idSeed++));
             }
 
-            if ($this.hasClass('kanban'))
-            {
+            if ($this.hasClass('kanban')) {
                 $this.find('.kanban-list').append('<div class="kanban-item kanban-item-empty"><i class="icon-plus"></i> {appendToTheEnd}</div>'.format(lang))
                     .append('<div class="kanban-item kanban-item-shadow"></div>'.format(lang));
             }
@@ -92,29 +76,24 @@
         this.bind();
     };
 
-    Kanban.prototype.bind = function(items)
-    {
+    Kanban.prototype.bind = function (items) {
         var $kanbans = this.$,
             setting = this.options;
-        if (typeof(items) == 'undefined')
-        {
+        if (typeof(items) == 'undefined') {
             items = $kanbans.find('.kanban-item:not(".disable-drop, .kanban-item-shadow")');
         }
 
         items.droppable(
             {
-                container:'.admin-main-container',
+                container: '.admin-main-container',
                 target: '.kanban-item:not(".disable-drop, .kanban-item-shadow")',
                 flex: true,
-                start: function(e)
-                {
+                start: function (e) {
                     $kanbans.addClass('dragging').find('.kanban-item-shadow').height(e.element.outerHeight());
                 },
-                drag: function(e)
-                {
+                drag: function (e) {
                     $kanbans.find('.kanban.drop-in-empty').removeClass('drop-in-empty');
-                    if (e.isIn)
-                    {
+                    if (e.isIn) {
                         var kanban = e.target.closest('.kanban').addClass('drop-in');
                         var shadow = kanban.find('.kanban-item-shadow');
                         var target = e.target;
@@ -125,39 +104,28 @@
 
                         kanban.toggleClass('drop-in-empty', target.hasClass('kanban-item-empty'));
                     }
-                    if(typeof setting.onDrag =='function'){
-                        setting.onDrag();
-                    }
+
                 },
-                drop: function(e)
-                {
-                    if (e.isNew)
-                    {
+                drop: function (e) {
+                    if (e.isNew) {
                         var DROP = 'drop';
-                        if (setting.hasOwnProperty(DROP) && $.isFunction(setting[DROP]))
-                        {
+
+                        e.element.insertBefore(e.target);
+                        if (setting.hasOwnProperty(DROP) && $.isFunction(setting[DROP])) {
                             setting[DROP](e);
                         }
-                        e.element.insertBefore(e.target);
                     }
-                    if(typeof setting.onDrop =='function'){
-                        setting.onDrop();
-                    }
+
                 },
-                finish: function()
-                {
+                finish: function () {
                     $kanbans.removeClass('dragging').removeClass('drop-in').find('.kanban.drop-in').removeClass('drop-in');
-                    if(typeof setting.onFinish =='function'){
-                        setting.onFinish();
-                    }
+
                 }
             });
     };
 
-    $.fn.kanbans = function(option)
-    {
-        return this.each(function()
-        {
+    $.fn.kanbans = function (option) {
+        return this.each(function () {
             var $this = $(this);
             var data = $this.data('zui.kanban');
             var options = typeof option == 'object' && option;
@@ -170,8 +138,7 @@
 
     $.fn.kanbans.Constructor = Kanban;
 
-    $(function()
-    {
+    $(function () {
         $('[data-toggle="kanbans"]').kanbans();
     });
 }(jQuery));
