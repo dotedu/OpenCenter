@@ -5898,6 +5898,7 @@
             finish: function()
             {
                 $boards.removeClass('dragging').removeClass('drop-in').find('.board.drop-in').removeClass('drop-in');
+
             }
         });
     };

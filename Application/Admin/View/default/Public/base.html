@@ -121,7 +121,7 @@
 
 <div class="panel-main" style="float:left;">
 
-    <div>
+    <div class="">
 
 
     <div class="clearfix " style="">
@@ -193,7 +193,10 @@
                     <!-- nav -->
                 </block>
 
-                <block name="body"></block>
+                <div class="admin-main-container">
+                    <block name="body"></block>
+                </div>
+
             </div>
         </div>
     </div>
@@ -222,7 +225,8 @@
 <script type="text/javascript" src="__ZUI__/js/zui.js"></script>
 <script type="text/javascript" src="__ZUI__/lib/autotrigger/autotrigger.min.js"></script>
 <!--zui end-->
-
+<link rel="stylesheet" type="text/css" href="__JS__/kanban/kanban.css" media="all">
+<script type="text/javascript" src="__JS__/kanban/kanban.js"></script>
 <script type="text/javascript">
     +function () {
         var $window = $(window), $subnav = $("#subnav"), url;
