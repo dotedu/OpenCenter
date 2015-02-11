@@ -75,7 +75,6 @@ class ConfigController extends BaseController
         if (IS_POST) {
             $this->checkNickname($aNickname);
             $this->checkSex($aSex);
-            $this->checkEmail($aEmail);
             $this->checkSignature($aSignature);
 
 
@@ -92,7 +91,6 @@ class ConfigController extends BaseController
             $rs_member = D('Member')->save($user);
 
             $ucuser['id'] = get_uid();
-            $ucuser['email'] = $aEmail;
             $rs_ucmember = D('User/UcenterMember')->save($ucuser);
             clean_query_user_cache(get_uid(), array('nickname', 'sex', 'signature', 'email', 'pos_province', 'pos_city', 'pos_district', 'pos_community'));
 

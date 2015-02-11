@@ -81,10 +81,9 @@
                             <label for="aEmail" class="col-sm-2 control-label">邮箱</label>
 
                             <div class="col-sm-10">
-                                <input type="email" class="form-control pull-left" id="aEmail"
-                                       placeholder="邮箱"
-                                       value="{$accountInfo.email}">
-                                <a class="pull-left lh32 " style="margin-left: 10px"
+
+                                {$accountInfo.email|default='未设置'}
+                                <a class=" lh32 " style="margin-left: 10px"
                                    data-remote="{:U('ucenter/config/changeaccount',array('tag'=>'email'))}"
                                    data-toggle="modal">修改邮箱</a>
                             </div>
@@ -97,10 +96,9 @@
                             <label for="aMobile" class="col-sm-2 control-label">手机</label>
 
                             <div class="col-sm-10">
-                                <input type="text" class="form-control pull-left" id="aMobile"
-                                       placeholder="手机"
-                                       value="{$accountInfo.mobile}">
-                                <a class="pull-left lh32 " style="margin-left: 10px"
+                                {$accountInfo.mobile|default='未设置'}
+
+                                <a class=" lh32 " style="margin-left: 10px"
                                    data-remote="{:U('ucenter/config/changeaccount',array('tag'=>'mobile'))}"
                                    data-toggle="modal">修改手机</a>
                             </div>
@@ -140,15 +138,6 @@
                                         <eq name="user.sex" value="0"> checked</eq>
                                         > 保密
                                     </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="email" class="col-sm-2 control-label">邮箱</label>
-
-                                <div class="col-sm-10">
-                                    <input type="email" class="form-control" id="email" placeholder="邮箱"
-                                           name="email"
-                                           value="{$user.email|htmlspecialchars}">
                                 </div>
                             </div>
 
