@@ -108,9 +108,12 @@
     </ul>
     <ul class="nav nav-primary nav-stacked" style="position: absolute;bottom: 0;width: 100%">
         <li>
-            <a href="{:U('module/lists')}" class="text-center">
-                <i class="icon-cloud"></i><br/>更多
-            </a>
+            <eq name="__MANAGE_COULD__" value="1">
+                <a href="{:U('module/lists')}" class="text-center">
+                    <i class="icon-cloud"></i><br/>云市场
+                </a>
+            </eq>
+
         </li>
     </ul>
 </div>
