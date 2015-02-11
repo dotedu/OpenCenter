@@ -61,6 +61,7 @@ class AdminController extends Controller
                 $this->error('未授权访问!');
             }
         }
+        $this->assign('__MANAGE_COULD__',$this->checkRule('admin/module/lists',array('in','1,2')));
 
         $this->assign('__MENU__', $this->getMenus());
         $this->assign('__MODULE_MENU__', $this->getModules());
@@ -252,7 +253,15 @@ class AdminController extends Controller
      */
     public function getModules()
     {
-        return D('Module')->getAll();
+        $modules=D('Module')->getAll();
+        foreach($modules as $key=> &$v){
+            $rule = strtolower($v['admin_entry']);
+            if (!$this->checkRule($rule, array('in', '1,2'))) {
+                unset($modules[$key]);
+            }
+
+        }
+        return $modules;
 
     }
 

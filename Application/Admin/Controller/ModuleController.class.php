@@ -13,13 +13,14 @@ namespace Admin\Controller;
 use Admin\Builder\AdminListBuilder;
 use Think\Controller;
 
-class ModuleController extends Controller
+class ModuleController extends AdminController
 {
     protected $moduleModel;
 
     function _initialize()
     {
         $this->moduleModel = D('Module');
+        parent::_initialize();
     }
 
 
