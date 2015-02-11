@@ -34,7 +34,8 @@ class UserConfigController extends AdminController {
 
         $admin_config->title('用户配置')
            ->keyCheckBox('REG_SWITCH','注册开关','允许使用的注册选项,全不选即为关闭注册',array('username'=>'用户名','email'=>'邮箱','mobile'=>'手机'))
-            ->keyRadio('EMAIL_VERIFY_TYPE','邮箱验证类型','邮箱验证的类型',array(0=>'注册前发送验证邮件',1=>'注册后发送激活邮件'))
+            ->keyRadio('EMAIL_VERIFY_TYPE','邮箱验证类型','邮箱验证的类型',array(0=>'不验证',1=>'注册后发送激活邮件',2=>'注册前发送验证邮件'))
+            ->keyRadio('MOBILE_VERIFY_TYPE','手机验证类型','手机验证的类型',array(0=>'不验证',1=>'注册前发送验证短信'))
 
             ->keyText('REG_STEP','注册步骤','注册后需要进行的步骤，根据填写顺序进行，当前可用步骤如下：'.$step_str.'请按顺序填写对应的英文名称，用英文逗号‘,’分隔')
 
@@ -47,7 +48,7 @@ class UserConfigController extends AdminController {
             ->keyTextArea('SMS_CONTENT','短信内容','短信内容')
 
 
-            ->group('基础配置','REG_SWITCH,EMAIL_VERIFY_TYPE,REG_STEP')
+            ->group('基础配置','REG_SWITCH,EMAIL_VERIFY_TYPE,MOBILE_VERIFY_TYPE,REG_STEP')
             ->group('邮箱验证模版','REG_EMAIL_VERIFY')
             ->group('邮箱激活模版','REG_EMAIL_ACTIVATE')
             ->group('短信配置','SMS_HTTP,SMS_UID,SMS_PWD,SMS_CONTENT')

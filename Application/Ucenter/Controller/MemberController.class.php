@@ -45,7 +45,7 @@ class MemberController extends Controller
                 }
             }
 
-            if ($aRegType == 'mobile' || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 0 && $aRegType == 'email')) {
+            if (($aRegType == 'mobile' && modC('MOBILE_VERIFY_TYPE', 0, 'USERCONFIG') == 1) || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 2 && $aRegType == 'email')) {
                 if (!D('Verify')->checkVerify($aUsername, $aRegType, $aRegVerify, 0)) {
                     $str = $aRegType == 'mobile' ? '手机' : '邮箱';
                     $this->error($str . '验证失败');
@@ -417,12 +417,14 @@ class MemberController extends Controller
     {
         switch ($type) {
             case 'mobile':
-                //TODO 手机短信验证
-                return true;
+                $content = modC('SMS_CONTENT', '{$verify}', 'USERCONFIG');
+                $content = str_replace('{$verify}', $verify, $content);
+                $content = str_replace('{$account}', $account, $content);
+                $res = sendSMS($account,$content);
+                return $res;
                 break;
             case 'email':
                 //发送验证邮箱
-                //TODO 邮箱发送模版
                 $content = modC('REG_EMAIL_VERIFY', '{$verify}', 'USERCONFIG');
                 $content = str_replace('{$verify}', $verify, $content);
                 $content = str_replace('{$account}', $account, $content);
