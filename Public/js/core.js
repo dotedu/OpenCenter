@@ -1,6 +1,5 @@
 $.getScript('Public/js/com/com.talker.class.js');
 $.getScript('Public/js/com/com.toast.class.js',function(){
-    $.getScript('Public/js/com/com.functions.js',function(){
         $.getScript('Public/js/com/com.ucard.js',function(){
             var atwho_config;
             $(function () {
@@ -39,7 +38,7 @@ $.getScript('Public/js/com/com.toast.class.js',function(){
                 };
                 var $inputor = $('#weibo_content').atwho(atwho_config);
             });
-        });
+       
     });
 });
 
