@@ -1,6 +1,5 @@
 $.getScript('Public/js/com/com.talker.class.js');
 $.getScript('Public/js/com/com.toast.class.js',function(){
-    $.getScript('Public/js/com/com.functions.js',function(){
         $.getScript('Public/js/com/com.ucard.js',function(){
             var atwho_config;
             $(function () {
@@ -39,7 +38,7 @@ $.getScript('Public/js/com/com.toast.class.js',function(){
                 };
                 var $inputor = $('#weibo_content').atwho(atwho_config);
             });
-        });
+       
     });
 });
 
@@ -293,21 +292,7 @@ function setAllReaded() {
  * @param title
  */
 function tip_message(text, title) {
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "positionClass": "toast-top-right",
-        "onclick": null,
-        "showDuration": "1000",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    }
-    toastr.info(text, title);
+   toast.info(text);
 }
 
 
@@ -525,48 +510,4 @@ function setCaretPosition(ctrl, pos) {//设置光标位置函数
 }
 
 /*微博表情end*/
-
-
-function bind_weibo_managment() {
-    $('.weibo_admin_btn').unbind('click');
-    $('.weibo_admin_btn').mouseover(function () {
-        if ($(this).parents('.weibo_content').find('.mark_box').css('display') == 'none' || typeof ($(this).parents('.weibo_content').find('.mark_box').css('display')) == 'undefined') {
-            $(this).find('img').attr('src', ThinkPHP.PUBLIC + '/Core/images/mark-aw2.png');
-        } else {
-            $(this).find('img').attr('src', ThinkPHP.PUBLIC + '/Core/images/mark-aw3.png');
-        }
-    });
-
-    $('.weibo_admin_btn').mouseleave(function () {
-        if ($(this).parents('.weibo_content').find('.mark_box').css('display') == 'none' || typeof ($(this).parents('.weibo_content').find('.mark_box').css('display')) == 'undefined') {
-            $(this).find('img').attr('src', ThinkPHP.PUBLIC + '/Core/images/mark-aw1.png');
-        } else {
-            $(this).find('img').attr('src', ThinkPHP.PUBLIC + '/Core/images/mark-aw4.png');
-        }
-    });
-    $('.weibo_content').mouseover(function () {
-        $(this).find('.weibo_admin_btn').show();
-
-    });
-
-    $('.weibo_admin_btn').click(function (e) {
-        var obj = $(this).parents('.weibo_content').find('.mark_box');
-        obj.toggle();
-        if (obj.css('display') == 'none' || typeof (obj.css('display')) == 'undefined') {
-            $(this).find('img').attr('src', ThinkPHP.PUBLIC + '/Core/images/mark-aw2.png');
-
-        } else {
-            $(this).find('img').attr('src', ThinkPHP.PUBLIC + '/Core/images/mark-aw3.png');
-        }
-        return false;
-
-    });
-    $('.weibo_content').mouseleave(function () {
-        $(this).find('.weibo_admin_btn').find('img').attr('src', ThinkPHP.PUBLIC + '/Core/images/mark-aw1.png');
-        $(this).find('.weibo_admin_btn').hide();
-        $(this).find('.mark_box').hide();
-
-    })
-
-}
 

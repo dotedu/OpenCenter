@@ -526,7 +526,6 @@ INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `
 (4, 'WEB_SITE_CLOSE', 4, '关闭站点', 1, '0:关闭,1:开启', '站点关闭后其他用户不能访问，管理员可以正常访问', 1378898976, 1379235296, 1, '1', 1),
 (9, 'CONFIG_TYPE_LIST', 3, '配置类型列表', 4, '', '主要用于数据解析和页面表单的生成', 1378898976, 1379235348, 1, '0:数字\r\n1:字符\r\n2:文本\r\n3:数组\r\n4:枚举', 8),
 (10, 'WEB_SITE_ICP', 1, '网站备案号', 1, '', '设置在网站底部显示的备案号，如“沪ICP备12007941号-2', 1378900335, 1379235859, 1, '浙ICP备XX号', 12),
-(13, 'COLOR_STYLE', 4, '后台色系', 1, 'default_color:默认\r\nblue_color:紫罗兰\r\namaze:Amazu', '后台颜色风格', 1379122533, 1409279514, 1, 'amaze', 2),
 (20, 'CONFIG_GROUP_LIST', 3, '配置分组', 4, '', '配置分组', 1379228036, 1384418383, 1, '1:基本\r\n2:内容\r\n3:用户\r\n4:系统\r\n5:邮件', 15),
 (21, 'HOOKS_TYPE', 3, '钩子的类型', 4, '', '类型 1-用于扩展显示内容，2-用于扩展业务处理', 1379313397, 1379313407, 1, '1:视图\r\n2:控制器', 17),
 (22, 'AUTH_CONFIG', 3, 'Auth配置', 4, '', '自定义Auth.class.php类配置', 1379409310, 1379409564, 1, 'AUTH_ON:1\r\nAUTH_TYPE:2', 20),
@@ -570,8 +569,17 @@ INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `
 (90, '_USER_LEVEL', 0, '', 0, '', '', 1420877470, 1420877470, 1, '0:Lv1 实习\r\n50:Lv2 试用\r\n100:Lv3 转正\r\n200:Lv4 助理\r\n400:Lv 5 经理\r\n800:Lv6 董事\r\n1600:Lv7 董事长', 0),
 (85, '_EXPRESSION_EXPRESSION', 0, '', 0, '', '', 1417150390, 1417150390, 1, 'miniblog', 0),
 (86, 'DEFUALT_HOME_URL', 1, '默认首页Url', 1, '', '支持形如weibo/index/index的ThinkPhp路由写法，支持普通的url写法，不填则显示默认聚合首页', 1417509438, 1417509501, 1, '', 0),
-(93, '_USERCONFIG_REG_SWITCH', 0, '', 0, '', '', 1422416188, 1422416188, 1, 'username', 0),
-(94, '_USERCONFIG_EMAIL_VERIFY_TYPE', 0, '', 0, '', '', 1422416188, 1422416188, 1, '0', 0);
+(121, '_USERCONFIG_REG_SWITCH', 0, '', 0, '', '', 1423536341, 1423536341, 1, 'username,email,mobile', 0),
+(122, '_USERCONFIG_EMAIL_VERIFY_TYPE', 0, '', 0, '', '', 1423536341, 1423536341, 1, '0', 0),
+(123, '_USERCONFIG_REG_STEP', 0, '', 0, '', '', 1423536341, 1423536341, 1, 'change_avatar', 0),
+(124, '_USERCONFIG_REG_EMAIL_VERIFY', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
+(125, '_USERCONFIG_PARSE', 0, '', 0, '', '', 1423536341, 1423536341, 1, '0', 0),
+(126, '_USERCONFIG_REG_EMAIL_ACTIVATE', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
+(127, '_USERCONFIG_SMS_HTTP', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
+(128, '_USERCONFIG_SMS_UID', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
+(129, '_USERCONFIG_SMS_PWD', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
+(130, '_USERCONFIG_SMS_CONTENT', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0);
+
 
 
 
@@ -600,8 +608,8 @@ CREATE TABLE IF NOT EXISTS `ocenter_field_group` (
 
 INSERT INTO `ocenter_field_group` (`id`, `profile_name`, `status`, `createTime`, `sort`, `visiable`) VALUES
 (1, '个人资料', 1, 1403847366, 0, 1),
-(14, '教育信息', 1, 1423032701, 0, 0),
-(15, '职业信息', 1, 1423037174, 0, 1);
+(14, '开发者资料', 1, 1423537648, 0, 0),
+(15, '开源中国资料', 1, 1423538446, 0, 0);
 
 CREATE TABLE IF NOT EXISTS `ocenter_field_setting` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -618,11 +626,16 @@ CREATE TABLE IF NOT EXISTS `ocenter_field_setting` (
   `child_form_type` varchar(25) NOT NULL,
   `input_tips` varchar(100) NOT NULL COMMENT '输入提示',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43 ;
 
 INSERT INTO `ocenter_field_setting` (`id`, `field_name`, `profile_group_id`, `visiable`, `required`, `sort`, `form_type`, `form_default_value`, `validation`, `status`, `createTime`, `child_form_type`, `input_tips`) VALUES
-(36, 'QQ', 1, 1, 1, 0, 'input', '', '', 1, 1409045825, 'string', ''),
-(37, '小学', 14, 1, 0, 0, 'input', '', '', 1, 1423034744, 'string', '');
+(36, 'qq', 1, 1, 1, 0, 'input', '', '', 1, 1409045825, 'string', ''),
+(37, '生日', 1, 1, 1, 0, 'time', '', '', 1, 1423537409, '', ''),
+(38, '擅长语言', 14, 1, 1, 0, 'select', 'Java|C++|Python|php|object c|ruby', '', 1, 1423537693, '', ''),
+(39, '承接项目', 14, 1, 1, 0, 'radio', '是|否', '', 1, 1423537733, '', ''),
+(40, '简介', 14, 1, 1, 0, 'textarea', '', '', 1, 1423537770, '', '简单介绍入行以来的工作经验，项目经验'),
+(41, '其他技能', 14, 1, 1, 0, 'checkbox', 'PhotoShop|Flash', '', 1, 1423537834, '', ''),
+(42, '昵称', 15, 1, 1, 0, 'input', '', '', 1, 1423704462, 'string', 'OSC账号昵称');
 
 
 
