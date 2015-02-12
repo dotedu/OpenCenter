@@ -46,7 +46,8 @@ class AddonsModel extends Model {
         if(!$addon_dir)
             $addon_dir = ONETHINK_ADDON_PATH;
         $dirs = array_map('basename',glob($addon_dir.'*', GLOB_ONLYDIR));
-        $modules=D('Module')->getAll();
+        //TODO 新增模块插件的支持
+       /* $modules=D('Module')->getAll();
         foreach($modules as $m){
             if($m['is_setup']){
                 $module_dir=APP_PATH.$m['name'].'/Addons/';
@@ -56,7 +57,7 @@ class AddonsModel extends Model {
                 $tmp_dirs = array_map('basename',glob($module_dir.'*', GLOB_ONLYDIR));
                 $dirs=array_merge($dirs,$tmp_dirs);
             }
-        }
+        }*/
 
 
         if($dirs === FALSE || !file_exists($addon_dir)){
