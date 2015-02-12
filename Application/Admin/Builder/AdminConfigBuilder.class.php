@@ -214,6 +214,11 @@ class AdminConfigBuilder extends AdminBuilder
         return $this;
     }
 
+    public function keyKanban($name, $title, $subtitle=null){
+
+        return $this->key($name, $title, $subtitle, 'kanban');
+    }
+
     /**自动处理配置存储事件，配置项必须全大写
      * @auth 陈一枭
      */
@@ -239,16 +244,6 @@ class AdminConfigBuilder extends AdminBuilder
                 }
                 $tag = 'conf_' . strtoupper(CONTROLLER_NAME) . '_' . strtoupper($k);
                 S($tag, null);
-                /*if ($configModel->where(array('name' =>  '_' . CONTROLLER_NAME . '_' .$k))->count()) {
-                    if ($configModel->save($config)) {
-                        $success = 1;
-                    }
-                } else {
-                    if ($configModel->add($config)) {
-                        $success = 1;
-                    }
-                }*/
-
             }
             if ($success) {
                 header('Content-type: application/json');

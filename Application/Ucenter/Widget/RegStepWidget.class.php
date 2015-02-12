@@ -21,6 +21,10 @@ class RegStepWidget extends Action
 
     public $mStep = array(
         'change_avatar'=>'修改头像',
+        'aa'=>'信息一',
+        'bb'=>'信息二',
+        'cc'=>'信息三',
+        'dd'=>'信息四',
 
 
     );
