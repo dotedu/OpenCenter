@@ -465,7 +465,7 @@ str;
             if($data['id']){
                 $flag = $hookModel->save($data);
                 if($flag !== false)
-                    $this->success('更新成功', Cookie('__forward__'));
+                    $this->success('更新成功', Cookie('__SELF__'));
                 else
                     $this->error('更新失败');
             }else{

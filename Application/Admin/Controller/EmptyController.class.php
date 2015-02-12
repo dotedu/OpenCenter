@@ -24,9 +24,8 @@ class EmptyController extends Controller
         // $controller= A(CONTROLLER_NAME.'/admin');
         // dump(APP_PATH . '/' . CONTROLLER_NAME . '/' . 'Controller' . '/' . 'WeiboController.class.php');
 
-        require_once(APP_PATH . CONTROLLER_NAME . '/' . 'Controller' . '/' . 'WeiboController.class.php');
-        $controller = new \Admin\Controller\WeiboController();
-        //  $controller = A('Weibo', 'Admin');
+        require_once(APP_PATH . CONTROLLER_NAME . '/' . 'Controller' . '/' .CONTROLLER_NAME. 'Controller.class.php');
+        $controller = A( 'Admin/'.CONTROLLER_NAME);
         $action=ACTION_NAME;
         $controller->$action();
 
