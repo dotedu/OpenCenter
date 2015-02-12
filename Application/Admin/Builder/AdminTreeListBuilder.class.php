@@ -19,8 +19,8 @@ class AdminTreeListBuilder extends AdminBuilder
     private $_level = 2;
     private $_model = '';
 
-    private $_move=true;
-    private $_merge=true;
+    private $_move=false;
+    private $_merge=false;
 
     public function title($title)
     {
@@ -446,15 +446,15 @@ class AdminTreeListBuilder extends AdminBuilder
         return $this;
     }
 
-    public function disableMove()
+    public function showMove()
     {
-        $this->_move = false;
+        $this->_move = true;
         return $this;
     }
 
-    public function disableMerge()
+    public function showMerge()
     {
-        $this->_merge = false;
+        $this->_merge = true;
         return $this;
     }
 }
