@@ -259,3 +259,26 @@ function postSMS($url, $data = '')
         return implode("", $receive);
     }
 }
+
+/**
+ * get_kanban_config  获取看板配置
+ * @param $key
+ * @param $kanban
+ * @param string $default
+ * @param string $module
+ * @return array|bool
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
+function get_kanban_config($key, $kanban, $default = '', $module = '')
+{
+    $config = modC($key, $default, $module);
+    $config = json_decode($config, true);
+    foreach ($config as $v) {
+        if ($v['data-id'] == $kanban) {
+                $res = $v['items'];
+                break;
+        }
+    }
+    return getSubByKey($res,'data-id');
+
+}

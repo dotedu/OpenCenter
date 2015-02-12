@@ -262,7 +262,7 @@ function closetags($html)
  */
 function checkImageSrc($file_path){
       if(!is_bool(strpos($file_path,'http://'))){
-        $header  = tox_get_headers($file_path);
+        $header  = curl_get_headers($file_path);
         $res = strpos($header['Content-Type'],'image/');
         return is_bool($res)?false:true;
     }else{

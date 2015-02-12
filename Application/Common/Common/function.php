@@ -1300,6 +1300,8 @@ require_once(APP_PATH . '/Common/Common/vendors.php');
 require_once(APP_PATH . '/Common/Common/parse.php');
 require_once(APP_PATH . '/Common/Common/user.php');
 /*require_once(APP_PATH . '/Common/Common/extend.php');*/
+
+
 function tox_addons_url($url, $param)
 {
     // 拆分URL
@@ -1369,13 +1371,14 @@ function create_rand($length = 8,$type='all')
 }
 
 
+
 /**
- * tox_get_headers 获取链接header
+ * curl_get_headers 获取链接header
  * @param $url
  * @return array
- * @author:xjw129xjt xjt@ourstu.com
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
  */
-function tox_get_headers($url)
+function curl_get_headers($url)
 {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
