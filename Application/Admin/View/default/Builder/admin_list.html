@@ -17,7 +17,7 @@
         }
     </php>
 
-    <div style="margin-bottom: 10px;" <eq name='show' value="">class="hidden" </eq> id="search_form">
+    <div style="margin-bottom: 10px;" <eq name='show' value="">class="hide" </eq> id="search_form">
 
         <style>
             .tb_search td{
@@ -36,7 +36,7 @@
                       {$search.title}
                   </td>
                   <td>
-                      <input style="float: none" type="text" name="{$search.name}" class="search-input"
+                      <input style="float: none" type="text" name="{$search.name}" class="search-input form-control form-input-width"
                              value="{:I($search['name'])}">
                   </td>
                   <td>

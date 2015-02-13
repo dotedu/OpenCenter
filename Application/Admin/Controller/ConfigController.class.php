@@ -22,7 +22,7 @@ class ConfigController extends AdminController {
     public function index(){
         /* 查询条件初始化 */
         $map = array();
-        $map  = array('status' => 1);
+        $map  = array('status' => 1,'title'=>array('neq',''));
         if(isset($_GET['group'])){
             $map['group']   =   I('group',0);
         }
@@ -160,7 +160,7 @@ class ConfigController extends AdminController {
             $ids = I('get.ids');
 
             //获取排序的数据
-            $map = array('status'=>array('gt',-1));
+            $map = array('status'=>array('gt',-1),'title'=>array('neq',''));
             if(!empty($ids)){
                 $map['id'] = array('in',$ids);
             }elseif(I('group')){

@@ -1,3 +1,9 @@
+.padding-15 {
+  padding: 15px;
+}
+.padding-20 {
+  padding: 20px;
+}
 /*布局样式*/
 .common_block_border {
   margin-bottom: 20px;
@@ -396,7 +402,7 @@ h2 {
 }
 /* extended dropdowns */
 .notification {
-  width: 200px;
+  width: 250px;
 }
 .notification .header {
   border-bottom: 1px solid #ccc;
