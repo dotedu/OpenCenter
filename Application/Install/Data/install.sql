@@ -497,7 +497,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_channel` (
 
 
 INSERT INTO `ocenter_channel` (`id`, `pid`, `title`, `url`, `sort`, `create_time`, `update_time`, `status`, `target`, `color`, `band_color`, `band_text`, `icon`) VALUES
-(1, 0, '首页', 'Home/Index/index', 1, 1379475111, 1421055116, 1, 0, '', '', '', 'home'),
+(1, 0, '首页', 'Home/Index/index', 0, 1379475111, 1421055116, 1, 0, '', '', '', 'home'),
 (16, 0, '会员展示', 'People/index/index', 3, 1421054845, 1421134856, 1, 0, '', '', '', 'group');
 
 

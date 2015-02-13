@@ -291,7 +291,7 @@ str;
     {
         if (IS_POST) {
             $builder = new AdminSortBuilder();
-            $builder->doSort('Field_group', $ids);
+            $builder->doSort('FieldSetting', $ids);
         } else {
             $profile = D('field_group')->where('id=' . $id)->find();
             $map['status'] = array('egt', 0);
