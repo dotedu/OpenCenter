@@ -485,6 +485,6 @@ class AdminController extends Controller
     }
 
     public function  _empty(){
-        $this->error('zhaoibuda');
+        $this->error('404，找不到您想要的页面。');
     }
 }
