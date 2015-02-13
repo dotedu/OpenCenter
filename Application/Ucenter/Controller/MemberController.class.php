@@ -600,6 +600,12 @@ class MemberController extends Controller
         $mUcenter = D('User/UcenterMember');
         switch ($aType) {
             case 'username':
+
+                $length = mb_strlen($aAccount, 'utf-8'); // 当前数据长度
+                if($length<4 || $length >30){
+                    $this->error('用户名长度在4-30之间');
+                }
+
                 empty($aAccount) && $this->error('用户名格式不正确！');
                 $id = $mUcenter->where(array('username' => $aAccount))->getField('id');
                 if ($id) {
@@ -611,6 +617,10 @@ class MemberController extends Controller
                 }
                 break;
             case 'email':
+                $length = mb_strlen($email, 'utf-8'); // 当前数据长度
+                if($length<4 || $length >32){
+                    $this->error('邮箱长度在4-32之间');
+                }
                 empty($email) && $this->error('邮箱格式不正确！');
                 $id = $mUcenter->where(array('email' => $email))->getField('id');
                 if ($id) {
@@ -639,6 +649,12 @@ class MemberController extends Controller
         if(empty($aNickname)){
             $this->error('不能为空！');
         }
+
+        $length = mb_strlen($aNickname, 'utf-8'); // 当前数据长度
+        if($length<2 || $length >30){
+            $this->error('昵称长度在2-30之间');
+        }
+
         $memberModel = D('member');
         $uid = $memberModel->where(array('nickname' => $aNickname))->getField('uid');
         if ($uid) {
