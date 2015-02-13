@@ -1,7 +1,10 @@
 <include file="Public/right_chat_panel"/>
 <php> //D('Home/Member')->need_login();</php>
 <!--[if lt IE 8]>
-<div class="alert alert-danger" style="margin-bottom: 0">您正在使用 <strong>过时的</strong> 浏览器. 是时候 <a target="_blank" href="http://browsehappy.com/">更换一个更好的浏览器</a> 来提升用户体验.</div>
+<div class="alert alert-danger" style="margin-bottom: 0">您正在使用 <strong>过时的</strong> 浏览器. 是时候 <a target="_blank"
+                                                                                                href="http://browsehappy.com/">更换一个更好的浏览器</a>
+    来提升用户体验.
+</div>
 <![endif]-->
 
 <php>
@@ -10,7 +13,8 @@
 <div id="nav_bar" class="nav_bar">
     <nav class="container navbar-static-top" id="nav_bar_container" role="navigation">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">打开下拉菜单</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -27,15 +31,24 @@
                             if($children){
                         </php>
                         <li class="dropdown">
-                            <a class="dropdown-toggle nav_item" data-toggle="dropdown" href="#" style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i>
+                            <a class="dropdown-toggle nav_item" data-toggle="dropdown" href="#"
+                               style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i>
 
-                                {$nav.title} <span class="caret"></span><neq name="nav.band_text" value="" > <span class="badge" style="background: {$nav.band_color}">{$nav.band_text}</span></neq>
+                                {$nav.title} <span class="caret"></span>
+                                <neq name="nav.band_text" value=""><span class="badge"
+                                                                         style="background: {$nav.band_color}">{$nav.band_text}</span>
+                                </neq>
                             </a>
                             <ul class="dropdown-menu">
                                 <volist name="children" id="subnav">
-                                    <li role="presentation"><a role="menuitem" tabindex="-1" style="color:{$subnav.color}"
+                                    <li role="presentation"><a role="menuitem" tabindex="-1"
+                                                               style="color:{$subnav.color}"
                                                                href="{$subnav.url|get_nav_url}"
-                                                               target="<eq name='subnav.target' value='1'>_blank<else/>_self</eq>">{$subnav.title}<neq name="subnav.band_text" value="" >  <span class="badge" style="background: {$subnav.band_color}">{$subnav.band_text}</span></neq></a>
+                                                               target="<eq name='subnav.target' value='1'>_blank<else/>_self</eq>">{$subnav.title}
+                                        <neq name="subnav.band_text" value=""><span class="badge"
+                                                                                    style="background: {$subnav.band_color}">{$subnav.band_text}</span>
+                                        </neq>
+                                    </a>
                                     </li>
                                 </volist>
                             </ul>
@@ -43,44 +56,46 @@
                         <php>}else{</php>
                         <li class="<eq name='nav.url|get_nav_active' value='1'>active<else/></eq>">
                             <a href="{$nav.url|get_nav_url}"
-                               target="<eq name='nav.target' value='1'>_blank<else/>_self</eq>" style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i> {$nav.title}<neq name="nav.band_text" value="" >  <span class="badge" style="background: {$nav.band_color}">{$nav.band_text}</span></neq></a>
+                               target="<eq name='nav.target' value='1'>_blank<else/>_self</eq>"
+                               style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i> {$nav.title}
+                                <neq name="nav.band_text" value=""><span class="badge"
+                                                                         style="background: {$nav.band_color}">{$nav.band_text}</span>
+                                </neq>
+                            </a>
                         </li>
                         <php>}</php>
                     </eq>
                 </think:nav>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <!--   <li>
-                     &lt;!&ndash;换肤功能预留&ndash;&gt;
+                <!--   <li>
+                       &lt;!&ndash;换肤功能预留&ndash;&gt;
                         <a><i class="icon-magic"></i></a>
                         &lt;!&ndash;换肤功能预留end&ndash;&gt;
                     </li>-->
                 <!--登陆面板-->
                 <if condition="is_login()">
-                    <li class="dropdown op_nav_ico hidden-xs hidden-sm">
+                    <li class="dropdown  hidden-xs hidden-sm">
                         <div></div>
                         <a id="nav_info" class="dropdown-toggle text-left" data-toggle="dropdown">
-                            <span class="icon-bell-alt"></span>
+                            <span class="icon-bell-alt"></span> 消息
                             <span id="nav_bandage_count"
                             <if condition="count($unreadMessage) eq 0"> style="display: none"</if>
                             class="label label-badge label-success">{:count($unreadMessage)}</span>
                             &nbsp;
                         </a>
                         <ul class="dropdown-menu extended notification">
-                            <li style="padding-left: 15px;padding-right: 15px;">
-                                <div class="row nav_info_center">
-                                    <div class="col-xs-9 nav_align_left"><span
+                            <li>
+                                <div class="clearfix header">
+                                    <div class="col-xs-6 nav_align_left"><span
                                             id="nav_hint_count">{:count($unreadMessage)}</span> 条未读
                                     </div>
-                                    <div class="col-xs-3"><i onclick="setAllReaded()"
-                                                             class="set_read icon-ok"
-                                                             title="全部标为已读"></i></div>
                                 </div>
                             </li>
-                            <li>
-                                <div style="position: relative;width: auto;overflow: hidden;max-height: 250px ">
-                                    <ul id="nav_message" class="dropdown-menu-list scroller "
-                                        style=" width: auto;">
+                            <li class="info-list">
+                                <div class="list-wrap">
+                                    <ul id="nav_message" class="dropdown-menu-list scroller  list-data"
+                                        style="width: auto;">
                                         <if condition="count($unreadMessage) eq 0">
                                             <div style="font-size: 18px;color: #ccc;font-weight: normal;text-align: center;line-height: 150px">
                                                 暂无任何消息!
@@ -89,7 +104,7 @@
                                             <volist name="unreadMessage" id="message">
                                                 <li>
                                                     <a data-url="{$message.url}"
-                                                       onclick="readMessage(this,{$message.id})">
+                                                       onclick="Notify.readMessage(this,{$message.id})">
                                                         <i class="icon-bell"></i>
                                                         {$message.title}
                                             <span class="time">
@@ -103,16 +118,20 @@
                                     </ul>
                                 </div>
                             </li>
-                            <li class="external">
-                                <a href="{:U('ucenter/Message/message')}">
-                                    <i class="icon-share"></i> 消息中心
-                                </a>
+                            <li class="footer text-right">
+                                <div class="btn-group">
+                                    <button onclick="Notify.setAllReaded()" class="btn btn-sm  btn-success ">全部已读
+                                    </button>
+                                    <a class="btn  btn-sm btn-info  " href="{:U('ucenter/Message/message')}">
+                                        查看消息
+                                    </a>
+                                </div>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a style="margin-right: 15px;" title="修改资料" href="{:U('ucenter/Config/index')}"><i
-                                class="icon-cog"></i></a>
+                        <a title="修改资料" href="{:U('ucenter/Config/index')}"><i
+                                class="icon-cog"></i> 设置</a>
                     </li>
                     <li class="top_spliter hidden-xs"></li>
                     <li class="dropdown">

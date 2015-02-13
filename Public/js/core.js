@@ -1,49 +1,46 @@
 $.getScript('Public/js/com/com.talker.class.js');
-$.getScript('Public/js/com/com.toast.class.js',function(){
-        $.getScript('Public/js/com/com.ucard.js',function(){
-            var atwho_config;
-            $(function () {
-                $('.open-popup-link').magnificPopup({
-                    type: 'inline',
-                    midClick: true,
-                    closeOnBgClick: false
-                });//绑定发微博弹窗
-                ucard();//绑定用户小名片
-                bindGoTop();//回到顶部
-                talker.bind_ctrl_enter();//绑定
+$.getScript('Public/js/com/com.toast.class.js', function () {
+    $.getScript('Public/js/com/com.ucard.js', function () {
+        var atwho_config;
+        $(function () {
+            $('.open-popup-link').magnificPopup({
+                type: 'inline',
+                midClick: true,
+                closeOnBgClick: false
+            });//绑定发微博弹窗
+            ucard();//绑定用户小名片
+            bindGoTop();//回到顶部
+            talker.bind_ctrl_enter();//绑定
 
-                $('input,area').placeholder();//修复ieplace holder
-                if (is_login()) {
-                    bindMessageChecker();//绑定用户消息
-                }
-                checkMessage();//检查一次消息
+            $('input,area').placeholder();//修复ieplace holder
+            if (is_login()) {
+                bindMessageChecker();//绑定用户消息
+            }
+            checkMessage();//检查一次消息
 
-                bindLogout();
-                $('.scroller').slimScroll({
-                    height: '150px'
-                });
-
-                $('#scrollArea_chat').slimScroll({
-                    height: '320px',
-                    alwaysVisible: true,
-                    start: 'bottom'
-                });
-                atwho_config = {
-                    at: "@",
-                    data: U('Weibo/Index/atWhoJson'),
-                    tpl: "<li data-value='@${nickname}'><img class='avatar-img' style='width:2em;margin-right: 0.6em' src='${avatar32}'/>${nickname}</li>",
-                    show_the_at: true,
-                    search_key: 'search_key',
-                    start_with_space: false
-                };
-                var $inputor = $('#weibo_content').atwho(atwho_config);
+            bindLogout();
+            $('.scroller').slimScroll({
+                height: '200px'
             });
-       
+
+            $('#scrollArea_chat').slimScroll({
+                height: '320px',
+                alwaysVisible: true,
+                start: 'bottom'
+            });
+            atwho_config = {
+                at: "@",
+                data: U('Weibo/Index/atWhoJson'),
+                tpl: "<li data-value='@${nickname}'><img class='avatar-img' style='width:2em;margin-right: 0.6em' src='${avatar32}'/>${nickname}</li>",
+                show_the_at: true,
+                search_key: 'search_key',
+                start_with_space: false
+            };
+            var $inputor = $('#weibo_content').atwho(atwho_config);
+        });
+
     });
 });
-
-
-
 
 
 $(function () {
@@ -124,8 +121,6 @@ $(function () {
 });
 
 
-
-
 function ufollow(obj, uid) {
     objt = obj;
     obj = $(obj);
@@ -176,8 +171,6 @@ function bindGoTop() {
 }
 
 
-
-
 /**
  * 绑定消息检查
  */
@@ -213,7 +206,7 @@ function checkMessage() {
                 //  var url=msg[index]['url']===''?U('') //设置默认跳转到消息中心
 
 
-                var new_html = $('<span><li><a data-url="' + msg['messages'][index]['url'] + '"' + 'onclick="readMessage(this,' + msg['messages'][index]['id'] + ')"><i class="glyphicon glyphicon-bell"></i>' +
+                var new_html = $('<span><li><a data-url="' + msg['messages'][index]['url'] + '"' + 'onclick="Notify.readMessage(this,' + msg['messages'][index]['id'] + ')"><i class="icon-bell"></i> ' +
                 msg['messages'][index]['title'] + '<br/><span class="time">' + msg['messages'][index]['ctime'] +
                 '</span> </a></li></span>');
                 $('#nav_message').prepend(new_html.html());
@@ -263,27 +256,7 @@ function checkMessage() {
     }, 'json');
 
 }
-function readMessage(obj, message_id) {
-    var url = $(obj).attr('data-url');
-    $.post(U('Ucenter/Public/readMessage'), {message_id: message_id}, function (msg) {
-        if (msg.status) {
-            location.href = url;
-        }
-    }, 'json');
-}
 
-/**
- * 将所有的消息设为已读
- */
-function setAllReaded() {
-    $.post(U('Ucenter/Public/setAllMessageReaded'), function () {
-        $hint_count.text(0);
-        $('#nav_message').html('<div style="font-size: 18px;color: #ccc;font-weight: normal;text-align: center;line-height: 150px">暂无任何消息!</div>');
-        $nav_bandage_count.hide();
-        $nav_bandage_count.text(0);
-
-    });
-}
 
 
 /**
@@ -292,10 +265,8 @@ function setAllReaded() {
  * @param title
  */
 function tip_message(text, title) {
-   toast.info(text);
+    toast.info(text);
 }
-
-
 
 
 /**
@@ -355,9 +326,6 @@ function op_fetchMessageTpl(message, mid) {
     });
     return tpl;
 }
-
-
-
 
 
 /**
@@ -428,7 +396,6 @@ function bindSupport() {
 function clearWeibo() {
     $('.weibo_post_box #weibo_content').val('');
 }
-
 
 
 /*微博表情*/
