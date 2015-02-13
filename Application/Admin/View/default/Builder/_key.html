@@ -49,65 +49,153 @@
                 {$option|htmlspecialchars}</label>
         </volist>
     </case>
-    <case value="image">
-        <div class="controls">
-            <input type="file" id="upload_picture_{$field.name}">
-            <input type="hidden" name="{$field.name}" id="cover_id_{$field.name}" value="{$field['value']}"/>
 
+    <case value="singleImage">
+        <div class="controls">
+            <div id="upload_single_image_{$field.name}" style="padding-bottom: 5px;">选择图片</div>
+            <input class="attach" type="hidden" name="{$field.name}" value="{$field['value']}"/>
             <div class="upload-img-box">
+                <div class="upload-pre-item popup-gallery">
+
                 <notempty name="field.value">
-                    <div class="upload-pre-item"><img src="{$field.value|get_cover='path'}"/></div>
+                    <div class="each">
+                    <a href="{$field.value|get_cover='path'}" title="点击查看大图">
+                        <img src="{$field.value|get_cover='path'}">
+                    </a>
+                        <div class="text-center opacity del_btn" ></div>
+                        <div onclick="admin_image.removeImage($(this),'{$field.value}')"  class="text-center del_btn">删除</div>
+                    </div>
                 </notempty>
+                </div>
             </div>
         </div>
-        <script type="text/javascript">
-            //上传图片
-            /* 初始化上传插件 */
-            $("#upload_picture_{$field.name}").uploadify({
-                "height": 30,
-                "swf": "__STATIC__/uploadify/uploadify.swf",
-                "fileObjName": "download",
-                "buttonText": "上传图片",
-                "uploader": "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
-                "width": 120,
-                'removeTimeout': 1,
-                'fileTypeExts': '*.jpg; *.png; *.gif;',
-                "onUploadSuccess": uploadPicture
-            {
-                $field.name
-            }
-            ,
-            'onFallback'
-            :
-            function () {
-                alert('未检测到兼容版本的Flash.');
-            }
+        <script>
+            $(function () {
+                var uploader_{$field.name}= WebUploader.create({
+                    // 选完文件后，是否自动上传。
+                    auto: true,
+                    // swf文件路径
+                    swf: 'Uploader.swf',
+                    // 文件接收服务端。
+                    server: "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                    // 选择文件的按钮。可选。
+                    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                    pick: '#upload_single_image_{$field.name}',
+                    // 只允许选择图片文件。
+                    accept: {
+                        title: 'Images',
+                        extensions: 'gif,jpg,jpeg,bmp,png',
+                        mimeTypes: 'image/*'
+                    }
+                });
+                uploader_{$field.name}.on('fileQueued', function (file) {
+                    uploader_{$field.name}.upload();
+                });
+                /*上传成功*/
+                uploader_{$field.name}.on('uploadSuccess', function (file, data) {
+                    if (data.status) {
+                        $("[name='{$field.name}']").val(data.id);
+                        $("[name='{$field.name}']").parent().find('.upload-pre-item').html(
+                                ' <div class="each"><a href="'+ data.path+'" title="点击查看大图"><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
+                                        '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">删除</div></div>'
+                        );
+                        uploader_{$field.name}.reset();
+                    } else {
+                        updateAlert(data.info);
+                        setTimeout(function () {
+                            $('#top-alert').find('button').click();
+                            $(that).removeClass('disabled').prop('disabled', false);
+                        }, 1500);
+                    }
+                });
             })
-            ;
-            function uploadPicture {
-                $field.name
-            }
-            (file, data)
-            {
-                var data = $.parseJSON(data);
-                var src = '';
-                if (data.status) {
-                    $("#cover_id_{$field.name}").val(data.id);
-                    src = data.url || '__ROOT__' + data.path
-                    $("#cover_id_{$field.name}").parent().find('.upload-img-box').html(
-                            '<div class="upload-pre-item"><img src="' + src + '"/></div>'
-                    );
-                } else {
-                    updateAlert(data.info);
-                    setTimeout(function () {
-                        $('#top-alert').find('button').click();
-                        $(that).removeClass('disabled').prop('disabled', false);
-                    }, 1500);
-                }
-            }
         </script>
 
     </case>
+
+    <case value="multiImage">
+        <div class="controls multiImage">
+            <div id="upload_multi_image_{$field.name}" style="padding-bottom: 5px;">选择图片</div>
+            <input class="attach" type="hidden" name="{$field.name}" value="{$field['value']}"/>
+            <div class="upload-img-box">
+                <div class="upload-pre-item popup-gallery">
+
+                    <notempty name="field.value">
+                        <php>$aIds = explode(',',$field['value']);</php>
+                        <volist name="aIds" id="aId">
+                            <div class="each">
+                                <a href="{$aId|get_cover='path'}" title="点击查看大图">
+                                    <img src="{$aId|get_cover='path'}">
+                                </a>
+                                <div class="text-center opacity del_btn" ></div>
+                                <div onclick="admin_image.removeImage($(this),'{$aId}')"  class="text-center del_btn">删除</div>
+                            </div>
+                        </volist>
+
+
+                    </notempty>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(function () {
+                var id = "#upload_multi_image_{$field.name}";
+                var limit = parseInt('{$field.opt}');
+                var uploader_{$field.name}= WebUploader.create({
+                    // 选完文件后，是否自动上传。
+                      // swf文件路径
+                    swf: 'Uploader.swf',
+                    // 文件接收服务端。
+                    server: "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                    // 选择文件的按钮。可选。
+                    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                    //pick: '#upload_multi_image_{$field.name}',
+                    pick: {'id': id, 'multi': true},
+                    fileNumLimit: limit,
+                    // 只允许选择图片文件。
+                    accept: {
+                        title: 'Images',
+                        extensions: 'gif,jpg,jpeg,bmp,png',
+                        mimeTypes: 'image/*'
+                    }
+                });
+                uploader_{$field.name}.on('fileQueued', function (file) {
+                    uploader_{$field.name}.upload();
+                });
+                uploader_{$field.name}.on('uploadFinished', function (file) {
+                    uploader_{$field.name}.reset();
+                });
+                /*上传成功*/
+                uploader_{$field.name}.on('uploadSuccess', function (file, data) {
+                          if (data.status) {
+                            var ids = $("[name='{$field.name}']").val();
+                            ids = ids.split(',');
+                          if( ids.indexOf(data.id) == -1){
+                                var rids = admin_image.upAttachVal('add',data.id, $("[name='{$field.name}']"));
+                              if(rids.length>limit){
+                                  updateAlert('超过图片限制');
+                                  return;
+                              }
+                              $("[name='{$field.name}']").parent().find('.upload-pre-item').append(
+                                        ' <div class="each"><a href="'+ data.path+'" title="点击查看大图"><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
+                                                '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">删除</div></div>'
+                                );
+                            }else{
+                                updateAlert('该图片已存在');
+                            }
+                        } else {
+                            updateAlert(data.info);
+                            setTimeout(function () {
+                                $('#top-alert').find('button').click();
+                                $(that).removeClass('disabled').prop('disabled', false);
+                            }, 1500);
+                        }
+                });
+            })
+        </script>
+
+    </case>
+
     <case value="checkbox">
         <php>
             $importCheckBox = true;
@@ -204,3 +292,4 @@
     <input type="hidden" name="{$field.name}" value="{$field.value|htmlspecialchars}"/>
 </switch>
 </div>
+

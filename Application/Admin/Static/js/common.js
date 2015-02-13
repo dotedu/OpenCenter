@@ -175,57 +175,7 @@ $(function () {
     });
 });
 
-/* 上传图片预览弹出层 */
-$(function () {
-    $(window).resize(function () {
-        var winW = $(window).width();
-        var winH = $(window).height();
-        $(".upload-img-box").click(function () {
-            //如果没有图片则不显示
-            if ($(this).find('img').attr('src') === undefined) {
-                return false;
-            }
-            // 创建弹出框以及获取弹出图片
-            var imgPopup = "<div id=\"uploadPop\" class=\"upload-img-popup\"></div>"
-            var imgItem = $(this).find(".upload-pre-item").html();
 
-            //如果弹出层存在，则不能再弹出
-            var popupLen = $(".upload-img-popup").length;
-            if (popupLen < 1) {
-                $(imgPopup).appendTo("body");
-                $(".upload-img-popup").html(
-                    imgItem + "<a class=\"close-pop\" href=\"javascript:;\" title=\"关闭\"></a>"
-                );
-            }
-
-            // 弹出层定位
-            var uploadImg = $("#uploadPop").find("img");
-            var popW = uploadImg.width();
-            var popH = uploadImg.height();
-            var left = (winW - popW) / 2;
-            var top = (winH - popH) / 2 + 50;
-            $(".upload-img-popup").css({
-                "max-width": winW * 0.9,
-                "left": left,
-                "top": top
-            });
-        });
-
-        // 关闭弹出层
-        $("body").on("click", "#uploadPop .close-pop", function () {
-            $(this).parent().remove();
-        });
-    }).resize();
-
-    // 缩放图片
-    function resizeImg(node, isSmall) {
-        if (!isSmall) {
-            $(node).height($(node).height() * 1.2);
-        } else {
-            $(node).height($(node).height() * 0.8);
-        }
-    }
-})
 
 //标签页切换(无下一步)
 function showTab() {
@@ -369,4 +319,38 @@ function U(url, params, rewrite) {
         website=website.toLowerCase();
     }
     return website;
+}
+
+
+
+admin_image ={
+    /**
+     *
+     * @param obj
+     * @param attachId
+     */
+    removeImage: function (obj, attachId) {
+        // 移除附件ID数据
+        this.upAttachVal('del', attachId, obj);
+        obj.parents('.each').remove();
+
+    },
+    /**
+     * 更新附件表单值
+     * @return void
+     */
+    upAttachVal: function (type, attachId,obj) {
+        var $attach_ids = obj.parents('.controls').find('.attach');
+        var attachVal = $attach_ids.val();
+        var attachArr = attachVal.split(',');
+        var newArr = [];
+        for (var i in attachArr) {
+            if (attachArr[i] !== '' && attachArr[i] !== attachId.toString()) {
+                newArr.push(attachArr[i]);
+            }
+        }
+        type === 'add' && newArr.push(attachId);
+        $attach_ids.val(newArr.join(','));
+        return newArr;
+    }
 }
