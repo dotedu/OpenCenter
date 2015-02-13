@@ -23,7 +23,7 @@ function ucard() {
                         '</div>' +
                         '<div class="col-xs-12" style="padding: 2px;margin-top: -25px;">' +
                         '<div class="col-xs-3">' +
-                        '<img src="{$userProfile.avatar64}" class="avatar-img img-responsive" style="-webkit-box-shadow: 0 3px 4px rgba(11, 2, 5, 0.54);-moz-box-shadow: 0 3px 4px rgba(11, 2, 5, 0.54);box-shadow: 0 3px 4px rgba(173, 173, 173, 0.54);border: solid 2px #fff;"/>' +
+                        '<img src="{$userProfile.avatar64}" class="avatar-img img-responsive" style=""/>' +
                         '</div>' +
                         '<div class="col-xs-9" style="padding-top: 25px;padding-right:0px;font-size: 12px;">' +
                         '<div style="font-size: 16px;font-weight: bold;"><a href="{$userProfile.space_url}" title="">{$userProfile.nickname}</a>{$userProfile.rank_link}' +
