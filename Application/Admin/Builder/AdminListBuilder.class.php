@@ -17,6 +17,7 @@ class AdminListBuilder extends AdminBuilder
     private $_data = array();
     private $_setStatusUrl;
     private $_searchPostUrl;
+    private $_setClearUrl;
 
     private $_search = array();
 
@@ -34,6 +35,17 @@ class AdminListBuilder extends AdminBuilder
     public function setStatusUrl($url)
     {
         $this->_setStatusUrl = $url;
+        return $this;
+    }
+
+    /**设置回收站根据ids彻底删除的URL
+     * @param $url
+     * @return $this
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function setClearUrl($url)
+    {
+        $this->_setClearUrl = $url;
         return $this;
     }
 
@@ -103,14 +115,20 @@ class AdminListBuilder extends AdminBuilder
         return $this->buttonSetStatus($url, 1, $title, $attr);
     }
 
-    /**清空回收站
+    /**彻底删除回收站
      * @param null $model 要清空回收站的模型
+     * @param null $url
      * @return $this
-     * @auth 陈一枭
+     * @author 陈一枭 -> 郑钟良<zzl@ourstu.com>
      */
-    public function buttonClear($model = null)
+    public function buttonClear($url=null)
     {
-        return $this->button('清空', array('class' => 'btn ajax-post tox-confirm', 'data-confirm' => '您确实要清空回收站吗？（清空后不可恢复）', 'url' => U('', array('model' => $model)), 'target-form' => 'ids'));
+        if (!$url) $url = $this->_setClearUrl;
+        $attr['class'] = 'btn ajax-post tox-confirm';
+        $attr['data-confirm']='您确实要彻底删除吗？（彻底删除后不可恢复）';
+        $attr['url'] = $url;
+        $attr['target-form'] = 'ids';
+        return $this->button('彻底删除', $attr);
     }
 
     public function buttonSort($href, $title = '排序', $attr = array())
@@ -420,6 +438,18 @@ class AdminListBuilder extends AdminBuilder
         $ids = is_array($ids) ? $ids : explode(',', $ids);
         M($model)->where(array('id' => array('in', $ids)))->save(array('status' => $status));
         $this->success('设置成功', $_SERVER['HTTP_REFERER']);
+    }
+
+    /**执行彻底删除数据
+     * @param $model
+     * @param $ids
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function doClear($model, $ids)
+    {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
+        M($model)->where(array('id' => array('in', $ids)))->delete();
+        $this->success('彻底删除成功', $_SERVER['HTTP_REFERER']);
     }
 
     private function convertKey($from, $to, $convertFunction)
