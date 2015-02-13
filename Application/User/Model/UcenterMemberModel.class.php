@@ -128,7 +128,7 @@ class UcenterMemberModel extends Model
      * @param  string $mobile 用户手机号码
      * @return integer          注册成功-用户信息，注册失败-错误编号
      */
-    public function register($username, $nickname, $password, $email, $mobile, $type)
+    public function register($username, $nickname, $password, $email, $mobile, $type=1)
     {
 
         $data = array(
@@ -147,14 +147,17 @@ class UcenterMemberModel extends Model
         /* 添加用户 */
         $usercenter_member = $this->create($data);
         if ($usercenter_member) {
-            $result = D('Member')->registerMember($nickname);
+            $result = D('Common/Member')->registerMember($nickname);
             if ($result > 0) {
                 $usercenter_member['id'] = $result;
                 $uid = $this->add($usercenter_member);
                 $this->setDefaultGroup($uid);//设置默认用户组
+                if ($uid === false) {
+                    //如果注册失败，则回去Memeber表删除掉错误的记录
+                    D('Common/Member')->where(array('uid' => $result))->delete();
+                }
                 return $uid ? $uid : 0; //0-未知错误，大于0-注册成功
             } else {
-
                 return $result;
             }
         } else {
@@ -571,9 +574,11 @@ class UcenterMemberModel extends Model
         return true;
     }
 
-    public function getErrorMessage($error_code)
+    public function getErrorMessage($error_code = null)
     {
-        switch ($this->error) {
+
+        $error = $error_code == null ? $this->error : $error_code;
+        switch ($error) {
             case -1:
                 $error = '用户名长度必须在16个字符以内！';
                 break;
@@ -612,6 +617,18 @@ class UcenterMemberModel extends Model
                 break;
             case -12:
                 $error = '用户名必须以中文或字母开始，只能包含拼音数字，字母，汉字！';
+                break;
+            case -31:
+                $error = '昵称禁止注册';
+                break;
+            case -33:
+                $error = '昵称长度不合法';
+                break;
+            case -32:
+                $error = '昵称不合法';
+                break;
+            case -30:
+                $error = '昵称已被占用';
                 break;
 
             default:
