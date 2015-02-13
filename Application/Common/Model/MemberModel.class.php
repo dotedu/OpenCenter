@@ -83,10 +83,12 @@ class MemberModel extends Model
                 $this->error = '前台用户信息注册失败，请重试！';
                 return false;
             }
+
+            return $uid;
         } else {
             return $this->getError(); //错误详情见自动验证注释
         }
-        return $uid;
+
     }
 
     /**
