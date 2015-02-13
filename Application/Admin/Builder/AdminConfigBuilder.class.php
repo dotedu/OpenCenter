@@ -274,4 +274,55 @@ class AdminConfigBuilder extends AdminBuilder
         }
         return $result;
     }
+
+    /**
+     * parseKanbanArray  解析看板数组
+     * @param $data
+     * @param array $item
+     * @param array $default
+     * @return array|mixed
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function parseKanbanArray($data,$item=array(),$default=array()){
+
+        if (empty($data)) {
+            $head = reset($default);
+            if(!array_key_exists("items",$head)){
+                $temp=array();
+                foreach($default as $k=>$v){
+                    $temp[] = array('data-id'=>$k,'title'=>$k,'items'=>$v);
+                }
+                $default = $temp;
+            }
+            $data =$default;
+        } else {
+            $data = json_decode($data, true);
+            $all = array();
+            foreach ($data as $v) {
+                $all = array_merge($all, $v['items']);
+            }
+
+            unset($v);
+            foreach ($item as $val) {
+                if (!in_array($val, $all)) {
+                    $data[0]['items'][] = $val;
+                }
+            }
+            foreach ($all as $v) {
+                if (!in_array($v, $item)) {
+                    foreach ($data as $key => $val) {
+                        $key_search = array_search($v, $val['items']);
+                        if (!is_bool($key_search)) {
+                            unset($data[$key]['items'][$key_search]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
+
+    }
+
+
 }

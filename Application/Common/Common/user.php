@@ -91,8 +91,8 @@ function check_reg_type($type){
  * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
  */
 function get_next_step($now_step =''){
-    $step = modC('REG_STEP', '', 'USERCONFIG');
-    $step = explode(',',$step);
+
+    $step = get_kanban_config('REG_STEP', 'enable','', 'USERCONFIG');
     if(empty($now_step) || $now_step == 'start'){
         $return = $step[0];
     }else{
@@ -105,9 +105,14 @@ function get_next_step($now_step =''){
     return $return;
 }
 
+/**
+ * check_step
+ * @param string $now_step
+ * @return string
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
 function check_step($now_step=''){
-    $step = modC('REG_STEP', '', 'USERCONFIG');
-    $step = explode(',',$step);
+    $step = get_kanban_config('REG_STEP', 'enable','', 'USERCONFIG');
     if(array_search($now_step,$step)){
         $return = $now_step;
     }
@@ -129,4 +134,17 @@ function set_user_status($uid,$status){
     D('Member')->where(array('uid'=>$uid))->setField('status',$status);
     D('UcenterMember')->where(array('id'=>$uid))->setField('status',$status);
     return true;
+}
+
+/**
+ * check_step_can_skip  判断注册步骤是否可跳过
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
+function check_step_can_skip($step){
+    $skip = modC('REG_CAN_SKIP','', 'USERCONFIG');
+    $skip = explode(',',$skip);
+    if(in_array($step,$skip)){
+        return true;
+    }
+    return false;
 }

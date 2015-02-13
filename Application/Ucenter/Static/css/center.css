@@ -107,7 +107,7 @@
 .avatar_256 {
   display: block;
   position: absolute;
-  z-index: 2000;
+  z-index: 99;
   top: 0;
   left: 600px;
   padding: 6px;
@@ -116,7 +116,7 @@
 .avatar_128 {
   display: block;
   position: absolute;
-  z-index: 2000;
+  z-index: 99;
   top: 0px;
   left: 900px;
   padding: 6px;
@@ -125,7 +125,7 @@
 .avatar_64 {
   display: block;
   position: absolute;
-  z-index: 2000;
+  z-index: 99;
   top: 230px;
   left: 900px;
   padding: 6px;
@@ -134,7 +134,7 @@
 .avatar_btn {
   display: block;
   position: absolute;
-  z-index: 2000;
+  z-index: 99;
   top: 415px;
   left: 600px;
   padding: 6px;
@@ -207,4 +207,3 @@
   top: 0;
   right: auto;
 }
-/*form_check.js 所用到的css end */

@@ -153,18 +153,17 @@
     <case value="kanban">
 
         <input type="hidden" name="{$field.name}" value='{:json_encode($field["value"])}'/>
-
         <div class="kanbans" id="{$field.name}">
             <php>foreach($field['value'] as $key =>$kanban){</php>
-            <div class="kanban panel" data-id="{$key}">
+            <div class="kanban panel" data-id="{$kanban['data-id']}" data-title="{$kanban['title']}">
                 <div class="panel-heading">
-                    <strong>{$key}</strong>
+                    <strong>{$kanban['title']}</strong>
                 </div>
                 <div class="panel-body">
                     <div class="kanban-list">
-                        <volist name="kanban" id="vo">
-                            <div class="kanban-item item" data-id="{$vo}">
-                                {$vo}
+                        <volist name="kanban.items" id="vo">
+                            <div class="kanban-item item" data-id="{$vo.data-id}" data-title="{$vo.title}">
+                                {$vo.title}
                             </div>
                         </volist>
                     </div>
@@ -175,15 +174,19 @@
         <script>
             $(function () {
                 var flag = "{$field.name}"
-                $('#{$field.name}').kanbans({'onFinish': function () {
-                    var kanban = new Object();
+                $('#{$field.name}').kanbans({'drop': function () {
+                    var kanban =new Array();
                     $('.kanbans .kanban').each(function (index, element) {
                         if ($(element).data('id')) {
-                            var key = $(element).data('id')
+                            kanban[index] =  new Object();
+                            kanban[index]['data-id'] =  $(element).data('id');
+                            kanban[index]['title'] =  $(element).data('title');
+                            kanban[index]['items'] =  new Array();
                             var obj = $(element).find('.item');
-                            kanban[key] =  new Array();
                             for (var i = 0; i < obj.length; i++) {
-                                kanban[key][i] =$(obj[i]).data('id');
+                                kanban[index]['items'][i] = new Object();
+                                kanban[index]['items'][i]['data-id'] = $(obj[i]).data('id');
+                                kanban[index]['items'][i]['title'] = $(obj[i]).data('title');
                             };
                         }
                     })
@@ -191,7 +194,6 @@
                     $('[name="'+flag+'"]').val(kanban_str);
                 }
                 })
-
             })
         </script>
 

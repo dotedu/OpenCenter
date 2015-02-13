@@ -99,6 +99,14 @@ class MemberController extends Controller
     {
         $aStep = I('get.step', '', 'op_t');
         $aUid = session('temp_login_uid');
+        $step = M('UcenterMember')->where('id=' . $aUid)->getField('step');
+        if(get_next_step($step) != $aStep){
+            $aStep = check_step($step);
+            $_GET['step'] = $aStep;
+            M('UcenterMember')->where('id=' . $aUid)->setField('step', $aStep);
+
+
+        }
         M('UcenterMember')->where('id=' . $aUid)->setField('step', $aStep);
         if ($aStep == 'finish') {
             D('Member')->login($aUid, false);
@@ -118,7 +126,6 @@ class MemberController extends Controller
         $aPassword = I('post.password', '', 'op_t');
         $aVerify = I('post.verify', '', 'op_t');
         $aRemember = I('post.remember', 0, 'intval');
-
 
         if (IS_POST) { //登录验证
             /* 检测验证码 */
