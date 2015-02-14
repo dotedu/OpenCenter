@@ -140,6 +140,18 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->keySelect($name, $title, $subtitle, $options);
     }
 
+    /**
+     * 添加城市选择（需安装城市联动插件）
+     * @param  $title
+     * @param  $subtitle
+     * @return hook ChinaCity
+     * @author LaoYang
+     */
+    public function keyCity($title,$subtitle)
+    {
+        return $this->key('', $title, $subtitle, 'city');
+    }
+
     public function button($title, $attr = array())
     {
         $this->_buttonList[] = array('title' => $title, 'attr' => $attr);

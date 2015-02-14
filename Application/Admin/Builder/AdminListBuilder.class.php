@@ -245,6 +245,13 @@ class AdminListBuilder extends AdminBuilder
         return $this->keyText($name, $title);
     }
 
+    //关联表字段显示+URL连接
+    public function keyJoin($name, $title , $mate , $return , $model, $url ='')
+    {
+        $map = array('mate'=>$mate ,'return'=>$return,'model'=>$model,'url'=>$url);
+        return $this->key($name, $title , 'Join' , $map);
+    }
+
     public function keyDoAction($getUrl, $text, $title = '操作')
     {
         //获取默认getUrl函数
@@ -383,6 +390,22 @@ class AdminListBuilder extends AdminBuilder
             return implode(' ', $result);
         });
 
+        //Join转换为html
+        $this->convertKey('Join', 'html', function ($value,$key) {
+            if($value!=0){
+                $val = get_table_field($value, $key['opt']['mate'], $key['opt']['return'] , $key['opt']['model']);
+                if(!$key['opt']['url']){
+                    return $val;
+                } else {
+                    $urld = U($key['opt']['url'],array($key['opt']['return']=>$value));
+                    return "<a href=\"$urld\">$val</a>";
+                }
+            }
+            else{
+                return '-';
+            }  
+        });
+
         //status转换为html
         $setStatusUrl = $this->_setStatusUrl;
         $that = & $this;
@@ -439,7 +462,6 @@ class AdminListBuilder extends AdminBuilder
         $rs=M($model)->where(array('id' => array('in', $id)))->save(array('status' => $status));
         if($rs===false)
         {
-            dump(D('')->getLastSql());exit;
             $this->error('设置失败。');
         }
         $this->success('设置成功', $_SERVER['HTTP_REFERER']);
