@@ -433,10 +433,15 @@ class AdminListBuilder extends AdminBuilder
         parent::display('admin_list');
     }
 
-    public function doSetStatus($model, $ids, $status)
+    public function doSetStatus($model, $ids, $status=1)
     {
-        $ids = is_array($ids) ? $ids : explode(',', $ids);
-        M($model)->where(array('id' => array('in', $ids)))->save(array('status' => $status));
+        $id = array_unique((array)$ids);
+        $rs=M($model)->where(array('id' => array('in', $id)))->save(array('status' => $status));
+        if($rs===false)
+        {
+            dump(D('')->getLastSql());exit;
+            $this->error('设置失败。');
+        }
         $this->success('设置成功', $_SERVER['HTTP_REFERER']);
     }
 
