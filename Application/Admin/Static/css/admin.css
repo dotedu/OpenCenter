@@ -178,3 +178,47 @@ label {
 .item-label {
   font-weight: bold;
 }
+.upload-img-box .upload-pre-item img {
+  width: 150px;
+}
+.upload-img-box .upload-pre-item .del_btn {
+  width: 150px;
+  position: absolute;
+  color: #fff;
+  margin-top: -30px;
+  height: 30px;
+  line-height: 30px;
+  cursor: pointer;
+}
+.upload-img-box .upload-pre-item .opacity {
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  background: #000;
+  opacity: 0.5;
+}
+.multiImage .upload-img-box .upload-pre-item .each {
+  display: inline-block;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+.multiImage .upload-img-box .upload-pre-item img {
+  width: 150px;
+  height: 150px;
+}
+.multiImage .upload-img-box .upload-pre-item .del_btn {
+  width: 150px;
+  position: absolute;
+  color: #fff;
+  margin-top: -30px;
+  height: 30px;
+  line-height: 30px;
+  cursor: pointer;
+}
+.multiImage .upload-img-box .upload-pre-item .opacity {
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  background: #000;
+  opacity: 0.5;
+}
