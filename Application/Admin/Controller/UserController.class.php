@@ -75,7 +75,7 @@ class UserController extends AdminController
             }
 
 
-            $groups = M('AuthGroup')->select();
+            $groups = M('AuthGroup')->where(array('status'=>1))->select();
             $this->assign('groups', $groups);
             $this->assign('users', $user);
             $this->display();
