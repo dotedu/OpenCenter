@@ -556,7 +556,7 @@ str;
         if ($res['status']) {
             $this->success('修改密码成功！');
         } else {
-            $this->error($res['info']);
+            $this->error(D('User/UcenterMember')->getErrorMessage($res['info']));
         }
     }
 
