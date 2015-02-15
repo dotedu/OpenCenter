@@ -20,10 +20,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- 表的结构 `thinkox_issue`
+-- 表的结构 `ocenter_issue`
 --
 
-CREATE TABLE IF NOT EXISTS `thinkox_issue` (
+CREATE TABLE IF NOT EXISTS `ocenter_issue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(40) NOT NULL,
   `create_time` int(11) NOT NULL,
@@ -36,20 +36,20 @@ CREATE TABLE IF NOT EXISTS `thinkox_issue` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
 
 --
--- 转存表中的数据 `thinkox_issue`
+-- 转存表中的数据 `ocenter_issue`
 --
 
-INSERT INTO `thinkox_issue` (`id`, `title`, `create_time`, `update_time`, `status`, `allow_post`, `pid`, `sort`) VALUES
+INSERT INTO `ocenter_issue` (`id`, `title`, `create_time`, `update_time`, `status`, `allow_post`, `pid`, `sort`) VALUES
 (13, '默认专辑', 1409712474, 1409712467, 1, 0, 0, 0),
 (14, '默认二级', 1409712480, 1409712475, 1, 0, 13, 0);
 
 -- --------------------------------------------------------
 
 --
--- 表的结构 `thinkox_issue_content`
+-- 表的结构 `ocenter_issue_content`
 --
 
-CREATE TABLE IF NOT EXISTS `thinkox_issue_content` (
+CREATE TABLE IF NOT EXISTS `ocenter_issue_content` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL COMMENT '标题',
   `content` text NOT NULL COMMENT '内容',
@@ -66,15 +66,15 @@ CREATE TABLE IF NOT EXISTS `thinkox_issue_content` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='专辑内容表' AUTO_INCREMENT=29 ;
 
 --
--- 转存表中的数据 `thinkox_issue_content`
+-- 转存表中的数据 `ocenter_issue_content`
 --
-INSERT INTO `thinkox_menu` (`title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`) VALUES
+INSERT INTO `ocenter_menu` (`title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`) VALUES
 ( '专辑', 0, 22, 'Issue/issue', 1, '', '', 0);
 
 set @tmp_id=0;
-select @tmp_id:= id from `thinkox_menu` where title = '专辑';
+select @tmp_id:= id from `ocenter_menu` where title = '专辑';
 
-INSERT INTO `thinkox_menu` ( `title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`) VALUES
+INSERT INTO `ocenter_menu` ( `title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`) VALUES
 ( '编辑专辑', @tmp_id, 0, 'Issue/add', 1, '', '专辑', 0),
 ( '专辑管理', @tmp_id, 0, 'Issue/issue', 0, '', '专辑', 0),
 ( '专辑回收站', @tmp_id, 4, 'Issue/issueTrash', 0, '', '专辑', 0),
@@ -85,6 +85,6 @@ INSERT INTO `thinkox_menu` ( `title`, `pid`, `sort`, `url`, `hide`, `tip`, `grou
 ( '专辑设置', @tmp_id, 0, 'Issue/config', 0, '', '设置', 0),
 ( '设置专辑状态', @tmp_id, 0, 'Issue/setIssueContentStatus', 1, '', '', 0);
 
-INSERT INTO `thinkox_auth_rule` ( `module`, `type`, `name`, `title`, `status`, `condition`) VALUES
+INSERT INTO `ocenter_auth_rule` ( `module`, `type`, `name`, `title`, `status`, `condition`) VALUES
 ( 'Issue', 1, 'addIssueContent', '专辑投稿权限', 1, ''),
 ( 'Issue', 1, 'editIssueContent', '编辑专辑内容（管理）', 1, '');
