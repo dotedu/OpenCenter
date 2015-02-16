@@ -149,7 +149,8 @@ class AdminConfigBuilder extends AdminBuilder
      */
     public function keyCity($title,$subtitle)
     {
-        return $this->key('', $title, $subtitle, 'city');
+        //修正在编辑信息时无法正常显示已经保存的地区信息
+        return $this->key(array('province','city','district'), $title, $subtitle, 'city');
     }
 
     public function button($title, $attr = array())
@@ -198,7 +199,20 @@ class AdminConfigBuilder extends AdminBuilder
     {
         //将数据融入到key中
         foreach ($this->_keyList as &$e) {
-            $e['value'] = $this->_data[$e['name']];
+            //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
+            if(is_array($e['name'])){
+                $i=0;
+                $n = count($e['name']);
+                while ($n>0) {
+                    $e['value'][$i] = $this->_data[$e['name'][$i]];
+                    $i++;
+                    $n--;
+                }
+            } else {
+                $e['value'] = $this->_data[$e['name']];
+            }
+            //原代码
+            /*$e['value'] = $this->_data[$e['name']];*/
         }
 
         //编译按钮的html属性
