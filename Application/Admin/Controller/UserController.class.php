@@ -333,7 +333,8 @@ str;
             $data['required'] = $required;
             $data['form_type'] = $form_type;
             $data['input_tips'] = $input_tips;
-            if ($form_type == 'input') {
+            //增加当二级字段类型为join时也提交$child_form_type @MingYang
+            if ($form_type == 'input' && $child_form_type == 'join') {
                 $data['child_form_type'] = $child_form_type;
             }
             $data['form_default_value'] = $form_default_value;
@@ -379,9 +380,12 @@ str;
                 'textarea' => '多行文本框'
             );
             $child_type = array(
+                
                 'string' => '字符串',
                 'phone' => '手机号码',
                 'email' => '邮箱',
+                //增加可选择关联字段类型 @MingYang
+                'join' => '关联字段',
                 'number' => '数字'
             );
             $builder->keyReadOnly("id", "标识")->keyReadOnly('profile_group_id', '分组id')->keyText('field_name', "字段名称")->keySelect('form_type', "表单类型", '', $type_default)->keySelect('child_form_type', "二级表单类型", '', $child_type)->keyTextArea('form_default_value', '默认值', "多个值用'|'分割开")
