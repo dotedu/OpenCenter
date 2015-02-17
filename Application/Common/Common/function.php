@@ -1452,7 +1452,6 @@ function get_userdata_join($id = null,$field = null,$table = null)
         if (is_array($id)){
             $map['id'] = array('in',$id);
             $data = D($table)->where($map)->getField($field,true);
-            dump($data);
             return  implode(',',$data);
         } else {
             $map['id'] = $id;
@@ -1461,4 +1460,3 @@ function get_userdata_join($id = null,$field = null,$table = null)
             }
         }
 }
-
