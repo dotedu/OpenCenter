@@ -65,62 +65,105 @@ class InputRenderWidget extends Action
                 $this->assign('items', $items);
                 $this->assign('checked', $checked);
                 break;
+            /*
+             * 添加用户扩展资料可添加关联字段功能（多选支持）
+             * 给原有多选扩展字段做一个join判断
+             * @MingYang <xint5288@126.com>
+             */
             case 'checkbox':
                 $this->assign('field_name', $data['field_name']);
                 if ($type == "personal") {
                     if ($data['form_default_value'] != '' && $data['form_default_value'] != null) {
                         $canCheck = explode('|', $data['form_default_value']);
                         $items = null;
-                        if (!$data['field_content']) {
-                            foreach ($canCheck as $key => $val) {
-                                if ($val != '') {
-                                    $items[$key]['value'] = $val;
+                        //join判断,对关联扩展资料信息处理
+                        if($data['child_form_type'] == "join"){
+                            $joindata = explode('|',$data['form_default_value']);
+                            $checked = explode('|', $data['field_content']['field_data']);
+                            foreach (get_userdata_join('',$joindata[0],$joindata[1]) as $key =>$val){
+                                $items[$key]['value'] = $val[$joindata[1]];
+                                $items[$key]['join'] = 1;
+                                $items[$key]['id'] = $val['id'];
+                                if (in_array($val['id'], $checked)) {
+                                    $items[$key]['selected'] = 1;
+                                } else {
                                     $items[$key]['selected'] = 0;
                                 }
                             }
+                            $this->assign('items', $items);
+                        //执行原扩展信息处理
                         } else {
-                            $checked = explode('|', $data['field_content']['field_data']);
-                            foreach ($canCheck as $key => $val) {
-                                if ($val != '') {
-                                    $items[$key]['value'] = $val;
-                                    if (in_array($val, $checked)) {
-                                        $items[$key]['selected'] = 1;
-                                    } else {
+                        
+                            if (!$data['field_content']) {
+                                foreach ($canCheck as $key => $val) {
+                                    if ($val != '') {
+                                        $items[$key]['value'] = $val;
                                         $items[$key]['selected'] = 0;
                                     }
                                 }
+                            } else {
+                                $checked = explode('|', $data['field_content']['field_data']);
+                                foreach ($canCheck as $key => $val) {
+                                    if ($val != '') {
+                                        $items[$key]['value'] = $val;
+                                        if (in_array($val, $checked)) {
+                                            $items[$key]['selected'] = 1;
+                                        } else {
+                                            $items[$key]['selected'] = 0;
+                                        }
+                                    }
+                                }
                             }
+                            $this->assign('items', $items);
                         }
-                        $this->assign('items', $items);
                     }
+
                 } else {
                     $checked = explode('|', $data['field_content']['field_data']);
                     $this->assign('checked', $checked);
                 }
                 break;
+            /*
+             * 添加用户扩展资料可添加关联字段功能（下拉菜单支持、相当于单选）
+             * 给原有下拉菜单做一个join判断
+             * @MingYang <xint5288@126.com>
+             */
             case 'select':
                 $this->assign('field_name', $data['field_name']);
                 $selected = isset($data['field_content']['field_data']) ? $data['field_content']['field_data'] : "还未选择";
                 if ($type == "personal") {
-                    if ($data['form_default_value'] != '' && $data['form_default_value'] != null) {
-                        $canSelected = explode('|', $data['form_default_value']);
-                        $items = array();
-                        foreach ($canSelected as $key => $val) {
-                            $items[$key]['value'] = $val;
-                            $items[$key]['selected'] = ($selected == $val) ? 'selected' : '';
+                    //join判断,对关联扩展资料信息处理
+                    if($data['child_form_type'] == "join"){
+                        $joindata = explode('|',$data['form_default_value']);
+                        foreach (get_userdata_join('',$joindata[0],$joindata[1]) as $key =>$val){
+                            $items[$key]['value'] = $val[$joindata[1]];
+                            $items[$key]['join'] = 1;
+                            $items[$key]['id'] = $val['id'];
+                            $items[$key]['selected'] = ($selected == $val['id']) ? 'selected' : '';
                         }
-                        if (!isset($data['field_content']['field_data'])) {
-                            $items[0]['selected'] = 'selected';
+                    //执行原扩展信息处理   
+                    } else {  
+                        if ($data['form_default_value'] != '' && $data['form_default_value'] != null) {
+                            $canSelected = explode('|', $data['form_default_value']);
+                            $items = array();
+                            foreach ($canSelected as $key => $val) {
+                                $items[$key]['value'] = $val;
+                                $items[$key]['selected'] = ($selected == $val) ? 'selected' : '';
+                            }
+                            if (!isset($data['field_content']['field_data'])) {
+                                $items[0]['selected'] = 'selected';
+                            }
+                        } else {
+                            $canSelected[0]['value'] = '无';
+                            $canSelected[0]['selected'] = 'selected';
                         }
-                    } else {
-                        $canSelected[0]['value'] = '无';
-                        $canSelected[0]['selected'] = 'selected';
-                    }
+                      }
                 }
+                
 
                 $this->assign('items', $items);
                 $this->assign('selected', $selected);
-                break;
+            break;
             case 'time':
                 $this->assign('field_name', $data['field_name']);
 
@@ -166,4 +209,4 @@ class InputRenderWidget extends Action
         return $data;
     }
 
-} 
+}
