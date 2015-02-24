@@ -1429,3 +1429,34 @@ function get_some_day($some=30,$day=null){
     return $some_day;
 }
 
+/**
+ * 用户扩展资料可添加关联字段
+ * @param string $id 关联数据表ID
+ * @param string $field 需要返回的字段内容
+ * @param string $table 关联数据表
+ * @return array string
+ * @author MingYang <xint5288@126.com>
+ */
+function get_userdata_join($id = null,$field = null,$table = null)
+{
+    if (empty($table) || empty($field)) {
+        return false;
+    }
+    if (empty($id)) {
+        $data = D($table)->select();
+        foreach ($data as $key=>$val){
+            $list[$key] = $val;
+        }
+        return $list;
+    } else {
+        if (is_array($id)){
+            $map['id'] = array('in',$id);
+            $data = D($table)->where($map)->getField($field,true);
+            return  implode(',',$data);
+        } else {
+            $map['id'] = $id;
+            $data = D($table)->where($map)->getField($field);
+            return $data;
+            }
+        }
+}
