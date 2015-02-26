@@ -12,7 +12,7 @@ namespace Admin\Controller;
 use Admin\Builder\AdminConfigBuilder;
 use Admin\Builder\AdminListBuilder;
 use Admin\Builder\AdminSortBuilder;
-use Home\Model\MemberModel;
+use Common\Model\MemberModel;
 use User\Api\UserApi;
 
 /**
@@ -133,34 +133,7 @@ class UserController extends AdminController
         $builder->display();
     }
 
-    public function config()
-    {
-        $admin_config = new AdminConfigBuilder();
-        $data = $admin_config->handleConfig();
-        if (!$data) {
-            $data['DEFAULT_GROUP'] = 1;
 
-            $data['LEVEL'] = <<<str
-0:Lv1 实习
-50:Lv2 试用
-100:Lv3 转正
-200:Lv4 助理
-400:Lv 5 经理
-800:Lv6 董事
-1600:Lv7 董事长
-str;
-        }
-
-
-        $groups = M('AuthGroup')->where(array('status' => 1))->select();
-        foreach ($groups as $g) {
-            $groupOption[$g['id']] = $g['title'];
-        }
-        $admin_config->title('基础设置')->keyTextArea('LEVEL', '等级配置', '每行一条，名称和积分之间用冒号分隔')
-            ->keyCheckBox('DEFAULT_GROUP', '默认用户组', '设置用户注册后的默认所在用户组', $groupOption)
-            ->buttonSubmit('', '保存')->data($data);
-        $admin_config->display();
-    }
 
     /**用户扩展资料详情
      * @param string $uid
@@ -698,5 +671,77 @@ str;
         }
         return $error;
     }
+
+
+
+    public function scoreList()
+    {
+        //读取数据
+        $map = array('status' => array('GT', -1));
+        $model = D('Ucenter/Score');
+        $list = $model->getTypeList($map);
+
+        //显示页面
+        $builder = new AdminListBuilder();
+        $builder
+            ->title('积分类型')
+            ->buttonNew(U('editScoreType'))
+            ->setStatusUrl(U('setTypeStatus'))->buttonEnable()->buttonDisable()->button('删除',array('class' => 'btn ajax-post tox-confirm', 'data-confirm' => '您确实要删除积分分类吗？（删除后对应的积分将会清空，不可恢复，请谨慎删除！）', 'url' => U('delType'), 'target-form' => 'ids'))
+            ->keyId()->keyText('title', '名称')
+           ->keyText('unit', '单位')->keyStatus()->keyDoActionEdit('editScoreType?id=###')
+            ->data($list)
+            ->display();
+    }
+
+    public function setTypeStatus($ids, $status)
+    {
+        $builder = new AdminListBuilder();
+        $builder->doSetStatus('ucenter_score_type', $ids, $status);
+
+    }
+
+    public function delType($ids){
+        $model = D('Ucenter/Score');
+        $res = $model->delType($ids);
+        if ($res) {
+            $this->success('删除成功');
+        } else {
+            $this->error('删除失败');
+        }
+    }
+    public function editScoreType(){
+            $aId = I('id',0,'intval');
+            $model = D('Ucenter/Score');
+            if (IS_POST) {
+                $data['title'] = I('post.title','','op_t');
+                $data['status'] = I('post.status',1,'intval');
+                $data['unit'] = I('post.unit','','op_t');
+
+                if ($aId != 0) {
+                    $data['id'] = $aId;
+                    $res = $model->editType($data);
+                } else {
+                    $res = $model->addType($data);
+                }
+                if ($res) {
+                    $this->success(($aId == 0 ? '添加' : '编辑') . '成功');
+                } else {
+                    $this->error(($aId == 0 ? '添加' : '编辑') . '失败');
+                }
+            } else {
+                $builder = new AdminConfigBuilder();
+                if ($aId != 0) {
+                    $type = $model->getType(array('id'=>$aId));
+                } else {
+                    $type = array('status' => 1, 'sort' => 0);
+                }
+                $builder->title(($aId == 0 ? '新增' : '编辑').'积分分类')->keyId()->keyText('title', '名称')
+                    ->keyText('unit', '单位')
+                    ->keyStatus()
+                    ->data($type)
+                    ->buttonSubmit(U('editScoreType'))->buttonBack()->display();
+            }
+    }
+
 
 }

@@ -42,7 +42,7 @@ class TitleModel
      */
     public function getTitleConfig()
     {
-        $title = modC('LEVEL', '', 'user');
+        $title = modC('LEVEL', '', 'USERCONFIG');
         if ($title == '') {
 
             return array(
