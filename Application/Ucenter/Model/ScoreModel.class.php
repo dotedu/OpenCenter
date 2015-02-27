@@ -23,7 +23,7 @@ class ScoreModel extends Model
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
     public function getTypeList($map=''){
-       $list = $this->typeModel->where($map)->select();
+       $list = $this->typeModel->where($map)->order('id asc')->select();
 
        return $list;
    }
@@ -59,10 +59,13 @@ class ScoreModel extends Model
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
     public function delType($ids){
-        $res = $this->typeModel->where(array('id'=>array('in',$ids)))->delete();
+
+        $res = $this->typeModel->where(array('id'=>array(array('in',$ids),array('gt',4),'and')))->delete();
         foreach($ids as $v){
-            $query = "alter table `ocenter_member` drop column score".$v;
-            D()->execute($query);
+            if($v>4){
+                $query = "alter table `ocenter_member` drop column score".$v;
+                D()->execute($query);
+            }
       }
         return $res;
     }
