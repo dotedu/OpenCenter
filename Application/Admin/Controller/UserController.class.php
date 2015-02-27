@@ -141,38 +141,56 @@ class UserController extends AdminController
      */
     public function expandinfo_details($uid = 0)
     {
-        $map['uid'] = $uid;
-        $map['status'] = array('egt', 0);
-        $member = M('Member')->where($map)->find();
-        $member['id'] = $member['uid'];
-        //扩展信息查询
-        $map_profile['status'] = 1;
-        $field_group = D('field_group')->where($map_profile)->select();
-        $field_group_ids = array_column($field_group, 'id');
-        $map_profile['profile_group_id'] = array('in', $field_group_ids);
-        $fields_list = D('field_setting')->where($map_profile)->getField('id,field_name,form_type');
-        $fields_list = array_combine(array_column($fields_list, 'field_name'), $fields_list);
-        $map_field['uid'] = $member['uid'];
-        foreach ($fields_list as $key => $val) {
-            $map_field['field_id'] = $val['id'];
-            $field_data = D('field')->where($map_field)->getField('field_data');
-            if ($field_data == null || $field_data == '') {
-                $member[$key] = '';
-            } else {
+        if(IS_POST){
+
+
+        }else{
+            $map['uid'] = $uid;
+            $map['status'] = array('egt', 0);
+            $member = M('Member')->where($map)->find();
+            $member['id'] = $member['uid'];
+            //扩展信息查询
+            $map_profile['status'] = 1;
+            $field_group = D('field_group')->where($map_profile)->select();
+            $field_group_ids = array_column($field_group, 'id');
+            $map_profile['profile_group_id'] = array('in', $field_group_ids);
+            $fields_list = D('field_setting')->where($map_profile)->getField('id,field_name,form_type');
+            $fields_list = array_combine(array_column($fields_list, 'field_name'), $fields_list);
+            $map_field['uid'] = $member['uid'];
+            foreach ($fields_list as $key => $val) {
+                $map_field['field_id'] = $val['id'];
+                $field_data = D('field')->where($map_field)->getField('field_data');
+                if ($field_data == null || $field_data == '') {
+                    $member[$key] = '';
+                } else {
+                    $member[$key] = $field_data;
+                }
                 $member[$key] = $field_data;
             }
-            $member[$key] = $field_data;
+            $builder = new AdminConfigBuilder();
+            $builder->title("用户扩展资料详情");
+            $builder->meta_title = '用户扩展资料详情';
+            $builder->keyId()->keyReadOnly('nickname', "用户名称");
+            $field_key = array('id','nickname');
+            foreach ($fields_list as $vt) {
+                $field_key[] = $vt['field_name'];
+                $builder->keyReadOnly($vt['field_name'], $vt['field_name']);
+            }
+
+            /* 积分设置*/
+
+           $field = D('Member')->getDbFields();
+
+            /*积分设置end*/
+
+            $builder->group('基本设置', implode(',',$field_key));
+            $builder->group('积分设置', '');
+            $builder->data($member);
+            $builder->buttonSubmit('', '保存');
+            $builder->buttonBack();
+            $builder->display();
         }
-        $builder = new AdminConfigBuilder();
-        $builder->title("用户扩展资料详情");
-        $builder->meta_title = '用户扩展资料详情';
-        $builder->keyId()->keyReadOnly('nickname', "用户名称");
-        foreach ($fields_list as $vt) {
-            $builder->keyReadOnly($vt['field_name'], $vt['field_name']);
-        }
-        $builder->data($member);
-        $builder->buttonBack();
-        $builder->display();
+
     }
 
     /**扩展用户信息分组列表
@@ -685,6 +703,7 @@ class UserController extends AdminController
         $builder = new AdminListBuilder();
         $builder
             ->title('积分类型')
+            ->suggest('id小于4的不能删除')
             ->buttonNew(U('editScoreType'))
             ->setStatusUrl(U('setTypeStatus'))->buttonEnable()->buttonDisable()->button('删除',array('class' => 'btn ajax-post tox-confirm', 'data-confirm' => '您确实要删除积分分类吗？（删除后对应的积分将会清空，不可恢复，请谨慎删除！）', 'url' => U('delType'), 'target-form' => 'ids'))
             ->keyId()->keyText('title', '名称')

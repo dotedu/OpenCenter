@@ -6,6 +6,7 @@
     <div class="main-title">
         <h2>
             {$title|htmlspecialchars}
+            <if condition="$suggest">（{$suggest|htmlspecialchars}）</if>
         </h2>
     </div>
     <php>

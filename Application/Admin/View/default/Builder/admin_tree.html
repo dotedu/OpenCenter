@@ -4,7 +4,7 @@
     <!-- 标题 -->
     <div class="main-title">
         <h2>
-            {$title|htmlspecialchars}
+            {$title|htmlspecialchars}            <if condition="$suggest">（{$suggest|htmlspecialchars}）</if>
         </h2>
     </div>
 

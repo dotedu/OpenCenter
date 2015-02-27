@@ -11,6 +11,7 @@ namespace Admin\Builder;
 class AdminConfigBuilder extends AdminBuilder
 {
     private $_title;
+    private $_suggest;
     private $_keyList = array();
     private $_data = array();
     private $_buttonList = array();
@@ -21,6 +22,11 @@ class AdminConfigBuilder extends AdminBuilder
     {
         $this->_title = $title;
         $this->meta_title=$title;
+        return $this;
+    }
+
+    public function suggest($suggest){
+        $this->_suggest = $suggest;
         return $this;
     }
 
@@ -223,6 +229,7 @@ class AdminConfigBuilder extends AdminBuilder
         //显示页面
         $this->assign('group', $this->_group);
         $this->assign('title', $this->_title);
+        $this->assign('suggest', $this->_suggest);
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('savePostUrl', $this->_savePostUrl);

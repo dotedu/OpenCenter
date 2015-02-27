@@ -11,6 +11,7 @@ namespace Admin\Builder;
 class AdminTreeListBuilder extends AdminBuilder
 {
     private $_title;
+    private $_suggest;
     private $_keyList = array();
     private $_buttonList = array();
     private $_pagination = array();
@@ -28,7 +29,11 @@ class AdminTreeListBuilder extends AdminBuilder
         $this->meta_title=$title;
         return $this;
     }
-
+    
+    public function suggest($suggest){
+        $this->_suggest = $suggest;
+        return $this;
+    }
     /**
      * @param $url string 已被U函数解析的地址
      * @return $this
@@ -342,6 +347,7 @@ class AdminTreeListBuilder extends AdminBuilder
 
         //显示页面
         $this->assign('title', $this->_title);
+        $this->assign('suggest', $this->_suggest);
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('pagination', $paginationHtml);

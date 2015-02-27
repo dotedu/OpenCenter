@@ -11,6 +11,7 @@ namespace Admin\Builder;
 class AdminListBuilder extends AdminBuilder
 {
     private $_title;
+    private $_suggest;
     private $_keyList = array();
     private $_buttonList = array();
     private $_pagination = array();
@@ -25,6 +26,11 @@ class AdminListBuilder extends AdminBuilder
     {
         $this->_title = $title;
         $this->meta_title=$title;
+        return $this;
+    }
+
+    public function suggest($suggest){
+        $this->_suggest = $suggest;
         return $this;
     }
 
@@ -446,6 +452,7 @@ class AdminListBuilder extends AdminBuilder
 
         //显示页面
         $this->assign('title', $this->_title);
+        $this->assign('suggest', $this->_suggest);
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('pagination', $paginationHtml);
