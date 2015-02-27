@@ -172,7 +172,7 @@ class UcenterMemberModel extends Model
     public function setDefaultGroup($uid)
     {
         //将该用户加入用户组
-        $defaultGroup = modC('DEFAULT_GROUP', '1', 'User');
+        $defaultGroup = modC('DEFAULT_GROUP', '1', 'USERCONFIG');
         $authGroupAccessModel = M('AuthGroupAccess');
         $defaultGroupArray = explode(',', $defaultGroup);
         foreach ($defaultGroupArray as $g) {

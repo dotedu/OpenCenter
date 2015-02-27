@@ -161,6 +161,12 @@ class IndexController extends BaseController
             $val['field_content'] = $field;
             unset($map['field_id']);
             $info_list[$val['id']] = $this->_get_field_data($val);
+            //当扩展资料为join时，读取数据并进行处理再显示到前端@MingYang
+            if($val['child_form_type'] == "join"){
+                $j = explode('|',$val['form_default_value']);
+                $a = explode(' ',$info_list[$val['id']]['field_data']);
+                $info_list[$val['id']]['field_data'] = get_userdata_join($a,$j[0],$j[1]);
+            }
         }
         return $info_list;
     }
@@ -532,4 +538,4 @@ class IndexController extends BaseController
         array_multisort($key_array, $sort, $multi_array);
         return $multi_array;
     }
-} 
+}

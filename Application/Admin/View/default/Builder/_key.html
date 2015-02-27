@@ -237,7 +237,19 @@
         <input type="text" data-field-name="{$field.name}" class="text input-large time form-control"
                style="width: 400px" value="{$field.value|time_format}" placeholder="请选择时间"/>
     </case>
-
+    
+    <!--添加城市选择（需安装城市联动插件,css样式不好处理排版有点怪）-->
+    <case value="city">
+            <style type="text/css">
+    			.form-control {
+				display:inline-block;
+				width: 120px;
+				}
+			</style>
+            <!--修正在编辑信息时无法正常显示已经保存的地区信息--> 
+            {:hook('J_China_City',array('province'=>$field['value']['0'],'city'=>$field['value']['1'],'district'=>$field['value']['2'],'community'=>$field['value']['3']))}
+    </case>
+    
     <case value="kanban">
 
         <input type="hidden" name="{$field.name}" value='{:json_encode($field["value"])}'/>
@@ -292,4 +304,3 @@
     <input type="hidden" name="{$field.name}" value="{$field.value|htmlspecialchars}"/>
 </switch>
 </div>
-

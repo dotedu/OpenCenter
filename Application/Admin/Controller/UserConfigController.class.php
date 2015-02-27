@@ -34,9 +34,32 @@ class UserConfigController extends AdminController
             $step[] = array('data-id' => $key, 'title' => $v);
         }
 
+
+
         $default = array(array('data-id' => 'disable', 'title' => '禁用', 'items' => $step), array('data-id' => 'enable', 'title' => '启用', 'items' => array()));
         //$default=array('禁用'=>$step,'启用并可跳过'=>array(),'启用但不可跳过'=>array());
         $data['REG_STEP'] = $admin_config->parseKanbanArray($data['REG_STEP'],$step,$default);
+
+        $groups = M('AuthGroup')->where(array('status' => 1))->select();
+        foreach ($groups as $g) {
+            $groupOption[$g['id']] = $g['title'];
+        }
+
+            empty($data['DEFAULT_GROUP']) && $data['DEFAULT_GROUP'] = 1;
+            empty($data['LEVEL']) && $data['LEVEL'] = <<<str
+0:Lv1 实习
+50:Lv2 试用
+100:Lv3 转正
+200:Lv4 助理
+400:Lv 5 经理
+800:Lv6 董事
+1600:Lv7 董事长
+str;
+
+
+
+
+
         $admin_config->title('用户配置')
             ->keyCheckBox('REG_SWITCH', '注册开关', '允许使用的注册选项,全不选即为关闭注册', array('username' => '用户名', 'email' => '邮箱', 'mobile' => '手机'))
             ->keyRadio('EMAIL_VERIFY_TYPE', '邮箱验证类型', '邮箱验证的类型', array(0 => '不验证', 1 => '注册后发送激活邮件', 2 => '注册前发送验证邮件'))
@@ -55,13 +78,19 @@ class UserConfigController extends AdminController
             ->keyTextArea('SMS_CONTENT', '短信内容', '短信内容')
 
 
+            ->keyTextArea('LEVEL', '等级配置', '每行一条，名称和积分之间用冒号分隔')
+            ->keyCheckBox('DEFAULT_GROUP', '默认用户组', '设置用户注册后的默认所在用户组', $groupOption)
+
             ->group('基础配置', 'REG_SWITCH,EMAIL_VERIFY_TYPE,MOBILE_VERIFY_TYPE,REG_STEP,REG_CAN_SKIP')
             ->group('邮箱验证模版', 'REG_EMAIL_VERIFY')
             ->group('邮箱激活模版', 'REG_EMAIL_ACTIVATE')
             ->group('短信配置', 'SMS_HTTP,SMS_UID,SMS_PWD,SMS_CONTENT')
-
+            ->group('基础设置', 'LEVEL,DEFAULT_GROUP')
             ->buttonSubmit('', '保存')->data($data);
         $admin_config->display();
     }
+
+
+
 
 }

@@ -140,6 +140,19 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->keySelect($name, $title, $subtitle, $options);
     }
 
+    /**
+     * 添加城市选择（需安装城市联动插件）
+     * @param  $title
+     * @param  $subtitle
+     * @return hook ChinaCity
+     * @author LaoYang
+     */
+    public function keyCity($title,$subtitle)
+    {
+        //修正在编辑信息时无法正常显示已经保存的地区信息
+        return $this->key(array('province','city','district'), $title, $subtitle, 'city');
+    }
+
     public function button($title, $attr = array())
     {
         $this->_buttonList[] = array('title' => $title, 'attr' => $attr);
@@ -186,7 +199,20 @@ class AdminConfigBuilder extends AdminBuilder
     {
         //将数据融入到key中
         foreach ($this->_keyList as &$e) {
-            $e['value'] = $this->_data[$e['name']];
+            //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
+            if(is_array($e['name'])){
+                $i=0;
+                $n = count($e['name']);
+                while ($n>0) {
+                    $e['value'][$i] = $this->_data[$e['name'][$i]];
+                    $i++;
+                    $n--;
+                }
+            } else {
+                $e['value'] = $this->_data[$e['name']];
+            }
+            //原代码
+            /*$e['value'] = $this->_data[$e['name']];*/
         }
 
         //编译按钮的html属性

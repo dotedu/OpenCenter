@@ -47,24 +47,9 @@
                 <dl>
                     <dt>
                     <div class="row">
-                        <div class="col-xs-9"><a href="{$message.url}">{$message.title}</a>
-                            <eq name="message.is_read" value="0"><span class="badge-primary">未读</span></eq>
-                            <if condition=" ($message['apptype'] neq '')">
-                                <if condition=" ($message['appname'] neq '')  AND ($message['talk_id'] eq 0)">
-                                    <a href="{:U('Ucenter/Message/talk',array('message_id'=>$message['id']))}">
-                                        <span class="badge-success">开始对话</span>
-                                    </a>
-                                    <else/>
-                                    <a href="{:U('Ucenter/Message/talk',array('talk_id'=>$message['talk_id']))}">
-                                        <span class="badge-success">继续对话</span>
-                                    </a>
-                                    <a href="{:U('Ucenter/Message/doDeleteTalk',array('talk_id'=>$message['talk_id']))}" class="ajax-post" data-confirm="您确实要删除该聊天吗？">
-                                        <span class="badge-danger">删除</span>
-                                    </a>
-                                </if>
-                                <else/>
+                        <div class="col-xs-9"><a href="{$message.url}" onclick="Notify.readMessage(this,{$message.id})">{$message.title}</a>
+                            <span class="badge-primary">未读</span>
 
-                            </if>
                         </div>
                         <div class="col-xs-3 message-ctime">{$message.create_time|friendlyDate}</div>
                     </div>

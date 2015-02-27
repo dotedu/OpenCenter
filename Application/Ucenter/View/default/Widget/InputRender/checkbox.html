@@ -8,7 +8,8 @@
             <ul class="expandinfo-ul" id="expand_{$field_id}" style="-webkit-padding-start: 0px;">
                 <volist name="items" id="vl">
                     <li class="expandinfo-li">
-                        <label><input class="checkbox-inline" style="margin: -2px 3px 0 0" type="checkbox" name="expand_{$field_id}[]" value="{$vl.value}" <eq name="vl.selected" value="1">checked</eq>>{$vl.value}</label>
+                     <!--增加编辑扩展资料关联字段数据显示-->
+                       <label><input class="checkbox-inline" style="margin: -2px 3px 0 0" type="checkbox" name="expand_{$field_id}[]" value="<eq name="vl.join" value="1">{$vl.id}<else/>{$vl.value}</eq>" <eq name="vl.selected" value="1">checked</eq>>{$vl.value}</label>
                     </li>
                 </volist>
             </ul>
