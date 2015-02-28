@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: caipeichao
- * Date: 14-3-12
- * Time: AM10:08
- */
+
 
 namespace Admin\Builder;
 
@@ -22,6 +17,11 @@ class AdminListBuilder extends AdminBuilder
 
     private $_search = array();
 
+    /**设置页面标题
+     * @param $title 标题文本
+     * @return $this
+     * @auth 陈一枭
+     */
     public function title($title)
     {
         $this->_title = $title;
@@ -66,12 +66,25 @@ class AdminListBuilder extends AdminBuilder
         return $this;
     }
 
+    /**加入一个按钮
+     * @param $title
+     * @param $attr
+     * @return $this
+     * @auth 陈一枭
+     */
     public function button($title, $attr)
     {
         $this->_buttonList[] = array('title' => $title, 'attr' => $attr);
         return $this;
     }
 
+    /**加入新增按钮
+     * @param        $href
+     * @param string $title
+     * @param array  $attr
+     * @return AdminListBuilder
+     * @auth 陈一枭
+     */
     public function buttonNew($href, $title = '新增', $attr = array())
     {
         $attr['href'] = $href;
@@ -165,11 +178,23 @@ class AdminListBuilder extends AdminBuilder
         return $this;
     }
 
+    /**显示纯文本
+     * @param $name 键名
+     * @param $title 标题
+     * @return AdminListBuilder
+     * @auth 陈一枭
+     */
     public function keyText($name, $title)
     {
-        return $this->key($name, op_t($title), 'text');
+        return $this->key($name, text($title), 'text');
     }
 
+    /**显示html
+     * @param $name 键名
+     * @param $title 标题
+     * @return AdminListBuilder
+     * @auth 陈一枭
+     */
     public function keyHtml($name, $title)
     {
         return $this->key($name, op_h($title), 'html');
@@ -329,6 +354,9 @@ class AdminListBuilder extends AdminBuilder
         return $this;
     }
 
+    /**显示页面
+     * @auth 陈一枭
+     */
     public function display()
     {
         //key类型的等价转换
@@ -474,17 +502,7 @@ class AdminListBuilder extends AdminBuilder
         $this->success('设置成功', $_SERVER['HTTP_REFERER']);
     }
 
-    /**执行彻底删除数据
-     * @param $model
-     * @param $ids
-     * @author 郑钟良<zzl@ourstu.com>
-     */
-    public function doClear($model, $ids)
-    {
-        $ids = is_array($ids) ? $ids : explode(',', $ids);
-        M($model)->where(array('id' => array('in', $ids)))->delete();
-        $this->success('彻底删除成功', $_SERVER['HTTP_REFERER']);
-    }
+
 
     private function convertKey($from, $to, $convertFunction)
     {
@@ -559,6 +577,17 @@ class AdminListBuilder extends AdminBuilder
             }
         }
     }
+    /**执行彻底删除数据，只适用于无关联的数据表
+     * @param $model
+     * @param $ids
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function doClear($model, $ids)
+    {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
+        M($model)->where(array('id' => array('in', $ids)))->delete();
+        $this->success('彻底删除成功', $_SERVER['HTTP_REFERER']);
+    }
 
     /**
      * keyLinkByFlag  带替换表示的链接
@@ -581,6 +610,12 @@ class AdminListBuilder extends AdminBuilder
         return $this->key($name, $title, 'link', $getUrl);
     }
 
+    /**解析Url
+     * @param $pattern URL文本
+     * @param $flag
+     * @return callable
+     * @auth 陈一枭
+     */
     private function ParseUrl($pattern, $flag)
     {
         return function ($item) use ($pattern, $flag) {
