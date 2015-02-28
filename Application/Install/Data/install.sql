@@ -728,6 +728,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
+
+
+
 CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `uid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `nickname` char(16) NOT NULL DEFAULT '' COMMENT '昵称',
@@ -747,10 +750,15 @@ CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `pos_city` int(11) NOT NULL,
   `pos_district` int(11) NOT NULL,
   `pos_community` int(11) NOT NULL,
+  `score1` float DEFAULT NULL COMMENT '用户积分',
+  `score2` float DEFAULT NULL COMMENT 'score2',
+  `score3` float DEFAULT NULL COMMENT 'score3',
+  `score4` float DEFAULT NULL COMMENT 'score4',
   PRIMARY KEY (`uid`),
   KEY `status` (`status`),
   KEY `name` (`nickname`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会员表' AUTO_INCREMENT=59 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会员表' AUTO_INCREMENT=100 ;
+
 
 
 
@@ -883,7 +891,10 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (2239, '前台权限管理', 27, 0, 'AuthManager/accessUser', 1, '', '权限管理', 0, ''),
 (2240, '转移用户组', 16, 0, 'User/changeGroup', 1, '批量转移用户组', '', 0, ''),
 (2241, '删除权限节点', 27, 0, 'AuthManager/deleteNode', 1, '', '', 0, ''),
-(2340, '用户注册配置', 16, 0, 'UserConfig/index', 0, '', '注册配置', 0, '');
+(2340, '用户注册配置', 16, 0, 'UserConfig/index', 0, '', '注册配置', 0, ''),
+(2341, '积分类型列表', 16, 0, 'User/scoreList', 0, '', '行为管理', 0, ''),
+(2342, '新增/编辑类型', 16, 0, 'user/editScoreType', 1, '', '行为管理', 0, ''),
+(2343, '充值积分', 16, 0, 'user/recharge', 1, '', '', 0, '用户管理');
 
 
 
@@ -1163,3 +1174,11 @@ CREATE TABLE IF NOT EXISTS `ocenter_verify` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `ocenter_ucenter_score_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  `unit` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
