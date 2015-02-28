@@ -30,6 +30,12 @@ class AdminTreeListBuilder extends AdminBuilder
         return $this;
     }
 
+    /**
+     * suggest  页面标题边上的提示信息
+     * @param $suggest
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
     public function suggest($suggest){
         $this->_suggest = $suggest;
         return $this;
