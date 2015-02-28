@@ -29,7 +29,7 @@ class AdminTreeListBuilder extends AdminBuilder
         $this->meta_title=$title;
         return $this;
     }
-    
+
     public function suggest($suggest){
         $this->_suggest = $suggest;
         return $this;

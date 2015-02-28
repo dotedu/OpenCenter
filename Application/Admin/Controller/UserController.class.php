@@ -142,8 +142,20 @@ class UserController extends AdminController
     public function expandinfo_details($uid = 0)
     {
         if(IS_POST){
-
-
+            /* 修改积分 xjw129xjt(肖骏涛)*/
+            $data = I('post.');
+            foreach($data as $key=>$val){
+                if(substr($key,0,5) =='score'){
+                    $data_score[$key]=$val;
+                }
+            }
+            $res = D('Member')->where(array('uid'=>$data['id']))->save($data_score);
+            if ($res) {
+                $this->success('设置成功');
+            } else {
+                $this->error('设置失败');
+            }
+            /* 修改积分 end*/
         }else{
             $map['uid'] = $uid;
             $map['status'] = array('egt', 0);
@@ -177,14 +189,19 @@ class UserController extends AdminController
                 $builder->keyReadOnly($vt['field_name'], $vt['field_name']);
             }
 
-            /* 积分设置*/
-
-           $field = D('Member')->getDbFields();
-
+            /* 积分设置 xjw129xjt(肖骏涛)*/
+            $field = D('Ucenter/Score')->getTypeList(array('status'=>1));
+            $score_key = array();
+            foreach($field as $vf){
+               $score_key[]='score'.$vf['id'];
+               $builder->keyText('score'.$vf['id'], $vf['title']);
+            }
+            $score_data = D('Member')->where(array('uid'=>$uid))->field(implode(',',$score_key))->find();
+            $member = array_merge($member,$score_data);
             /*积分设置end*/
 
             $builder->group('基本设置', implode(',',$field_key));
-            $builder->group('积分设置', '');
+            $builder->group('积分设置', implode(',',$score_key));
             $builder->data($member);
             $builder->buttonSubmit('', '保存');
             $builder->buttonBack();
@@ -703,13 +720,44 @@ class UserController extends AdminController
         $builder = new AdminListBuilder();
         $builder
             ->title('积分类型')
-            ->suggest('id小于4的不能删除')
+            ->suggest('id<=4的不能删除')
             ->buttonNew(U('editScoreType'))
             ->setStatusUrl(U('setTypeStatus'))->buttonEnable()->buttonDisable()->button('删除',array('class' => 'btn ajax-post tox-confirm', 'data-confirm' => '您确实要删除积分分类吗？（删除后对应的积分将会清空，不可恢复，请谨慎删除！）', 'url' => U('delType'), 'target-form' => 'ids'))
+            ->button('充值',array('href' => U('recharge')))
+
             ->keyId()->keyText('title', '名称')
            ->keyText('unit', '单位')->keyStatus()->keyDoActionEdit('editScoreType?id=###')
             ->data($list)
             ->display();
+    }
+
+    public function recharge(){
+        $scoreTypes = D('Ucenter/Score')->getTypeList(array('status'=>1));
+        if(IS_POST){
+            $aUids = I('post.uid','','op_t');
+            foreach($scoreTypes as $v){
+                $aAction = I('post.action_score'.$v['id'],'','op_t');
+                $aValue = I('post.value_score'.$v['id'],0,'intval');
+                D('Ucenter/Score')->setUserScore($aUids,$aValue,$v['id'],$aAction);
+            }
+            $this->success('设置成功','refresh');
+        }else{
+
+            $this->assign('scoreTypes',$scoreTypes);
+            $this->display();
+        }
+    }
+
+    public function getNickname(){
+        $uid = I('get.uid',0,'intval');
+        if($uid){
+            $user = query_user(null,$uid);
+            $this->ajaxReturn($user);
+        }
+        else{
+            $this->ajaxReturn(null);
+        }
+
     }
 
     public function setTypeStatus($ids, $status)
