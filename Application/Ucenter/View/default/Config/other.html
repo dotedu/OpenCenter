@@ -2,37 +2,42 @@
 
 <block name="body">
 
-<div id="center">
-<div id="center_base">
+    <div id="center">
+        <div id="center_base">
 
-    <h2>
-        其他设置
-    </h2>
-    <div class="row">
-        <div class="with-padding">
-            {:hook('userConfig')}
+            <h2>
+                其他设置
+            </h2>
+
+            <div class="row">
+
+
+                <div class="with-padding">
+                    <button data-row="cleanRemember" class="btn btn-large btn-block btn-primary" type="button">清除记住登录
+                    </button>
+                    {:hook('userConfig')}
+                </div>
+
+            </div>
+
+
+            <block name="script">
+                <script>
+                    //检查两次输入的密码是否一致
+                    $(function () {
+                        $('[data-row=cleanRemember]').click(function () {
+                            if (confirm('是否确认清除记住登录状态？')) {
+                                $.get(U('Ucenter/Config/cleanRemember'), '', function (res) {
+                                    handleAjax(res);
+                                })
+                            }
+                        })
+
+
+                    })
+                </script>
+            </block>
         </div>
-
     </div>
-
-
-    <block name="script">
-        <script>
-            //检查两次输入的密码是否一致
-            $(function(){
-                $('#changePasswordForm').submit(function(e){
-                    var newPassword = $('#inputNewPassword').val();
-                    var confirmPassword = $('#inputConfirmPassword').val();
-                    if(newPassword != confirmPassword) {
-                        toast.error('两次输入的密码不一致');
-                        e.stopPropagation();
-                        return false;
-                    }
-                })
-            })
-        </script>
-    </block>
-</div>
-</div>
 
 </block>

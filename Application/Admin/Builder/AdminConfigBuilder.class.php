@@ -11,6 +11,7 @@ namespace Admin\Builder;
 class AdminConfigBuilder extends AdminBuilder
 {
     private $_title;
+    private $_suggest;
     private $_keyList = array();
     private $_data = array();
     private $_buttonList = array();
@@ -24,7 +25,18 @@ class AdminConfigBuilder extends AdminBuilder
         return $this;
     }
 
-    /**键，一般用于内部调用
+    /**
+     * suggest  页面标题边上的提示信息
+     * @param $suggest
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function suggest($suggest){
+        $this->_suggest = $suggest;
+        return $this;
+    }
+
+   /**键，一般用于内部调用
      * @param      $name
      * @param      $title
      * @param null $subtitle
@@ -258,6 +270,7 @@ class AdminConfigBuilder extends AdminBuilder
         //显示页面
         $this->assign('group', $this->_group);
         $this->assign('title', $this->_title);
+        $this->assign('suggest', $this->_suggest);
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('savePostUrl', $this->_savePostUrl);

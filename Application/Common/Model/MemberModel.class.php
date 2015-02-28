@@ -167,17 +167,15 @@ class MemberModel extends Model
 
         session('user_auth', $auth);
         session('user_auth_sign', data_auth_sign($auth));
-
         if ($remember) {
-            $token = build_auth_key();
             $user1 = D('user_token')->where('uid=' . $user['uid'])->find();
-            $data['token'] = $token;
-            $data['time'] = time();;
+            $token = $user1['token'];
             if ($user1 == null) {
+                $token = build_auth_key();
+                $data['token'] = $token;
+                $data['time'] = time();
                 $data['uid'] = $user['uid'];
                 D('user_token')->add($data);
-            } else {
-                D('user_token')->where('uid=' . $user['uid'])->save($data);
             }
         }
 
@@ -199,6 +197,7 @@ class MemberModel extends Model
 
     public function getCookieUid()
     {
+
         static $cookie_uid = null;
         if (isset($cookie_uid) && $cookie_uid !== null) {
             return $cookie_uid;

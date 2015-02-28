@@ -637,4 +637,14 @@ class ConfigController extends BaseController
 
     }
 
+
+    public function cleanRemember(){
+        $uid = is_login();
+        if($uid){
+            D('user_token')->where('uid=' . $uid)->delete();
+            $this->success('清除成功！');
+        }
+        $this->error('清除失败！');
+    }
+
 }
