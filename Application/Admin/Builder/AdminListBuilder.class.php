@@ -54,12 +54,25 @@ class AdminListBuilder extends AdminBuilder
      * @return $this
      * @auth 陈一枭
      */
-    public function setSearchPostUrl($url)
+    /**原@auth 陈一枭
+     *public function setSearchPostUrl($url)
+     *{
+     *  $this->_searchPostUrl = $url;
+     *  return $this;
+     *}
+     */
+     /**更新筛选搜索功能 ，修正连续提交多出N+个GET参数的BUG
+     * @param $url   提交的getURL
+     * @param $param GET参数
+     * @param $val   GET值
+     */
+    public function setSearchPostUrl($url,$param,$val)
     {
-        $this->_searchPostUrl = $url;
+        $dd = array($param=>$val);
+        $this->_searchPostUrl = U($url);
         return $this;
     }
-
+    
     public function button($title, $attr)
     {
         $this->_buttonList[] = array('title' => $title, 'attr' => $attr);
@@ -146,10 +159,40 @@ class AdminListBuilder extends AdminBuilder
      * @return $this
      * @auth 陈一枭
      */
-    public function search($title = '搜索', $name = 'key', $type = 'text', $des = '', $attr)
+    /**原@auth 陈一枭
+    public function search($title = '搜索', $name = 'key', $type = 'text', $des = '', $attr )
     {
         $this->_search[] = array('title' => $title, 'name' => $name, 'type' => $type, 'des' => $des, 'attr' => $attr);
         return $this;
+    }
+    */
+    
+    /**更新筛选搜索功能 ，修正连续提交多出N+个GET参数的BUG
+     * @param string $title 标题
+     * @param string $name  键名
+     * @param string $type  类型，默认文本
+     * @param string $des   描述
+     * @param        $attr  标签文本
+     * @param string $arrdb 择筛选项数据来源
+     * @param string $arrvalue 筛选数据（包含ID 和value的数组:array(array('id'=>1,'value'=>'系统'),array('id'=>2,'value'=>'项目'),array('id'=>3,'value'=>'机构'));）
+     * @return $this
+     * @auth MingYang <xint5288@126.com>
+     */
+    public function search($title = '搜索', $name = 'key', $type = 'text', $des = '', $attr , $arrdb = '',$arrvalue = null)
+    {
+        
+        if(empty($type) && $type = 'text'){
+            $this->_search[] = array('title' => $title, 'name' => $name, 'type' => $type, 'des' => $des, 'attr' => $attr);
+            $this->setSearchPostUrl('',$name,$_GET[$name]);
+        } else {
+            if (empty($arrdb)) {
+                $this->_search[] = array('title' => $title, 'name' => $name, 'type' => $type, 'des' => $des, 'attr' => $attr,'field'=>$field,'table'=>$table,'arrvalue'=>$arrvalue);
+                $this->setSearchPostUrl('',$field,$_GET[$field]);
+            } else {
+                //TODO:呆完善如果$arrdb存在的就把当前数据表的$name字段的信息全部查询出来供筛选。
+            }
+        }
+         return $this;
     }
 
     public function key($name, $title, $type, $opt = null)
