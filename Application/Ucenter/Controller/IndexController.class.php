@@ -161,6 +161,22 @@ class IndexController extends BaseController
             $val['field_content'] = $field;
             unset($map['field_id']);
             $info_list[$val['id']] = $this->_get_field_data($val);
+            //当用户扩展资料为数组方式的处理@MingYang
+            $vlaa = explode('|', $val['form_default_value']);
+            $needle =':';//判断是否包含a这个字符
+            $tmparray = explode($needle,$vlaa[0]);
+            if(count($tmparray)>1){
+                foreach ($vlaa as $kye=>$vlaas){
+                    if(count($tmparray)>1){
+                        $vlab[] = explode(':', $vlaas);
+                        foreach ($vlab as $key=>$vlass){
+                            $items[$vlass[0]] = $vlass[1];
+                        }
+                    }
+                    continue;
+                }
+                $info_list[$val['id']]['field_data'] = $items[$info_list[$val['id']]['field_data']];
+            }
             //当扩展资料为join时，读取数据并进行处理再显示到前端@MingYang
             if($val['child_form_type'] == "join"){
                 $j = explode('|',$val['form_default_value']);
