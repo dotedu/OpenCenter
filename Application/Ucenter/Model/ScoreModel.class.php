@@ -9,6 +9,7 @@ use Think\Model;
  */
 class ScoreModel extends Model
 {
+
     private $typeModel =null;
     protected function _initialize()
     {
@@ -23,7 +24,7 @@ class ScoreModel extends Model
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
     public function getTypeList($map=''){
-       $list = $this->typeModel->where($map)->select();
+       $list = $this->typeModel->where($map)->order('id asc')->select();
 
        return $list;
    }
@@ -46,8 +47,9 @@ class ScoreModel extends Model
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
     public function addType($data){
+        $db_prefix = C('DB_PREFIX');
        $res = $this->typeModel->add($data);
-       $query = "ALTER TABLE  `ocenter_member` ADD  `score".$res."` FLOAT NOT NULL COMMENT  '".$data['title']."'";
+       $query = "ALTER TABLE  `{$db_prefix}member` ADD  `score".$res."` FLOAT NOT NULL COMMENT  '".$data['title']."'";
        D()->execute($query);
        return $res;
     }
@@ -59,10 +61,13 @@ class ScoreModel extends Model
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
     public function delType($ids){
-        $res = $this->typeModel->where(array('id'=>array('in',$ids)))->delete();
+        $db_prefix = C('DB_PREFIX');
+        $res = $this->typeModel->where(array('id'=>array(array('in',$ids),array('gt',4),'and')))->delete();
         foreach($ids as $v){
-            $query = "alter table `ocenter_member` drop column score".$v;
-            D()->execute($query);
+            if($v>4){
+                $query = "alter table `{$db_prefix}member` drop column score".$v;
+                D()->execute($query);
+            }
       }
         return $res;
     }
@@ -74,8 +79,9 @@ class ScoreModel extends Model
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
     public function editType($data){
+        $db_prefix = C('DB_PREFIX');
         $res = $this->typeModel->save($data);
-        $query = "alter table `ocenter_member` modify column `score".$data['id']."` FLOAT comment '".$data['title']."';";
+        $query = "alter table `{$db_prefix}member` modify column `score".$data['id']."` FLOAT comment '".$data['title']."';";
         D()->execute($query);
         return $res;
     }
@@ -102,20 +108,20 @@ class ScoreModel extends Model
      * @param string $action
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    public function setUserScore($uid,$score,$type,$action='inc'){
+    public function setUserScore($uids,$score,$type,$action='inc'){
 
         $model = D('Member');
         switch($action){
             case 'inc':
                 $score = abs($score);
-                $res = $model->where(array('uid'=>$uid))->setInc('score'.$type,$score);
+                $res = $model->where(array('uid'=>array('in',$uids)))->setInc('score'.$type,$score);
                 break;
             case 'dec':
                 $score = abs($score);
-                $res = $model->where(array('uid'=>$uid))->setDec('score'.$type,$score);
+                $res = $model->where(array('uid'=>array('in',$uids)))->setDec('score'.$type,$score);
                 break;
             case 'to':
-                $res = $model->where(array('uid'=>$uid))->setField('score'.$type,$score);
+                $res = $model->where(array('uid'=>array('in',$uids)))->setField('score'.$type,$score);
                 break;
             default:
                 $res = false;

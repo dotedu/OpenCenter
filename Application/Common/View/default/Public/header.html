@@ -1,5 +1,5 @@
 <include file="Public/right_chat_panel"/>
-<php> //D('Home/Member')->need_login();</php>
+<php> D('Member')->need_login();</php>
 <!--[if lt IE 8]>
 <div class="alert alert-danger" style="margin-bottom: 0">您正在使用 <strong>过时的</strong> 浏览器. 是时候 <a target="_blank"
                                                                                                 href="http://browsehappy.com/">更换一个更好的浏览器</a>
@@ -120,9 +120,9 @@
                             </li>
                             <li class="footer text-right">
                                 <div class="btn-group">
-                                    <button onclick="Notify.setAllReaded()" class="btn btn-sm  btn-success ">全部已读
+                                    <button onclick="Notify.setAllReaded()" class="btn btn-sm  "><i class="icon-check"></i> 全部已读
                                     </button>
-                                    <a class="btn  btn-sm btn-info  " href="{:U('ucenter/Message/message')}">
+                                    <a class="btn  btn-sm  " href="{:U('ucenter/Message/message')}">
                                         查看消息
                                     </a>
                                 </div>

@@ -6,6 +6,7 @@
     <div class="main-title">
         <h2>
             {$title|htmlspecialchars}
+            <if condition="$suggest">（{$suggest|htmlspecialchars}）</if>
         </h2>
     </div>
     <php>
@@ -30,8 +31,26 @@
 
     <volist name="searches" id="search">
 
-
-              <tr style="line-height: 28px">
+             <!--判断搜索选项是TEXT还是SELECT-->
+    		 <if condition="$search['type'] == 'select'">
+			 	<tr style="line-height: 28px">
+                  <td>
+                      {$search.title} 
+                  </td>			  
+                  <td>
+                  	<select size="1" name="{$search['name']}" class="search-input form-control form-input-width">
+                  		<option value="">全部</option>
+                  		<volist name="search['arrvalue']" id="svo">
+                  			<option value="{$svo.id}" <eq name="svo.id" value="$_GET[$search['name']]">selected</eq>>{$svo.value}</option>
+                  		</volist>	
+					</select>
+                  </td>
+                  <td>
+                      {$search.des}
+                  </td>
+              </tr>
+			 <else/>
+			 	 <tr style="line-height: 28px">
                   <td>
                       {$search.title}
                   </td>
@@ -43,6 +62,7 @@
                       {$search.des}
                   </td>
               </tr>
+			 </if>
 
     </volist>
             <tr><td></td>

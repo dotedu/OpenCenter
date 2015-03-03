@@ -11,6 +11,7 @@ namespace Admin\Builder;
 class AdminConfigBuilder extends AdminBuilder
 {
     private $_title;
+    private $_suggest;
     private $_keyList = array();
     private $_data = array();
     private $_buttonList = array();
@@ -24,6 +25,26 @@ class AdminConfigBuilder extends AdminBuilder
         return $this;
     }
 
+    /**
+     * suggest  页面标题边上的提示信息
+     * @param $suggest
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function suggest($suggest){
+        $this->_suggest = $suggest;
+        return $this;
+    }
+
+   /**键，一般用于内部调用
+     * @param      $name
+     * @param      $title
+     * @param null $subtitle
+     * @param      $type
+     * @param null $opt
+     * @return $this
+     * @auth 陈一枭
+     */
     public function key($name, $title, $subtitle = null, $type, $opt = null)
     {
         $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => $type, 'opt' => $opt);
@@ -31,16 +52,37 @@ class AdminConfigBuilder extends AdminBuilder
         return $this;
     }
 
+    /**只读文本
+     * @param      $name
+     * @param      $title
+     * @param null $subtitle
+     * @return AdminConfigBuilder
+     * @auth 陈一枭
+     */
     public function keyHidden($name, $title, $subtitle = null)
     {
         return $this->key($name, $title, $subtitle, 'hidden');
     }
 
+    /**只读文本
+     * @param      $name
+     * @param      $title
+     * @param null $subtitle
+     * @return AdminConfigBuilder
+     * @auth 陈一枭
+     */
     public function keyReadOnly($name, $title, $subtitle = null)
     {
         return $this->key($name, $title, $subtitle, 'readonly');
     }
 
+    /**文本输入框
+     * @param      $name
+     * @param      $title
+     * @param null $subtitle
+     * @return AdminConfigBuilder
+     * @auth 陈一枭
+     */
     public function keyText($name, $title, $subtitle = null)
     {
         return $this->key($name, $title, $subtitle, 'text');
@@ -106,6 +148,11 @@ class AdminConfigBuilder extends AdminBuilder
     public function keyUpdateTime($name = 'update_time', $title = '修改时间', $subtitle = null)
     {
         return $this->keyTime($name, $title, $subtitle);
+    }
+
+    public function keyKanban($name, $title, $subtitle=null){
+
+        return $this->key($name, $title, $subtitle, 'kanban');
     }
 
     public function keyTitle($name = 'title', $title = '标题', $subtitle = null)
@@ -223,6 +270,7 @@ class AdminConfigBuilder extends AdminBuilder
         //显示页面
         $this->assign('group', $this->_group);
         $this->assign('title', $this->_title);
+        $this->assign('suggest', $this->_suggest);
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('savePostUrl', $this->_savePostUrl);
@@ -230,7 +278,12 @@ class AdminConfigBuilder extends AdminBuilder
     }
 
 
-
+    /**插入配置分组
+     * @param       $name 组名
+     * @param array $list 组内字段列表
+     * @return $this
+     * @auth 肖骏涛
+     */
     public function group($name,$list = array()){
         !is_array($list) && $list = explode(',',$list);
         $this->_group[$name] = $list;
@@ -244,10 +297,6 @@ class AdminConfigBuilder extends AdminBuilder
         return $this;
     }
 
-    public function keyKanban($name, $title, $subtitle=null){
-
-        return $this->key($name, $title, $subtitle, 'kanban');
-    }
 
     /**自动处理配置存储事件，配置项必须全大写
      * @auth 陈一枭

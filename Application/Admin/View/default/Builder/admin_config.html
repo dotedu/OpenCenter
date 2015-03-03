@@ -2,7 +2,7 @@
 
 <block name="body">
     <div class="main-title">
-        <h2>{$title}</h2>
+        <h2>{$title}            <if condition="$suggest">（{$suggest|htmlspecialchars}）</if></h2>
     </div>
     <div class="with-padding">
 
@@ -38,8 +38,7 @@
 
             <div class="form-item">
                 <volist name="buttonList" id="button">
-                    <button
-                    {$button.attr}>{$button.title}</button>  &nbsp;
+                    <button {$button.attr}>{$button.title}</button>  &nbsp;
                 </volist>
             </div>
         </form>

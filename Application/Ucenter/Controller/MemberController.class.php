@@ -126,7 +126,6 @@ class MemberController extends Controller
         $aPassword = I('post.password', '', 'op_t');
         $aVerify = I('post.verify', '', 'op_t');
         $aRemember = I('post.remember', 0, 'intval');
-
         if (IS_POST) { //登录验证
             /* 检测验证码 */
             if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 3) {
@@ -146,8 +145,7 @@ class MemberController extends Controller
             if (0 < $uid) { //UC登录成功
                 /* 登录用户 */
                 $Member = D('Member');
-
-                if ($Member->login($uid, $aRemember == 'on')) { //登录用户
+                if ($Member->login($uid, $aRemember == 1)) { //登录用户
                     //TODO:跳转到登录前页面
 
                     if (UC_SYNC && $uid != 1) {
