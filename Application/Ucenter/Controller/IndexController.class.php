@@ -161,7 +161,7 @@ class IndexController extends BaseController
             $val['field_content'] = $field;
             unset($map['field_id']);
             $info_list[$val['id']] = $this->_get_field_data($val);
-            //当用户扩展资料为数组方式的处理@MingYang
+            //当用户扩展资料为数组方式的处理@MingYangliu
             $vlaa = explode('|', $val['form_default_value']);
             $needle =':';//判断是否包含a这个字符
             $tmparray = explode($needle,$vlaa[0]);
