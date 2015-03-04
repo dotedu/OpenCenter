@@ -44,10 +44,12 @@ function getSkinInfoList($skinList){
         $skinConf =include(SKIN_PATH.'Skins/'.$path.'/config.php');
         $skin['value']=$path;
         $skin['name'] = $skinConf['name'];
+        $skin['sort'] = $skinConf['sort'];
         $skin['thumb_url'] = SKIN_PATH.'Skins/'.$path.'/thumb.png';
         $skinInfoList[] = $skin;
     }
     unset($path,$skin);
+    $skinInfoList=list_sort_by($skinInfoList,'sort','asc');
     return $skinInfoList;
 }
 

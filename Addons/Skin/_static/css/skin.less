@@ -1,5 +1,5 @@
-#skin_block{
-  .change_skin{
+#skin_block {
+  .change_skin {
     background: url(../images/enter.png) -6px 0;
     display: block;
     width: 24px;
@@ -8,50 +8,56 @@
     right: 0px;
     top: 0;
     z-index: 9;
-    &:hover{
+    &:hover {
       background-position: 0 30px;
       width: 29px;
       height: 29px;
     }
   }
 }
-.skin_popup{
-  .button_list{
+
+.skin_popup {
+  .button_list {
     text-align: center;
     width: 100%;
-    a{
+    a {
       margin: 0 5px;
     }
   }
 }
+
 .SkinPreview a {
   display: block;
   text-decoration: none;
   outline-style: none;
-  position: relative;
-  overflow: hidden;
 }
-.SkinPreview a img{
+
+.SkinPreview a img {
   width: 100%;
 }
+
 .SkinPreview .colorBox {
   border: 2px solid #FFF;
-  height: 91px;
-  width: 120px;;
-  margin: 10px;
+  height: 73px;
+  width: 127px;
+  margin: 4px;
   float: left;
   margin-left: 10px;
   text-align: center;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .SkinPreview .colorBox:hover, .SkinPreview .colorBox.current {
   border: 2px solid #26E528;
 }
-.lineD{
+
+.lineD {
   clear: both;
 }
-.skin_title{
+
+.skin_title {
   position: absolute;
   width: 100%;
   text-align: center;
@@ -59,4 +65,12 @@
   opacity: 0.5;
   color: #FFF;
   font-size: 18px;
+}
+
+.need_login_tip {
+  width: 100%;
+  text-align: center;
+  color: rgb(255, 132, 132);
+  line-height: 20px;
+  font-size: 16px;
 }
