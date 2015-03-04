@@ -172,6 +172,10 @@ function getThumbImage($filename, $width = 100, $height = 'auto', $type = 0, $re
     }
 }
 
+/**获取网站的根Url
+ * @return string
+ * @auth 陈一枭
+ */
 function getRootUrl()
 {
     if (__ROOT__ != '') {
@@ -182,7 +186,15 @@ function getRootUrl()
     return __ROOT__;
 }
 
-
+/**通过ID获取到图片的缩略图
+ * @param        $cover_id 图片的ID
+ * @param int    $width 需要取得的宽
+ * @param string $height 需要取得的高
+ * @param int    $type 图片的类型，qiniu 七牛，local 本地, sae SAE
+ * @param bool   $replace 是否强制替换
+ * @return string
+ * @auth 陈一枭
+ */
 function getThumbImageById($cover_id, $width = 100, $height = 'auto', $type = 0, $replace = false)
 {
 

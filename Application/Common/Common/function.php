@@ -1208,13 +1208,28 @@ function getLou($k)
     return $res;
 }
 
-function getMyScore()
+/**获取当前的积分
+ * @return mixed
+ * @auth 陈一枭
+ */
+/**获取当前的积分
+ * @param string $score_name
+ * @return mixed
+ * @auth 陈一枭
+ */
+function getMyScore($score_name='score1')
 {
-    $user = query_user(array('score'), is_login());
-    $score = $user['score'];
+    $user = query_user(array($score_name), is_login());
+    $score = $user[$score_name];
     return $score;
 }
 
+/**根据积分的变动返回提示文本
+ * @param $before 变动前的积分
+ * @param $after 变动后的积分
+ * @return string
+ * @auth 陈一枭
+ */
 function getScoreTip($before, $after)
 {
     $score_change = $after - $before;

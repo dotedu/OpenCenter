@@ -198,7 +198,14 @@ function modC($key, $default = '', $module = '')
     return $result;
 }
 
-
+/**发送短消息
+ * @param        $mobile 手机号码
+ * @param        $content 内容
+ * @param string $time 定时发送
+ * @param string $mid 子扩展号
+ * @return string
+ * @auth 肖骏涛
+ */
 function sendSMS($mobile, $content, $time = '', $mid = '')
 {
     $uid = modC('SMS_UID', '', 'USERCONFIG');

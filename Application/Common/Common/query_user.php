@@ -192,9 +192,6 @@ function query_user($fields = null, $uid = null)
     if (in_array('following', $fields)) {
         $result['following'] = D('Follow')->where('who_follow=' . $uid)->count();
     }
-    if (in_array('weibocount', $fields)) {
-        $result['weibocount'] = D('Weibo')->where('uid=' . $uid . ' and status >0')->count();
-    }
 
     //是否关注、是否被关注
     if (in_array('is_following', $fields)) {
@@ -242,6 +239,11 @@ function write_query_user_cache($uid, $field, $value)
     return S("query_user_{$uid}_{$field}", $value, 1800);
 }
 
+/**清理用户数据缓存，即时更新query_user返回结果。
+ * @param $uid
+ * @param $field
+ * @auth 陈一枭
+ */
 function clean_query_user_cache($uid, $field)
 {
     if (is_array($field)) {
