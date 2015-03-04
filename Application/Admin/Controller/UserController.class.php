@@ -12,6 +12,7 @@ namespace Admin\Controller;
 use Admin\Builder\AdminConfigBuilder;
 use Admin\Builder\AdminListBuilder;
 use Admin\Builder\AdminSortBuilder;
+use Home\Model\MemberModel;
 use Common\Model\MemberModel;
 use User\Api\UserApi;
 
@@ -75,6 +76,7 @@ class UserController extends AdminController
             }
 
 
+            $groups = M('AuthGroup')->select();
             $groups = M('AuthGroup')->where(array('status'=>1))->select();
             $this->assign('groups', $groups);
             $this->assign('users', $user);
@@ -133,7 +135,34 @@ class UserController extends AdminController
         $builder->display();
     }
 
+    public function config()
+    {
+        $admin_config = new AdminConfigBuilder();
+        $data = $admin_config->handleConfig();
+        if (!$data) {
+            $data['DEFAULT_GROUP'] = 1;
 
+            $data['LEVEL'] = <<<str
+0:Lv1 实习
+50:Lv2 试用
+100:Lv3 转正
+200:Lv4 助理
+400:Lv 5 经理
+800:Lv6 董事
+1600:Lv7 董事长
+str;
+        }
+
+
+        $groups = M('AuthGroup')->where(array('status' => 1))->select();
+        foreach ($groups as $g) {
+            $groupOption[$g['id']] = $g['title'];
+        }
+        $admin_config->title('基础设置')->keyTextArea('LEVEL', '等级配置', '每行一条，名称和积分之间用冒号分隔')
+            ->keyCheckBox('DEFAULT_GROUP', '默认用户组', '设置用户注册后的默认所在用户组', $groupOption)
+            ->buttonSubmit('', '保存')->data($data);
+        $admin_config->display();
+    }
 
     /**用户扩展资料详情
      * @param string $uid
@@ -141,6 +170,23 @@ class UserController extends AdminController
      */
     public function expandinfo_details($uid = 0)
     {
+        $map['uid'] = $uid;
+        $map['status'] = array('egt', 0);
+        $member = M('Member')->where($map)->find();
+        $member['id'] = $member['uid'];
+        //扩展信息查询
+        $map_profile['status'] = 1;
+        $field_group = D('field_group')->where($map_profile)->select();
+        $field_group_ids = array_column($field_group, 'id');
+        $map_profile['profile_group_id'] = array('in', $field_group_ids);
+        $fields_list = D('field_setting')->where($map_profile)->getField('id,field_name,form_type');
+        $fields_list = array_combine(array_column($fields_list, 'field_name'), $fields_list);
+        $map_field['uid'] = $member['uid'];
+        foreach ($fields_list as $key => $val) {
+            $map_field['field_id'] = $val['id'];
+            $field_data = D('field')->where($map_field)->getField('field_data');
+            if ($field_data == null || $field_data == '') {
+                $member[$key] = '';
         if(IS_POST){
             /* 修改积分 xjw129xjt(肖骏涛)*/
             $data = I('post.');
@@ -179,6 +225,7 @@ class UserController extends AdminController
                 }
                 $member[$key] = $field_data;
             }
+            $member[$key] = $field_data;
             $builder = new AdminConfigBuilder();
             $builder->title("用户扩展资料详情");
             $builder->meta_title = '用户扩展资料详情';
@@ -207,6 +254,16 @@ class UserController extends AdminController
             $builder->buttonBack();
             $builder->display();
         }
+        $builder = new AdminConfigBuilder();
+        $builder->title("用户扩展资料详情");
+        $builder->meta_title = '用户扩展资料详情';
+        $builder->keyId()->keyReadOnly('nickname', "用户名称");
+        foreach ($fields_list as $vt) {
+            $builder->keyReadOnly($vt['field_name'], $vt['field_name']);
+        }
+        $builder->data($member);
+        $builder->buttonBack();
+        $builder->display();
 
     }
 
@@ -341,6 +398,8 @@ class UserController extends AdminController
             $data['required'] = $required;
             $data['form_type'] = $form_type;
             $data['input_tips'] = $input_tips;
+            //增加当二级字段类型为join时也提交$child_form_type @MingYang
+            if ($form_type == 'input' && $child_form_type == 'join') {
             if ($form_type == 'input') {
                 $data['child_form_type'] = $child_form_type;
             }
@@ -387,9 +446,12 @@ class UserController extends AdminController
                 'textarea' => '多行文本框'
             );
             $child_type = array(
+                
                 'string' => '字符串',
                 'phone' => '手机号码',
                 'email' => '邮箱',
+                //增加可选择关联字段类型 @MingYang
+                'join' => '关联字段',
                 'number' => '数字'
             );
             $builder->keyReadOnly("id", "标识")->keyReadOnly('profile_group_id', '分组id')->keyText('field_name', "字段名称")->keySelect('form_type', "表单类型", '', $type_default)->keySelect('child_form_type', "二级表单类型", '', $child_type)->keyTextArea('form_default_value', '默认值', "多个值用'|'分割开")
@@ -564,6 +626,7 @@ class UserController extends AdminController
         if ($res['status']) {
             $this->success('修改密码成功！');
         } else {
+            $this->error($res['info']);
             $this->error(D('User/UcenterMember')->getErrorMessage($res['info']));
         }
     }
@@ -707,6 +770,7 @@ class UserController extends AdminController
         return $error;
     }
 
+}
 
 
     public function scoreList()
