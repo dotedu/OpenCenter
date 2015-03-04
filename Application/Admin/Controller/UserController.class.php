@@ -340,8 +340,16 @@ class UserController extends AdminController
             $data['visiable'] = $visiable;
             $data['required'] = $required;
             $data['form_type'] = $form_type;
+            //当表单类型为以下三种是默认值不能为空判断@MingYang
+            $form_types = array('radio','checkbox','select');
+            if(in_array($data['form_type'],$form_types)){
+                if($data['form_default_value'] == ''){
+                    $this->error($data['form_type'].'表单类型默认值不能为空');
+                }
+            }
             $data['input_tips'] = $input_tips;
-            if ($form_type == 'input') {
+            //增加当二级字段类型为join时也提交$child_form_type @MingYang
+            if ($form_type == 'input' && $child_form_type == 'join') {
                 $data['child_form_type'] = $child_form_type;
             }
             $data['form_default_value'] = $form_default_value;
@@ -390,9 +398,11 @@ class UserController extends AdminController
                 'string' => '字符串',
                 'phone' => '手机号码',
                 'email' => '邮箱',
+                //增加可选择关联字段类型 @MingYang
+                'join' => '关联字段',
                 'number' => '数字'
             );
-            $builder->keyReadOnly("id", "标识")->keyReadOnly('profile_group_id', '分组id')->keyText('field_name', "字段名称")->keySelect('form_type', "表单类型", '', $type_default)->keySelect('child_form_type', "二级表单类型", '', $child_type)->keyTextArea('form_default_value', '默认值', "多个值用'|'分割开")
+            $builder->keyReadOnly("id", "标识")->keyReadOnly('profile_group_id', '分组id')->keyText('field_name', "字段名称")->keySelect('form_type', "表单类型", '', $type_default)->keySelect('child_form_type', "二级表单类型", '', $child_type)->keyTextArea('form_default_value',"多个值用'|'分割开,格式【字符串：男|女，数组：1:男|2:女，关联数据表：字段名|表名】开")
                 ->keyText('validation', '表单验证规则', '例：min=5&max=10')->keyText('input_tips', '用户输入提示', '提示用户如何输入该字段信息')->keyBool('visiable', '是否公开')->keyBool('required', '是否必填');
             $builder->data($field_setting);
             $builder->buttonSubmit(U('editFieldSetting'), $id == 0 ? "添加" : "修改")->buttonBack();
