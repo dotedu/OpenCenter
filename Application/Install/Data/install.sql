@@ -453,7 +453,6 @@ INSERT INTO `ocenter_auth_rule` (`id`, `module`, `type`, `name`, `title`, `statu
 (334, 'Weibo', 1, 'deleteWeibo', '删除微博', 1, ''),
 (333, 'Weibo', 1, 'sendWeibo', '发微博', 1, ''),
 (313, 'admin', 1, 'Admin/module/install', '模块安装', 1, ''),
-(314, 'admin', 1, 'Admin/User/config', '基础设置', 1, ''),
 (315, 'admin', 1, 'Admin/module/lists', '模块管理', 1, ''),
 (316, 'admin', 1, 'Admin/module/uninstall', '卸载模块', 1, ''),
 (317, 'admin', 1, 'Admin/AuthManager/addNode', '新增权限节点', 1, ''),
