@@ -55,6 +55,8 @@ class SkinAddon extends Addon
      */
     public function setSkin($param)
     {
+        $config=getAddonConfig();
+        $this->assign('Skin_CanSet',$config['canSet']);
         $this->display(T('Addons://Skin@Skin/skin'));
     }
 
@@ -68,7 +70,7 @@ class SkinAddon extends Addon
     {
         $SkinsUrl = getRootUrl() . "Addons/Skin/Skins/";
         $config = getAddonConfig();
-        if ($config['mandatory'] == 1) { //强制执行管理员设置的默认皮肤
+        if ($config['canSet'] == 0||$config['mandatory'] == 1) { //强制执行管理员设置的默认皮肤
             // 载入换肤插件默认样式
             echo '<link href="' . $SkinsUrl . $config['defaultSkin'] . '/style.css" rel="stylesheet" type="text/css"/>';
         } else { //执行用户设置样式

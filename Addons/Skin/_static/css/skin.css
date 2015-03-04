@@ -24,21 +24,21 @@
   display: block;
   text-decoration: none;
   outline-style: none;
-  position: relative;
-  overflow: hidden;
 }
 .SkinPreview a img {
   width: 100%;
 }
 .SkinPreview .colorBox {
   border: 2px solid #FFF;
-  height: 91px;
-  width: 120px;
-  margin: 10px;
+  height: 73px;
+  width: 127px;
+  margin: 4px;
   float: left;
   margin-left: 10px;
   text-align: center;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 .SkinPreview .colorBox:hover,
 .SkinPreview .colorBox.current {
@@ -55,4 +55,11 @@
   opacity: 0.5;
   color: #FFF;
   font-size: 18px;
+}
+.need_login_tip {
+  width: 100%;
+  text-align: center;
+  color: #ff8484;
+  line-height: 20px;
+  font-size: 16px;
 }
