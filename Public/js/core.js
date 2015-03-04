@@ -10,6 +10,7 @@ $.getScript('Public/js/com/com.toast.class.js', function () {
             });//绑定发微博弹窗
             ucard();//绑定用户小名片
             bindGoTop();//回到顶部
+            bindQuickLogin();//快捷登录
             talker.bind_ctrl_enter();//绑定
 
             $('input,area').placeholder();//修复ieplace holder
@@ -41,7 +42,6 @@ $.getScript('Public/js/com/com.toast.class.js', function () {
 
     });
 });
-
 
 $(function () {
     /**
@@ -118,6 +118,7 @@ $(function () {
         //返回
         return false;
     });
+
 });
 
 
@@ -477,4 +478,18 @@ function setCaretPosition(ctrl, pos) {//设置光标位置函数
 }
 
 /*微博表情end*/
+
+function bindQuickLogin(){
+    if(!is_login()){
+        $('[data-login="quick_login"]').click(quickLogin);
+    }
+    return true;
+}
+/**
+ * 快捷登录
+ */
+var quickLogin=function (){//快捷登录
+    $('[data-login="quick_login_now"]').click();
+    return true;
+}
 

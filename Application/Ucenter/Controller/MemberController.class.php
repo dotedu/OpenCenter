@@ -100,7 +100,7 @@ class MemberController extends Controller
         $aStep = I('get.step', '', 'op_t');
         $aUid = session('temp_login_uid');
         $step = M('UcenterMember')->where('id=' . $aUid)->getField('step');
-        if(get_next_step($step) != $aStep){
+        if (get_next_step($step) != $aStep) {
             $aStep = check_step($step);
             $_GET['step'] = $aStep;
             M('UcenterMember')->where('id=' . $aUid)->setField('step', $aStep);
@@ -122,70 +122,26 @@ class MemberController extends Controller
     {
         $this->setTitle('用户登录');
 
-        $aUsername = $username = I('post.username', '', 'op_t');
-        $aPassword = I('post.password', '', 'op_t');
-        $aVerify = I('post.verify', '', 'op_t');
-        $aRemember = I('post.remember', 0, 'intval');
-        if (IS_POST) { //登录验证
-            /* 检测验证码 */
-            if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 3) {
-                if (!check_verify($aVerify)) {
-                    $this->error('验证码输入错误。');
-                }
+        if (IS_POST) {
+            $result = A('Ucenter/Login','Widget')->doLogin();
+            if($result['status']){
+                $this->success($result['info'], get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
+            }else{
+                $this->error($result['info']);
             }
-
-            /* 调用UC登录接口登录 */
-            check_username($aUsername, $email, $mobile, $aUnType);
-
-            if (!check_reg_type($aUnType)) {
-                $this->error('该类型未开放登录。');
-            }
-
-            $uid = D('User/UcenterMember')->login($username, $aPassword, $aUnType);
-            if (0 < $uid) { //UC登录成功
-                /* 登录用户 */
-                $Member = D('Member');
-                if ($Member->login($uid, $aRemember == 1)) { //登录用户
-                    //TODO:跳转到登录前页面
-
-                    if (UC_SYNC && $uid != 1) {
-                        //同步登录到UC
-                        $ref = M('ucenter_user_link')->where(array('uid' => $uid))->find();
-                        $html = '';
-                        $html = uc_user_synlogin($ref['uc_uid']);
-                    }
+        } else { //显示登录页面
+            $this->display();
+        }
+    }
 
 
-                    $this->success($html, get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
-                } else {
-                    $this->error($Member->getError());
-                }
-
-            } else { //登录失败
-                switch ($uid) {
-                    case -1:
-                        $error = '用户不存在或被禁用！';
-                        break; //系统级别禁用
-                    case -2:
-                        $error = '密码错误！';
-                        break;
-                    default:
-                        $error = $uid;
-                        break; // 0-接口参数错误（调试阶段使用）
-                }
-                $this->error($error);
-            }
-
-        } else { //显示登录表单
-            if (is_login()) {
-                redirect(U('Home/Index/index'));
-            }
-
-            $ph = array();
-            check_reg_type('username') && $ph[] = '用户名';
-            check_reg_type('email') && $ph[] = '邮箱';
-            check_reg_type('mobile') && $ph[] = '手机号';
-            $this->assign('ph', implode('/', $ph));
+    /* 快捷登录登录页面 */
+    public function quickLogin()
+    {
+        if (IS_POST) {
+            $result = A('Ucenter/Login','Widget')->doLogin();
+            $this->ajaxReturn($result);
+        } else { //显示登录弹出框
             $this->display();
         }
     }
@@ -425,7 +381,7 @@ class MemberController extends Controller
                 $content = modC('SMS_CONTENT', '{$verify}', 'USERCONFIG');
                 $content = str_replace('{$verify}', $verify, $content);
                 $content = str_replace('{$account}', $account, $content);
-                $res = sendSMS($account,$content);
+                $res = sendSMS($account, $content);
                 return $res;
                 break;
             case 'email':
@@ -589,9 +545,9 @@ class MemberController extends Controller
      */
     public function checkAccount()
     {
-        $aAccount =  I('post.account', '', 'op_t');
+        $aAccount = I('post.account', '', 'op_t');
         $aType = I('post.type', '', 'op_t');
-        if(empty($aAccount)){
+        if (empty($aAccount)) {
             $this->error('不能为空！');
         }
         check_username($aAccount, $email, $mobile, $aUnType);
@@ -600,7 +556,7 @@ class MemberController extends Controller
             case 'username':
 
                 $length = mb_strlen($aAccount, 'utf-8'); // 当前数据长度
-                if($length<4 || $length >30){
+                if ($length < 4 || $length > 30) {
                     $this->error('用户名长度在4-30之间');
                 }
 
@@ -616,7 +572,7 @@ class MemberController extends Controller
                 break;
             case 'email':
                 $length = mb_strlen($email, 'utf-8'); // 当前数据长度
-                if($length<4 || $length >32){
+                if ($length < 4 || $length > 32) {
                     $this->error('邮箱长度在4-32之间');
                 }
                 empty($email) && $this->error('邮箱格式不正确！');
@@ -642,14 +598,14 @@ class MemberController extends Controller
      */
     public function checkNickname()
     {
-        $aNickname =  I('post.nickname', '', 'op_t');
+        $aNickname = I('post.nickname', '', 'op_t');
 
-        if(empty($aNickname)){
+        if (empty($aNickname)) {
             $this->error('不能为空！');
         }
 
         $length = mb_strlen($aNickname, 'utf-8'); // 当前数据长度
-        if($length<2 || $length >30){
+        if ($length < 2 || $length > 30) {
             $this->error('昵称长度在2-30之间');
         }
 
