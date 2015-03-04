@@ -81,7 +81,7 @@ str;
             ->keyTextArea('LEVEL', '等级配置', '每行一条，名称和积分之间用冒号分隔')
             ->keyCheckBox('DEFAULT_GROUP', '默认用户组', '设置用户注册后的默认所在用户组', $groupOption)
 
-            ->group('基础配置', 'REG_SWITCH,EMAIL_VERIFY_TYPE,MOBILE_VERIFY_TYPE,REG_STEP,REG_CAN_SKIP')
+            ->group('注册配置', 'REG_SWITCH,EMAIL_VERIFY_TYPE,MOBILE_VERIFY_TYPE,REG_STEP,REG_CAN_SKIP')
             ->group('邮箱验证模版', 'REG_EMAIL_VERIFY')
             ->group('邮箱激活模版', 'REG_EMAIL_ACTIVATE')
             ->group('短信配置', 'SMS_HTTP,SMS_UID,SMS_PWD,SMS_CONTENT')
