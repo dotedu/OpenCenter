@@ -145,12 +145,27 @@ class AdminConfigBuilder extends AdminBuilder
      * @param  $title
      * @param  $subtitle
      * @return hook ChinaCity
-     * @author LaoYang
+     * @author @MingYangliu <xint5288@126.com>
      */
     public function keyCity($title,$subtitle)
     {
         //修正在编辑信息时无法正常显示已经保存的地区信息
         return $this->key(array('province','city','district'), $title, $subtitle, 'city');
+    }
+
+    /**
+     * 增加数据时通过列表页选择相应的关联数据ID  -_-。sorry！表述不清楚..
+     * @param  unknown $name     字段名
+     * @param  unknown $title    标题
+     * @param  string  $subtitle 副标题（说明）
+     * @param  unknown $url      选择数据的列表页地址，U方法地址'index/index'
+     * @return $this
+     * @author @MingYangliu <xint5288@126.com>
+     */
+    public function keyDataSelect($name, $title, $subtitle = null, $url)
+    {
+        $urls = U($url,array('inputid'=>$name));
+        return $this->key($name, $title, $subtitle, 'dataselect', $urls);
     }
 
     public function button($title, $attr = array())
