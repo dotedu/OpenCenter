@@ -27,9 +27,9 @@ class AuthorizeController extends AdminController
 
             ->keyRadio('SSO_SWITCH', '单点登录开关', '单点登录的开关', array(0 => '关闭单点登录', 1 => '开启单点登录', 2 => '作为用户中心开启单点登录'))
             ->keyTextArea('SSO_CONFIG', '单点登录配置', '单点登录配置文件中的配置（当开关为开启单点登录时有效，不包括作为用户中心开启单点登录）')
-            ->keyText('SSO_UC_AUTH_KEY', '用户中心加密密钥', '为空则使用上面配置信息中的SSO_DATA_AUTH_KEY。')
-            ->keyText('SSO_UC_DB_DSN', '用户中心数据连接', '为空则使用上面配置信息中的数据连接。')
-            ->keyText('SSO_UC_TABLE_PREFIX', '用户中心表前缀', '为空则使用上面配置信息中的前缀。')
+            ->keyLabel('SSO_UC_AUTH_KEY', '用户中心加密密钥', '系统已自动写入配置文件，如写入失败请手动复制。')
+            ->keyLabel('SSO_UC_DB_DSN', '用户中心数据连接', '系统已自动写入配置文件，如写入失败请手动复制。')
+            ->keyLabel('SSO_UC_TABLE_PREFIX', '用户中心表前缀', '系统已自动写入配置文件，如写入失败请手动复制。')
             ->buttonSubmit('', '保存')->data($data);
         $admin_config->display();
     }
@@ -37,7 +37,7 @@ class AuthorizeController extends AdminController
     public function ssoCallback($config)
     {
 
-        $str = "<?php \n return " . ($config['SSO_CONFIG']?$config['SSO_CONFIG']:'array()');
+        $str = "<?php \n return " . ($config['SSO_CONFIG']?$config['SSO_CONFIG']:'array();');
         file_put_contents('./OcApi/oc_config.php', $str);
 
 
@@ -48,12 +48,11 @@ class AuthorizeController extends AdminController
             $add['SSO_UC_TABLE_PREFIX'] = $config['SSO_UC_TABLE_PREFIX'] = $oc_config['SSO_DB_PREFIX'];
 
         if (!$config['SSO_CONFIG']) {
-            $o_config = include_once './Conf/common.php';
-            $add['SSO_UC_AUTH_KEY'] = $config['SSO_UC_AUTH_KEY'] = $o_config['DATA_AUTH_KEY'];
-            $add['SSO_UC_DB_DSN'] = $config['SSO_UC_DB_DSN'] = 'mysqli://' . $o_config['DB_USER'] . ':' . $o_config['DB_PWD'] . '@' . $o_config['DB_HOST'] . ':' . $o_config['DB_PORT'] . '/' . $o_config['DB_NAME'];
-            $add['SSO_UC_TABLE_PREFIX'] = $config['SSO_UC_TABLE_PREFIX'] = $o_config['DB_PREFIX'];
-        }
 
+            $add['SSO_UC_AUTH_KEY'] = $config['SSO_UC_AUTH_KEY'] = C('DATA_AUTH_KEY');
+            $add['SSO_UC_DB_DSN'] = $config['SSO_UC_DB_DSN'] = 'mysqli://' . C('DB_USER') . ':' . C('DB_PWD') . '@' . C('DB_HOST') . ':' . C('DB_PORT') . '/' . C('DB_NAME');
+            $add['SSO_UC_TABLE_PREFIX'] = $config['SSO_UC_TABLE_PREFIX'] = C('DB_PREFIX');
+        }
 
         $content = file_get_contents('./Conf/user.php');
         $content = preg_replace('/\'UC_AUTH_KEY\', \'.*?\'/i', '\'UC_AUTH_KEY\', \'' . $config['SSO_UC_AUTH_KEY'] . '\'', $content);
