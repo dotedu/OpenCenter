@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>项目列表|管理后台</title>
+    <title> {$title|htmlspecialchars}台</title>
     <link href="/Public/favicon.ico" type="image/x-icon" rel="shortcut icon">
 
 
@@ -47,7 +47,7 @@
         $show=1;
         }
         }
-        //如果inputid存在就将它加入到缓存
+        //如果inpitid存在就将它加入缓存
     	if ($_GET['inputid']){
 		S('inputid',$_GET['inputid']);
 		}
