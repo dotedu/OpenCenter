@@ -250,6 +250,33 @@
             {:hook('J_China_City',array('province'=>$field['value']['0'],'city'=>$field['value']['1'],'district'=>$field['value']['2'],'community'=>$field['value']['3']))}
     </case>
     
+    <!--弹出窗口选择并返回值（目前只支持返回ID）开始-->
+    <case value="dataselect">
+        <input type="text" name="{$field.name}" id="{$field.name}" value="{$field.value|htmlspecialchars}"
+               class="text input-large form-control" style="width: 400px;display:inline-block;"/><input class="btn" style="margin-left:10px" type="button" value="选择" onclick="openwin('{$field.opt}','600','500')">
+			     <script type="text/javascript">  
+						//弹出窗口  
+						function openwin(url,width,height){     
+						    var l=window.screen.width ;     
+						    var w= window.screen.height;      
+						    var al=(l-width)/2;     
+						    var aw=(w-height)/2;     
+						    var OpenWindow=window.open(url,"弹出窗口","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width="+width+",height="+height+",top="+aw+",left="+al+"");         
+						    OpenWindow.focus();  
+						if(OpenWindow!=null){ //弹出窗口关闭事件  
+						//if(window.attachEvent) OpenWindow.attachEvent("onbeforeunload",   quickOut);   
+						if(window.attachEvent) OpenWindow.attachEvent("onunload",   quickOut);   
+						}  
+						}  
+						//关闭触发方法  
+						function quickOut()  
+						{  
+						alert("窗口已关闭");  
+						}  
+				 </script> 
+    </case>
+	<!--弹出窗口选择并返回值（目前只支持返回ID）结束-->
+    
     <case value="kanban">
 
         <input type="hidden" name="{$field.name}" value='{:json_encode($field["value"])}'/>
