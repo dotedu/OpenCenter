@@ -23,11 +23,14 @@ class SkinController extends AddonsController
         $aSkin = I('post.skin', '', 'op_t');
         $aSet_default = I('post.set_default', 0, 'intval');
         $msg['status'] = 0;
-        $UserSkinModel = M('UserSkin');
-        $exit = $UserSkinModel->where(array('uid' => is_login()))->count();
+
+        $map=getUserConfigMap(USER_CONFIG_MARK.skin,USER_CONFIG_MARK.model,get_login_role());
+
+        $UserConfigModel = M('UserConfig');
+        $exit = $UserConfigModel->where($map)->count();
         if ($aSet_default) { //设为默认
             if ($exit) { //0为不存在了，1为存在
-                $result = $UserSkinModel->where(array('uid' => is_login()))->delete();
+                $result = $UserConfigModel->where($map)->delete();
             } else {
                 $result = 1;
             }
@@ -38,18 +41,17 @@ class SkinController extends AddonsController
                 $msg['info'] = "未选择皮肤";
                 $this->ajaxReturn($msg);
             }
-            $skinConfig['skin'] = $aSkin;
-            $map['config'] = json_encode($skinConfig);
-            $map['uid'] = is_login();
+            $map_change=$map;//$map_change是判断配置信息是否修改时的查询条件
+            $map_change['value'] = $aSkin;
             if ($exit) {
-                $changed = $UserSkinModel->where($map)->count();
+                $changed = $UserConfigModel->where($map_change)->count();
                 if ($changed) { //0为修改了，1为未修改
                     $result = 1;
                 } else {
-                    $result = $UserSkinModel->where(array('uid' => is_login()))->setField('config', $map['config']);
+                    $result = $UserConfigModel->where($map)->setField('value', $aSkin);
                 }
             } else {
-                $result = $UserSkinModel->add($map);
+                $result = $UserConfigModel->add($map_change);
             }
         }
 
@@ -69,6 +71,8 @@ class SkinController extends AddonsController
     {
         $skinList=getSkinList();
         $this->assign('skinList',$skinList);
+        $defaultSkin=getUserConfig();
+        $this->assign('defaultSkin',$defaultSkin);
         $this->display(T('Addons://Skin@Skin/change'));
     }
 } 

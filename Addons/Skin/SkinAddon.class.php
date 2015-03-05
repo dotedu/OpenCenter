@@ -20,7 +20,7 @@ class SkinAddon extends Addon
         'description' => '用户自定义风格',
         'status' => 1,
         'author' => '想天科技-zzl(郑钟良)',
-        'version' => '0.1'
+        'version' => '1.0'
     );
     public $custom_config = 'config.html';
 
@@ -30,19 +30,12 @@ class SkinAddon extends Addon
         $model = D();
         $sql = "REPLACE INTO `{$prefix}hooks` (`name`, `description`, `type`, `update_time`, `addons`) VALUES('setSkin', '设置个人皮肤', 2, 1425265259, 'Skin');";
         $model->execute($sql);
-        $model->execute("DROP TABLE IF EXISTS `{$prefix}user_skin`;");
-        $model->execute("CREATE TABLE IF NOT EXISTS `{$prefix}user_skin` (
-    `uid` int(11) NOT NULL,
-  `config` varchar(200) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户皮肤配置';");
         return true;
     }
 
     public function uninstall()
     {
         $prefix = C("DB_PREFIX");
-        $sql = "DROP TABLE IF EXISTS `{$prefix}user_skin`";
-        D('')->execute($sql);
         $sql = "DELETE FROM `{$prefix}hooks` WHERE `name`='setSkin';";
         D('')->execute($sql);
         return true;
@@ -76,7 +69,7 @@ class SkinAddon extends Addon
         } else { //执行用户设置样式
             // 载入换肤插件用户样式
             $userSkin = getUserConfig();
-            echo '<link href="' . $SkinsUrl . $userSkin['skin'] . '/style.css" rel="stylesheet" type="text/css"/>';
+            echo '<link href="' . $SkinsUrl . $userSkin . '/style.css" rel="stylesheet" type="text/css"/>';
         }
     }
 }
