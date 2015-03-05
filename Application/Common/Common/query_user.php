@@ -20,13 +20,18 @@
  */
 function query_user($fields = null, $uid = null)
 {
-    if($fields===null){
+    if ($fields === null) {
         $fields = array('nickname', 'space_url', 'avatar64', 'avatar128', 'uid');
     }
     //如果fields不是数组，则返回值也不是数组
     if (!is_array($fields)) {
         $result = query_user(array($fields), $uid);
         return $result[$fields];
+    }
+
+
+    if (in_array('score', $fields)) {
+        $fields[] = 'score1';
     }
 
     //默认获取自己的资料
@@ -39,7 +44,7 @@ function query_user($fields = null, $uid = null)
     $cachedFields = array();
     $cacheResult = array();
     foreach ($fields as $field) {
-        if (in_array($field, array('icons_html', 'title', 'score', 'tox_money'))) {
+        if (in_array($field, array('icons_html', 'title', 'score'))) {
             continue;
         }
         $cache = read_query_user_cache($uid, $field);
@@ -82,10 +87,10 @@ function query_user($fields = null, $uid = null)
     foreach ($avatarFields as $e) {
         $avatarSize = intval(substr($e, 6));
         $avatarUrl = $avatarObject->getAvatar($uid, $avatarSize);
-        $check= file_exists('./api/uc_login.lock');
-        if($check){
+        $check = file_exists('./api/uc_login.lock');
+        if ($check) {
             include_once './api/uc_client/client.php';
-             $avatarUrl = UC_API.'/avatar.php?uid='.$uid.'&size=big';
+            $avatarUrl = UC_API . '/avatar.php?uid=' . $uid . '&size=big';
         }
 
 
@@ -117,13 +122,13 @@ function query_user($fields = null, $uid = null)
 
     //获取昵称链接
     if (in_array('space_link', $fields)) {
-        if(!$ucenterResult['nickname']){
-            $res=query_user(array('nickname'),$uid);
-            $ucenterResult['nickname']=$res['nickname'];
+        if (!$ucenterResult['nickname']) {
+            $res = query_user(array('nickname'), $uid);
+            $ucenterResult['nickname'] = $res['nickname'];
         }
         $result['space_link'] = '<a ucard="' . $uid . '" target="_blank" href="' . U('Ucenter/Index/index', array('uid' => $uid)) . '">' . $ucenterResult['nickname'] . '</a>';
     }
-    
+
     //获取用户头衔链接
     if (in_array('rank_link', $fields)) {
         $rank_List = D('rank_user')->where(array('uid' => $uid, 'status' => 1))->select();
@@ -225,6 +230,7 @@ function query_user($fields = null, $uid = null)
     //合并结果，包括缓存
     $result = array_merge($result, $cacheResult);
 
+    $result['score'] = $result['score1'];
     //返回结果
     return $result;
 }

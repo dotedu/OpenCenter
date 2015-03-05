@@ -757,8 +757,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_member` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会员表' AUTO_INCREMENT=100 ;
 
 
-
-
+DROP TABLE  IF EXISTS `ocenter_menu`;
 CREATE TABLE IF NOT EXISTS `ocenter_menu` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '文档ID',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
@@ -864,7 +863,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (132, '规则管理', 68, 0, 'SEO/index', 0, '', 'SEO规则', 0, ''),
 (146, '规则回收站', 68, 0, 'SEO/ruleTrash', 0, '', 'SEO规则', 0, ''),
 (147, '头衔列表', 16, 10, 'Rank/index', 0, '', '头衔管理', 0, ''),
-(149, '添加头衔', 16, 2, 'Rank/editRank', 0, '', '头衔管理', 0, ''),
+(149, '添加头衔', 16, 2, 'Rank/editRank', 1, '', '头衔管理', 0, ''),
 (150, '查看用户', 16, 0, 'Rank/userList', 0, '', '头衔管理', 0, ''),
 (151, '用户头衔列表', 150, 0, 'Rank/userRankList', 1, '', '', 0, ''),
 (152, '关联新头衔', 150, 0, 'Rank/userAddRank', 1, '', '', 0, ''),
@@ -1171,11 +1170,17 @@ CREATE TABLE IF NOT EXISTS `ocenter_verify` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
+DROP TABLE  IF EXISTS `ocenter_ucenter_score_type`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_score_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
   `status` tinyint(4) NOT NULL,
   `unit` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+
+INSERT INTO `ocenter_ucenter_score_type` (`id`, `title`, `status`, `unit`) VALUES
+(1, '积分', 1, '分'),
+(2, '威望', 1, '点'),
+(3, '贡献', 1, '元'),
+(4, '余额', 1, '点');
