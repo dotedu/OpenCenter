@@ -451,7 +451,7 @@ function get_username($uid = 0)
 {
     static $list;
     if (!($uid && is_numeric($uid))) { //获取当前登录用户名
-        return $_SESSION['onethink_home']['user_auth']['username'];
+        return $_SESSION['ocenter']['user_auth']['username'];
     }
 
     /* 获取缓存数据 */

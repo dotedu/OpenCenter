@@ -182,7 +182,6 @@ class MemberModel extends Model
         if (!$this->getCookieUid() && $remember) {
             $expire = 3600 * 24 * 7;
             cookie('OX_LOGGED_USER', $this->jiami($this->change() . ".{$user['uid']}.{$token}"), $expire);
-
         }
     }
 

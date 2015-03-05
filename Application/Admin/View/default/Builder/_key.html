@@ -12,6 +12,12 @@
         <input type="text" name="{$field.name}" value="{$field.value|htmlspecialchars}"
                class="text input-large form-control" style="width: 400px"/>
     </case>
+
+    <case value="label">
+        {$field.value}
+    </case>
+
+
     <case value="hidden">
         <input type="hidden" name="{$field.name}" value="{$field.value}" class="text input-large"/>
     </case>
