@@ -6,8 +6,7 @@
  * Time: 下午4:29
  * @author 郑钟良<zzl@ourstu.com>
  */
-define('THIS_ADDON_NAME','Skin');
-define('SKIN_PATH',ONETHINK_ADDON_PATH.'Skin/');
+require_once(ONETHINK_ADDON_PATH.'Skin/Config/config.php');
 /**
  * 获取可用皮肤列表
  * @author 郑钟良<zzl@ourstu.com>
@@ -73,12 +72,11 @@ function getAddonConfig(){
  */
 function getUserConfig()
 {
-    $UserConfig  =   M('UserSkin')->where(array('uid'=>is_login()))->getField('config');
+    $map=getUserConfigMap(USER_CONFIG_MARK.skin,USER_CONFIG_MARK.model,get_login_role());
+    $UserConfig  =   M('UserConfig')->where($map)->getField('value');
     if(!$UserConfig){
         $UserConfig=getAddonConfig();
         $UserConfig['skin']=$UserConfig['defaultSkin'];
-    }else{
-        $UserConfig=json_decode($UserConfig,true);
     }
     return $UserConfig;
 }
