@@ -2,7 +2,7 @@
 <div class="col-md-6 col-xs-12 lg_left">
     <div class="col-xs-12">
         <div class="col-xs-12  lg_lf_top">
-            <h2>欢迎回到 {:C('WEB_SITE')} ！</h2>
+            <h2>欢迎回到 <eq name="login_type" value="login"><a href="http://{:$_SERVER['HTTP_HOST']}__ROOT__" title="进入首页">{:C('WEB_SITE')}</a><else/>{:C('WEB_SITE')}</eq> ！</h2>
         </div>
         <div class="clearfix"></div>
         <form action="__SELF__" method="post" class="lg_lf_form ">

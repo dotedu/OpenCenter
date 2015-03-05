@@ -10,12 +10,13 @@ $.getScript('Public/js/com/com.toast.class.js', function () {
             });//绑定发微博弹窗
             ucard();//绑定用户小名片
             bindGoTop();//回到顶部
-            bindQuickLogin();//快捷登录
             talker.bind_ctrl_enter();//绑定
 
             $('input,area').placeholder();//修复ieplace holder
             if (is_login()) {
                 bindMessageChecker();//绑定用户消息
+            } else {
+                bindLogin();//快捷登录
             }
             checkMessage();//检查一次消息
 
@@ -208,8 +209,8 @@ function checkMessage() {
 
 
                 var new_html = $('<span><li><a data-url="' + msg['messages'][index]['url'] + '"' + 'onclick="Notify.readMessage(this,' + msg['messages'][index]['id'] + ')"><i class="icon-bell"></i> ' +
-                msg['messages'][index]['title'] + '<br/><span class="time">' + msg['messages'][index]['ctime'] +
-                '</span> </a></li></span>');
+                    msg['messages'][index]['title'] + '<br/><span class="time">' + msg['messages'][index]['ctime'] +
+                    '</span> </a></li></span>');
                 $('#nav_message').prepend(new_html.html());
 
 
@@ -257,7 +258,6 @@ function checkMessage() {
     }, 'json');
 
 }
-
 
 
 /**
@@ -479,17 +479,49 @@ function setCaretPosition(ctrl, pos) {//设置光标位置函数
 
 /*微博表情end*/
 
-function bindQuickLogin(){
-    if(!is_login()){
+/*登录*/
+
+/**
+ * 绑定登录按钮
+ * [data-login="quick_login"] 强制弹出快捷登录窗
+ * [data-login="do_login"] 根据条件选择登录方式(弹窗/跳转登录页面)
+ * @returns {boolean}
+ */
+function bindLogin() {
+    if (!is_login()) {
         $('[data-login="quick_login"]').click(quickLogin);
+        $('[data-login="do_login"]').click(doLogin);
     }
     return true;
 }
+
 /**
- * 快捷登录
+ * 强制弹出快捷登录窗
  */
-var quickLogin=function (){//快捷登录
-    $('[data-login="quick_login_now"]').click();
-    return true;
+var quickLogin = function () {//快捷登录
+    if (!is_login()) {
+        var myModalTrigger = new ModalTrigger({
+            remote: U('Ucenter/Member/quickLogin'),
+            title: "登录"
+        });
+        myModalTrigger.show();
+    }
 }
 
+/**
+ * 根据条件选择登录方式(弹窗/跳转登录页面)
+ */
+var doLogin = function () {//登录界面
+    if (!is_login()) {
+        if (OPEN_QUICK_LOGIN == 1) {
+            var myModalTrigger = new ModalTrigger({
+                remote: U('Ucenter/Member/quickLogin'),
+                title: "登录"
+            });
+            myModalTrigger.show();
+        } else {
+            window.location.href = U('Ucenter/Member/login');
+        }
+    }
+}
+/*登录end*/
