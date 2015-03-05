@@ -168,9 +168,17 @@
                     </li>
                     <li class="top_spliter hidden-xs"></li>
                     <else/>
+
+
                     <li class="top_spliter hidden-xs"></li>
                     <li class="hidden-xs">
-                        <a href="{:U('Ucenter/Member/login')}">登录</a>
+                        <php>
+                            $open_quick_login=modC('OPEN_QUICK_LOGIN', 0, 'USERCONFIG');
+                        </php>
+                        <script>
+                            var OPEN_QUICK_LOGIN="{$open_quick_login}";
+                        </script>
+                        <a data-login="do_login">登录</a>
                     </li>
                     <li class="hidden-xs">
                         <a href="{:U('Ucenter/Member/register')}">注册</a>
