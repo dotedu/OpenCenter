@@ -366,7 +366,10 @@ class AdminListBuilder extends AdminBuilder
         return $this;
     }
 
-    public function display()
+    /**
+     * $solist 判断是否属于选择返回数据的列表页，如果是在列表页->display('admin_solist');@mingyangliu
+     * */
+    public function display($solist = '')
     {
         //key类型的等价转换
         //map转换成text
@@ -496,7 +499,12 @@ class AdminListBuilder extends AdminBuilder
         /*加入搜索 陈一枭*/
         $this->assign('searches', $this->_search);
         $this->assign('searchPostUrl', $this->_searchPostUrl);
-        parent::display('admin_list');
+        //如果是选择返回数据的列表页就调用admin_solist模板文件，否则编译原有模板
+        if($solist){
+            parent::display('admin_solist');
+        } else {
+            parent::display('admin_list');
+        }
     }
 
     public function doSetStatus($model, $ids, $status)
