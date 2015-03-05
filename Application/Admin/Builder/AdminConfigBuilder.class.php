@@ -17,7 +17,7 @@ class AdminConfigBuilder extends AdminBuilder
     private $_buttonList = array();
     private $_savePostUrl = array();
     private $_group = array();
-
+    private $_callback = null;
     public function title($title)
     {
         $this->_title = $title;
@@ -33,6 +33,11 @@ class AdminConfigBuilder extends AdminBuilder
      */
     public function suggest($suggest){
         $this->_suggest = $suggest;
+        return $this;
+    }
+
+    public function callback($callback){
+        $this->_callback = $callback;
         return $this;
     }
 
@@ -86,6 +91,11 @@ class AdminConfigBuilder extends AdminBuilder
     public function keyText($name, $title, $subtitle = null)
     {
         return $this->key($name, $title, $subtitle, 'text');
+    }
+
+    public function keyLabel($name, $title, $subtitle = null)
+    {
+        return $this->key($name, $title, $subtitle, 'label');
     }
 
     public function keyTextArea($name, $title, $subtitle = null)
@@ -319,12 +329,16 @@ class AdminConfigBuilder extends AdminBuilder
                 $config['value'] = $v;
                 $config['sort'] = 0;
                 if ($configModel->add($config, null, true)) {
-                    $success = 1;
+                        $success = 1;
                 }
                 $tag = 'conf_' . strtoupper(CONTROLLER_NAME) . '_' . strtoupper($k);
                 S($tag, null);
             }
             if ($success) {
+                if($this->_callback){
+                    $str = $this->_callback;
+                    A(CONTROLLER_NAME)->$str(I(''));
+                }
                 header('Content-type: application/json');
                 exit(json_encode(array('info' => '保存配置成功。', 'status' => 1, 'url' => __SELF__)));
             } else {
