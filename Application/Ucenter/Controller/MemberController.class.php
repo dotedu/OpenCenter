@@ -145,6 +145,13 @@ class MemberController extends Controller
             if (0 < $uid) { //UC登录成功
                 /* 登录用户 */
                 $Member = D('Member');
+
+
+                $args['uid'] = $uid;
+                $args = array('uid'=>$uid,'nickname'=>$username);
+                check_and_add($args);
+
+
                 if ($Member->login($uid, $aRemember == 1)) { //登录用户
                     //TODO:跳转到登录前页面
 
@@ -155,7 +162,12 @@ class MemberController extends Controller
                         $html = uc_user_synlogin($ref['uc_uid']);
                     }
 
-
+                    $oc_config =  include_once './OcApi/oc_config.php';
+                    if ($oc_config['SSO_SWITCH']) {
+                        include_once  './OcApi/OCenter/OCenter.php';
+                        $OCApi = new \OCApi();
+                        $html = $OCApi->oc_syn_login($uid);
+                    }
                     $this->success($html, get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
                 } else {
                     $this->error($Member->getError());

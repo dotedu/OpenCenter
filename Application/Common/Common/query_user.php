@@ -21,7 +21,7 @@
 function query_user($fields = null, $uid = null)
 {
     if($fields===null){
-        $fields = array('nickname', 'space_url', 'avatar64', 'avatar128', 'uid');
+        $fields = array('nickname', 'space_url', 'avatar64', 'avatar128','avatar256', 'uid');
     }
     //如果fields不是数组，则返回值也不是数组
     if (!is_array($fields)) {
