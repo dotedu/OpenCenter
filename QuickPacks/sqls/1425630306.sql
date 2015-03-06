@@ -1,0 +1,1 @@
+ALTER TABLE  `ocenter_rank_user` ADD  `role_id` INT( 11 ) NOT NULL FIRST；
