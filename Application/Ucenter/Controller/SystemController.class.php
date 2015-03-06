@@ -38,6 +38,12 @@ class SystemController extends BaseController
             $html = uc_user_synlogout();
         }
 
+        $oc_config =  include_once './OcApi/oc_config.php';
+        if ($oc_config['SSO_SWITCH']) {
+            include_once  './OcApi/OCenter/OCenter.php';
+            $OCApi = new \OCApi();
+            $html = $OCApi->oc_syn_logout();
+        }
 
         exit(json_encode(array('message' =>'退出登陆成功。','url' => U('Home/Index/index'),'html'=>$html)));
         //显示页面

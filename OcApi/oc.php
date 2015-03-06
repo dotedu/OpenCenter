@@ -37,12 +37,13 @@ class oc_node{
     var $thisConfig ;
     function oc_node(){
         $this->dirpath = substr(dirname(__FILE__), 0, -5);
-        require_once( $this->dirpath.'OcApi/OCenter/Lib/mysql.php');
-        $db_config =  require('./oc_config.php');
-        $this->db = new mysql($db_config['SSO_DB_NAME'],$db_config['SSO_DB_HOST'],$db_config['SSO_DB_USER'],$db_config['SSO_DB_PWD'],$db_config['SSO_DB_PORT']);
-        $this->tablePre = $db_config['SSO_DB_PREFIX'];
+        require_once( $this->dirpath.'OcApi/OCenter/Lib/Mysql.php');
 
         $this->thisConfig = require_once $this->dirpath.'/Conf/common.php';
+        $this->db = new Mysql($this->thisConfig ['DB_NAME'],$this->thisConfig ['DB_HOST'],$this->thisConfig ['DB_USER'],$this->thisConfig ['DB_PWD']);
+        $this->tablePre = $this->thisConfig ['DB_PREFIX'];
+
+
     }
 
     function test() {
@@ -55,17 +56,23 @@ class oc_node{
         header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
         session_start();
 
-        require_once  $this->dirpath.'OcApi/OCenter/ocenter.php';
-        $user = oc_get_user_info('uid='.$uid);
 
-        $auth = array(
-            'uid' => $user['uid'],
-            'username' => $user['username'],
-            'last_login_time' => $user['last_login_time'],
-        );
+        $check_user = $this->db->getOne("SELECT * FROM `".$this->tablePre."member` WHERE uid=".$uid);
+        if($check_user){
+            require_once  ($this->dirpath.'OcApi/OCenter/OCenter.php');
+            $OCApi = new OCApi();
+            $user = $OCApi->oc_get_user_info('uid='.$uid);
 
-        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth']=$auth;
-        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign']=data_auth_sign($auth);
+            $auth = array(
+                'uid' => $user['uid'],
+                'username' => $user['username'],
+                'last_login_time' => $user['last_login_time'],
+            );
+
+            $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth']=$auth;
+            $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign']=data_auth_sign($auth);
+        }
+
 
     }
 

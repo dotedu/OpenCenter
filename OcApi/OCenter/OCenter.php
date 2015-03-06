@@ -9,12 +9,10 @@
 
 
 error_reporting(0);
-
 define('OC_ROOT', substr(__FILE__, 0, -11));
 
 
 class OCApi{
-
 function oc_post($model,$action,$args=array()){
     global $oc_model;
     if(empty($oc_model[$model])) {
@@ -26,7 +24,8 @@ function oc_post($model,$action,$args=array()){
 }
 
 function oc_user_login($username,$password){
-    $return = call_user_func('oc_post', 'User', 'login', array('username'=>$username, 'password'=>$password));
+
+    $return = $this->oc_post('User', 'login', array('username'=>$username, 'password'=>$password));
     return $return;
 }
 
@@ -34,20 +33,20 @@ function oc_user_login($username,$password){
 function oc_get_user_info($where=''){
     $return ='无法查找';
     if($where){
-        $return = call_user_func('oc_post', 'User', 'getUserInfo', $where);
+        $return = $this->oc_post('User', 'getUserInfo', $where);
     }
     return $return;
 }
 
 
 function oc_syn_login($uid){
-    $return = call_user_func('oc_post', 'User', 'synLogin', $uid);
+    $return = $this->oc_post( 'User', 'synLogin', $uid);
     return $return;
 }
 
 
 function oc_syn_logout(){
-    $return = call_user_func('oc_post', 'User', 'synLogout', null);
+    $return = $this->oc_post( 'User', 'synLogout', null);
     return $return;
 }
 

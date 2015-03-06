@@ -132,7 +132,7 @@ function check_step($now_step=''){
  */
 function set_user_status($uid,$status){
     D('Member')->where(array('uid'=>$uid))->setField('status',$status);
-    D('UcenterMember')->where(array('id'=>$uid))->setField('status',$status);
+    D('User/UcenterMember')->where(array('id'=>$uid))->setField('status',$status);
     return true;
 }
 
@@ -147,4 +147,18 @@ function check_step_can_skip($step){
         return true;
     }
     return false;
+}
+
+
+
+function check_and_add($args){
+    $Member = D('Member');
+    $uid = $args['uid'];
+
+    $check = $Member->find($uid);
+    if(!$check){
+        $args['status'] =1;
+        $Member-> add($args);
+    }
+    return true;
 }

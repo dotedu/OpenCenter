@@ -32,6 +32,38 @@ function is_login()
     }
 }
 
+/**
+ * 获取当前用户登录的角色的标识(角色功能完成后修改)
+ * @return string
+ * @author 郑钟良<zzl@ourstu.com>
+ */
+function get_login_role()
+{
+    //todo 获取当前用户登录的角色的标识
+    return '';
+}
+
+/**
+ * 构造用户配置表 D('UserConfig')查询条件
+ * @param string $name 表中name字段的值(配置标识)
+ * @param string $model 表中model字段的值(模块标识)
+ * @param int $role_id 登录的角色id
+ * @param int $uid 用户id
+ * @return array 查询条件 $map
+ * @author 郑钟良<zzl@ourstu.com>
+ */
+function getUserConfigMap($name='',$model='',$role_id=0,$uid=0){
+    $uid=$uid?$uid:is_login();
+
+    $map=array();
+    //构造查询条件
+    $map['uid']=$uid;
+    $map['name']=$name;
+    $map['role_id']=$role_id;
+    $map['model']=$model;
+    return $map;
+}
+
 function get_uid()
 {
     return is_login();

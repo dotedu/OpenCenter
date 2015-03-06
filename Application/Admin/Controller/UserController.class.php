@@ -814,7 +814,7 @@ class UserController extends AdminController
                 }
                 $builder->title(($aId == 0 ? '新增' : '编辑').'积分分类')->keyId()->keyText('title', '名称')
                     ->keyText('unit', '单位')
-                    ->keyStatus()
+                    ->keySelect('status', '状态', null,  array(-1 => '删除', 0 => '禁用', 1 => '启用'))
                     ->data($type)
                     ->buttonSubmit(U('editScoreType'))->buttonBack()->display();
             }

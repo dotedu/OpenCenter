@@ -5,7 +5,16 @@
         搜索用户： <span class="check-tips">（输入用户ID查询）</span>
     </label>
     <input type="text" data-row="searchUser" class="text input-large form-control" style="width: 400px"/>
+<script>
+    $(function () {
+        $('[data-row="searchUser"]').keypress(function (e) {
+            if ( e.which == 13 || e.which == 10) {
+                $(this).blur();
 
+            }
+        });
+        });
+</script>
 
     <div style="border-top:1px dashed #ccc;margin-top: 15px;margin-bottom: 15px "></div>
     <strong>当前选中用户：</strong>
@@ -69,15 +78,14 @@
                         obj.parents('form').find('#userlist').append(' <div class="btn" data-row="delUser">'+res.nickname+' <input type="hidden" name="uid[]" value="'+res.uid+'"/></div>');
                         delUser();
                         obj.val('')
+                        obj.focus();
                     },'json')
                 }
             }
-
         })
 
 
         $('.frm_change_group .submit').click(function () {
-
                 $.post($(this).attr('url'), $('.frm_change_group').serialize(), function (msg) {
                     handleAjax(msg);
                 });

@@ -54,14 +54,26 @@ class LoginWidget extends Action
         if (0 < $uid) { //UC登录成功
             /* 登录用户 */
             $Member = D('Member');
+            $args['uid'] = $uid;
+            $args = array('uid'=>$uid,'nickname'=>$username);
+            check_and_add($args);
+
             if ($Member->login($uid, $aRemember == 1)) { //登录用户
                 //TODO:跳转到登录前页面
+
 
                 if (UC_SYNC && $uid != 1) {
                     //同步登录到UC
                     $ref = M('ucenter_user_link')->where(array('uid' => $uid))->find();
                     $html = '';
                     $html = uc_user_synlogin($ref['uc_uid']);
+                }
+
+                $oc_config =  include_once './OcApi/oc_config.php';
+                if ($oc_config['SSO_SWITCH']) {
+                    include_once  './OcApi/OCenter/OCenter.php';
+                    $OCApi = new \OCApi();
+                    $html = $OCApi->oc_syn_login($uid);
                 }
 
                 $res['status']=1;
