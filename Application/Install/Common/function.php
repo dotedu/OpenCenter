@@ -210,7 +210,7 @@ function create_tables($db, $prefix = ''){
 function register_administrator($db, $prefix, $admin, $auth){
 	show_msg('开始注册创始人帐号...');
 	$sql = "REPLACE INTO `[PREFIX]ucenter_member` VALUES " .
-		   "('1', '[NAME]', '[PASS]', '[EMAIL]', '', '[TIME]', '[IP]', 0, 0, '[TIME]', '1',1,'F')";
+		   "('1', '[NAME]', '[PASS]', '[EMAIL]', '', '[TIME]', '[IP]', 0, 0, '[TIME]', '1',1,'finish')";
 
 	$password = user_md5($admin['password'], $auth);
 	$sql = str_replace(
@@ -221,7 +221,7 @@ function register_administrator($db, $prefix, $admin, $auth){
 	$db->execute($sql);
 
 	$sql = "REPLACE INTO `[PREFIX]member` VALUES ".
-		   "('1', '[NAME]', '0', '0', '', '0', '1', '0', '[TIME]', '0', '[TIME]', '1','',0,0,0,0,0);";
+		   "('1', '[NAME]', '0', '0', '',  '1', '0', '[TIME]', '0', '[TIME]', '1','',0,0,0,0,0,0,0,0);";
 	$sql = str_replace(
 		array('[PREFIX]', '[NAME]', '[TIME]'),
 		array($prefix, $admin['username'], NOW_TIME),

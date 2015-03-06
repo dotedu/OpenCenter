@@ -91,7 +91,7 @@ class ConfigController extends BaseController
             $rs_member = D('Member')->save($user);
 
             $ucuser['id'] = get_uid();
-            $rs_ucmember = D('User/UcenterMember')->save($ucuser);
+            $rs_ucmember = UCenterMember()->save($ucuser);
             clean_query_user_cache(get_uid(), array('nickname', 'sex', 'signature', 'email', 'pos_province', 'pos_city', 'pos_district', 'pos_community'));
 
             //TODO tox 清空缓存
@@ -464,7 +464,7 @@ class ConfigController extends BaseController
     public function doChangePassword($old_password, $new_password)
     {
         //调用接口
-        $memberModel=D('User/UcenterMember');
+        $memberModel=UCenterMember();
         $res=$memberModel->changePassword($old_password,$new_password);
         if($res){
             $this->success('修改密码成功。','refresh');
@@ -503,7 +503,7 @@ class ConfigController extends BaseController
 
         $map['email'] = $email;
         $map['id'] = array('neq', get_uid());
-        $had = D('UcenterMember')->where($map)->count();
+        $had = UCenterMember()->where($map)->count();
         if ($had) {
             $this->error('该邮箱已被人使用。');
         }
@@ -515,7 +515,7 @@ class ConfigController extends BaseController
      */
     private function accountInfo()
     {
-        $info = D('User/UcenterMember')->field('id,username,email,mobile,type')->find(is_login());
+        $info = UCenterMember()->field('id,username,email,mobile,type')->find(is_login());
         $this->assign('accountInfo', $info);
     }
 
@@ -554,7 +554,7 @@ class ConfigController extends BaseController
         }
 
         $uid = get_uid();
-        $mUcenter = D('User/UcenterMember');
+        $mUcenter = UCenterMember();
         //判断用户是否已设置用户名
         $username = $mUcenter->where(array('id' => $uid))->getField('username');
         if (empty($username)) {
@@ -632,7 +632,7 @@ class ConfigController extends BaseController
         if (!$res) {
            $this->error('验证失败');
         }
-        D('User/UcenterMember')->where(array('id' => $aUid))->save(array($aType => $aAccount));
+        UCenterMember()->where(array('id' => $aUid))->save(array($aType => $aAccount));
         $this->success('验证成功', U('ucenter/config/index'));
 
     }

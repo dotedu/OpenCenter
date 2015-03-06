@@ -43,7 +43,7 @@ class VerifyController extends Controller
             $this->error('请验证手机格式是否正确');
         }
 
-        $checkIsExist = D('User/UcenterMember')->where(array($aType => $aAccount))->find();
+        $checkIsExist = UCenterMember()->where(array($aType => $aAccount))->find();
         if ($checkIsExist) {
             $str = $aType == 'mobile' ? '手机' : '邮箱';
             $this->error('该' . $str . '已被其他用户使用！');

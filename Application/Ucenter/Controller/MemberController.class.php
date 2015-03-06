@@ -65,7 +65,7 @@ class MemberController extends Controller
                 $this->error('该类型未开放注册。');
             }
             /* 注册用户 */
-            $uid = D('User/UcenterMember')->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
+            $uid = UCenterMember()->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
             if (0 < $uid) { //注册成功
                 if (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType == 2) {
                     set_user_status($uid, 3);
@@ -74,7 +74,7 @@ class MemberController extends Controller
                     // $this->success('注册成功，请登录邮箱进行激活');
                 }
 
-                $uid = D('User/UcenterMember')->login($username, $aPassword, $aUnType); //通过账号密码取到uid
+                $uid = UCenterMember()->login($username, $aPassword, $aUnType); //通过账号密码取到uid
                 D('Member')->login($uid, false); //登陆
                 $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
             } else { //注册失败，显示错误信息
@@ -99,15 +99,19 @@ class MemberController extends Controller
     {
         $aStep = I('get.step', '', 'op_t');
         $aUid = session('temp_login_uid');
-        $step = M('UcenterMember')->where('id=' . $aUid)->getField('step');
+        if(empty($aUid)){
+            $this->error('参数错误');
+        }
+        $ucenterMemberModel = UCenterMember();
+        $step = $ucenterMemberModel->where('id=' . $aUid)->getField('step');
         if (get_next_step($step) != $aStep) {
             $aStep = check_step($step);
             $_GET['step'] = $aStep;
-            M('UcenterMember')->where('id=' . $aUid)->setField('step', $aStep);
+            $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
 
 
         }
-        M('UcenterMember')->where('id=' . $aUid)->setField('step', $aStep);
+        $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
         if ($aStep == 'finish') {
             D('Member')->login($aUid, false);
 
@@ -178,7 +182,7 @@ class MemberController extends Controller
             }
 
             //根据用户名获取用户UID
-            $user = D('User/UcenterMember')->where(array('username' => $username, 'email' => $email, 'status' => 1))->find();
+            $user = UCenterMember()->where(array('username' => $username, 'email' => $email, 'status' => 1))->find();
             $uid = $user['id'];
             if (!$uid) {
                 $this->error("用户名或邮箱错误");
@@ -246,7 +250,7 @@ class MemberController extends Controller
 
         //将新的密码写入数据库
         $data = array('id' => $uid, 'password' => $password);
-        $model = D('User/UcenterMember');
+        $model = UCenterMember();
         $data = $model->create($data);
         if (!$data) {
             $this->error('密码格式不正确');
@@ -262,7 +266,7 @@ class MemberController extends Controller
 
     private function getResetPasswordVerifyCode($uid)
     {
-        $user = D('User/UcenterMember')->where(array('id' => $uid))->find();
+        $user = UCenterMember()->where(array('id' => $uid))->find();
         $clear = implode('|', array($user['uid'], $user['username'], $user['last_login_time'], $user['password']));
         $verify = thinkox_hash($clear, UC_AUTH_KEY);
         return $verify;
@@ -405,7 +409,7 @@ class MemberController extends Controller
 
         // $aUid = I('get.uid',0,'intval');
         $aUid = session('temp_login_uid');
-        $status = D('User/UcenterMember')->where(array('id' => $aUid))->getField('status');
+        $status = UCenterMember()->where(array('id' => $aUid))->getField('status');
         if ($status != 3) {
             redirect(U('ucenter/member/login'));
         }
@@ -437,7 +441,7 @@ class MemberController extends Controller
     {
         $aEmail = I('post.email', '', 'op_t');
         $aUid = session('temp_login_uid');
-        $ucenterMemberModel = D('User/UcenterMember');
+        $ucenterMemberModel = UCenterMember();
         $ucenterMemberModel->where(array('id' => $aUid))->getField('status');
         if ($ucenterMemberModel->where(array('id' => $aUid))->getField('status') != 3) {
             $this->error('权限不足！');
@@ -456,7 +460,7 @@ class MemberController extends Controller
     private function activateVerify()
     {
         $aUid = session('temp_login_uid');
-        $email = D('User/UcenterMember')->where(array('id' => $aUid))->getField('email');
+        $email = UCenterMember()->where(array('id' => $aUid))->getField('email');
         $verify = D('Verify')->addVerify($email, 'email', $aUid);
         $res = $this->sendActivateEmail($email, $verify, $aUid); //发送激活邮件
         return $res;
@@ -551,7 +555,7 @@ class MemberController extends Controller
             $this->error('不能为空！');
         }
         check_username($aAccount, $email, $mobile, $aUnType);
-        $mUcenter = D('User/UcenterMember');
+        $mUcenter = UCenterMember();
         switch ($aType) {
             case 'username':
 

@@ -500,7 +500,7 @@ INSERT INTO `ocenter_channel` (`id`, `pid`, `title`, `url`, `sort`, `create_time
 (16, 0, '会员展示', 'People/index/index', 3, 1421054845, 1421134856, 1, 0, '', '', '', 'group');
 
 
-
+DROP TABLE  IF EXISTS `ocenter_config`;
 CREATE TABLE IF NOT EXISTS `ocenter_config` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '配置ID',
   `name` varchar(30) NOT NULL DEFAULT '' COMMENT '配置名称',
@@ -561,23 +561,7 @@ INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `
 (60, 'AFTER_LOGIN_JUMP_URL', 2, '登陆后跳转的Url', 1, '', '支持形如weibo/index/index的ThinkPhp路由写法，支持普通的url写法', 1407145718, 1407154887, 1, 'Home/index/index', 7),
 (58, 'USER_REG_WEIBO_CONTENT', 1, '用户注册微博提示内容', 3, '', '留空则表示不发新微博，支持face', 1404965285, 1404965445, 1, '', 0),
 (92, 'URL_MODEL', 4, 'URL模式', 4, '1:PATHINFO模式\r\n2:REWRITE模式(开启伪静态)\r\n3:兼容模式', '选择Rewrite模式则开启伪静态，默认建议开启兼容模式', 1421027546, 1421027676, 1, '3', 0),
-(78, '_WEIBO_SHOW_TITLE', 0, '', 0, '', '', 1409670239, 1409670239, 1, '1', 0),
-(75, '_WEIBO_SHOWTITLE', 0, '', 0, '', '', 1409670094, 1409670094, 1, '0', 0),
-(80, '_FORUM_LIMIT_IMAGE', 0, '', 0, '', '', 1409711730, 1409711730, 1, '1', 0),
-(82, '_ISSUE_NEED_VERIFY', 0, '', 0, '', '', 1409712596, 1409712596, 1, '0', 0),
-(90, '_USERCONFIG_LEVEL', 0, '', 0, '', '', 1420877470, 1420877470, 1, '0:Lv1 实习\r\n50:Lv2 试用\r\n100:Lv3 转正\r\n200:Lv4 助理\r\n400:Lv 5 经理\r\n800:Lv6 董事\r\n1600:Lv7 董事长', 0),
-(85, '_EXPRESSION_EXPRESSION', 0, '', 0, '', '', 1417150390, 1417150390, 1, 'miniblog', 0),
-(86, 'DEFUALT_HOME_URL', 1, '默认首页Url', 1, '', '支持形如weibo/index/index的ThinkPhp路由写法，支持普通的url写法，不填则显示默认聚合首页', 1417509438, 1417509501, 1, '', 0),
-(121, '_USERCONFIG_REG_SWITCH', 0, '', 0, '', '', 1423536341, 1423536341, 1, 'username,email,mobile', 0),
-(122, '_USERCONFIG_EMAIL_VERIFY_TYPE', 0, '', 0, '', '', 1423536341, 1423536341, 1, '0', 0),
-(123, '_USERCONFIG_REG_STEP', 0, '', 0, '', '', 1423536341, 1423536341, 1, 'change_avatar', 0),
-(124, '_USERCONFIG_REG_EMAIL_VERIFY', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
-(125, '_USERCONFIG_PARSE', 0, '', 0, '', '', 1423536341, 1423536341, 1, '0', 0),
-(126, '_USERCONFIG_REG_EMAIL_ACTIVATE', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
-(127, '_USERCONFIG_SMS_HTTP', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
-(128, '_USERCONFIG_SMS_UID', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
-(129, '_USERCONFIG_SMS_PWD', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0),
-(130, '_USERCONFIG_SMS_CONTENT', 0, '', 0, '', '', 1423536341, 1423536341, 1, '', 0);
+(86, 'DEFUALT_HOME_URL', 1, '默认首页Url', 1, '', '支持形如weibo/index/index的ThinkPhp路由写法，支持普通的url写法，不填则显示默认聚合首页', 1417509438, 1417509501, 1, '', 0);
 
 
 
@@ -736,7 +720,6 @@ CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `sex` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '性别',
   `birthday` date NOT NULL DEFAULT '0000-00-00' COMMENT '生日',
   `qq` char(10) NOT NULL DEFAULT '' COMMENT 'qq号',
-  `score` mediumint(8) NOT NULL DEFAULT '0' COMMENT '用户积分',
   `login` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '登录次数',
   `reg_ip` bigint(20) NOT NULL DEFAULT '0' COMMENT '注册IP',
   `reg_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '注册时间',
@@ -744,7 +727,6 @@ CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `last_login_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最后登录时间',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '会员状态',
   `signature` text NOT NULL,
-  `tox_money` int(11) NOT NULL,
   `pos_province` int(11) NOT NULL,
   `pos_city` int(11) NOT NULL,
   `pos_district` int(11) NOT NULL,
@@ -759,8 +741,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_member` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会员表' AUTO_INCREMENT=100 ;
 
 
-
-
+DROP TABLE  IF EXISTS `ocenter_menu`;
 CREATE TABLE IF NOT EXISTS `ocenter_menu` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '文档ID',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
@@ -866,7 +847,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (132, '规则管理', 68, 0, 'SEO/index', 0, '', 'SEO规则', 0, ''),
 (146, '规则回收站', 68, 0, 'SEO/ruleTrash', 0, '', 'SEO规则', 0, ''),
 (147, '头衔列表', 16, 10, 'Rank/index', 0, '', '头衔管理', 0, ''),
-(149, '添加头衔', 16, 2, 'Rank/editRank', 0, '', '头衔管理', 0, ''),
+(149, '添加头衔', 16, 2, 'Rank/editRank', 1, '', '头衔管理', 0, ''),
 (150, '查看用户', 16, 0, 'Rank/userList', 0, '', '头衔管理', 0, ''),
 (151, '用户头衔列表', 150, 0, 'Rank/userRankList', 1, '', '', 0, ''),
 (152, '关联新头衔', 150, 0, 'Rank/userAddRank', 1, '', '', 0, ''),
@@ -1173,11 +1154,17 @@ CREATE TABLE IF NOT EXISTS `ocenter_verify` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
+DROP TABLE  IF EXISTS `ocenter_ucenter_score_type`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_score_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
   `status` tinyint(4) NOT NULL,
   `unit` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+
+INSERT INTO `ocenter_ucenter_score_type` (`id`, `title`, `status`, `unit`) VALUES
+(1, '积分', 1, '分'),
+(2, '威望', 1, '点'),
+(3, '贡献', 1, '元'),
+(4, '余额', 1, '点');

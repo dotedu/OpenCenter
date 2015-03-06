@@ -36,12 +36,24 @@ class Mysql{
         return mysql_fetch_array($query, $result_type);
     }
 
-
+    /**
+     * getOne  获取单条记录
+     * @param $sql
+     * @return array
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
     function getOne($sql) {
         $query = $this->query($sql);
         return $this->fetch_array($query);
     }
 
+    /**
+     * getAll  获取多条记录
+     * @param $sql
+     * @param string $id
+     * @return array
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
     function getAll($sql, $id = '') {
         $arr = array();
         $query = $this->query($sql);

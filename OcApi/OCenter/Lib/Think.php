@@ -10,9 +10,15 @@
 class Think {
     var $_key =null;
 
-    function think($key) {
+    function __construct($key) {
         $this->_key = $key;
     }
+
+    /**
+     * 系统非常规MD5加密方法
+     * @param  string $str 要加密的字符串
+     * @return string
+     */
 
     function think_ucenter_md5($str, $key = '')
     {
