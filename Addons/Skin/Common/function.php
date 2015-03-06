@@ -58,7 +58,7 @@ function getSkinInfoList($skinList){
  * @author 郑钟良<zzl@ourstu.com>
  */
 function getAddonConfig(){
-    $map['name']    =   THIS_ADDON_NAME;
+    $map['name']    =   ADDON_NAME;
     $map['status']  =   1;
     $config  =   M('Addons')->where($map)->getField('config');
     $config=json_decode($config,true);
@@ -72,7 +72,7 @@ function getAddonConfig(){
  */
 function getUserConfig()
 {
-    $map=getUserConfigMap(USER_CONFIG_MARK.skin,USER_CONFIG_MARK.model,get_login_role());
+    $map=getUserConfigMap(USER_CONFIG_MARK_NAME,USER_CONFIG_MARK_MODEL,get_login_role());
     $UserConfig  =   M('UserConfig')->where($map)->getField('value');
     if(!$UserConfig){
         $UserConfig=getAddonConfig();

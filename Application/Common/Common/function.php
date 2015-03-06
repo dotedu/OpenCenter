@@ -34,13 +34,13 @@ function is_login()
 
 /**
  * 获取当前用户登录的角色的标识(角色功能完成后修改)
- * @return string
+ * @return int 角色id
  * @author 郑钟良<zzl@ourstu.com>
  */
 function get_login_role()
 {
     //todo 获取当前用户登录的角色的标识
-    return '';
+    return 0;
 }
 
 /**

@@ -8,9 +8,7 @@
  */
 
 
-define('THIS_ADDON_NAME','Skin');
+define('ADDON_NAME','Skin');
 define('SKIN_PATH',ONETHINK_ADDON_PATH.'Skin/');
-define('USER_CONFIG_MARK',array(
-    'name'=>'skin',
-    'model'=>'Addon_Skin'
-));
+define('USER_CONFIG_MARK_NAME','skin');
+define('USER_CONFIG_MARK_MODEL','Addon_Skin');
