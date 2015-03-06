@@ -46,7 +46,7 @@ class IndexController extends AdminController
                     $day = $today - $i * 86400;
                     $day_after = $today - ($i - 1) * 86400;
                     $week[] = date('m月d日', $day);
-                    $user = M('UcenterMember')->where('status=1 and reg_time >=' . $day . ' and reg_time < ' . $day_after)->count() * 1;
+                    $user = UCenterMember()->where('status=1 and reg_time >=' . $day . ' and reg_time < ' . $day_after)->count() * 1;
                     $registeredMemeberCount[] = $user;
                     if ($i == 0) {
                         $count['today_user'] = $user;
@@ -54,7 +54,7 @@ class IndexController extends AdminController
                 }
                 $week = json_encode($week);
                 $this->assign('week', $week);
-                $count['total_user'] = $userCount = M('UcenterMember')->where(array('status' => 1))->count();
+                $count['total_user'] = $userCount = UCenterMember()->where(array('status' => 1))->count();
                 $count['today_action_log'] = M('ActionLog')->where('status=1 and create_time>=' . $today)->count();
                 $count['last_day']['days'] = $week;
                 $count['last_day']['data'] = json_encode($registeredMemeberCount);

@@ -19,8 +19,11 @@ class Base {
     var $appid;
     function __construct() {
         $db_config =  require(OC_ROOT. '../oc_config.php');
-        $this->db = new Mysql($db_config['SSO_DB_NAME'],$db_config['SSO_DB_HOST'],$db_config['SSO_DB_USER'],$db_config['SSO_DB_PWD']);
+        if(!$db_config['SSO_SWITCH']){
+            return -1;
+        }
 
+        $this->db = new Mysql($db_config['SSO_DB_NAME'],$db_config['SSO_DB_HOST'],$db_config['SSO_DB_USER'],$db_config['SSO_DB_PWD']);
         $this->AUTH_KEY= $db_config['SSO_DATA_AUTH_KEY'];
         $this->tablePre = $db_config['SSO_DB_PREFIX'];
         $this->session_pre = $db_config['OC_SESSION_PRE'];
@@ -29,7 +32,15 @@ class Base {
     }
 
 
-
+    /**
+     * check_username   验证用户名类型
+     * @param $username
+     * @param $email
+     * @param $mobile
+     * @param int $type
+     * @return bool
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
     function check_username(&$username, &$email, &$mobile, &$type = 0)
     {
 

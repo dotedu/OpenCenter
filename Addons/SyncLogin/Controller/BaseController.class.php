@@ -226,7 +226,7 @@ class BaseController extends AddonsController
         $token =session('SYNCLOGIN_TOKEN');
         $user_info = D('Addons://SyncLogin/Info')->$type($token);
         if ($info1 = D('sync_login')->where("`type_uid`='" . $openid . "' AND type='" . $type . "'")->find()) {
-            $user = D('UcenterMember')->where("id=" . $info1 ['uid'])->find();
+            $user = UCenterMember()->where("id=" . $info1 ['uid'])->find();
             if (empty ($user)) {
                 D('sync_login')->where("type_uid=" . $openid . " AND type='" . $type . "'")->delete();
                 //已经绑定过，执行登录操作，设置token

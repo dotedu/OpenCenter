@@ -54,7 +54,7 @@ function query_user($fields = null, $uid = null)
 
     //获取两张用户表格中的所有字段
     $homeModel = M('Member');
-    $ucenterModel = M('UcenterMember');
+    $ucenterModel = UCenterMember();
     $homeFields = $homeModel->getDbFields();
     $ucenterFields = $ucenterModel->getDbFields();
 
@@ -71,7 +71,7 @@ function query_user($fields = null, $uid = null)
         $homeResult = D('Home/Member')->where(array('uid' => $uid))->field($homeFields)->find();
     }
     if ($ucenterFields) {
-        $model = D('User/UcenterMember');
+        $model = UCenterMember();
         $ucenterResult = $model->where(array('id' => $uid))->field($ucenterFields)->find();
     }
 

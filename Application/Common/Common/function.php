@@ -1528,3 +1528,8 @@ function get_data_field_id($map = null ,$field = null,$table = null,$yesnoid = '
         return $list;
         }
 }
+
+
+function UCenterMember(){
+    return D('User/UcenterMember');
+}

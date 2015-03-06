@@ -88,7 +88,7 @@ class AuthorizeController extends AdminController
         $requester = new requester($url);
         $requester->charset = "utf-8";
         $requester->content_type = 'application/x-www-form-urlencoded';
-        $requester->data = "username=xzg&passwd=xzg";
+        $requester->data = "";
         $requester->enableCookie = true;
         $requester->enableHeaderOutput = false;
         $requester->method = "post";

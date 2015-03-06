@@ -31,7 +31,7 @@ class ContentHandlerModel {
                 $first=false;
                 continue;
             }
-            //$user = D('User/UcenterMember')->find($uid);
+            //$user = UCenterMember()->find($uid);
             $title = $sender['nickname'] . '@了您';
             $message = '评论内容：' . mb_substr(op_t( $content),0,50,'utf-8');
             if($url==''){//如果未设置来源的url，则自动跳转到来源页面

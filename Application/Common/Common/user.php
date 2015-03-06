@@ -132,7 +132,7 @@ function check_step($now_step=''){
  */
 function set_user_status($uid,$status){
     D('Member')->where(array('uid'=>$uid))->setField('status',$status);
-    D('User/UcenterMember')->where(array('id'=>$uid))->setField('status',$status);
+    UCenterMember()->where(array('id'=>$uid))->setField('status',$status);
     return true;
 }
 

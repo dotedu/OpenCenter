@@ -41,7 +41,7 @@ class IndexController extends HomeController
 
 
     public function test(){
-        $a = D('User/UcenterMember')->info(1);
+        $a = UCenterMember()->info(1);
         dump(UC_AUTH_KEY);
         dump($a);
         exit;

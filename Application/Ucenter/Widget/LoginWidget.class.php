@@ -50,7 +50,7 @@ class LoginWidget extends Action
             $res['info']="该类型未开放登录。";
         }
 
-        $uid = D('User/UcenterMember')->login($username, $aPassword, $aUnType);
+        $uid = UCenterMember()->login($username, $aPassword, $aUnType);
         if (0 < $uid) { //UC登录成功
             /* 登录用户 */
             $Member = D('Member');

@@ -10,81 +10,103 @@
 
 error_reporting(0);
 set_magic_quotes_runtime(0);
-$db_config =  require( './oc_config.php');
+$db_config = require('./oc_config.php');
 
 require_once('./ocenter/Lib/Think.php');
 
-if($db_config['SSO_SWITCH'] ==0){
+if ($db_config['SSO_SWITCH'] == 0) {
     exit('该应用未开启单点登录');
 }
 $think = new think($db_config['SSO_DATA_AUTH_KEY']);
 $code = @$_GET['code'];
 parse_str($think->think_decrypt($code), $get);
 
-if(in_array($get['action'], array('test','synLogin', 'synLogout'))) {
+$timestamp = time();
+if($timestamp - $get['time'] > 3600) {
+    exit('timeout');
+}
+if(empty($get)) {
+    exit('parameter error');
+}
+
+if (in_array($get['action'], array('test', 'synLogin', 'synLogout'))) {
     $node = new oc_node();
     exit($node->$get['action']($get));
 } else {
     exit('error');
 }
 
-
-
-class oc_node{
+class oc_node
+{
     var $db;
-    var $tablePre ;
-    var $dirpath ;
-    var $thisConfig ;
-    function oc_node(){
+    var $tablePre;
+    var $dirpath;
+    var $thisConfig;
+
+    function oc_node()
+    {
         $this->dirpath = substr(dirname(__FILE__), 0, -5);
-        require_once( $this->dirpath.'OcApi/OCenter/Lib/Mysql.php');
+        require_once($this->dirpath . 'OcApi/OCenter/Lib/Mysql.php');
 
-        $this->thisConfig = require_once $this->dirpath.'/Conf/common.php';
-        $this->db = new Mysql($this->thisConfig ['DB_NAME'],$this->thisConfig ['DB_HOST'],$this->thisConfig ['DB_USER'],$this->thisConfig ['DB_PWD']);
+        $this->thisConfig = require_once $this->dirpath . '/Conf/common.php';
+        $this->db = new Mysql($this->thisConfig ['DB_NAME'], $this->thisConfig ['DB_HOST'], $this->thisConfig ['DB_USER'], $this->thisConfig ['DB_PWD']);
         $this->tablePre = $this->thisConfig ['DB_PREFIX'];
-
-
     }
 
-    function test() {
+    function test()
+    {
         return 'success';
     }
 
-
-    function synLogin($get) {
+    /**
+     * synLogin  同步登陆
+     * @param $get
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    function synLogin($get)
+    {
         $uid = $get['uid'];
+        $username = $get['username'];
+        $password = $get['password'];
         header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
         session_start();
-
-
-        $check_user = $this->db->getOne("SELECT * FROM `".$this->tablePre."member` WHERE uid=".$uid);
-        if($check_user){
-            require_once  ($this->dirpath.'OcApi/OCenter/OCenter.php');
+        $check_user = $this->db->getOne("SELECT * FROM `" . $this->tablePre . "member` WHERE uid=" . $uid);
+        if ($check_user) {
+            require_once($this->dirpath . 'OcApi/OCenter/OCenter.php');
             $OCApi = new OCApi();
-            $user = $OCApi->oc_get_user_info('uid='.$uid);
-
-            $auth = array(
-                'uid' => $user['uid'],
-                'username' => $user['username'],
-                'last_login_time' => $user['last_login_time'],
-            );
-
-            $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth']=$auth;
-            $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign']=data_auth_sign($auth);
+            $user = $OCApi->oc_get_user_info("id=" . $uid . " AND password='" . $password . "'");
+            //验证用户
+            if ($user) {
+                $auth = array(
+                    'uid' => $user['uid'],
+                    'username' => $user['username'],
+                    'last_login_time' => $user['last_login_time'],
+                );
+                $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth'] = $auth;
+                $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign'] = data_auth_sign($auth);
+            }
         }
-
-
     }
 
-    function synLogout($get) {
+    /**
+     * synLogout  同步登出
+     * @param $get
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    function synLogout($get)
+    {
         header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
         session_start();
-        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth']=null;
-        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign']=null;
+        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth'] = null;
+        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign'] = null;
     }
-
 }
-
+/**
+ * 数据签名认证
+ * @param  array $data 被认证的数据
+ * @return string       签名
+ * @author 麦当苗儿 <zuojiazi@vip.qq.com>
+ */
 function data_auth_sign($data)
 {
     //数据类型检测

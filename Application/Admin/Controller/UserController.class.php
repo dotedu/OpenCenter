@@ -54,7 +54,7 @@ class UserController extends AdminController
             if ($aAll) {//设置全部用户
                 $prefix = C('DB_PREFIX');
                 D('')->execute("TRUNCATE TABLE {$prefix}auth_group_access");
-                $aUids = M('UcenterMember')->getField('id', true);
+                $aUids = UCenterMember()->getField('id', true);
 
             } else {
                 M('AuthGroupAccess')->where(array('uid' => array('in', implode(',', $aUids))))->delete();;
@@ -574,7 +574,7 @@ class UserController extends AdminController
         if ($res['status']) {
             $this->success('修改密码成功！');
         } else {
-            $this->error(D('User/UcenterMember')->getErrorMessage($res['info']));
+            $this->error(UCenterMember()->getErrorMessage($res['info']));
         }
     }
 
