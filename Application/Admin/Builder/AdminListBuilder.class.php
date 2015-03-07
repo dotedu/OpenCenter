@@ -155,7 +155,6 @@ class AdminListBuilder extends AdminBuilder
     }
 
     /**彻底删除回收站
-     * @param null $model 要清空回收站的模型
      * @param null $url
      * @return $this
      * @author 陈一枭 -> 郑钟良<zzl@ourstu.com>
