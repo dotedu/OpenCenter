@@ -69,7 +69,7 @@ class SkinAddon extends Addon
         } else { //执行用户设置样式
             // 载入换肤插件用户样式
             $userSkin = getUserConfig();
-            echo '<link href="' . $SkinsUrl . $userSkin . '/style.css" rel="stylesheet" type="text/css"/>';
+            echo '<link href="' . $SkinsUrl . $userSkin['skin'] . '/style.css" rel="stylesheet" type="text/css"/>';
         }
     }
 }
