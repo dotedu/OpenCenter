@@ -80,12 +80,13 @@ function getUserConfig()
     if(!$UserConfig){
         $map=getUserConfigMap(USER_CONFIG_MARK_NAME,USER_CONFIG_MARK_MODEL,get_login_role());
         $skin  =   M('UserConfig')->where($map)->getField('value');
-        if(!$UserConfig){
+        if(!$skin){
             $UserConfig=getAddonConfig();
             $UserConfig['skin']=$UserConfig['defaultSkin'];
         }else{
             $UserConfig['skin']=$skin;
         }
+        S('SKIN_USER_CONFIG_'.is_login(),$UserConfig,600);
     }
     return $UserConfig;
 }
