@@ -18,11 +18,10 @@ class AdminConfigBuilder extends AdminBuilder
     private $_savePostUrl = array();
     private $_group = array();
     private $_callback = null;
-
     public function title($title)
     {
         $this->_title = $title;
-        $this->meta_title = $title;
+        $this->meta_title=$title;
         return $this;
     }
 
@@ -32,19 +31,17 @@ class AdminConfigBuilder extends AdminBuilder
      * @return $this
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    public function suggest($suggest)
-    {
+    public function suggest($suggest){
         $this->_suggest = $suggest;
         return $this;
     }
 
-    public function callback($callback)
-    {
+    public function callback($callback){
         $this->_callback = $callback;
         return $this;
     }
 
-    /**键，一般用于内部调用
+   /**键，一般用于内部调用
      * @param      $name
      * @param      $title
      * @param null $subtitle
@@ -163,8 +160,7 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->keyTime($name, $title, $subtitle);
     }
 
-    public function keyKanban($name, $title, $subtitle = null)
-    {
+    public function keyKanban($name, $title, $subtitle=null){
 
         return $this->key($name, $title, $subtitle, 'kanban');
     }
@@ -190,9 +186,9 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->key($name, $title, $subtitle, 'singleImage');
     }
 
-    public function keyMultiImage($name, $title, $subtitle = null, $limit = '')
+    public function keyMultiImage($name, $title, $subtitle = null,$limit='')
     {
-        return $this->key($name, $title, $subtitle, 'multiImage', $limit);
+         return $this->key($name, $title, $subtitle, 'multiImage',$limit);
     }
 
     public function keySingleUserGroup($name, $title, $subtitle = null)
@@ -207,46 +203,29 @@ class AdminConfigBuilder extends AdminBuilder
      * @param  $subtitle
      * @return hook ChinaCity
      * @author LaoYang
+     * @author @MingYangliu <xint5288@126.com>
      */
-    public function keyCity($title, $subtitle)
+    public function keyCity($title,$subtitle)
     {
         //修正在编辑信息时无法正常显示已经保存的地区信息
-        return $this->key(array('province', 'city', 'district'), $title, $subtitle, 'city');
+        return $this->key(array('province','city','district'), $title, $subtitle, 'city');
     }
+
 
     /**
-     * keyChosen  多选菜单
-     * @param $name
-     * @param $title
-     * @param null $subtitle
-     * @param $options
+     * 增加数据时通过列表页选择相应的关联数据ID  -_-。sorry！表述不清楚..
+     * @param  unknown $name     字段名
+     * @param  unknown $title    标题
+     * @param  string  $subtitle 副标题（说明）
+     * @param  unknown $url      选择数据的列表页地址，U方法地址'index/index'
      * @return $this
-     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     * @author @MingYangliu <xint5288@126.com>
      */
-    public function keyChosen($name, $title, $subtitle = null, $options)
+    public function keyDataSelect($name, $title, $subtitle = null, $url)
     {
-        // 解析option数组
-        if (key($options) === 0) {
-            if (!is_array($options[0])) {
-                foreach ($options as $key => &$val) {
-                    $val = array($val, $val);
-                }
-                unset($key, $val);
-            }
-        }else{
-            foreach($options as $key=>&$val){
-               foreach($val as $k=>&$v){
-                   if(!is_array($v)){
-                       $v = array($v, $v);
-                   }
-                }
-                unset($k, $v);
-            }
-            unset($key, $val);
-        }
-        return $this->key($name, $title, $subtitle, 'chosen', $options);
+        $urls = U($url,array('inputid'=>$name));
+        return $this->key($name, $title, $subtitle, 'dataselect', $urls);
     }
-
 
     public function button($title, $attr = array())
     {
@@ -295,10 +274,10 @@ class AdminConfigBuilder extends AdminBuilder
         //将数据融入到key中
         foreach ($this->_keyList as &$e) {
             //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
-            if (is_array($e['name'])) {
-                $i = 0;
+            if(is_array($e['name'])){
+                $i=0;
                 $n = count($e['name']);
-                while ($n > 0) {
+                while ($n>0) {
                     $e['value'][$i] = $this->_data[$e['name'][$i]];
                     $i++;
                     $n--;
@@ -325,6 +304,38 @@ class AdminConfigBuilder extends AdminBuilder
         parent::display('admin_config');
     }
 
+    /**
+     * keyChosen  多选菜单
+     * @param $name
+     * @param $title
+     * @param null $subtitle
+     * @param $options
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function keyChosen($name, $title, $subtitle = null, $options)
+    {
+        // 解析option数组
+        if (key($options) === 0) {
+            if (!is_array($options[0])) {
+                foreach ($options as $key => &$val) {
+                    $val = array($val, $val);
+                }
+                unset($key, $val);
+            }
+        }else{
+            foreach($options as $key=>&$val){
+                foreach($val as $k=>&$v){
+                    if(!is_array($v)){
+                        $v = array($v, $v);
+                    }
+                }
+                unset($k, $v);
+            }
+            unset($key, $val);
+        }
+        return $this->key($name, $title, $subtitle, 'chosen', $options);
+    }
 
     /**插入配置分组
      * @param       $name 组名
@@ -332,17 +343,15 @@ class AdminConfigBuilder extends AdminBuilder
      * @return $this
      * @auth 肖骏涛
      */
-    public function group($name, $list = array())
-    {
-        !is_array($list) && $list = explode(',', $list);
+    public function group($name,$list = array()){
+        !is_array($list) && $list = explode(',',$list);
         $this->_group[$name] = $list;
         return $this;
     }
 
-    public function groups($list = array())
-    {
-        foreach ($list as $key => $v) {
-            $this->_group[$key] = is_array($v) ? $v : explode(',', $v);
+    public function groups($list = array()){
+        foreach($list as $key =>$v){
+            $this->_group[$key] =  is_array($v) ? $v :explode(',',$v);
         }
         return $this;
     }
@@ -369,13 +378,13 @@ class AdminConfigBuilder extends AdminBuilder
                 $config['value'] = $v;
                 $config['sort'] = 0;
                 if ($configModel->add($config, null, true)) {
-                    $success = 1;
+                        $success = 1;
                 }
                 $tag = 'conf_' . strtoupper(CONTROLLER_NAME) . '_' . strtoupper($k);
                 S($tag, null);
             }
             if ($success) {
-                if ($this->_callback) {
+                if($this->_callback){
                     $str = $this->_callback;
                     A(CONTROLLER_NAME)->$str(I(''));
                 }
@@ -416,19 +425,18 @@ class AdminConfigBuilder extends AdminBuilder
      * @return array|mixed
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    public function parseKanbanArray($data, $item = array(), $default = array())
-    {
+    public function parseKanbanArray($data,$item=array(),$default=array()){
 
         if (empty($data)) {
             $head = reset($default);
-            if (!array_key_exists("items", $head)) {
-                $temp = array();
-                foreach ($default as $k => $v) {
-                    $temp[] = array('data-id' => $k, 'title' => $k, 'items' => $v);
+            if(!array_key_exists("items",$head)){
+                $temp=array();
+                foreach($default as $k=>$v){
+                    $temp[] = array('data-id'=>$k,'title'=>$k,'items'=>$v);
                 }
                 $default = $temp;
             }
-            $data = $default;
+            $data =$default;
         } else {
             $data = json_decode($data, true);
             $all = array();

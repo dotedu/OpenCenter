@@ -1,12 +1,14 @@
 var root=_ROOT_;
+var DefaultSkinHref;
 $(function(){
+    DefaultSkinHref=$('[data-role="skin_link"]').attr('href');
     $('[data-role="SkinPreview"]').find('[data-role="colorBox"]').mouseenter(function(){
         $(this).find('[data-role="skin_title"]').animate({bottom:'0px'});
     }).mouseleave(function(){
         $(this).find('[data-role="skin_title"]').animate({bottom:'-27px'});
     });
     $('[data-role="USelectSkin"]').click(function(){
-        $('[data-role="skin_css_block"]').html('');
+        $('[data-role="skin_link"]').attr('href',DefaultSkinHref);
         $('[data-dismiss="modal"]').click();
     });
     $('[data-role="SelectSkin"]').click(function(){
@@ -26,8 +28,8 @@ $(function(){
         $.post(url,{set_default:1},function(msg){
             if(msg.status){
                 $('[data-dismiss="modal"]').click();
-                $('[data-role="skin_css_block"]').html('');
-                $('[data-role="skin_css_block"]').append('<link type="text/css" rel="stylesheet" href="'+root+'/Addons/Skin/Skins/'+msg.defaultSkin+'/style.css"/> ');
+                var href=root+'/Addons/Skin/Skins/'+msg.defaultSkin+'/style.css';
+                $('[data-role="skin_link"]').attr('href',href);
                 toast.success(msg.info);
             }else{
                 handleAjax(msg);
@@ -46,7 +48,7 @@ var fChange = function (key, obj) {
     $('#style_list').find('[data-role="colorBox"]').removeClass('current');
     $(obj).addClass('current');
     $('#default').val(key);
-    $('[data-role="skin_css_block"]').html('');
-    $('[data-role="skin_css_block"]').append('<link type="text/css" rel="stylesheet" href="'+root+'/Addons/Skin/Skins/'+key+'/style.css"/> ');
+    var href=root+'/Addons/Skin/Skins/'+key+'/style.css';
+    $('[data-role="skin_link"]').attr('href',href);
     return false;
 }

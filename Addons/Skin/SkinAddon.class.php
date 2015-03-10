@@ -65,11 +65,11 @@ class SkinAddon extends Addon
         $config = getAddonConfig();
         if ($config['canSet'] == 0||$config['mandatory'] == 1) { //强制执行管理员设置的默认皮肤
             // 载入换肤插件默认样式
-            echo '<link href="' . $SkinsUrl . $config['defaultSkin'] . '/style.css" rel="stylesheet" type="text/css"/>';
+            echo '<link href="' . $SkinsUrl . $config['defaultSkin'] . '/style.css" data-role="skin_link" rel="stylesheet" type="text/css"/>';
         } else { //执行用户设置样式
             // 载入换肤插件用户样式
             $userSkin = getUserConfig();
-            echo '<link href="' . $SkinsUrl . $userSkin . '/style.css" rel="stylesheet" type="text/css"/>';
+            echo '<link href="' . $SkinsUrl . $userSkin['skin'] . '/style.css" data-role="skin_link" rel="stylesheet" type="text/css"/>';
         }
     }
 }
