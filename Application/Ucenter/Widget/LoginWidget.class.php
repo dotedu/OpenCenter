@@ -73,7 +73,7 @@ class LoginWidget extends Action
                 if ($oc_config['SSO_SWITCH']) {
                     include_once  './OcApi/OCenter/OCenter.php';
                     $OCApi = new \OCApi();
-                    $html = $OCApi->oc_syn_login($uid);
+                    $html = $OCApi->ocSynLogin($uid);
                 }
 
                 $res['status']=1;

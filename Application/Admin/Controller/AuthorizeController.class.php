@@ -25,11 +25,14 @@ class AuthorizeController extends AdminController
         $admin_config->title('单点登录配置')
 
 
-            ->keyRadio('SSO_SWITCH', '单点登录开关', '单点登录的开关', array(0 => '关闭单点登录', 1 => '开启单点登录', 2 => '作为用户中心开启单点登录'))
+            ->keyRadio('SSO_SWITCH_USER_CENTER', '单点登录开关', '作为用户中心的单点登录开关，其他开关在登录配置里面设置', array(0 => '关闭单点登录', 1 => '作为用户中心开启单点登录'))
             ->keyTextArea('SSO_CONFIG', '单点登录配置', '单点登录配置文件中的配置（当开关为开启单点登录时有效，不包括作为用户中心开启单点登录）')
             ->keyLabel('SSO_UC_AUTH_KEY', '用户中心加密密钥', '系统已自动写入配置文件，如写入失败请手动复制。')
             ->keyLabel('SSO_UC_DB_DSN', '用户中心数据连接', '系统已自动写入配置文件，如写入失败请手动复制。')
             ->keyLabel('SSO_UC_TABLE_PREFIX', '用户中心表前缀', '系统已自动写入配置文件，如写入失败请手动复制。')
+
+        ->group('作为用户中心配置','SSO_SWITCH_USER_CENTER')
+        ->group('作为应用配置','SSO_CONFIG,SSO_UC_AUTH_KEY,SSO_UC_DB_DSN,SSO_UC_TABLE_PREFIX')
             ->buttonSubmit('', '保存')->data($data);
         $admin_config->display();
     }
@@ -105,7 +108,7 @@ class AuthorizeController extends AdminController
         $appList = $model->where($map)->order('id asc')->select();
 
         foreach ($appList as &$v) {
-            $url = $v['url'] . '/' . $v['path'] . '?code=' . urlencode(think_encrypt('action=test'));
+            $url = $v['url'] . '/' . $v['path'] . '?code=' . urlencode(think_encrypt('action=test&time='.time()));
             $arr = $this->check_link($url);
             $v['link_status'] = $v['status'] == 1 ? ($arr === 'success' ? '<span style="color:green">连接成功</span>' : '<span style="color:red">连接失败</span>') : '<span style="color:red">连接失败-已被禁用</span>';
         }
