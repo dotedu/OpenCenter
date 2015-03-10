@@ -27,8 +27,13 @@ class ActionLimitModel extends Model
     }
 
     public function getActionLimit($where){
-        $verify = $this->where($where)->find();
-        return $verify;
+        $limit = $this->where($where)->find();
+        return $limit;
+    }
+
+    public function getList($where){
+        $list = $this->where($where)->select();
+        return $list;
     }
 
 

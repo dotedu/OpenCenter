@@ -68,4 +68,15 @@ class ActionModel extends Model {
 
     }
 
+
+    public function getAction($map){
+        $result = $this->where($map)->select();
+        return $result;
+    }
+
+    public function getActionOpt(){
+        $result = $this->where(array('status'=>1))->field('name,title')->select();
+        return $result;
+    }
+
 }

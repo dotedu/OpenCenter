@@ -317,7 +317,7 @@ class AdminConfigBuilder extends AdminBuilder
     {
         // 解析option数组
         if (key($options) === 0) {
-            if (!is_array($options[0])) {
+            if (!is_array(reset($options))) {
                 foreach ($options as $key => &$val) {
                     $val = array($val, $val);
                 }
