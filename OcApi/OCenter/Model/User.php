@@ -14,6 +14,7 @@ require_once(OC_ROOT.'Model/base.php');
  * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
  */
 class User extends base{
+
     /**
      * doLogin  执行登录操作
      * @param $args
@@ -23,7 +24,7 @@ class User extends base{
     function doLogin($args){
         $username = $args['username'];
         $password = $args['password'];
-        $this->check_username($username, $email, $mobile, $type);
+        $this->checkUsername($username, $email, $mobile, $type);
 
         switch ($type) {
             case 1:
@@ -42,7 +43,7 @@ class User extends base{
                 return 0; //参数错误
         }
 
-        if($this->think->think_ucenter_md5($password) === $res['password']){
+        if($this->think->thinkUcenterMd5($password) === $res['password']){
             $time = time();
             $ip = get_client_ip(1);
             $uid= $res['id'];
@@ -65,7 +66,7 @@ class User extends base{
 
             session_start();
             $_SESSION[$this->session_pre]['user_auth']=$auth;
-            $_SESSION[$this->session_pre]['user_auth_sign']=$this->think->data_auth_sign($auth);
+            $_SESSION[$this->session_pre]['user_auth_sign']=$this->think->dataAuthSign($auth);
             //TODO 记住登陆待做
 
             return $uid;
@@ -102,7 +103,7 @@ class User extends base{
             foreach($appList as &$app) {
                 $app['config_data'] = unserialize($app['config']);
                 if($app['config_data']['SSO_SWITCH'] && $app['id'] != $this->appid) {
-                    $synstr .= '<script type="text/javascript" src="'.$app['url'].'/'.$app['path'].'?time='.$time.'&code='.urlencode($this->think->think_encrypt('action=synLogin&username='.$user['username'].'&uid='.$user['uid'].'&password='.$user['password']."&time=".$time)).'"></script>';
+                    $synstr .= '<script type="text/javascript" src="'.$app['url'].'/'.$app['path'].'?time='.$time.'&code='.urlencode($this->think->thinkEncrypt('action=synLogin&username='.$user['username'].'&uid='.$user['uid'].'&password='.$user['password']."&time=".$time)).'"></script>';
                 }
             }
             return $synstr;
@@ -120,7 +121,7 @@ class User extends base{
         foreach($appList as &$app) {
             $app['config_data'] = unserialize($app['config']);
             if($app['config_data']['SSO_SWITCH'] && $app['id'] != $this->appid) {
-                $synstr .= '<script type="text/javascript" src="'.$app['url'].'/'.$app['path'].'?time='.$time.'&code='.urlencode($this->think->think_encrypt('action=synLogout&time='.$time)).'"></script>';
+                $synstr .= '<script type="text/javascript" src="'.$app['url'].'/'.$app['path'].'?time='.$time.'&code='.urlencode($this->think->thinkEncrypt('action=synLogout&time='.$time)).'"></script>';
             }
         }
         return $synstr;

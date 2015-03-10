@@ -202,6 +202,7 @@ class AdminConfigBuilder extends AdminBuilder
      * @param  $title
      * @param  $subtitle
      * @return hook ChinaCity
+     * @author LaoYang
      * @author @MingYangliu <xint5288@126.com>
      */
     public function keyCity($title,$subtitle)
@@ -209,6 +210,7 @@ class AdminConfigBuilder extends AdminBuilder
         //修正在编辑信息时无法正常显示已经保存的地区信息
         return $this->key(array('province','city','district'), $title, $subtitle, 'city');
     }
+
 
     /**
      * 增加数据时通过列表页选择相应的关联数据ID  -_-。sorry！表述不清楚..
@@ -302,6 +304,38 @@ class AdminConfigBuilder extends AdminBuilder
         parent::display('admin_config');
     }
 
+    /**
+     * keyChosen  多选菜单
+     * @param $name
+     * @param $title
+     * @param null $subtitle
+     * @param $options
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function keyChosen($name, $title, $subtitle = null, $options)
+    {
+        // 解析option数组
+        if (key($options) === 0) {
+            if (!is_array($options[0])) {
+                foreach ($options as $key => &$val) {
+                    $val = array($val, $val);
+                }
+                unset($key, $val);
+            }
+        }else{
+            foreach($options as $key=>&$val){
+                foreach($val as $k=>&$v){
+                    if(!is_array($v)){
+                        $v = array($v, $v);
+                    }
+                }
+                unset($k, $v);
+            }
+            unset($key, $val);
+        }
+        return $this->key($name, $title, $subtitle, 'chosen', $options);
+    }
 
     /**插入配置分组
      * @param       $name 组名

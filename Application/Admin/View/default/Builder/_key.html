@@ -331,7 +331,37 @@
         </script>
 
     </case>
+<case value="chosen">
+    <select name="{$field.name}[]" style="width: 400px" class="chosen-select" multiple="multiple">
+        <php>
+            if( key($field['opt']) === 0){
+        </php>
+        <volist name="field['opt']" id="option">
+            <php>
+                $selected = in_array($option[0],$field['value'])? 'selected' : '';
+            </php>
+            <option value="{$option[0]}" {$selected}>{$option[1]|htmlspecialchars}</option>
+        </volist>
+        <php>
+            }else{
+            foreach($field['opt'] as $optgroupkey =>$optgroup){
+        </php>
+        <optgroup label="{$optgroupkey}">
+            <volist name="optgroup" id="option">
+                <php>
+                    $selected = in_array($option[0],$field['value'])? 'selected' : '';
+                </php>
+                <option value="{$option[0]}" {$selected}>{$option[1]|htmlspecialchars}</option>
+            </volist>
+        </optgroup>
+        <php>
+            }
+            }
+        </php>
+    </select>
 
+
+</case>
     <default/>
     <span style="color: #f00;">错误：未知字段类型 {$field.type}</span>
     <input type="hidden" name="{$field.name}" value="{$field.value|htmlspecialchars}"/>

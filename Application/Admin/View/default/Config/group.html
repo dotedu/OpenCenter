@@ -64,6 +64,69 @@
                                 <input type="password" class="text input-large form-control" style="width:400px;" name="config[{$config.name}]" autoComplete="off"
                                        value="{$config.value}">
                             </case>
+                            <case value="7">
+                                <script type="text/javascript" charset="utf-8" src="__PUBLIC__/js/ext/webuploader/js/webuploader.js"></script>
+                                <link href="__PUBLIC__/js/ext/webuploader/css/webuploader.css" type="text/css" rel="stylesheet">
+                                <div class="controls">
+                                    <div id="upload_single_image_{$config.name}" style="padding-bottom: 5px;">选择图片</div>
+                                    <input class="attach" type="hidden" name="config[{$config.name}]" value="{$config['value']}"/>
+                                    <div class="upload-img-box">
+                                        <div class="upload-pre-item popup-gallery">
+                                            <notempty name="config.value">
+                                                <div class="each">
+                                                    <a href="{$config.value|get_cover='path'}" title="点击查看大图">
+                                                        <img src="{$config.value|get_cover='path'}">
+                                                    </a>
+                                                    <div class="text-center opacity del_btn" ></div>
+                                                    <div onclick="admin_image.removeImage($(this),'{$config.value}')"  class="text-center del_btn">删除</div>
+                                                </div>
+                                            </notempty>
+                                        </div>
+                                    </div>
+                                </div>
+                                <script>
+                                    $(function () {
+                                        var uploader_{$config.name}= WebUploader.create({
+                                            // 选完文件后，是否自动上传。
+                                            auto: true,
+                                            // swf文件路径
+                                            swf: 'Uploader.swf',
+                                            // 文件接收服务端。
+                                            server: "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
+                                            // 选择文件的按钮。可选。
+                                            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                                            pick: '#upload_single_image_{$config.name}',
+                                            // 只允许选择图片文件。
+                                            accept: {
+                                                title: 'Images',
+                                                extensions: 'gif,jpg,jpeg,bmp,png',
+                                                mimeTypes: 'image/*'
+                                            }
+                                        });
+                                        uploader_{$config.name}.on('fileQueued', function (file) {
+                                            uploader_{$config.name}.upload();
+                                        });
+                                        /*上传成功*/
+                                        uploader_{$config.name}.on('uploadSuccess', function (file, data) {
+                                            if (data.status) {
+                                                $("[name='config[{$config.name}]']").val(data.id);
+                                                $("[name='config[{$config.name}]']").parent().find('.upload-pre-item').html(
+                                                        ' <div class="each"><a href="'+ data.path+'" title="点击查看大图"><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
+                                                                '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">删除</div></div>'
+                                                );
+                                                uploader_{$config.name}.reset();
+                                            } else {
+                                                updateAlert(data.info);
+                                                setTimeout(function () {
+                                                    $('#top-alert').find('button').click();
+                                                    $(that).removeClass('disabled').prop('disabled', false);
+                                                }, 1500);
+                                            }
+                                        });
+                                    })
+                                </script>
+
+                            </case>
                         </switch>
 
                     </div>

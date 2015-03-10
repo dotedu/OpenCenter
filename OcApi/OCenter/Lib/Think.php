@@ -20,7 +20,7 @@ class Think {
      * @return string
      */
 
-    function think_ucenter_md5($str, $key = '')
+    function thinkUcenterMd5($str, $key = '')
     {
         $key = empty($key) ? $this->_key : $key;
         return '' === $str ? '' : md5(sha1($str) . $key);
@@ -34,7 +34,7 @@ class Think {
      * @return string
      * @author 麦当苗儿 <zuojiazi@vip.qq.com>
      */
-    function think_encrypt($data, $key = '', $expire = 0)
+    function thinkEncrypt($data, $key = '', $expire = 0)
     {
         $key = md5(empty($key) ? $this->_key : $key);
         $data = base64_encode($data);
@@ -64,7 +64,7 @@ class Think {
      * @return string
      * @author 麦当苗儿 <zuojiazi@vip.qq.com>
      */
-    function think_decrypt($data, $key = '')
+    function thinkDecrypt($data, $key = '')
     {
         $key = md5(empty($key) ? $this->_key : $key);
         $data = str_replace(array('-', '_'), array('+', '/'), $data);
@@ -106,7 +106,7 @@ class Think {
      * @return string       签名
      * @author 麦当苗儿 <zuojiazi@vip.qq.com>
      */
-    function data_auth_sign($data)
+    function dataAuthSign($data)
     {
         //数据类型检测
         if (!is_array($data)) {

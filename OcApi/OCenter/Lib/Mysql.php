@@ -32,7 +32,7 @@ class Mysql{
         return $this->sql_id=mysql_query($sql);
     }
 
-    function fetch_array($query, $result_type = 1) {
+    function fetchArray($query, $result_type = 1) {
         return mysql_fetch_array($query, $result_type);
     }
 
@@ -44,7 +44,7 @@ class Mysql{
      */
     function getOne($sql) {
         $query = $this->query($sql);
-        return $this->fetch_array($query);
+        return $this->fetchArray($query);
     }
 
     /**
@@ -57,7 +57,7 @@ class Mysql{
     function getAll($sql, $id = '') {
         $arr = array();
         $query = $this->query($sql);
-        while($data = $this->fetch_array($query)) {
+        while($data = $this->fetchArray($query)) {
             $id ? $arr[$data[$id]] = $data : $arr[] = $data;
         }
         return $arr;
