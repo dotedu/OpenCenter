@@ -86,6 +86,7 @@ function getUserConfig()
         }else{
             $UserConfig['skin']=$skin;
         }
+        $UserConfig=S('SKIN_USER_CONFIG_'.is_login(),$UserConfig,600);
     }
     return $UserConfig;
 }
