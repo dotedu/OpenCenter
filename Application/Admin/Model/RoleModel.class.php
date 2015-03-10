@@ -22,11 +22,11 @@ class RoleModel extends Model
 
     protected $_validate = array(
         array('name', 'require', '标识不能为空。', self::EXISTS_VALIDATE, 'regex', self::MODEL_BOTH),
-        array('name', '', '角色标识已经存在。', self::VALUE_VALIDATE, 'unique', self::MODEL_BOTH,array('status'=>array('neq',-1))),
+        array('name', '', '角色标识已经存在。', self::VALUE_VALIDATE, 'unique', self::MODEL_BOTH),
         array('name', 'checkName', '角色标识只能由字母和下滑线组成。', self::VALUE_VALIDATE, 'callback', self::MODEL_BOTH),
 
         array('title', 'require', '角色名不能为空。', self::EXISTS_VALIDATE , 'regex', self::MODEL_BOTH),
-        array('title', '', '角色名已经存在。', self::VALUE_VALIDATE , 'unique', self::MODEL_BOTH,array('status'=>array('neq',-1))),
+        array('title', '', '角色名已经存在。', self::VALUE_VALIDATE , 'unique', self::MODEL_BOTH),
     );
 
     protected $_auto = array(

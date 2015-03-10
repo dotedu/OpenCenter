@@ -1,0 +1,104 @@
+<extend name="Public/base" />
+<block name="body">
+    <div class="main-title">
+        <h2>默认资料配置</h2>
+    </div>
+    <div class="tab-wrap with-padding">
+
+        <div class="clearfix">
+            <div class="col-xs-10">
+                <ul class="nav nav-secondary">
+                    <li class="active"><a href="javascript:;">用户积分配置</a></li>
+                    <li><a href="{:U('Role/configAuth',array('id'=>$this_role['id']))}">用户默认头像配置</a></li>
+
+                </ul>
+            </div>
+            <div class="col-xs-2 text-right">
+                <select name="role" class="form-control">
+                    <volist name="auth_role" id="vo">
+                        <option value="{:U('Role/config',array('id'=>$vo['id'],'type'=>1))}" <eq name="vo['id']" value="$this_rle['id']">selected</eq> >{$vo.title}</option>
+                    </volist>
+                </select>
+            </div>
+        </div>
+        <div class="node-list">
+            <!-- 访问授权 -->
+            <div class="tab-pane in">
+                <form action="__SELF__" enctype="application/x-www-form-urlencoded" method="POST" class="form-horizontal auth-form">
+                    <volist name="score_keys" id="score">
+                        <label class="item-label">{$score.title|htmlspecialchars}<span>（单位：{$score.unit|htmlspecialchars}）</span></label>
+                        <div class="controls ">
+                            <input type="text" name="score{$key}" value="{$score.value}" class="text input-large form-control"style="width: 400px"/>
+                        </div>
+                    </volist>
+                    <input type="hidden" name="type" value="1" />
+                    <input type="hidden" name="id" value="{$this_role.id}" />
+                    <div style="margin-top: 20px;"></div>
+                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                </form>
+            </div>
+
+            <!-- 成员授权 -->
+            <div class="tab-pane"></div>
+
+            <!-- 分类 -->
+            <div class="tab-pane"></div>
+        </div>
+    </div>
+
+</block>
+<block name="script">
+    <script type="text/javascript" src="__STATIC__/qtip/jquery.qtip.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/qtip/jquery.qtip.min.css" media="all">
+    <script type="text/javascript" charset="utf-8">
+        +function($){
+            var rules = [{$this_role.rules}];
+        $('.auth_rules').each(function(){
+            if( $.inArray( parseInt(this.value,10),rules )>-1 ){
+                $(this).prop('checked',true);
+            }
+            if(this.value==''){
+                $(this).closest('span').remove();
+            }
+        });
+
+        //全选节点
+        $('.rules_all').on('change',function(){
+            $(this).closest('dl').find('dd').find('input').prop('checked',this.checked);
+        });
+        $('.rules_row').on('change',function(){
+            $(this).closest('.rule_check').find('.child_row').find('input').prop('checked',this.checked);
+        });
+
+        $('.checkbox').each(function(){
+            $(this).qtip({
+                content: {
+                    text: $(this).attr('title'),
+                    title: $(this).text()
+                },
+                position: {
+                    my: 'bottom center',
+                    at: 'top center',
+                    target: $(this)
+                },
+                style: {
+                    classes: 'qtip-dark',
+                    tip: {
+                        corner: true,
+                        mimic: false,
+                        width: 10,
+                        height: 10
+                    }
+                }
+            });
+        });
+
+        $('select[name=group]').change(function(){
+            location.href = this.value;
+        });
+        //导航高亮
+        highlight_subnav('{:U('Role/configauth')}');
+        }(jQuery);
+    </script>
+</block>

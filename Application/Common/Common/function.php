@@ -64,6 +64,29 @@ function getUserConfigMap($name='',$model='',$role_id=0,$uid=0){
     return $map;
 }
 
+/**
+ * 获取角色配置表 D('RoleConfig')查询条件
+ * @param $type 类型
+ * @param int $role_id 角色id
+ * @return mixed 查询条件 $map
+ * @author 郑钟良<zzl@ourstu.com>
+ */
+function getRoleConfigMap($type,$role_id=0){
+    switch($type){
+        case 'rules':
+            $map['name']='rules';
+            $map['role_id']=$role_id;
+            break;
+        case 'score':
+            $map['name']='score';
+            $map['role_id']=$role_id;
+            break;
+        default:
+            $map['role_id']=$role_id;
+    }
+    return $map;
+}
+
 function get_uid()
 {
     return is_login();

@@ -77,7 +77,9 @@ $(function () {
                 return false;
             } else if (form.get(0).nodeName == 'FORM') {
                 if ($(this).hasClass('confirm')) {
-                    if (!confirm('确认要执行该操作吗?')) {
+                    var confirm_info = $(that).attr('confirm-info');
+                    confirm_info=confirm_info?confirm_info:"确认要执行该操作吗?";
+                    if (!confirm(confirm_info)) {
                         return false;
                     }
                 }
@@ -94,14 +96,18 @@ $(function () {
                     }
                 })
                 if (nead_confirm && $(this).hasClass('confirm')) {
-                    if (!confirm('确认要执行该操作吗?')) {
+                    var confirm_info = $(that).attr('confirm-info');
+                    confirm_info=confirm_info?confirm_info:"确认要执行该操作吗?";
+                    if (!confirm(confirm_info)) {
                         return false;
                     }
                 }
                 query = form.serialize();
             } else {
                 if ($(this).hasClass('confirm')) {
-                    if (!confirm('确认要执行该操作吗?')) {
+                    var confirm_info = $(that).attr('confirm-info');
+                    confirm_info=confirm_info?confirm_info:"确认要执行该操作吗?";
+                    if (!confirm(confirm_info)) {
                         return false;
                     }
                 }
