@@ -73,12 +73,19 @@ function getUserConfigMap($name='',$model='',$role_id=0,$uid=0){
  */
 function getRoleConfigMap($type,$role_id=0){
     switch($type){
-        case 'rules':
+        case 'rules'://权限
             $map['name']='rules';
+            $map['type']='';
             $map['role_id']=$role_id;
             break;
-        case 'score':
+        case 'score'://积分
             $map['name']='score';
+            $map['type']='';
+            $map['role_id']=$role_id;
+            break;
+        case 'avatar'://默认头像id
+            $map['name']='avatar';
+            $map['type']='';
             $map['role_id']=$role_id;
             break;
         default:

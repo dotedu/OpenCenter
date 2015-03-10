@@ -215,8 +215,11 @@ class RoleController extends AdminController
      */
     public function configAuth()
     {
+        $aRoleId=I('id',0,'intval');
+        if(!$aRoleId){
+            $this->error('请选择角色！');
+        }
         if(IS_POST){
-            $aRoleId=I('post.id',0,'intval');
             $aType=I('post.type',0,'intval');//权限设置类型：1为前台权限设置，0为后台权限设置
             if (isset($_POST['rules'])) {
                 sort($_POST['rules']);
@@ -224,18 +227,17 @@ class RoleController extends AdminController
             }
             $map=getRoleConfigMap('rules',$aRoleId);
             $oldRule = $this->roleConfigModel->where($map)->find();
-
             if($oldRule){
                 if($aType==1){//前台
                     $data['value'] = $this->getMergedRules($oldRule['value'], explode(',', $_POST['rules']), 'neq');
                 }else{//后台
                     $data['value'] = $this->getMergedRules($oldRule['value'], explode(',', $_POST['rules']), 'eq');
                 }
-                $data['update_time']=time();
-                $result=$this->roleConfigModel->where($map)->save($data);
+                $result=$this->roleConfigModel->saveData($map,$data);
             }else{
-                $data=$this->initRoleConfigData('rules',$aRoleId,$_POST['rules']);
-                $result=$this->roleConfigModel->add($data);
+                $data=$map;
+                $data['value']=$_POST['rules'];
+                $result=$this->roleConfigModel->addData($data);
             }
             if ($result === false) {
                 $this->error('操作失败' . $this->roleConfigModel->getError());
@@ -243,7 +245,6 @@ class RoleController extends AdminController
                 $this->success('操作成功!');
             }
         }else{
-            $aRoleId=I('get.id',0,'intval');
             $aType=I('get.type',0,'intval');//权限设置类型：1为前台权限设置，0为后台权限设置
             if(!$aRoleId){
                 $this->error('参数错误！');
@@ -284,26 +285,99 @@ class RoleController extends AdminController
     }
 
     /**
-     * 角色默认值配置
+     * 角色默认积分配置
      * @author 郑钟良<zzl@ourstu.com>
      */
     public function config(){
         $aRoleId=I('id',0,'intval');
+        if(!$aRoleId){
+            $this->error('请选择角色！');
+        }
+        if(IS_POST){
+            $aPostKey=I('post.post_key','','op_t');
+            $post_key=explode(',',$aPostKey);
+            $config_value=array();
+            foreach($post_key as $val){
+                $config_value[$val]=I('post.'.$val,0,'intval');
+            }
+            $data['value']=json_encode($config_value,true);
+            $map=getRoleConfigMap('score',$aRoleId);
+            if($this->roleConfigModel->where($map)->find()){
+                $result=$this->roleConfigModel->saveData($map,$data);
+            }else{
+                $data=array_merge($map,$data);
+                $result=$this->roleConfigModel->addData($data);
+            }
+            if($result){
+                $this->success('操作成功！',U('Admin/Role/config',array('id'=>$aRoleId)));
+            }else{
+                $this->error('操作失败！'.$this->roleConfigModel->getError());
+            }
+        }else{
+            $mRole_list=$this->roleModel->field('id,title')->select();
 
-        $mRole_list=$this->roleModel->field('id,title')->select();
-        $this->assign('auth_role',$mRole_list);
+            //获取默认配置值
+            $map=getRoleConfigMap('score',$aRoleId);
+            $score = $this->roleConfigModel->where($map)->getField('value');
+            $score=json_decode($score,true);
 
-        //获取member表中积分字段$score_keys
-        $model = D('Ucenter/Score');
-        $score_keys= $model->getTypeList(array('status' => array('GT', -1)));
-        $this->assign('score_keys',$score_keys);
+            //获取member表中积分字段$score_keys
+            $model = D('Ucenter/Score');
+            $score_keys= $model->getTypeList(array('status' => array('GT', -1)));
 
-        //获取默认配置值
-        $map=getRoleConfigMap('score',$aRoleId);
-        $score = $this->roleConfigModel->where($map)->getField('value');
-        $score=json_decode($score,true);
-        $this->assign('default_score',$score);
-        $this->display();
+            $post_key='';
+            foreach($score_keys as &$val){
+                $post_key.=',score'.$val['id'];
+                $val['value']=$score['score'.$val['id']];//写入默认值
+            }
+            unset($val);
+
+            $this->assign('score_keys',$score_keys);
+            $this->assign('post_key',$post_key);
+            $this->assign('auth_role',$mRole_list);
+            $this->assign('this_role', array('id'=>$aRoleId));
+            $this->display();
+        }
+    }
+
+    /**
+     * 角色默认头像配置
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function configAvatar()
+    {
+        $aRoleId=I('id',0,'intval');
+        if(!$aRoleId){
+            $this->error('请选择角色！');
+        }
+        $map=getRoleConfigMap('avatar',$aRoleId);
+        $data['data']='';
+        if(IS_POST){
+            $data['value']=I('post.avatar_id',0,'intval');
+            if($this->roleConfigModel->where($map)->find()){
+                if($data['value']==0){//使用系统默认头像
+                    $result=$this->roleConfigModel->where($map)->delete();
+                }else{
+                    $result=$this->roleConfigModel->saveData($map,$data);
+                }
+            }else{
+                if($data['value']!=0){
+                    $data=array_merge($map,$data);
+                    $result=$this->roleConfigModel->addData($data);
+                }
+            }
+            if($result){
+                $this->success('操作成功！',U('Admin/Role/configAvatar',array('id'=>$aRoleId)));
+            }else{
+                $this->error('操作失败！'.$this->roleConfigModel->getError());
+            }
+        }else{
+            $avatar_id=$this->roleConfigModel->where($map)->getField('value');
+            $mRole_list=$this->roleModel->field('id,title')->select();
+            $this->assign('auth_role',$mRole_list);
+            $this->assign('this_role', array('id'=>$aRoleId,'avatar'=>$avatar_id));
+            $this->display();
+        }
     }
 
     //角色其他配置 end
@@ -331,20 +405,38 @@ class RoleController extends AdminController
     }
 
     /**
-     * 初始化角色配置表数据
-     * @param string $type 类型
-     * @param int $role_id 角色id
-     * @param $value
-     * @param string $other_value 数据库中data字段
-     * @return mixed|string
-     * @author 郑钟良<zzl@ourstu.com>
+     * 上传图片
+     * @author huajie <banhuajie@163.com>
      */
-    private function initRoleConfigData($type='rules',$role_id=0,$value,$other_value=''){
-        $data=getRoleConfigMap($type,$role_id);
-        $data['update_time']=time();
-        $data['value']=$value;
-        $data['data']=json_encode($other_value,true);
-        $data['type']=isset($data['type'])?$data['type']:'';
-        return $data;
+    public function uploadPicture(){
+        //TODO: 用户登录检测
+
+        /* 返回标准数据 */
+        $return  = array('status' => 1, 'info' => '上传成功', 'data' => '');
+
+        /* 调用文件上传组件上传文件 */
+        $Picture = D('Picture');
+        $pic_driver = C('PICTURE_UPLOAD_DRIVER');
+        $info = $Picture->upload(
+            $_FILES,
+            C('PICTURE_UPLOAD'),
+            C('PICTURE_UPLOAD_DRIVER'),
+            C("UPLOAD_{$pic_driver}_CONFIG")
+        ); //TODO:上传到远程服务器
+        /* 记录图片信息 */
+        if($info){
+            $return['status'] = 1;
+            empty($info['download']) && $info['download']= $info['file'];
+            $return = array_merge($info['download'], $return);
+            $return['path256']=getThumbImageById($return['id'],256,256);
+            $return['path128']=getThumbImageById($return['id'],128,128);
+            $return['path64']=getThumbImageById($return['id'],64,64);
+            $return['path32']=getThumbImageById($return['id'],32,32);
+        } else {
+            $return['status'] = 0;
+            $return['info']   = $Picture->getError();
+        }
+        /* 返回JSON数据 */
+        $this->ajaxReturn($return);
     }
 } 

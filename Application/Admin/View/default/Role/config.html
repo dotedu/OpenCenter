@@ -9,14 +9,14 @@
             <div class="col-xs-10">
                 <ul class="nav nav-secondary">
                     <li class="active"><a href="javascript:;">用户积分配置</a></li>
-                    <li><a href="{:U('Role/configAuth',array('id'=>$this_role['id']))}">用户默认头像配置</a></li>
+                    <li><a href="{:U('Role/configavatar',array('id'=>$this_role['id']))}">用户默认头像配置</a></li>
 
                 </ul>
             </div>
             <div class="col-xs-2 text-right">
                 <select name="role" class="form-control">
                     <volist name="auth_role" id="vo">
-                        <option value="{:U('Role/config',array('id'=>$vo['id'],'type'=>1))}" <eq name="vo['id']" value="$this_rle['id']">selected</eq> >{$vo.title}</option>
+                        <option value="{:U('Role/config',array('id'=>$vo['id']))}" <eq name="vo['id']" value="$this_role['id']">selected</eq> >{$vo.title}</option>
                     </volist>
                 </select>
             </div>
@@ -28,10 +28,10 @@
                     <volist name="score_keys" id="score">
                         <label class="item-label">{$score.title|htmlspecialchars}<span>（单位：{$score.unit|htmlspecialchars}）</span></label>
                         <div class="controls ">
-                            <input type="text" name="score{$key}" value="{$score.value}" class="text input-large form-control"style="width: 400px"/>
+                            <input type="text" name="score{$score.id}" value="{$score.value}" class="text input-large form-control"style="width: 400px"/>
                         </div>
                     </volist>
-                    <input type="hidden" name="type" value="1" />
+                    <input type="hidden" name="post_key" value="{$post_key}"/>
                     <input type="hidden" name="id" value="{$this_role.id}" />
                     <div style="margin-top: 20px;"></div>
                     <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
