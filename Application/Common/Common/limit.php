@@ -14,7 +14,10 @@ class ActionLimit
     var $item = array();
     var $state = true;
     var $info = '';
-
+    var $punish = array(
+        array('logout_account', '强制注销账户'),
+        array('ban_account', '封停账户'),
+    );
     function __construct()
     {
 
@@ -37,8 +40,14 @@ class ActionLimit
 
     function checkOne($item)
     {
+        foreach($item as $k=>$v){
+            if(empty($v)){
+                unset($item[$k]);
+            }
+        }
+        unset($k,$v);
         $time = time();
-        $map['action_list'] = array('like', '%[' . $item['action'] . ']%');
+        $map['action_list'] = array(array('like', '%[' . $item['action'] . ']%'),'','or');
         $map['status'] = 1;
         $limitList = D('ActionLimit')->getList($map);
         !empty($item['action'])  && $item['action_id'] = M('action')->where(array('name' => $item['action']))->getField('id');
@@ -50,8 +59,9 @@ class ActionLimit
                 $this->state = false;
                 $punishes = explode(',', $val['punish']);
                 foreach ($punishes as $punish) {
-                    if (function_exists($punish)) {
-                        $this->$punish();
+                    //执行惩罚
+                    if (method_exists($this,$punish)) {
+                        $this->$punish($item);
                     }
                 }
                 unset($punish);
@@ -62,8 +72,36 @@ class ActionLimit
         }
         unset($val);
     }
+
+    /**
+     * logout_account 注销已登录帐号
+     * @param $item
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    function logout_account($item){
+        D('Member')->logout();
+    }
+
+    /**
+     * ban_account  封停帐号
+     * @param $item
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    function ban_account($item){
+        set_user_status($item['user_id'],0);
+    }
+
+
+
 }
 
+
+
+function check_action_limit($action = null, $model = null, $record_id = null, $user_id = null, $ip = false){
+    $obj = new ActionLimit();
+    $obj->checkOne(array('action' => $action, 'model' => $model, 'record_id' => $record_id, 'user_id' => $user_id,'action_ip'=>$ip));
+    return true;
+}
 
 function get_time_ago($type = 'second', $some = 1, $time = null)
 {

@@ -41,8 +41,8 @@ class IndexController extends HomeController
 
 
     public function test(){
-    $object = new \ActionLimit();
-        $object->checkOne(array('action' => 'user_login', 'model' => 'member', 'record_id' => 1, 'user_id' => 1));
+
+       check_action_limit('user_login','member',1,1);
         exit;
     }
 

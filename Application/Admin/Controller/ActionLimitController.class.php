@@ -24,6 +24,7 @@ class ActionLimitController extends AdminController
         foreach($List as &$val){
             $timeUnit = $this->getTimeUnit();
             $val['time_unit'] = $timeUnit[$val['time_unit']];
+            empty( $val['action_list']) &&  $val['action_list'] = '所有行为';
         }
         unset($val);
         //显示页面
@@ -120,10 +121,9 @@ class ActionLimitController extends AdminController
 
     private function getPunish()
     {
-        return array(
-            array('logout_account', '强制注销账户'),
-            array('ban_account', '封停账户'),
-        );
+        $obj = new \ActionLimit();
+        return $obj->punish;
+
     }
 
 
