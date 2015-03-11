@@ -375,7 +375,7 @@ class AdminConfigBuilder extends AdminBuilder
                 $config['create_time'] = time();
                 $config['update_time'] = time();
                 $config['status'] = 1;
-                $config['value'] = $v;
+                $config['value'] = is_array($v)?implode(',',$v): $v;
                 $config['sort'] = 0;
                 if ($configModel->add($config, null, true)) {
                         $success = 1;

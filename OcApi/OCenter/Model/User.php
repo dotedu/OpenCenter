@@ -8,7 +8,7 @@
  */
 
 
-require_once(OC_ROOT.'Model/base.php');
+require_once(OC_ROOT.'Model/Base.php');
 /**
  * Class User  用户操作类
  * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
