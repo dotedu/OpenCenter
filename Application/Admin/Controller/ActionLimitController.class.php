@@ -98,10 +98,10 @@ class ActionLimitController extends AdminController
                 ->keyText('name', '名称')
                 ->keyText('frequency', '频率')
                 ->keySelect('time_unit', '时间单位', '', $this->getTimeUnit())
-                ->keyChosen('punish', '处罚', '', $opt_punish)
+                ->keyChosen('punish', '处罚', '可多选', $opt_punish)
                 ->keyBool('if_message', '是否发送提醒')
                 ->keyTextArea('message_content', '消息提示内容')
-                ->keyChosen('action_list', '行为', '', $opt)
+                ->keyChosen('action_list', '行为', '可多选', $opt)
                 ->keyStatus()
                 ->data($limit)
                 ->buttonSubmit(U('editLimit'))->buttonBack()->display();

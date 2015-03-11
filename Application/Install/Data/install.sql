@@ -1,6 +1,7 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
+DROP TABLE  IF EXISTS `ocenter_action`;
 CREATE TABLE IF NOT EXISTS `ocenter_action` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` char(30) NOT NULL DEFAULT '' COMMENT '行为唯一标识',
@@ -24,8 +25,23 @@ INSERT INTO `ocenter_action` ( `name`, `title`, `remark`, `rule`, `log`, `type`,
 ( 'update_menu', '更新菜单', '新增或修改或删除菜单', '', '', 1, 1, 1383296392),
 ( 'update_category', '更新分类', '新增或修改或删除分类', '', '', 1, 1, 1383296765);
 
+DROP TABLE  IF EXISTS `ocenter_action_limit`;
+CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `frequency` int(11) NOT NULL,
+  `time_unit` varchar(50) NOT NULL,
+  `punish` text NOT NULL,
+  `if_message` tinyint(4) NOT NULL,
+  `message_content` text NOT NULL,
+  `action_list` text NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_action_log`;
 CREATE TABLE IF NOT EXISTS `ocenter_action_log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `action_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '行为id',
@@ -42,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_log` (
   KEY `user_id_ix` (`user_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='行为日志表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_addons`;
 CREATE TABLE IF NOT EXISTS `ocenter_addons` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(40) NOT NULL COMMENT '插件名或标识',
@@ -66,7 +82,7 @@ INSERT INTO `ocenter_addons` (`id`, `name`, `title`, `description`, `status`, `c
 (6, 'LocalComment', '本地评论', '本地评论插件，不依赖社会化评论平台', 1, '{"can_guest_comment":"1"}', 'caipeichao', '0.1', 1399440324, 0);
 
 
-
+DROP TABLE  IF EXISTS `ocenter_attachment`;
 CREATE TABLE IF NOT EXISTS `ocenter_attachment` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
@@ -85,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_attachment` (
   KEY `idx_record_status` (`record_id`,`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='附件表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_extend`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_extend` (
   `group_id` mediumint(10) unsigned NOT NULL COMMENT '用户id',
   `extend_id` mediumint(8) unsigned NOT NULL COMMENT '扩展表中数据的id',
@@ -106,7 +122,7 @@ INSERT INTO `ocenter_auth_extend` (`group_id`, `extend_id`, `type`) VALUES
 (1, 4, 1),
 (1, 37, 1);
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_group`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_group` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户组id,自增主键',
   `module` varchar(20) NOT NULL COMMENT '用户组所属模块',
@@ -125,7 +141,7 @@ INSERT INTO `ocenter_auth_group` (`id`, `module`, `type`, `title`, `description`
 (2, 'admin', 1, 'VIP', '', 1, '');
 
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_group_access`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_group_access` (
   `uid` int(10) unsigned NOT NULL COMMENT '用户id',
   `group_id` mediumint(8) unsigned NOT NULL COMMENT '用户组id',
@@ -141,7 +157,7 @@ INSERT INTO `ocenter_auth_group_access` (`uid`, `group_id`) VALUES
 (58, 1);
 
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_rule`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_rule` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '规则id,自增主键',
   `module` varchar(20) NOT NULL COMMENT '规则所属module',
@@ -463,7 +479,7 @@ INSERT INTO `ocenter_auth_rule` (`id`, `module`, `type`, `name`, `title`, `statu
 (322, 'admin', 2, 'Admin/module/lists', '云平台', 1, '');
 
 
-
+DROP TABLE  IF EXISTS `ocenter_avatar`;
 CREATE TABLE IF NOT EXISTS `ocenter_avatar` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -472,10 +488,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_avatar` (
   `status` int(11) NOT NULL,
   `is_temp` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_channel`;
 CREATE TABLE IF NOT EXISTS `ocenter_channel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '频道ID',
   `pid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上级频道ID',
@@ -499,7 +515,6 @@ INSERT INTO `ocenter_channel` (`id`, `pid`, `title`, `url`, `sort`, `create_time
 (1, 0, '首页', 'Home/Index/index', 0, 1379475111, 1421055116, 1, 0, '', '', '', 'home'),
 (2, 0, '会员展示', 'People/index/index', 3, 1421054845, 1421134856, 1, 0, '', '', '', 'group');
 
-
 DROP TABLE  IF EXISTS `ocenter_config`;
 CREATE TABLE IF NOT EXISTS `ocenter_config` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '配置ID',
@@ -518,7 +533,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_config` (
   UNIQUE KEY `uk_name` (`name`),
   KEY `type` (`type`),
   KEY `group` (`group`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=95 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=42 ;
 
 
 INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `remark`, `create_time`, `update_time`, `status`, `value`, `sort`) VALUES
@@ -566,7 +581,7 @@ INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `
 
 
 
-
+DROP TABLE  IF EXISTS `ocenter_field`;
 CREATE TABLE IF NOT EXISTS `ocenter_field` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -580,6 +595,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_field` (
 INSERT INTO `ocenter_field` (`id`, `uid`, `field_id`, `field_data`, `createTime`, `changeTime`) VALUES
 (1, 1, 36, 'ad', 1423034721, 1423034721);
 
+DROP TABLE  IF EXISTS `ocenter_field_group`;
 CREATE TABLE IF NOT EXISTS `ocenter_field_group` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `profile_name` varchar(25) NOT NULL,
@@ -595,6 +611,7 @@ INSERT INTO `ocenter_field_group` (`id`, `profile_name`, `status`, `createTime`,
 (2, '开发者资料', 1, 1423537648, 0, 0),
 (3, '开源中国资料', 1, 1423538446, 0, 0);
 
+DROP TABLE  IF EXISTS `ocenter_field_setting`;
 CREATE TABLE IF NOT EXISTS `ocenter_field_setting` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `field_name` varchar(25) NOT NULL,
@@ -622,7 +639,7 @@ INSERT INTO `ocenter_field_setting` (`id`, `field_name`, `profile_group_id`, `vi
 (7, '昵称', 3, 1, 1, 0, 'input', '', '', 1, 1423704462, 'string', 'OSC账号昵称');
 
 
-
+DROP TABLE  IF EXISTS `ocenter_file`;
 CREATE TABLE IF NOT EXISTS `ocenter_file` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '文件ID',
   `name` char(30) NOT NULL DEFAULT '' COMMENT '原始文件名',
@@ -638,20 +655,20 @@ CREATE TABLE IF NOT EXISTS `ocenter_file` (
   `driver` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_md5` (`md5`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='文件表' AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='文件表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_follow`;
 CREATE TABLE IF NOT EXISTS `ocenter_follow` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `follow_who` int(11) NOT NULL COMMENT '关注谁',
   `who_follow` int(11) NOT NULL COMMENT '谁关注',
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='关注表' AUTO_INCREMENT=91 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='关注表' AUTO_INCREMENT=1 ;
 
 
 
-
+DROP TABLE  IF EXISTS `ocenter_hooks`;
 CREATE TABLE IF NOT EXISTS `ocenter_hooks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(40) NOT NULL DEFAULT '' COMMENT '钩子名称',
@@ -696,7 +713,7 @@ INSERT INTO `ocenter_hooks` (`id`, `name`, `description`, `type`, `update_time`,
 (36, 'dealPicture', '上传图片处理', 2, 1417139975, ''),
 (37, 'ucenterSideMenu', '用户中心左侧菜单', 1, 1417161205, '');
 
-
+DROP TABLE  IF EXISTS `ocenter_local_comment`;
 CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -709,12 +726,12 @@ CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
   `pid` int(11) NOT NULL,
   `status` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 
 
-
+DROP TABLE  IF EXISTS `ocenter_member`;
 CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `uid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `nickname` char(16) NOT NULL DEFAULT '' COMMENT '昵称',
@@ -876,7 +893,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 
 
 
-
+DROP TABLE  IF EXISTS `ocenter_message`;
 CREATE TABLE IF NOT EXISTS `ocenter_message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `from_uid` int(11) NOT NULL,
@@ -895,10 +912,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_message` (
   `find_id` int(11) NOT NULL,
   `status` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='thinkox新增消息表' AUTO_INCREMENT=358 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='thinkox新增消息表' AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_module`;
 CREATE TABLE IF NOT EXISTS `ocenter_module` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL COMMENT '模块名',
@@ -918,10 +935,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_module` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `name_2` (`name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='模块管理表' AUTO_INCREMENT=53 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='模块管理表' AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_picture`;
 CREATE TABLE IF NOT EXISTS `ocenter_picture` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id自增',
   `type` varchar(50) NOT NULL,
@@ -932,9 +949,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_picture` (
   `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=111 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_rank`;
 CREATE TABLE IF NOT EXISTS `ocenter_rank` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL COMMENT '上传者id',
@@ -943,9 +960,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_rank` (
   `create_time` int(11) NOT NULL,
   `types` tinyint(2) NOT NULL DEFAULT '1' COMMENT '前台是否可申请',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_rank_user`;
 CREATE TABLE IF NOT EXISTS `ocenter_rank_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -955,10 +972,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_rank_user` (
   `create_time` int(11) NOT NULL,
   `status` tinyint(2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_seo_rule`;
 CREATE TABLE IF NOT EXISTS `ocenter_seo_rule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` text NOT NULL,
@@ -971,29 +988,29 @@ CREATE TABLE IF NOT EXISTS `ocenter_seo_rule` (
   `seo_title` text NOT NULL,
   `sort` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=21 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
 
 
 
 INSERT INTO `ocenter_seo_rule` (`id`, `title`, `app`, `controller`, `action`, `status`, `seo_keywords`, `seo_description`, `seo_title`, `sort`) VALUES
-(4, '整站标题', '', '', '', 1, '', '', 'OpenCenter', 7),
-(6, '论坛版块页', 'forum', 'index', 'forum', -1, '{$forum.title} ', '{$forum.title} ', '{$forum.title} —— ThinkOX论坛', 2),
-(7, '微博首页', '', 'Index', 'index', 1, '微博', '微博首页', 'OpenCenter轻量化社交框架', 5),
-(8, '微博详情页', '', 'Index', 'weiboDetail', 1, '{$weibo.title|op_t},OpenCenter,oc,微博', '{$weibo.content|op_t}\r\n', '{$weibo.content|op_t}——OpenCenter微博', 6),
-(9, '用户中心', 'Ucenter', 'index', 'index', 1, '{$user_info.nickname|op_t},OpenCenter', '{$user_info.username|op_t}的个人主页', '{$user_info.nickname|op_t}的个人主页', 3),
-(10, '会员页面', 'people', 'index', 'index', 1, '会员', '会员', '会员', 4),
-(11, '论坛帖子详情页', 'forum', 'index', 'detail', -1, '{$post.title|op_t},论坛,thinkox', '{$post.title|op_t}', '{$post.title|op_t} —— ThinkOX论坛', 1),
-(12, '商城首页', 'shop', 'index', 'index', -1, '商城,积分', '积分商城', '商城首页——ThinkOX', 0),
-(13, '商城商品详情页', 'shop', 'index', 'goodsdetail', -1, '{$content.goods_name|op_t},商城', '{$content.goods_name|op_t}', '{$content.goods_name|op_t}——ThinkOX商城', 0),
-(14, '资讯首页', 'blog', 'index', 'index', -1, '资讯首页', '资讯首页\r\n', '资讯——ThinkOX', 0),
-(15, '资讯列表页', 'blog', 'article', 'lists', -1, '{$category.title|op_t}', '{$category.title|op_t}', '{$category.title|op_t}', 0),
-(16, '资讯文章页', 'blog', 'article', 'detail', -1, '{$info.title|op_t}', '{$info.title|op_t}', '{$info.title|op_t}——ThinkOX', 0),
-(17, '活动首页', 'event', 'index', 'index', -1, '活动', '活动首页', '活动首页——ThinkOX', 0),
-(18, '活动详情页', 'event', 'index', 'detail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0),
-(19, '专辑首页', 'issue', 'index', 'index', -1, '专辑', '专辑首页', '专辑首页——ThinkOX', 0),
-(20, '专辑详情页', 'issue', 'index', 'issuecontentdetail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0);
+(1, '整站标题', '', '', '', 1, '', '', 'OpenCenter', 7),
+(2, '论坛版块页', 'forum', 'index', 'forum', -1, '{$forum.title} ', '{$forum.title} ', '{$forum.title} —— ThinkOX论坛', 2),
+(3, '微博首页', '', 'Index', 'index', 1, '微博', '微博首页', 'OpenCenter轻量化社交框架', 5),
+(4, '微博详情页', '', 'Index', 'weiboDetail', 1, '{$weibo.title|op_t},OpenCenter,oc,微博', '{$weibo.content|op_t}\r\n', '{$weibo.content|op_t}——OpenCenter微博', 6),
+(5, '用户中心', 'Ucenter', 'index', 'index', 1, '{$user_info.nickname|op_t},OpenCenter', '{$user_info.username|op_t}的个人主页', '{$user_info.nickname|op_t}的个人主页', 3),
+(6, '会员页面', 'people', 'index', 'index', 1, '会员', '会员', '会员', 4),
+(7, '论坛帖子详情页', 'forum', 'index', 'detail', -1, '{$post.title|op_t},论坛,thinkox', '{$post.title|op_t}', '{$post.title|op_t} —— ThinkOX论坛', 1),
+(8, '商城首页', 'shop', 'index', 'index', -1, '商城,积分', '积分商城', '商城首页——ThinkOX', 0),
+(9, '商城商品详情页', 'shop', 'index', 'goodsdetail', -1, '{$content.goods_name|op_t},商城', '{$content.goods_name|op_t}', '{$content.goods_name|op_t}——ThinkOX商城', 0),
+(10, '资讯首页', 'blog', 'index', 'index', -1, '资讯首页', '资讯首页\r\n', '资讯——ThinkOX', 0),
+(11, '资讯列表页', 'blog', 'article', 'lists', -1, '{$category.title|op_t}', '{$category.title|op_t}', '{$category.title|op_t}', 0),
+(12, '资讯文章页', 'blog', 'article', 'detail', -1, '{$info.title|op_t}', '{$info.title|op_t}', '{$info.title|op_t}——ThinkOX', 0),
+(13, '活动首页', 'event', 'index', 'index', -1, '活动', '活动首页', '活动首页——ThinkOX', 0),
+(14, '活动详情页', 'event', 'index', 'detail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0),
+(15, '专辑首页', 'issue', 'index', 'index', -1, '专辑', '专辑首页', '专辑首页——ThinkOX', 0),
+(16, '专辑详情页', 'issue', 'index', 'issuecontentdetail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0);
 
-
+DROP TABLE  IF EXISTS `ocenter_super_links`;
 CREATE TABLE IF NOT EXISTS `ocenter_super_links` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `type` int(1) NOT NULL DEFAULT '1' COMMENT '类别（1：图片，2：普通）',
@@ -1004,7 +1021,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_super_links` (
   `status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '状态（0：禁用，1：正常）',
   `create_time` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='友情连接表' AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='友情连接表' AUTO_INCREMENT=5 ;
 
 
 INSERT INTO `ocenter_super_links` ( `type`, `title`, `cover_id`, `link`, `level`, `status`, `create_time`) VALUES
@@ -1014,7 +1031,7 @@ INSERT INTO `ocenter_super_links` ( `type`, `title`, `cover_id`, `link`, `level`
 ( 1, 'OpenSNS', 0, 'http://www.opensns.cn', 0, 1, 1407156830),;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_support`;
 CREATE TABLE IF NOT EXISTS `ocenter_support` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `appname` varchar(20) NOT NULL COMMENT '应用名',
@@ -1023,9 +1040,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_support` (
   `create_time` int(11) NOT NULL COMMENT '发布时间',
   `table` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='支持的表' AUTO_INCREMENT=52 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='支持的表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_sync_login`;
 CREATE TABLE IF NOT EXISTS `ocenter_sync_login` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -1038,7 +1055,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_sync_login` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_talk`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `create_time` int(11) NOT NULL,
@@ -1055,9 +1072,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk` (
   `other_uid` int(11) NOT NULL,
   `title` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会话表' AUTO_INCREMENT=166 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会话表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_talk_message`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk_message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content` varchar(500) NOT NULL,
@@ -1065,10 +1082,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk_message` (
   `create_time` int(11) NOT NULL,
   `talk_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='聊天消息表' AUTO_INCREMENT=279 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='聊天消息表' AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_talk_message_push`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk_message_push` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -1077,9 +1094,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk_message_push` (
   `status` tinyint(4) NOT NULL,
   `talk_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=gbk COMMENT='状态，0为未提示，1为未点击，-1为已点击' AUTO_INCREMENT=112 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=gbk COMMENT='状态，0为未提示，1为未点击，-1为已点击' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_talk_push`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk_push` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL COMMENT '接收推送的用户id',
@@ -1087,17 +1104,17 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk_push` (
   `create_time` int(11) NOT NULL,
   `status` tinyint(4) NOT NULL COMMENT '状态，0为未提示，1为未点击，-1为已点击',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='对话推送表' AUTO_INCREMENT=100 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='对话推送表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_ucenter_admin`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_admin` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
   `member_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '管理员用户ID',
   `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '管理员状态',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='管理员表' AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='管理员表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_ucenter_member`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` char(16) NOT NULL COMMENT '用户名',
@@ -1114,9 +1131,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `step` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `status` (`status`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=60 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=100 ;
 
 
+DROP TABLE  IF EXISTS `ocenter_ucenter_setting`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_setting` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '设置ID',
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '配置类型（1-用户配置）',
@@ -1124,7 +1142,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_setting` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='设置表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_url`;
 CREATE TABLE IF NOT EXISTS `ocenter_url` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '链接唯一标识',
   `url` char(255) NOT NULL DEFAULT '' COMMENT '链接地址',
@@ -1136,14 +1154,16 @@ CREATE TABLE IF NOT EXISTS `ocenter_url` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='链接表' AUTO_INCREMENT=1 ;
 
 
+DROP TABLE  IF EXISTS `ocenter_user_token`;
 CREATE TABLE IF NOT EXISTS `ocenter_user_token` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `token` varchar(255) NOT NULL,
   `time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+DROP TABLE  IF EXISTS `ocenter_verify`;
 CREATE TABLE IF NOT EXISTS `ocenter_verify` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -1153,6 +1173,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_verify` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 DROP TABLE  IF EXISTS `ocenter_ucenter_score_type`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_score_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
