@@ -1,6 +1,24 @@
 <ul class="nav nav-secondary">
-    <li><a href="{:U('Role/configAuth',array('id'=>$this_role['id']))}">管理后台授权</a></li>
-    <li class="active"><a href="javascript:;">前台访问授权</a></li>
-    <li><a href="{:U('Role/config',array('id'=>$this_role['id']))}">用户积分配置</a></li>
-    <li class="active"><a href="{:U('Role/configavatar',array('id'=>$this_role['id']))}">用户默认头像配置</a></li>
+    <php>
+        switch($tab){
+            case 'auth':
+                $authClass="active";
+                break;
+            case 'authAdmin':
+                $authAdminClass="active";
+                break;
+            case 'config':
+                $configClass="active";
+                break;
+            case 'configAvatar':
+                $configAvatarClass="active";
+                break;
+            default:
+                break;
+        }
+    </php>
+    <li class="{$authAdminClass}"><a href="{:U('Role/configAuth',array('id'=>$this_role['id']))}">管理后台授权</a></li>
+    <li class="{$authClass}"><a href="{:U('Role/configAuth',array('id'=>$this_role['id'],'type'=>1))}">前台访问授权</a></li>
+    <li class="{$configClass}"><a href="{:U('Role/config',array('id'=>$this_role['id']))}">用户积分配置</a></li>
+    <li class="{$configAvatarClass}"><a href="{:U('Role/configavatar',array('id'=>$this_role['id']))}">用户默认头像配置</a></li>
 </ul>

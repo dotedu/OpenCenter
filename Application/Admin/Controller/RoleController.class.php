@@ -56,9 +56,7 @@ class RoleController extends AdminController
             ->keyCreateTime()
             ->keyUpdateTime()
             ->keyDoActionEdit('Role/editRole?id=###')
-            ->keyDoAction('Role/configAuth?id=###','权限配置')
-            ->keyDoAction('Role/config?id=###','默认资料配置')
-            ->keyDoAction('Role/configExpend?id=###','默认扩展资料配置')
+            ->keyDoAction('Role/configAuth?id=###','配置')
             ->data($roleList)
             ->pagination($totalCount, $r)
             ->display('index');
@@ -262,13 +260,15 @@ class RoleController extends AdminController
                 $map_main = array('module' => array('neq', 'admin'), 'type' => AuthRuleModel::RULE_MAIN, 'status' => 1);
                 $map_child = array('module' => array('neq', 'admin'), 'type' => AuthRuleModel::RULE_URL, 'status' => 1);
                 $this->meta_title = '用户前台授权';
-                $tpl='Role/Auth/config';//模板地址
+                $tpl='auth';//模板地址
+                $tab='auth';
             }else{//后台
                 $node_list = $this->returnNodes();
                 $map_main = array('module' => 'admin', 'type' => AuthRuleModel::RULE_MAIN, 'status' => 1);
                 $map_child = array('module' => 'admin', 'type' => AuthRuleModel::RULE_URL, 'status' => 1);
                 $this->meta_title = '访问授权';
-                $tpl='Role/Auth/configadmin';//模板地址
+                $tpl='authadmin';//模板地址
+                $tab='authAdmin';
             }
 
             $main_rules = M('AuthRule')->where($map_main)->getField('name,id');
@@ -279,6 +279,7 @@ class RoleController extends AdminController
             $this->assign('node_list', $node_list);
             $this->assign('auth_role',$mRole_list);
             $this->assign('this_role', $mThis_role);
+            $this->assign('tab',$tab);
             $this->display($tpl);
         }
 
@@ -336,6 +337,7 @@ class RoleController extends AdminController
             $this->assign('post_key',$post_key);
             $this->assign('auth_role',$mRole_list);
             $this->assign('this_role', array('id'=>$aRoleId));
+            $this->assign('tab','config');
             $this->display();
         }
     }
@@ -376,6 +378,7 @@ class RoleController extends AdminController
             $mRole_list=$this->roleModel->field('id,title')->select();
             $this->assign('auth_role',$mRole_list);
             $this->assign('this_role', array('id'=>$aRoleId,'avatar'=>$avatar_id));
+            $this->assign('tab','configAvatar');
             $this->display();
         }
     }
