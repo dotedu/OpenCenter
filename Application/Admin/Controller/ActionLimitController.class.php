@@ -17,8 +17,10 @@ class ActionLimitController extends AdminController
 
     public function limitList()
     {
+        $action_name = I('get.action','','op_t') ;
+        !empty($action_name) && $map['action_list'] = array(array('like', '%[' . $action_name . ']%'),'','or');
         //读取规则列表
-        $map = array('status' => array('EGT', 0));
+        $map['status'] = array('EGT', 0);
         $model = M('action_limit');
         $List = $model->where($map)->order('id asc')->select();
         foreach($List as &$val){
