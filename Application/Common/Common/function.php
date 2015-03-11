@@ -12,6 +12,26 @@ use Admin\Model\AuthRuleModel;
 const ONETHINK_VERSION = '1.0.131218';
 const ONETHINK_ADDON_PATH = './Addons/';
 
+
+
+require_once(APP_PATH . '/Common/Common/pagination.php');
+require_once(APP_PATH . '/Common/Common/query_user.php');
+require_once(APP_PATH . '/Common/Common/thumb.php');
+require_once(APP_PATH . '/Common/Common/api.php');
+require_once(APP_PATH . '/Common/Common/time.php');
+require_once(APP_PATH . '/Common/Common/match.php');
+require_once(APP_PATH . '/Common/Common/seo.php');
+require_once(APP_PATH . '/Common/Common/type.php');
+require_once(APP_PATH . '/Common/Common/cache.php');
+require_once(APP_PATH . '/Common/Common/vendors.php');
+require_once(APP_PATH . '/Common/Common/parse.php');
+require_once(APP_PATH . '/Common/Common/user.php');
+require_once(APP_PATH . '/Common/Common/limit.php');
+/*require_once(APP_PATH . '/Common/Common/extend.php');*/
+
+
+
+
 /**
  * 系统公共库文件
  * 主要定义系统公共函数库
@@ -1334,19 +1354,7 @@ function array_subtract($a, $b)
     return array_diff($a, array_intersect($a, $b));
 }
 
-require_once(APP_PATH . '/Common/Common/pagination.php');
-require_once(APP_PATH . '/Common/Common/query_user.php');
-require_once(APP_PATH . '/Common/Common/thumb.php');
-require_once(APP_PATH . '/Common/Common/api.php');
-require_once(APP_PATH . '/Common/Common/time.php');
-require_once(APP_PATH . '/Common/Common/match.php');
-require_once(APP_PATH . '/Common/Common/seo.php');
-require_once(APP_PATH . '/Common/Common/type.php');
-require_once(APP_PATH . '/Common/Common/cache.php');
-require_once(APP_PATH . '/Common/Common/vendors.php');
-require_once(APP_PATH . '/Common/Common/parse.php');
-require_once(APP_PATH . '/Common/Common/user.php');
-/*require_once(APP_PATH . '/Common/Common/extend.php');*/
+
 
 
 function tox_addons_url($url, $param)
