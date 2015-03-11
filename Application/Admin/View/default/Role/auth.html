@@ -8,11 +8,7 @@
 
         <div class="clearfix">
             <div class="col-xs-10">
-                <ul class="nav nav-secondary">
-                    <li><a href="{:U('Role/configAuth',array('id'=>$this_role['id']))}">管理后台授权</a></li>
-                    <li class="active"><a href="javascript:;">前台访问授权</a></li>
-
-                </ul>
+                <include file="_link"/>
             </div>
             <div class="col-xs-2 text-right">
                 <select name="role" class="form-control">
@@ -26,10 +22,10 @@
             <!-- 访问授权 -->
             <div class="tab-pane in">
                 <form action="__SELF__" enctype="application/x-www-form-urlencoded" method="POST" class="form-horizontal auth-form">
-                    <volist name="score_keys" id="score" >
+                    <volist name="node_list" id="node" >
                         <dl class="checkmod">
                             <dt class="hd">
-                                <input class="auth_rules rules_all" type="checkbox" name="rules[]" value="<?php echo $main_rules[$node['url']] ?>">
+                                <label class="checkbox"><input class="auth_rules rules_all" type="checkbox" name="rules[]" value="<?php echo $main_rules[$node['url']] ?>">{$node.title}管理</label>
                             </dt>
                             <dd class="bd">
                                 <present name="node['child']">
@@ -37,7 +33,7 @@
                                         <div class="rule_check">
                                             <div>
                                                 <label class="checkbox" <notempty name="child['tip']">title='{$child.tip}'</notempty>>
-                                                <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="{$child.id}"/>{$child.title}
+                                                <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="<?php echo $auth_rules[$child['url']] ?>"/>{$child.title}
                                                 </label>
                                             </div>
                                             <notempty name="child['operator']">

@@ -8,10 +8,7 @@
 
         <div class="clearfix">
             <div class="col-xs-10">
-                <ul class="nav nav-secondary">
-                    <li class="active"><a href="javascript:;">管理后台授权</a></li>
-                    <li><a href="{:U('Role/configAuth',array('id'=>$this_role['id'],'type'=>1))}">前台访问授权</a></li>
-                </ul>
+                <include file="./_link"/>
             </div>
             <div class="col-xs-2 text-right">
                 <select name="role" class="form-control">
