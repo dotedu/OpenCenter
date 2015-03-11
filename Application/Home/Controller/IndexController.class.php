@@ -39,11 +39,4 @@ class IndexController extends HomeController
         exit(json_encode(D('Common/ ')->getAllExpression()));
     }
 
-
-    public function test(){
-
-       check_action_limit('user_login','member',1,1);
-        exit;
-    }
-
 }

@@ -23,6 +23,7 @@ class MemberController extends Controller
      */
     public function register()
     {
+
         //获取参数
         $aUsername = $username = I('post.username', '', 'op_t');
         $aNickname = I('post.nickname', '', 'op_t');
@@ -37,7 +38,10 @@ class MemberController extends Controller
             $this->error('注册已关闭');
         }
         if (IS_POST) { //注册用户
-
+            $return = check_action_limit('reg','ucenter_member',1,1,true);
+            if($return && !$return['state']){
+                $this->error($return['info'],$return['url']);
+            }
             /* 检测验证码 */
             if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
                 if (!check_verify($aVerify)) {
@@ -78,6 +82,8 @@ class MemberController extends Controller
 
                 $uid = UCenterMember()->login($username, $aPassword, $aUnType); //通过账号密码取到uid
                 D('Member')->login($uid, false); //登陆
+
+                exit;
                 $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
             } else { //注册失败，显示错误信息
                 $this->error($this->showRegError($uid));
