@@ -32,7 +32,7 @@
 		<tr>
             <td><input class="ids" type="checkbox" name="ids[]" value="{$vo.id}" /></td>
 			<td>{$vo.id} </td>
-			<td>{$vo.name}</td>
+			<td><a href="{:U('ActionLimit/limitlist',array('action'=>$vo['name']))}" title="查看限制">{$vo.name}</a></td>
 			<td><a href="{:U('editAction?id='.$vo['id'])}">{$vo.title}</a></td>
 			<td><span>{:get_action_type($vo['type'])}</span></td>
 			<td>{$vo.remark}</td>

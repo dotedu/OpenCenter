@@ -14,36 +14,21 @@ use Admin\Builder\AdminListBuilder;
 class ActionLimitController extends AdminController
 {
 
-    public function ssoSetting()
-    {
-
-        $admin_config = new AdminConfigBuilder();
-         $data = $admin_config->handleConfig();
-
-        $admin_config->title('单点登录配置')
-            ->keyRadio('SSO_SWITCH_USER_CENTER', '单点登录开关', '作为用户中心的单点登录开关，其他开关在登录配置里面设置', array(0 => '关闭单点登录', 1 => '作为用户中心开启单点登录'))
-            ->keyTextArea('SSO_CONFIG', '单点登录配置', '单点登录配置文件中的配置（当开关为开启单点登录时有效，不包括作为用户中心开启单点登录）')
-            ->keyLabel('SSO_UC_AUTH_KEY', '用户中心加密密钥', '系统已自动写入配置文件，如写入失败请手动复制。')
-            ->keyLabel('SSO_UC_DB_DSN', '用户中心数据连接', '系统已自动写入配置文件，如写入失败请手动复制。')
-            ->keyLabel('SSO_UC_TABLE_PREFIX', '用户中心表前缀', '系统已自动写入配置文件，如写入失败请手动复制。')
-
-        ->group('作为用户中心配置','SSO_SWITCH_USER_CENTER')
-        ->group('作为应用配置','SSO_CONFIG,SSO_UC_AUTH_KEY,SSO_UC_DB_DSN,SSO_UC_TABLE_PREFIX')
-            ->buttonSubmit('', '保存')->data($data);
-        $admin_config->display();
-    }
-
-
-
-
 
     public function limitList()
     {
+        $action_name = I('get.action','','op_t') ;
+        !empty($action_name) && $map['action_list'] = array(array('like', '%[' . $action_name . ']%'),'','or');
         //读取规则列表
-        $map = array('status' => array('EGT', 0));
+        $map['status'] = array('EGT', 0);
         $model = M('action_limit');
         $List = $model->where($map)->order('id asc')->select();
-
+        foreach($List as &$val){
+            $timeUnit = $this->getTimeUnit();
+            $val['time_unit'] = $timeUnit[$val['time_unit']];
+            empty( $val['action_list']) &&  $val['action_list'] = '所有行为';
+        }
+        unset($val);
         //显示页面
         $builder = new AdminListBuilder();
         $builder->title('行为限制列表')
@@ -51,13 +36,14 @@ class ActionLimitController extends AdminController
             ->setStatusUrl(U('setLimitStatus'))->buttonEnable()->buttonDisable()->buttonDelete()
             ->keyId()
             ->keyTitle()
+            ->keyText('name', '名称')
             ->keyText('frequency', '频率')
+            ->keyText('time_unit', '时间单位')
             ->keyText('punish', '处罚')
             ->keyBool('if_message', '是否发送提醒')
-            ->keyText('message_content', '处罚')
+            ->keyText('message_content', '消息提示内容')
             ->keyText('action_list', '行为')
             ->keyStatus()
-
             ->keyDoActionEdit('editLimit?id=###')
             ->data($List)
             ->display();
@@ -70,15 +56,22 @@ class ActionLimitController extends AdminController
         if (IS_POST) {
 
             $data['title'] = I('post.title', '', 'op_t');
+            $data['name'] = I('post.name', '', 'op_t');
             $data['frequency'] = I('post.frequency', 1, 'intval');
+            $data['time_unit'] = I('post.time_unit', '', 'op_t');
             $data['punish'] = I('post.punish', '', 'op_t');
             $data['if_message'] = I('post.if_message', '', 'op_t');
             $data['message_content'] = I('post.message_content', '', 'op_t');
             $data['action_list'] = I('post.action_list', '', 'op_t');
             $data['status'] = I('post.status', 1, 'intval');
 
-            $data['punish'] = implode(',',$data['punish']);
-            $data['action_list'] = implode(',',$data['action_list']);
+            $data['punish'] = implode(',', $data['punish']);
+
+            foreach($data['action_list'] as &$v){
+                $v = '['.$v.']';
+            }
+            unset($v);
+            $data['action_list'] = implode(',', $data['action_list']);
             if ($aId != 0) {
                 $data['id'] = $aId;
                 $res = $model->editActionLimit($data);
@@ -91,24 +84,24 @@ class ActionLimitController extends AdminController
             $builder = new AdminConfigBuilder();
             if ($aId != 0) {
                 $limit = $model->getActionLimit(array('id' => $aId));
-                $limit['punish'] = explode(',',$limit['punish']);
-                $limit['action_list'] = explode(',',$limit['action_list']);
+                $limit['punish'] = explode(',', $limit['punish']);
+                $limit['action_list'] = str_replace('[','',$limit['action_list']);
+                $limit['action_list'] = str_replace(']','',$limit['action_list']);
+                $limit['action_list'] = explode(',', $limit['action_list']);
             } else {
                 $limit = array('status' => 1);
             }
-
-
-
             $opt_punish = $this->getPunish();
-            $opt = array('行为组一'=>array(array('1','行为1'),array('2','行为2'),array('3','行为3'),array('4','行为4')),'行为组二'=>array(array('5','行为5'),array('6','行为6'),array('7','行为7'),array('8','行为8')));
-
+            $opt = D('Action')->getActionOpt();
             $builder->title(($aId == 0 ? '新增' : '编辑') . '行为限制')->keyId()
                 ->keyTitle()
+                ->keyText('name', '名称')
                 ->keyText('frequency', '频率')
-                ->keyChosen('punish', '处罚','',$opt_punish)
+                ->keySelect('time_unit', '时间单位', '', $this->getTimeUnit())
+                ->keyChosen('punish', '处罚', '可多选', $opt_punish)
                 ->keyBool('if_message', '是否发送提醒')
-                ->keyTextArea('message_content', '处罚')
-                ->keyChosen('action_list', '行为','',$opt)
+                ->keyTextArea('message_content', '消息提示内容')
+                ->keyChosen('action_list', '行为', '可多选', $opt)
                 ->keyStatus()
                 ->data($limit)
                 ->buttonSubmit(U('editLimit'))->buttonBack()->display();
@@ -122,14 +115,17 @@ class ActionLimitController extends AdminController
         $builder->doSetStatus('action_limit', $ids, $status);
     }
 
+    private function getTimeUnit()
+    {
+        return array('second' => '秒', 'minute' => '分', 'hour' => '小时', 'day' => '天', 'week' => '周', 'month' => '月', 'year' => '年');
+    }
 
 
     private function getPunish()
     {
-        return array(
-            array('logout_account',  '强制注销账户'),
-            array('ban_account', '封停账户'),
-        );
+        $obj = new \ActionLimit();
+        return $obj->punish;
+
     }
 
 

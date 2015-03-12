@@ -317,7 +317,7 @@ class AdminConfigBuilder extends AdminBuilder
     {
         // 解析option数组
         if (key($options) === 0) {
-            if (!is_array($options[0])) {
+            if (!is_array(reset($options))) {
                 foreach ($options as $key => &$val) {
                     $val = array($val, $val);
                 }
@@ -375,7 +375,7 @@ class AdminConfigBuilder extends AdminBuilder
                 $config['create_time'] = time();
                 $config['update_time'] = time();
                 $config['status'] = 1;
-                $config['value'] = $v;
+                $config['value'] = is_array($v)?implode(',',$v): $v;
                 $config['sort'] = 0;
                 if ($configModel->add($config, null, true)) {
                         $success = 1;

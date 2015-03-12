@@ -102,7 +102,7 @@ class ScoreModel extends Model
 
     /**
      * setUserScore  设置用户的积分
-     * @param $uid
+     * @param $uids
      * @param $score
      * @param $type
      * @param string $action

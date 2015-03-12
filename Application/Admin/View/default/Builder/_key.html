@@ -338,9 +338,9 @@
         </php>
         <volist name="field['opt']" id="option">
             <php>
-                $selected = in_array($option[0],$field['value'])? 'selected' : '';
+                $selected = in_array(reset($option),$field['value'])? 'selected' : '';
             </php>
-            <option value="{$option[0]}" {$selected}>{$option[1]|htmlspecialchars}</option>
+            <option value="{:reset($option)}" {$selected}>{$option|end|htmlspecialchars}</option>
         </volist>
         <php>
             }else{
@@ -349,9 +349,9 @@
         <optgroup label="{$optgroupkey}">
             <volist name="optgroup" id="option">
                 <php>
-                    $selected = in_array($option[0],$field['value'])? 'selected' : '';
+                    $selected = in_array(reset($option),$field['value'])? 'selected' : '';
                 </php>
-                <option value="{$option[0]}" {$selected}>{$option[1]|htmlspecialchars}</option>
+                <option value="{:reset($option)}" {$selected}>{$option|end|htmlspecialchars}</option>
             </volist>
         </optgroup>
         <php>

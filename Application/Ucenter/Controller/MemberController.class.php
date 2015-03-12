@@ -23,6 +23,7 @@ class MemberController extends Controller
      */
     public function register()
     {
+
         //获取参数
         $aUsername = $username = I('post.username', '', 'op_t');
         $aNickname = I('post.nickname', '', 'op_t');
@@ -37,7 +38,10 @@ class MemberController extends Controller
             $this->error('注册已关闭');
         }
         if (IS_POST) { //注册用户
-
+            $return = check_action_limit('reg','ucenter_member',1,1,true);
+            if($return && !$return['state']){
+                $this->error($return['info'],$return['url']);
+            }
             /* 检测验证码 */
             if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
                 if (!check_verify($aVerify)) {
@@ -60,7 +64,9 @@ class MemberController extends Controller
             if ($aRegType == 'mobile' && $aUnType != 3) {
                 $this->error('手机格式不正确');
             }
-
+            if ($aRegType == 'username' && $aUnType != 1) {
+                $this->error('用户名格式不正确');
+            }
             if (!check_reg_type($aUnType)) {
                 $this->error('该类型未开放注册。');
             }
@@ -76,6 +82,8 @@ class MemberController extends Controller
 
                 $uid = UCenterMember()->login($username, $aPassword, $aUnType); //通过账号密码取到uid
                 D('Member')->login($uid, false); //登陆
+
+                exit;
                 $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
             } else { //注册失败，显示错误信息
                 $this->error($this->showRegError($uid));
@@ -558,13 +566,13 @@ class MemberController extends Controller
         $mUcenter = UCenterMember();
         switch ($aType) {
             case 'username':
-
+                empty($aAccount) && $this->error('用户名格式不正确！');
                 $length = mb_strlen($aAccount, 'utf-8'); // 当前数据长度
                 if ($length < 4 || $length > 30) {
                     $this->error('用户名长度在4-30之间');
                 }
 
-                empty($aAccount) && $this->error('用户名格式不正确！');
+
                 $id = $mUcenter->where(array('username' => $aAccount))->getField('id');
                 if ($id) {
                     $this->error('该用户名已经存在！');
@@ -575,11 +583,12 @@ class MemberController extends Controller
                 }
                 break;
             case 'email':
+                empty($email) && $this->error('邮箱格式不正确！');
                 $length = mb_strlen($email, 'utf-8'); // 当前数据长度
                 if ($length < 4 || $length > 32) {
                     $this->error('邮箱长度在4-32之间');
                 }
-                empty($email) && $this->error('邮箱格式不正确！');
+
                 $id = $mUcenter->where(array('email' => $email))->getField('id');
                 if ($id) {
                     $this->error('该邮箱已经存在！');

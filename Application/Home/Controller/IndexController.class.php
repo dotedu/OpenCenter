@@ -39,12 +39,4 @@ class IndexController extends HomeController
         exit(json_encode(D('Common/ ')->getAllExpression()));
     }
 
-
-    public function test(){
-        $a = UCenterMember()->info(1);
-        dump(UC_AUTH_KEY);
-        dump($a);
-        exit;
-    }
-
 }
