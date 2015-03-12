@@ -2,7 +2,7 @@
 <extend name="Public/base" />
 <block name="body">
     <div class="main-title">
-        <h2>默认前台权限配置<span style="margin-left: 20px;color: #FA4747;font-size: 14px;">对于权限节点的增加、删除、修改请到 用户》权限管理 中操作</span></h2>
+        <h2>角色用户拥有扩展资料字段配置</h2>
     </div>
     <div class="tab-wrap with-padding">
 
@@ -13,47 +13,38 @@
             <div class="col-xs-2 text-right">
                 <select name="role" class="form-control">
                     <volist name="role_list" id="vo">
-                        <option value="{:U('Role/configAuth',array('id'=>$vo['id'],'type'=>1))}" <eq name="vo['id']" value="$this_role['id']">selected</eq> >{$vo.title}</option>
+                        <option value="{:U('Role/configfield',array('id'=>$vo['id']))}" <eq name="vo['id']" value="$this_role['id']">selected</eq> >{$vo.title}</option>
                     </volist>
                 </select>
             </div>
         </div>
-        <div class="node-list">
+
+        <div>
             <!-- 访问授权 -->
-            <div class="tab-pane in">
+            <div class="node-list in">
                 <form action="__SELF__" enctype="application/x-www-form-urlencoded" method="POST" class="form-horizontal auth-form">
-                    <volist name="node_list" id="node" >
+                    <volist name="field_list" id="group" >
                         <dl class="checkmod">
                             <dt class="hd">
-                                <label class="checkbox"><input class="auth_rules rules_all" type="checkbox" name="rules[]" value="<?php echo $main_rules[$node['url']] ?>">{$node.alias}管理</label>
+                                <label class="checkbox"><input class="auth_fields fields_all" type="checkbox">{$group.profile_name}</label>
                             </dt>
                             <dd class="bd">
-                                <present name="node['child']">
-                                    <volist name="node['child']" id="child" >
-                                        <div class="rule_check">
+                                <present name="group['field_list']">
+                                    <volist name="group['field_list']" id="field" >
+                                        <div class="filed_check">
                                             <div>
-                                                <label class="checkbox" <notempty name="child['tip']">title='{$child.tip}'</notempty>>
-                                                <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="{$child.id}"/>{$child.title}
+                                                <label class="checkbox" title="id：{$field['id']}  字段类型：{$field['form_type']}">
+                                                <input class="auth_fields fields_row" type="checkbox" name="fields[]" value="{$field.id}"/>{$field.field_name}
                                                 </label>
                                             </div>
-                                            <notempty name="child['operator']">
-                                                <span class="divsion">&nbsp;</span>
-                                           <span class="child_row">
-                                               <volist name="child['operator']" id="op">
-                                                   <label class="checkbox" <notempty name="op['tip']">title='{$op.tip}'</notempty>>
-                                                   <input class="auth_rules" type="checkbox" name="rules[]"
-                                                          value="<?php echo $auth_rules[$op['url']] ?>"/>{$op.title}
-                                                   </label>
-                                               </volist>
-                                           </span>
-                                            </notempty>
                                         </div>
                                     </volist>
                                 </present>
+                                <div class="clearfix"></div>
                             </dd>
                         </dl>
                     </volist>
-                    <input type="hidden" name="type" value="1" />
+
                     <input type="hidden" name="id" value="{$this_role.id}" />
                     <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
                     <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
@@ -67,16 +58,22 @@
             <div class="tab-pane"></div>
         </div>
     </div>
-
+    <style>
+        .filed_check{
+            width: 200px;
+            float: left;
+            margin: 5px 0;
+        }
+    </style>
 </block>
 <block name="script">
     <script type="text/javascript" src="__STATIC__/qtip/jquery.qtip.min.js"></script>
     <link rel="stylesheet" type="text/css" href="__STATIC__/qtip/jquery.qtip.min.css" media="all">
     <script type="text/javascript" charset="utf-8">
         +function($){
-            var rules = [{$this_role.rules}];
-        $('.auth_rules').each(function(){
-            if( $.inArray( parseInt(this.value,10),rules )>-1 ){
+            var fields = [{$this_role.fields}];
+        $('.auth_fields').each(function(){
+            if( $.inArray( parseInt(this.value,10),fields )>-1 ){
                 $(this).prop('checked',true);
             }
             if(this.value==''){
@@ -85,11 +82,11 @@
         });
 
         //全选节点
-        $('.rules_all').on('change',function(){
+        $('.fields_all').on('change',function(){
             $(this).closest('dl').find('dd').find('input').prop('checked',this.checked);
         });
-        $('.rules_row').on('change',function(){
-            $(this).closest('.rule_check').find('.child_row').find('input').prop('checked',this.checked);
+        $('.fields_row').on('change',function(){
+            $(this).closest('.filed_check').find('.child_row').find('input').prop('checked',this.checked);
         });
 
         $('.checkbox').each(function(){
@@ -119,7 +116,7 @@
             location.href = this.value;
         });
         //导航高亮
-        highlight_subnav('{:U('Role/configauth')}');
+        highlight_subnav('{:U('Role/configfield')}');
         }(jQuery);
     </script>
 </block>

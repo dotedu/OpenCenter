@@ -10,7 +10,7 @@
         </div>
         <div class="col-xs-2 text-right">
             <select name="role" class="form-control">
-                <volist name="auth_role" id="vo">
+                <volist name="role_list" id="vo">
                     <option value="{:U('Role/configavatar',array('id'=>$vo['id']))}" <eq name="vo['id']" value="$this_role['id']">selected</eq>>{$vo.title}</option>
                 </volist>
             </select>
@@ -162,9 +162,12 @@
                     }, 1500);
                 }
             });
+            $('select[name="role"]').change(function(){
+                location.href = this.value;
+            });
         })
         //导航高亮
-        highlight_subnav('{:U('Role/configAvatar')}');
+        highlight_subnav('{:U('Role/configavatar')}');
     </script>
     <link type="text/css" rel="stylesheet" href="__PUBLIC__/js/ext/magnific/magnific-popup.css"/>
     <script type="text/javascript" src="__PUBLIC__/js/ext/magnific/jquery.magnific-popup.min.js"></script>

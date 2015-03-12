@@ -72,24 +72,21 @@ function getUserConfigMap($name='',$model='',$role_id=0,$uid=0){
  * @author 郑钟良<zzl@ourstu.com>
  */
 function getRoleConfigMap($type,$role_id=0){
+    $map['role_id']=$role_id;
+    $map['type']='';
+    $map['name']=$type;
     switch($type){
         case 'rules'://权限
-            $map['name']='rules';
-            $map['type']='';
-            $map['role_id']=$role_id;
-            break;
         case 'score'://积分
-            $map['name']='score';
-            $map['type']='';
-            $map['role_id']=$role_id;
+        case 'avatar'://默认头像
+        case 'rank'://默认头衔
             break;
-        case 'avatar'://默认头像id
-            $map['name']='avatar';
-            $map['type']='';
-            $map['role_id']=$role_id;
+        case 'expend_field'://角色拥有的扩展字段
+            $map['type']='expend_field';
+        case 'register_expend_field'://注册时角色要填写的扩展字段
+            $map['type']='expend_field';
             break;
-        default:
-            $map['role_id']=$role_id;
+        default:;
     }
     return $map;
 }

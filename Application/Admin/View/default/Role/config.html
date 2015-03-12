@@ -1,7 +1,7 @@
 <extend name="Public/base" />
 <block name="body">
     <div class="main-title">
-        <h2>默认资料配置</h2>
+        <h2>默认积分配置</h2>
     </div>
     <div class="tab-wrap with-padding">
 
@@ -11,7 +11,7 @@
             </div>
             <div class="col-xs-2 text-right">
                 <select name="role" class="form-control">
-                    <volist name="auth_role" id="vo">
+                    <volist name="role_list" id="vo">
                         <option value="{:U('Role/config',array('id'=>$vo['id']))}" <eq name="vo['id']" value="$this_role['id']">selected</eq> >{$vo.title}</option>
                     </volist>
                 </select>
@@ -49,52 +49,11 @@
     <link rel="stylesheet" type="text/css" href="__STATIC__/qtip/jquery.qtip.min.css" media="all">
     <script type="text/javascript" charset="utf-8">
         +function($){
-            var rules = [{$this_role.rules}];
-        $('.auth_rules').each(function(){
-            if( $.inArray( parseInt(this.value,10),rules )>-1 ){
-                $(this).prop('checked',true);
-            }
-            if(this.value==''){
-                $(this).closest('span').remove();
-            }
-        });
-
-        //全选节点
-        $('.rules_all').on('change',function(){
-            $(this).closest('dl').find('dd').find('input').prop('checked',this.checked);
-        });
-        $('.rules_row').on('change',function(){
-            $(this).closest('.rule_check').find('.child_row').find('input').prop('checked',this.checked);
-        });
-
-        $('.checkbox').each(function(){
-            $(this).qtip({
-                content: {
-                    text: $(this).attr('title'),
-                    title: $(this).text()
-                },
-                position: {
-                    my: 'bottom center',
-                    at: 'top center',
-                    target: $(this)
-                },
-                style: {
-                    classes: 'qtip-dark',
-                    tip: {
-                        corner: true,
-                        mimic: false,
-                        width: 10,
-                        height: 10
-                    }
-                }
-            });
-        });
-
-        $('select[name=group]').change(function(){
+        $('select[name="role"]').change(function(){
             location.href = this.value;
         });
         //导航高亮
-        highlight_subnav('{:U('Role/configauth')}');
+        highlight_subnav('{:U('Role/config')}');
         }(jQuery);
     </script>
 </block>

@@ -2,7 +2,7 @@
 <extend name="Public/base" />
 <block name="body">
     <div class="main-title">
-    <h2>角色 {$this_role.title} 默认权限配置<span style="margin-left: 20px;color: #FA4747;font-size: 14px;">对于权限节点的增加、删除、修改请到 用户》权限管理 中操作</span></h2>
+    <h2>默认后台权限配置<span style="margin-left: 20px;color: #FA4747;font-size: 14px;">对于权限节点的增加、删除、修改请到 用户》权限管理 中操作</span></h2>
 </div>
 	<div class="tab-wrap with-padding">
 
@@ -12,7 +12,7 @@
             </div>
             <div class="col-xs-2 text-right">
                 <select name="role" class="form-control">
-                    <volist name="auth_role" id="vo">
+                    <volist name="role_list" id="vo">
                         <option value="{:U('Role/configAuth',array('id'=>$vo['id']))}" <eq name="vo['id']" value="$this_role['id']">selected</eq> >{$vo.title}</option>
                     </volist>
                 </select>
@@ -116,7 +116,7 @@
             });
         });
 
-        $('select[name=role]').change(function(){
+        $('select[name="role"]').change(function(){
 			location.href = this.value;
         });
         //导航高亮
