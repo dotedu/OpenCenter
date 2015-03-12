@@ -25,6 +25,7 @@ class RoleController extends AdminController
     protected $roleModel;
     protected $userRoleModel;
     protected $roleConfigModel;
+    protected $roleGroupModel;
 
     public function _initialize()
     {
@@ -32,6 +33,7 @@ class RoleController extends AdminController
         $this->roleModel = D("Admin/Role");
         $this->userRoleModel = D('UserRole');
         $this->roleConfigModel = D('RoleConfig');
+        $this->roleGroupModel=D('RoleGroup');
     }
 
     //角色基本信息及配置 start
@@ -41,7 +43,7 @@ class RoleController extends AdminController
         $map['status'] = array('egt', 0);
         $roleList = $this->roleModel->selectPageByMap($map, &$totalCount, $page, $r, 'sort asc');
         $map_group['id']=array('in',array_column($roleList,'group_id'));
-        $group=D('RoleGroup')->where($map_group)->field('id,name,title')->select();
+        $group=$this->roleGroupModel->where($map_group)->field('id,name,title')->select();
         $group=array_combine(array_column($group,'id'),$group);
         foreach($roleList as &$val){
             $val['group']=$group[$val['group_id']]['title']."(".$group[$val['group_id']]['name'].")";
@@ -49,7 +51,7 @@ class RoleController extends AdminController
         unset($val);
 
         $builder = new AdminListBuilder;
-        $builder->mata_title = "角色列表";
+        $builder->meta_title = "角色列表";
         $builder->title("角色列表");
         $builder->buttonNew(U('Role/editRole'))->setStatusUrl(U('setStatus'))->buttonEnable()->buttonDisable()->button('删除', array('class' => 'btn ajax-post confirm', 'url' => U('setStatus', array('status' => -1)), 'target-form' => 'ids', 'confirm-info' => "确认删除角色？删除后不可恢复！"))->buttonSort(U('sort'));
         $builder->keyId()
@@ -173,7 +175,7 @@ class RoleController extends AdminController
             } else {
                 $this->error('角色' . $result['role']['name'] . '（' . $result["role"]["id"] . '）【' . $result["role"]["title"] . '】中存在单角色用户，移出单角色用户后才能禁用该角色！');
             }
-        } else if ($status == -1) {
+        } else if ($status == -1) {//（真删除）
             $result = $this->checkSingleRoleUser($ids);
             if ($result['status']) {
                 $result = $this->roleModel->where(array('id' => array('in', $ids)))->delete();
@@ -232,6 +234,85 @@ class RoleController extends AdminController
     }
 
     //角色基本信息及配置 end
+
+    //角色分组 start
+
+    public function group()
+    {
+        $group=$this->roleGroupModel->field('id,title,update_time')->select();
+        foreach($group as &$val){
+            $map['group_id']=$val['id'];
+            $roles=$this->roleModel->selectByMap($map,'id asc','id');
+            $val['roles']=explode(',',array_column($roles,'id'));
+        }
+        unset($roles,$val);
+        $builder=new AdminListBuilder;
+        $builder->title('角色分组（同组角色互斥，即同一分组下的角色不能同时被用户拥有）')
+            ->buttonNew(U('Role/editGroup'))
+            ->keyId()
+            ->keyText('title','标题')
+            ->keyText('roles','分组下的角色id')
+            ->keyUpdateTime()
+            ->keyDoActionEdit('Role/editGroup?id=###')
+            ->keyDoAction('Role/deleteGroup?id=###','删除')
+            ->data($group)
+            ->display();
+    }
+
+    public function editGroup()
+    {
+        $aGroupId=I('id',0,'intval');
+        $is_edit=$aGroupId?1:0;
+        $title=$is_edit?'编辑分组':'新增分组';
+        if(IS_POST){
+            $data['title']=I('post.title','','op_t');
+            $data['update_time']=time();
+            if($is_edit){
+                $result=$this->roleGroupModel->where(array('id'=>$aGroupId))->save($data);
+            }else{
+                $result=$this->roleGroupModel->add($data);
+            }
+            if($result){
+                $this->success("{$title}成功！",U('Role/group'));
+            }else{
+                $this->error("{$title}失败！".$this->roleGroupModel->getError());
+            }
+        }else{
+            $data=array();
+            if($is_edit){
+                $data=$this->roleGroupModel->where(array('id'=>$aGroupId))->find();
+            }
+            $builder=new AdminConfigBuilder;
+            $builder->title($title);
+            $builder->keyId()
+                ->keyText('title','标题')
+                ->buttonSubmit()
+                ->buttonBack()
+                ->data($data)
+                ->display();
+        }
+    }
+
+    /**
+     * 删除分组（真删除）
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function deleteGroup()
+    {
+        $aGroupId=I('id',0,'intval');
+        if(!$aGroupId){
+            $this->error('参数错误！');
+        }
+        $this->roleModel->where(array('group_id'=>$aGroupId))->setField('group_id',0);
+        $result=$this->roleGroupModel->where(array('id'=>$aGroupId))->delete();
+        if($result){
+            $this->success('删除成功！');
+        }else{
+            $this->error('删除失败！');
+        }
+    }
+
+    //角色分组end
 
     //角色其他配置 start
 
@@ -358,6 +439,7 @@ class RoleController extends AdminController
             }
             unset($val);
 
+            $this->meta_title = '角色默认积分配置';
             $this->assign('score_keys', $score_keys);
             $this->assign('post_key', $post_key);
             $this->assign('role_list', $mRole_list);
