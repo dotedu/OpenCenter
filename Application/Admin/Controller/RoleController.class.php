@@ -282,10 +282,13 @@ class RoleController extends AdminController
             if($is_edit){
                 $data=$this->roleGroupModel->where(array('id'=>$aGroupId))->find();
             }
+            $roles=$this->roleModel->field('id,title')->select();
+            dump($roles);exit;
             $builder=new AdminConfigBuilder;
             $builder->title($title);
             $builder->keyId()
                 ->keyText('title','标题')
+                ->keyChosen('roles','分组下角色选择','',$roles)
                 ->buttonSubmit()
                 ->buttonBack()
                 ->data($data)
