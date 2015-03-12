@@ -273,6 +273,12 @@ class AdminConfigBuilder extends AdminBuilder
     {
         //将数据融入到key中
         foreach ($this->_keyList as &$e) {
+            if($e['type'] == 'multiInput'){
+                $e['name'] = explode(',',$e['name']);
+            }
+
+
+
             //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
             if(is_array($e['name'])){
                 $i=0;
@@ -301,6 +307,7 @@ class AdminConfigBuilder extends AdminBuilder
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('savePostUrl', $this->_savePostUrl);
+
         parent::display('admin_config');
     }
 
@@ -335,6 +342,15 @@ class AdminConfigBuilder extends AdminBuilder
             unset($key, $val);
         }
         return $this->key($name, $title, $subtitle, 'chosen', $options);
+    }
+
+
+
+    public function keyMultiInput($name,$title,$subtitle,$config){
+
+        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'multiInput', 'config' => $config);
+        $this->_keyList[] = $key;
+        return $this;
     }
 
     /**插入配置分组
