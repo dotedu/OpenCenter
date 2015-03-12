@@ -15,14 +15,14 @@ define('OC_ROOT', substr(__FILE__, 0, -11));
 class OCApi
 {
     /**
-     * oc_post  执行方法
+     * ocPost  执行方法
      * @param $model
      * @param $action
      * @param array $args
      * @return mixed
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    function oc_post($model, $action, $args = array())
+    function ocPost($model, $action, $args = array())
     {
         global $oc_model;
         if (empty($oc_model[$model])) {
@@ -34,54 +34,54 @@ class OCApi
     }
 
     /**
-     * oc_user_login  登录
+     * ocUserLogin  登录
      * @param $username
      * @param $password
      * @return mixed
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    function oc_user_login($username, $password)
+    function ocUserLogin($username, $password)
     {
 
-        $return = $this->oc_post('User', 'login', array('username' => $username, 'password' => $password));
+        $return = $this->ocPost('User', 'login', array('username' => $username, 'password' => $password));
         return $return;
     }
 
     /**
-     * oc_get_user_info 获取用户信息
+     * ocGetUserInfo 获取用户信息
      * @param string $where
      * @return mixed|string
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    function oc_get_user_info($where = '')
+    function ocGetUserInfo($where = '')
     {
         $return = '无法查找';
         if ($where) {
-            $return = $this->oc_post('User', 'getUserInfo', $where);
+            $return = $this->ocPost('User', 'getUserInfo', $where);
         }
         return $return;
     }
 
     /**
-     * oc_syn_login  同步登录
+     * ocSynLogin  同步登录
      * @param $uid
      * @return mixed
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    function oc_syn_login($uid)
+    function ocSynLogin($uid)
     {
-        $return = $this->oc_post('User', 'synLogin', $uid);
+        $return = $this->ocPost('User', 'synLogin', $uid);
         return $return;
     }
 
     /**
-     * oc_syn_logout 同步登出
+     * ocSynLogout 同步登出
      * @return mixed
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    function oc_syn_logout()
+    function ocSynLogout()
     {
-        $return = $this->oc_post('User', 'synLogout', null);
+        $return = $this->ocPost('User', 'synLogout', null);
         return $return;
     }
 

@@ -20,7 +20,10 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="logo" href="{:U('Home/Index/index')}"><img src="__ROOT__/Public/images/logo.png"/></a>
+            <php>$logo = get_cover(C('SITE_LOGO'),'path');
+            $logo = $logo?$logo:'__ROOT__/Public/images/logo.png';
+            </php>
+            <a class="logo" href="{:U('Home/Index/index')}"><img src="{$logo}"/></a>
         </div>
         <div class="collapse navbar-collapse " id="nav_bar_main">
             <ul class="nav navbar-nav">
@@ -181,9 +184,7 @@
                     <li class="spliter hidden-xs"></li>
                 </if>
             </ul>
-            <!--换肤插件钩子-->
-            {:hook('setSkin')}
-            <!--换肤插件钩子 end-->
+
         </div>
 
         <!--导航栏菜单项-->
@@ -202,5 +203,7 @@
 
     </nav>
 </div>
-
+<!--换肤插件钩子-->
+{:hook('setSkin')}
+<!--换肤插件钩子 end-->
 <a id="goTopBtn"></a>

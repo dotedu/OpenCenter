@@ -19,7 +19,7 @@ if ($db_config['SSO_SWITCH'] == 0) {
 }
 $think = new think($db_config['SSO_DATA_AUTH_KEY']);
 $code = @$_GET['code'];
-parse_str($think->think_decrypt($code), $get);
+parse_str($think->thinkDecrypt($code), $get);
 
 $timestamp = time();
 if($timestamp - $get['time'] > 3600) {
@@ -30,20 +30,20 @@ if(empty($get)) {
 }
 
 if (in_array($get['action'], array('test', 'synLogin', 'synLogout'))) {
-    $node = new oc_node();
+    $node = new ocNode();
     exit($node->$get['action']($get));
 } else {
     exit('error');
 }
 
-class oc_node
+class ocNode
 {
     var $db;
     var $tablePre;
     var $dirpath;
     var $thisConfig;
 
-    function oc_node()
+    function ocNode()
     {
         $this->dirpath = substr(dirname(__FILE__), 0, -5);
         require_once($this->dirpath . 'OcApi/OCenter/Lib/Mysql.php');
@@ -74,7 +74,7 @@ class oc_node
         if ($check_user) {
             require_once($this->dirpath . 'OcApi/OCenter/OCenter.php');
             $OCApi = new OCApi();
-            $user = $OCApi->oc_get_user_info("id=" . $uid . " AND password='" . $password . "'");
+            $user = $OCApi->ocGetUserInfo("id=" . $uid . " AND password='" . $password . "'");
             //验证用户
             if ($user) {
                 $auth = array(

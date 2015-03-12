@@ -55,6 +55,7 @@ class SkinController extends AddonsController
         }
 
         if ($result) {
+            S('SKIN_USER_CONFIG_'.is_login(),null);
             $msg['status'] = 1;
             $msg['info'] = '设置成功';
         } else {

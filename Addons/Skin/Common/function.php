@@ -58,10 +58,14 @@ function getSkinInfoList($skinList){
  * @author 郑钟良<zzl@ourstu.com>
  */
 function getAddonConfig(){
-    $map['name']    =   ADDON_NAME;
-    $map['status']  =   1;
-    $config  =   M('Addons')->where($map)->getField('config');
-    $config=json_decode($config,true);
+    $config=S('SKIN_ADDON_CONFIG');
+    if(!$config){
+        $map['name']    =   ADDON_NAME;
+        $map['status']  =   1;
+        $config  =   M('Addons')->where($map)->getField('config');
+        $config=json_decode($config,true);
+        S('SKIN_ADDON_CONFIG',$config,600);
+    }
     return $config;
 }
 
@@ -72,11 +76,17 @@ function getAddonConfig(){
  */
 function getUserConfig()
 {
-    $map=getUserConfigMap(USER_CONFIG_MARK_NAME,USER_CONFIG_MARK_MODEL,get_login_role());
-    $UserConfig  =   M('UserConfig')->where($map)->getField('value');
+    $UserConfig=S('SKIN_USER_CONFIG_'.is_login());
     if(!$UserConfig){
-        $UserConfig=getAddonConfig();
-        $UserConfig['skin']=$UserConfig['defaultSkin'];
+        $map=getUserConfigMap(USER_CONFIG_MARK_NAME,USER_CONFIG_MARK_MODEL,get_login_role());
+        $skin  =   M('UserConfig')->where($map)->getField('value');
+        if(!$skin){
+            $UserConfig=getAddonConfig();
+            $UserConfig['skin']=$UserConfig['defaultSkin'];
+        }else{
+            $UserConfig['skin']=$skin;
+        }
+        S('SKIN_USER_CONFIG_'.is_login(),$UserConfig,600);
     }
     return $UserConfig;
 }

@@ -9,5 +9,6 @@
 'SSO_DB_PREFIX'=>'ocenter_', //用户中心数据库前缀
 'SSO_DATA_AUTH_KEY'=>'KOi7SehRQFmYVpAr8XngxyuBdq5GkETvMJbosZNc', //用户中心数据库密钥
 'OC_HOST'=>'http://localhost/opencenter', //Ocenter主机地址
+'OC_SESSION_PRE'=>'ocenter', //session前缀
 'APP_ID'=>'3', //应用ID
 );
