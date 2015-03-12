@@ -277,8 +277,6 @@ class AdminConfigBuilder extends AdminBuilder
                 $e['name'] = explode(',',$e['name']);
             }
 
-
-
             //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
             if(is_array($e['name'])){
                 $i=0;
@@ -345,10 +343,18 @@ class AdminConfigBuilder extends AdminBuilder
     }
 
 
-
-    public function keyMultiInput($name,$title,$subtitle,$config){
-
-        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'multiInput', 'config' => $config);
+    /**
+     * keyMultiInput  输入组组件
+     * @param $name
+     * @param $title
+     * @param $subtitle
+     * @param $config
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function keyMultiInput($name,$title,$subtitle,$config,$style = null){
+        empty($style) && $style = 'width:400px;';
+        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'multiInput', 'config' => $config,'style'=>$style);
         $this->_keyList[] = $key;
         return $this;
     }

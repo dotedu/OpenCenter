@@ -362,6 +362,7 @@
 </case>
 
     <case value="multiInput">
+        <div class="clearfix" style="{$field['style']}">
         <php>
             $field['name'] = is_array($field['name'])?$field['name']:explode(',',$field['name']);
             foreach($field['name'] as $key=>$val){
@@ -373,13 +374,11 @@
             </case>
             <case value="select">
                 <select name="{$val}" class="pull-left form-control" style="{$field['config'][$key]['style']}">
-                    <php>dump($field['config'][$key]['opt']);</php>
                     <php>foreach($field['config'][$key]['opt'] as $key_opt =>$option){</php>
                     <php>
                         $selected = $field['value'][$key]==$key_opt ? 'selected' : '';
                     </php>
-                    <option value="{$key_opt}"
-                    {$selected}>{$option|htmlspecialchars}</option>
+                    <option value="{$key_opt}"{$selected}>{$option|htmlspecialchars}</option>
                     <php>}</php>
                 </select>
             </case>
@@ -387,7 +386,7 @@
         <php>
             }
         </php>
-        <div class="clearfix"></div>
+        </div>
     </case>
 
 
