@@ -17,13 +17,16 @@ class ActionLimitController extends AdminController
 
     public function limitList()
     {
+        $action_name = I('get.action','','op_t') ;
+        !empty($action_name) && $map['action_list'] = array(array('like', '%[' . $action_name . ']%'),'','or');
         //读取规则列表
-        $map = array('status' => array('EGT', 0));
+        $map['status'] = array('EGT', 0);
         $model = M('action_limit');
         $List = $model->where($map)->order('id asc')->select();
         foreach($List as &$val){
             $timeUnit = $this->getTimeUnit();
             $val['time_unit'] = $timeUnit[$val['time_unit']];
+            empty( $val['action_list']) &&  $val['action_list'] = '所有行为';
         }
         unset($val);
         //显示页面
@@ -55,6 +58,7 @@ class ActionLimitController extends AdminController
             $data['title'] = I('post.title', '', 'op_t');
             $data['name'] = I('post.name', '', 'op_t');
             $data['frequency'] = I('post.frequency', 1, 'intval');
+            $data['time_number'] = I('post.time_number', 1, 'intval');
             $data['time_unit'] = I('post.time_unit', '', 'op_t');
             $data['punish'] = I('post.punish', '', 'op_t');
             $data['if_message'] = I('post.if_message', '', 'op_t');
@@ -85,8 +89,9 @@ class ActionLimitController extends AdminController
                 $limit['action_list'] = str_replace('[','',$limit['action_list']);
                 $limit['action_list'] = str_replace(']','',$limit['action_list']);
                 $limit['action_list'] = explode(',', $limit['action_list']);
+
             } else {
-                $limit = array('status' => 1);
+                $limit = array('status' => 1,'time_number'=>1);
             }
             $opt_punish = $this->getPunish();
             $opt = D('Action')->getActionOpt();
@@ -94,11 +99,13 @@ class ActionLimitController extends AdminController
                 ->keyTitle()
                 ->keyText('name', '名称')
                 ->keyText('frequency', '频率')
-                ->keySelect('time_unit', '时间单位', '', $this->getTimeUnit())
-                ->keyChosen('punish', '处罚', '', $opt_punish)
+               // ->keySelect('time_unit', '时间单位', '', $this->getTimeUnit())
+                ->keyMultiInput('time_number,time_unit','时间单位','时间单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>$this->getTimeUnit(),'style'=>'width:100px')))
+
+                ->keyChosen('punish', '处罚', '可多选', $opt_punish)
                 ->keyBool('if_message', '是否发送提醒')
                 ->keyTextArea('message_content', '消息提示内容')
-                ->keyChosen('action_list', '行为', '', $opt)
+                ->keyChosen('action_list', '行为', '可多选', $opt)
                 ->keyStatus()
                 ->data($limit)
                 ->buttonSubmit(U('editLimit'))->buttonBack()->display();
@@ -114,16 +121,15 @@ class ActionLimitController extends AdminController
 
     private function getTimeUnit()
     {
-        return array('second' => '秒', 'minute' => '分', 'hour' => '小时', 'day' => '天', 'week' => '周', 'month' => '月', 'year' => '年');
+        return get_time_unit();
     }
 
 
     private function getPunish()
     {
-        return array(
-            array('logout_account', '强制注销账户'),
-            array('ban_account', '封停账户'),
-        );
+        $obj = new \ActionLimit();
+        return $obj->punish;
+
     }
 
 

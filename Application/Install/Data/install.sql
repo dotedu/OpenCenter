@@ -1,6 +1,7 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
+DROP TABLE  IF EXISTS `ocenter_action`;
 CREATE TABLE IF NOT EXISTS `ocenter_action` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` char(30) NOT NULL DEFAULT '' COMMENT '行为唯一标识',
@@ -24,8 +25,23 @@ INSERT INTO `ocenter_action` ( `name`, `title`, `remark`, `rule`, `log`, `type`,
 ( 'update_menu', '更新菜单', '新增或修改或删除菜单', '', '', 1, 1, 1383296392),
 ( 'update_category', '更新分类', '新增或修改或删除分类', '', '', 1, 1, 1383296765);
 
+DROP TABLE  IF EXISTS `ocenter_action_limit`;
+CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `frequency` int(11) NOT NULL,
+  `time_unit` varchar(50) NOT NULL,
+  `punish` text NOT NULL,
+  `if_message` tinyint(4) NOT NULL,
+  `message_content` text NOT NULL,
+  `action_list` text NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_action_log`;
 CREATE TABLE IF NOT EXISTS `ocenter_action_log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `action_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '行为id',
@@ -42,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_log` (
   KEY `user_id_ix` (`user_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='行为日志表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_addons`;
 CREATE TABLE IF NOT EXISTS `ocenter_addons` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(40) NOT NULL COMMENT '插件名或标识',
@@ -66,7 +82,7 @@ INSERT INTO `ocenter_addons` (`id`, `name`, `title`, `description`, `status`, `c
 (6, 'LocalComment', '本地评论', '本地评论插件，不依赖社会化评论平台', 1, '{"can_guest_comment":"1"}', 'caipeichao', '0.1', 1399440324, 0);
 
 
-
+DROP TABLE  IF EXISTS `ocenter_attachment`;
 CREATE TABLE IF NOT EXISTS `ocenter_attachment` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
@@ -85,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_attachment` (
   KEY `idx_record_status` (`record_id`,`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='附件表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_extend`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_extend` (
   `group_id` mediumint(10) unsigned NOT NULL COMMENT '用户id',
   `extend_id` mediumint(8) unsigned NOT NULL COMMENT '扩展表中数据的id',
@@ -106,7 +122,7 @@ INSERT INTO `ocenter_auth_extend` (`group_id`, `extend_id`, `type`) VALUES
 (1, 4, 1),
 (1, 37, 1);
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_group`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_group` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户组id,自增主键',
   `module` varchar(20) NOT NULL COMMENT '用户组所属模块',
@@ -125,7 +141,7 @@ INSERT INTO `ocenter_auth_group` (`id`, `module`, `type`, `title`, `description`
 (2, 'admin', 1, 'VIP', '', 1, '');
 
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_group_access`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_group_access` (
   `uid` int(10) unsigned NOT NULL COMMENT '用户id',
   `group_id` mediumint(8) unsigned NOT NULL COMMENT '用户组id',
@@ -141,7 +157,7 @@ INSERT INTO `ocenter_auth_group_access` (`uid`, `group_id`) VALUES
 (58, 1);
 
 
-
+DROP TABLE  IF EXISTS `ocenter_auth_rule`;
 CREATE TABLE IF NOT EXISTS `ocenter_auth_rule` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '规则id,自增主键',
   `module` varchar(20) NOT NULL COMMENT '规则所属module',
@@ -463,7 +479,7 @@ INSERT INTO `ocenter_auth_rule` (`id`, `module`, `type`, `name`, `title`, `statu
 (322, 'admin', 2, 'Admin/module/lists', '云平台', 1, '');
 
 
-
+DROP TABLE  IF EXISTS `ocenter_avatar`;
 CREATE TABLE IF NOT EXISTS `ocenter_avatar` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -472,10 +488,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_avatar` (
   `status` int(11) NOT NULL,
   `is_temp` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_channel`;
 CREATE TABLE IF NOT EXISTS `ocenter_channel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '频道ID',
   `pid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上级频道ID',
@@ -499,7 +515,6 @@ INSERT INTO `ocenter_channel` (`id`, `pid`, `title`, `url`, `sort`, `create_time
 (1, 0, '首页', 'Home/Index/index', 0, 1379475111, 1421055116, 1, 0, '', '', '', 'home'),
 (2, 0, '会员展示', 'People/index/index', 3, 1421054845, 1421134856, 1, 0, '', '', '', 'group');
 
-
 DROP TABLE  IF EXISTS `ocenter_config`;
 CREATE TABLE IF NOT EXISTS `ocenter_config` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '配置ID',
@@ -518,7 +533,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_config` (
   UNIQUE KEY `uk_name` (`name`),
   KEY `type` (`type`),
   KEY `group` (`group`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=95 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=42 ;
 
 
 INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `remark`, `create_time`, `update_time`, `status`, `value`, `sort`) VALUES
@@ -566,7 +581,7 @@ INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `
 
 
 
-
+DROP TABLE  IF EXISTS `ocenter_field`;
 CREATE TABLE IF NOT EXISTS `ocenter_field` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -580,6 +595,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_field` (
 INSERT INTO `ocenter_field` (`id`, `uid`, `field_id`, `field_data`, `createTime`, `changeTime`) VALUES
 (1, 1, 36, 'ad', 1423034721, 1423034721);
 
+DROP TABLE  IF EXISTS `ocenter_field_group`;
 CREATE TABLE IF NOT EXISTS `ocenter_field_group` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `profile_name` varchar(25) NOT NULL,
@@ -595,6 +611,7 @@ INSERT INTO `ocenter_field_group` (`id`, `profile_name`, `status`, `createTime`,
 (2, '开发者资料', 1, 1423537648, 0, 0),
 (3, '开源中国资料', 1, 1423538446, 0, 0);
 
+DROP TABLE  IF EXISTS `ocenter_field_setting`;
 CREATE TABLE IF NOT EXISTS `ocenter_field_setting` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `field_name` varchar(25) NOT NULL,
@@ -622,7 +639,7 @@ INSERT INTO `ocenter_field_setting` (`id`, `field_name`, `profile_group_id`, `vi
 (7, '昵称', 3, 1, 1, 0, 'input', '', '', 1, 1423704462, 'string', 'OSC账号昵称');
 
 
-
+DROP TABLE  IF EXISTS `ocenter_file`;
 CREATE TABLE IF NOT EXISTS `ocenter_file` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '文件ID',
   `name` char(30) NOT NULL DEFAULT '' COMMENT '原始文件名',
@@ -638,20 +655,20 @@ CREATE TABLE IF NOT EXISTS `ocenter_file` (
   `driver` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_md5` (`md5`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='文件表' AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='文件表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_follow`;
 CREATE TABLE IF NOT EXISTS `ocenter_follow` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `follow_who` int(11) NOT NULL COMMENT '关注谁',
   `who_follow` int(11) NOT NULL COMMENT '谁关注',
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='关注表' AUTO_INCREMENT=91 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='关注表' AUTO_INCREMENT=1 ;
 
 
 
-
+DROP TABLE  IF EXISTS `ocenter_hooks`;
 CREATE TABLE IF NOT EXISTS `ocenter_hooks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(40) NOT NULL DEFAULT '' COMMENT '钩子名称',
@@ -696,7 +713,7 @@ INSERT INTO `ocenter_hooks` (`id`, `name`, `description`, `type`, `update_time`,
 (36, 'dealPicture', '上传图片处理', 2, 1417139975, ''),
 (37, 'ucenterSideMenu', '用户中心左侧菜单', 1, 1417161205, '');
 
-
+DROP TABLE  IF EXISTS `ocenter_local_comment`;
 CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -709,12 +726,12 @@ CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
   `pid` int(11) NOT NULL,
   `status` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 
 
-
+DROP TABLE  IF EXISTS `ocenter_member`;
 CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `uid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `nickname` char(16) NOT NULL DEFAULT '' COMMENT '昵称',
@@ -756,129 +773,127 @@ CREATE TABLE IF NOT EXISTS `ocenter_menu` (
   `icon` varchar(20) NOT NULL COMMENT '导航图标',
   PRIMARY KEY (`id`),
   KEY `pid` (`pid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2341 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=116 ;
 
 INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`, `icon`) VALUES
 (1, '首页', 0, 1, 'Index/index', 0, '', '', 0, 'home'),
-(16, '用户', 0, 3, 'User/index', 0, '', '', 0, 'group'),
-(17, '用户信息', 16, 0, 'User/index', 0, '', '用户管理', 0, ''),
-(19, '用户行为', 16, 0, 'User/action', 0, '', '行为管理', 0, ''),
-(20, '新增用户行为', 19, 0, 'User/addaction', 0, '', '', 0, ''),
-(21, '编辑用户行为', 19, 0, 'User/editaction', 0, '', '', 0, ''),
-(22, '保存用户行为', 19, 0, 'User/saveAction', 0, '"用户->用户行为"保存编辑和新增的用户行为', '', 0, ''),
-(23, '变更行为状态', 19, 0, 'User/setStatus', 0, '"用户->用户行为"中的启用,禁用和删除权限', '', 0, ''),
-(24, '禁用会员', 19, 0, 'User/changeStatus?method=forbidUser', 0, '"用户->用户信息"中的禁用', '', 0, ''),
-(25, '启用会员', 19, 0, 'User/changeStatus?method=resumeUser', 0, '"用户->用户信息"中的启用', '', 0, ''),
-(26, '删除会员', 19, 0, 'User/changeStatus?method=deleteUser', 0, '"用户->用户信息"中的删除', '', 0, ''),
-(27, '权限管理', 16, 0, 'AuthManager/index', 0, '', '权限管理', 0, ''),
-(28, '删除', 27, 0, 'AuthManager/changeStatus?method=deleteGroup', 0, '删除用户组', '', 0, ''),
-(29, '禁用', 27, 0, 'AuthManager/changeStatus?method=forbidGroup', 0, '禁用用户组', '', 0, ''),
-(30, '恢复', 27, 0, 'AuthManager/changeStatus?method=resumeGroup', 0, '恢复已禁用的用户组', '', 0, ''),
-(31, '新增', 27, 0, 'AuthManager/createGroup', 0, '创建新的用户组', '', 0, ''),
-(32, '编辑', 27, 0, 'AuthManager/editGroup', 0, '编辑用户组名称和描述', '', 0, ''),
-(33, '保存用户组', 27, 0, 'AuthManager/writeGroup', 0, '新增和编辑用户组的"保存"按钮', '', 0, ''),
-(34, '授权', 27, 0, 'AuthManager/group', 0, '"后台 \\ 用户 \\ 用户信息"列表页的"授权"操作按钮,用于设置用户所属用户组', '', 0, ''),
-(35, '访问授权', 27, 0, 'AuthManager/access', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"访问授权"操作按钮', '', 0, ''),
-(36, '成员授权', 27, 0, 'AuthManager/user', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"成员授权"操作按钮', '', 0, ''),
-(37, '解除授权', 27, 0, 'AuthManager/removeFromGroup', 0, '"成员授权"列表页内的解除授权操作按钮', '', 0, ''),
-(38, '保存成员授权', 27, 0, 'AuthManager/addToGroup', 0, '"用户信息"列表页"授权"时的"保存"按钮和"成员授权"里右上角的"添加"按钮)', '', 0, ''),
-(39, '分类授权', 27, 0, 'AuthManager/category', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"分类授权"操作按钮', '', 0, ''),
-(40, '保存分类授权', 27, 0, 'AuthManager/addToCategory', 0, '"分类授权"页面的"保存"按钮', '', 0, ''),
-(41, '模型授权', 27, 0, 'AuthManager/modelauth', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"模型授权"操作按钮', '', 0, ''),
-(42, '保存模型授权', 27, 0, 'AuthManager/addToModel', 0, '"分类授权"页面的"保存"按钮', '', 0, ''),
-(43, '插件', 0, 998, 'Addons/index', 0, '', '', 0, 'cogs'),
-(44, '插件管理', 43, 1, 'Addons/index', 0, '', '扩展', 0, ''),
-(45, '创建', 44, 0, 'Addons/create', 0, '服务器上创建插件结构向导', '', 0, ''),
-(46, '检测创建', 44, 0, 'Addons/checkForm', 0, '检测插件是否可以创建', '', 0, ''),
-(47, '预览', 44, 0, 'Addons/preview', 0, '预览插件定义类文件', '', 0, ''),
-(48, '快速生成插件', 44, 0, 'Addons/build', 0, '开始生成插件结构', '', 0, ''),
-(49, '设置', 44, 0, 'Addons/config', 0, '设置插件配置', '', 0, ''),
-(50, '禁用', 44, 0, 'Addons/disable', 0, '禁用插件', '', 0, ''),
-(51, '启用', 44, 0, 'Addons/enable', 0, '启用插件', '', 0, ''),
-(52, '安装', 44, 0, 'Addons/install', 0, '安装插件', '', 0, ''),
-(53, '卸载', 44, 0, 'Addons/uninstall', 0, '卸载插件', '', 0, ''),
-(54, '更新配置', 44, 0, 'Addons/saveconfig', 0, '更新插件配置处理', '', 0, ''),
-(55, '插件后台列表', 44, 0, 'Addons/adminList', 0, '', '', 0, ''),
-(56, 'URL方式访问插件', 44, 0, 'Addons/execute', 0, '控制是否有权限通过url访问插件控制器方法', '', 0, ''),
-(57, '钩子管理', 43, 2, 'Addons/hooks', 0, '', '扩展', 0, ''),
-(2263, '模块安装', 2260, 0, 'module/install', 1, '', '云市场', 0, ''),
-(68, '系统', 0, 9999, 'Config/group', 0, '', '', 0, 'windows'),
-(69, '网站设置', 68, 1, 'Config/group', 0, '', '系统设置', 0, ''),
-(70, '配置管理', 68, 4, 'Config/index', 0, '', '系统设置', 0, ''),
-(71, '编辑', 70, 0, 'Config/edit', 0, '新增编辑和保存配置', '', 0, ''),
-(72, '删除', 70, 0, 'Config/del', 0, '删除配置', '', 0, ''),
-(73, '新增', 70, 0, 'Config/add', 0, '新增配置', '', 0, ''),
-(74, '保存', 70, 0, 'Config/save', 0, '保存配置', '', 0, ''),
-(75, '菜单管理', 16, 5, 'Menu/index', 0, '', '权限管理', 0, ''),
-(76, '导航管理', 68, 6, 'Channel/index', 0, '', '系统设置', 0, ''),
-(77, '新增', 76, 0, 'Channel/add', 0, '', '', 0, ''),
-(78, '编辑', 76, 0, 'Channel/edit', 0, '', '', 0, ''),
-(79, '删除', 76, 0, 'Channel/del', 0, '', '', 0, ''),
-(80, '分类管理', 2, 2, 'Category/index', 0, '', '系统设置', 0, ''),
-(81, '编辑', 80, 0, 'Category/edit', 0, '编辑和保存栏目分类', '', 0, ''),
-(82, '新增', 80, 0, 'Category/add', 0, '新增栏目分类', '', 0, ''),
-(83, '删除', 80, 0, 'Category/remove', 0, '删除栏目分类', '', 0, ''),
-(84, '移动', 80, 0, 'Category/operate/type/move', 0, '移动栏目分类', '', 0, ''),
-(85, '合并', 80, 0, 'Category/operate/type/merge', 0, '合并栏目分类', '', 0, ''),
-(86, '备份数据库', 68, 20, 'Database/index?type=export', 0, '', '数据备份', 0, ''),
-(87, '备份', 86, 0, 'Database/export', 0, '备份数据库', '', 0, ''),
-(88, '优化表', 86, 0, 'Database/optimize', 0, '优化数据表', '', 0, ''),
-(89, '修复表', 86, 0, 'Database/repair', 0, '修复数据表', '', 0, ''),
-(90, '还原数据库', 68, 0, 'Database/index?type=import', 0, '', '数据备份', 0, ''),
-(91, '恢复', 90, 0, 'Database/import', 0, '数据库恢复', '', 0, ''),
-(92, '删除', 90, 0, 'Database/del', 0, '删除备份文件', '', 0, ''),
-(96, '新增', 75, 0, 'Menu/add', 0, '', '系统设置', 0, ''),
-(98, '编辑', 75, 0, 'Menu/edit', 0, '', '', 0, ''),
-(104, '下载管理', 102, 0, 'Think/lists?model=download', 0, '', '', 0, ''),
-(105, '配置管理', 102, 0, 'Think/lists?model=config', 0, '', '', 0, ''),
-(106, '行为日志', 16, 0, 'Action/actionlog', 0, '', '行为管理', 0, ''),
-(108, '修改密码', 16, 0, 'User/updatePassword', 1, '', '', 0, ''),
-(109, '修改昵称', 16, 0, 'User/updateNickname', 1, '', '', 0, ''),
-(110, '查看行为日志', 106, 0, 'action/edit', 1, '', '', 0, ''),
-(112, '新增数据', 58, 0, 'think/add', 1, '', '', 0, ''),
-(113, '编辑数据', 58, 0, 'think/edit', 1, '', '', 0, ''),
-(114, '导入', 75, 0, 'Menu/import', 0, '', '', 0, ''),
-(116, '新增钩子', 57, 0, 'Addons/addHook', 0, '', '', 0, ''),
-(117, '编辑钩子', 57, 0, 'Addons/edithook', 0, '', '', 0, ''),
-(119, '排序', 70, 0, 'Config/sort', 1, '', '', 0, ''),
-(120, '排序', 75, 0, 'Menu/sort', 1, '', '', 0, ''),
-(121, '排序', 76, 0, 'Channel/sort', 1, '', '', 0, ''),
-(130, '新增、编辑', 132, 0, 'SEO/editRule', 0, '', '', 0, ''),
-(131, '排序', 132, 0, 'SEO/sortRule', 0, '', '', 0, ''),
-(132, '规则管理', 68, 0, 'SEO/index', 0, '', 'SEO规则', 0, ''),
-(146, '规则回收站', 68, 0, 'SEO/ruleTrash', 0, '', 'SEO规则', 0, ''),
-(147, '头衔列表', 16, 10, 'Rank/index', 0, '', '头衔管理', 0, ''),
-(149, '添加头衔', 16, 2, 'Rank/editRank', 1, '', '头衔管理', 0, ''),
-(150, '查看用户', 16, 0, 'Rank/userList', 0, '', '头衔管理', 0, ''),
-(151, '用户头衔列表', 150, 0, 'Rank/userRankList', 1, '', '', 0, ''),
-(152, '关联新头衔', 150, 0, 'Rank/userAddRank', 1, '', '', 0, ''),
-(153, '编辑头衔关联', 150, 0, 'Rank/userChangeRank', 1, '', '', 0, ''),
-(162, '扩展资料', 16, 0, 'Admin/User/profile', 0, '', '用户管理', 0, ''),
-(163, '添加、编辑分组', 162, 0, 'Admin/User/editProfile', 0, '', '', 0, ''),
-(164, '分组排序', 162, 0, 'Admin/User/sortProfile', 0, '', '', 0, ''),
-(165, '字段列表', 162, 0, 'Admin/User/field', 0, '', '', 0, ''),
-(166, '添加、编辑字段', 165, 0, 'Admin/User/editFieldSetting', 0, '', '', 0, ''),
-(167, '字段排序', 165, 0, 'Admin/User/sortField', 0, '', '', 0, ''),
-(168, '全部补丁', 68, 0, 'Admin/Update/quick', 0, '', '升级补丁', 0, ''),
-(169, '新增补丁', 68, 0, 'Admin/Update/addpack', 1, '', '升级补丁', 0, ''),
-(170, '用户扩展资料列表', 16, 0, 'Admin/User/expandinfo_select', 0, '', '用户管理', 0, ''),
-(171, '扩展资料详情', 170, 0, 'User/expandinfo_details', 0, '', '', 0, ''),
-(216, '待审核用户头衔', 16, 0, 'Rank/rankVerify', 0, '', '头衔管理', 0, ''),
-(217, '被驳回的头衔申请', 16, 0, 'Rank/rankVerifyFailure', 0, '', '头衔管理', 0, ''),
-(2260, '云市场', 0, 999999, 'module/lists', 1, '', '', 0, 'cloud'),
-(2261, '模块管理', 2260, 0, 'module/lists', 0, '', '云市场', 0, ''),
-(2262, '卸载模块', 2260, 0, 'module/uninstall', 1, '', '云市场', 0, ''),
-(2238, '新增权限节点', 27, 0, 'AuthManager/addNode', 1, '', '', 1, ''),
-(2239, '前台权限管理', 27, 0, 'AuthManager/accessUser', 1, '', '权限管理', 0, ''),
-(2240, '转移用户组', 16, 0, 'User/changeGroup', 1, '批量转移用户组', '', 0, ''),
-(2241, '删除权限节点', 27, 0, 'AuthManager/deleteNode', 1, '', '', 0, ''),
-(2340, '用户注册配置', 16, 0, 'UserConfig/index', 0, '', '注册配置', 0, ''),
-(2341, '积分类型列表', 16, 0, 'User/scoreList', 0, '', '行为管理', 0, ''),
-(2342, '新增/编辑类型', 16, 0, 'user/editScoreType', 1, '', '行为管理', 0, ''),
-(2343, '充值积分', 16, 0, 'user/recharge', 1, '', '', 0, '用户管理');
+(2, '用户', 0, 2, 'User/index', 0, '', '', 0, 'group'),
+(3, '用户信息', 2, 0, 'User/index', 0, '', '用户管理', 0, ''),
+(4, '用户行为', 2, 0, 'User/action', 0, '', '行为管理', 0, ''),
+(5, '新增用户行为', 4, 0, 'User/addaction', 0, '', '', 0, ''),
+(6, '编辑用户行为', 4, 0, 'User/editaction', 0, '', '', 0, ''),
+(7, '保存用户行为', 4, 0, 'User/saveAction', 0, '"用户->用户行为"保存编辑和新增的用户行为', '', 0, ''),
+(8, '变更行为状态', 4, 0, 'User/setStatus', 0, '"用户->用户行为"中的启用,禁用和删除权限', '', 0, ''),
+(9, '禁用会员', 4, 0, 'User/changeStatus?method=forbidUser', 0, '"用户->用户信息"中的禁用', '', 0, ''),
+(10, '启用会员', 4, 0, 'User/changeStatus?method=resumeUser', 0, '"用户->用户信息"中的启用', '', 0, ''),
+(11, '删除会员', 4, 0, 'User/changeStatus?method=deleteUser', 0, '"用户->用户信息"中的删除', '', 0, ''),
+(12, '权限管理', 2, 0, 'AuthManager/index', 0, '', '权限管理', 0, ''),
+(13, '删除', 12, 0, 'AuthManager/changeStatus?method=deleteGroup', 0, '删除用户组', '', 0, ''),
+(14, '禁用', 12, 0, 'AuthManager/changeStatus?method=forbidGroup', 0, '禁用用户组', '', 0, ''),
+(15, '恢复', 12, 0, 'AuthManager/changeStatus?method=resumeGroup', 0, '恢复已禁用的用户组', '', 0, ''),
+(16, '新增', 12, 0, 'AuthManager/createGroup', 0, '创建新的用户组', '', 0, ''),
+(17, '编辑', 12, 0, 'AuthManager/editGroup', 0, '编辑用户组名称和描述', '', 0, ''),
+(18, '保存用户组', 12, 0, 'AuthManager/writeGroup', 0, '新增和编辑用户组的"保存"按钮', '', 0, ''),
+(19, '授权', 12, 0, 'AuthManager/group', 0, '"后台 \\ 用户 \\ 用户信息"列表页的"授权"操作按钮,用于设置用户所属用户组', '', 0, ''),
+(20, '访问授权', 12, 0, 'AuthManager/access', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"访问授权"操作按钮', '', 0, ''),
+(21, '成员授权', 12, 0, 'AuthManager/user', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"成员授权"操作按钮', '', 0, ''),
+(22, '解除授权', 12, 0, 'AuthManager/removeFromGroup', 0, '"成员授权"列表页内的解除授权操作按钮', '', 0, ''),
+(23, '保存成员授权', 12, 0, 'AuthManager/addToGroup', 0, '"用户信息"列表页"授权"时的"保存"按钮和"成员授权"里右上角的"添加"按钮)', '', 0, ''),
+(24, '分类授权', 12, 0, 'AuthManager/category', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"分类授权"操作按钮', '', 0, ''),
+(25, '保存分类授权', 12, 0, 'AuthManager/addToCategory', 0, '"分类授权"页面的"保存"按钮', '', 0, ''),
+(26, '模型授权', 12, 0, 'AuthManager/modelauth', 0, '"后台 \\ 用户 \\ 权限管理"列表页的"模型授权"操作按钮', '', 0, ''),
+(27, '保存模型授权', 12, 0, 'AuthManager/addToModel', 0, '"分类授权"页面的"保存"按钮', '', 0, ''),
+(28, '新增权限节点', 12, 0, 'AuthManager/addNode', 1, '', '', 1, ''),
+(29, '前台权限管理', 12, 0, 'AuthManager/accessUser', 1, '', '权限管理', 0, ''),
+(30, '删除权限节点', 12, 0, 'AuthManager/deleteNode', 1, '', '', 0, ''),
+(31, '行为日志', 2, 0, 'Action/actionlog', 0, '', '行为管理', 0, ''),
+(32, '查看行为日志', 31, 0, 'action/edit', 1, '', '', 0, ''),
+(33, '修改密码', 2, 0, 'User/updatePassword', 1, '', '', 0, ''),
+(34, '修改昵称', 2, 0, 'User/updateNickname', 1, '', '', 0, ''),
+(35, '查看用户', 2, 0, 'Rank/userList', 0, '', '头衔管理', 0, ''),
+(36, '用户头衔列表', 35, 0, 'Rank/userRankList', 1, '', '', 0, ''),
+(37, '关联新头衔', 35, 0, 'Rank/userAddRank', 1, '', '', 0, ''),
+(38, '编辑头衔关联', 35, 0, 'Rank/userChangeRank', 1, '', '', 0, ''),
+(39, '扩展资料', 2, 0, 'Admin/User/profile', 0, '', '用户管理', 0, ''),
+(40, '添加、编辑分组', 39, 0, 'Admin/User/editProfile', 0, '', '', 0, ''),
+(41, '分组排序', 39, 0, 'Admin/User/sortProfile', 0, '', '', 0, ''),
+(42, '字段列表', 39, 0, 'Admin/User/field', 0, '', '', 0, ''),
+(43, '添加、编辑字段', 42, 0, 'Admin/User/editFieldSetting', 0, '', '', 0, ''),
+(44, '字段排序', 42, 0, 'Admin/User/sortField', 0, '', '', 0, ''),
+(45, '用户扩展资料列表', 2, 0, 'Admin/User/expandinfo_select', 0, '', '用户管理', 0, ''),
+(46, '扩展资料详情', 45, 0, 'User/expandinfo_details', 0, '', '', 0, ''),
+(47, '待审核用户头衔', 2, 0, 'Rank/rankVerify', 0, '', '头衔管理', 0, ''),
+(48, '被驳回的头衔申请', 2, 0, 'Rank/rankVerifyFailure', 0, '', '头衔管理', 0, ''),
+(49, '转移用户组', 2, 0, 'User/changeGroup', 1, '批量转移用户组', '', 0, ''),
+(50, '用户注册配置', 2, 0, 'UserConfig/index', 0, '', '注册配置', 0, ''),
+(51, '积分类型列表', 2, 0, 'User/scoreList', 0, '', '行为管理', 0, ''),
+(52, '新增/编辑类型', 2, 0, 'user/editScoreType', 1, '', '行为管理', 0, ''),
+(53, '充值积分', 2, 0, 'user/recharge', 1, '', '', 0, '用户管理'),
+(54, '头衔列表', 2, 10, 'Rank/index', 0, '', '头衔管理', 0, ''),
+(55, '添加头衔', 2, 2, 'Rank/editRank', 1, '', '头衔管理', 0, ''),
+(56, '插件', 0, 3, 'Addons/index', 0, '', '', 0, 'cogs'),
+(57, '插件管理', 56, 1, 'Addons/index', 0, '', '扩展', 0, ''),
+(58, '钩子管理', 56, 2, 'Addons/hooks', 0, '', '扩展', 0, ''),
+(59, '创建', 57, 0, 'Addons/create', 0, '服务器上创建插件结构向导', '', 0, ''),
+(60, '检测创建', 57, 0, 'Addons/checkForm', 0, '检测插件是否可以创建', '', 0, ''),
+(61, '预览', 57, 0, 'Addons/preview', 0, '预览插件定义类文件', '', 0, ''),
+(62, '快速生成插件', 57, 0, 'Addons/build', 0, '开始生成插件结构', '', 0, ''),
+(64, '设置', 57, 0, 'Addons/config', 0, '设置插件配置', '', 0, ''),
+(65, '禁用', 57, 0, 'Addons/disable', 0, '禁用插件', '', 0, ''),
+(66, '启用', 57, 0, 'Addons/enable', 0, '启用插件', '', 0, ''),
+(67, '安装', 57, 0, 'Addons/install', 0, '安装插件', '', 0, ''),
+(68, '卸载', 57, 0, 'Addons/uninstall', 0, '卸载插件', '', 0, ''),
+(69, '更新配置', 57, 0, 'Addons/saveconfig', 0, '更新插件配置处理', '', 0, ''),
+(70, '插件后台列表', 57, 0, 'Addons/adminList', 0, '', '', 0, ''),
+(71, 'URL方式访问插件', 57, 0, 'Addons/execute', 0, '控制是否有权限通过url访问插件控制器方法', '', 0, ''),
+(72, '新增钩子', 58, 0, 'Addons/addHook', 0, '', '', 0, ''),
+(73, '编辑钩子', 58, 0, 'Addons/edithook', 0, '', '', 0, ''),
+(74, '系统', 0, 4, 'Config/group', 0, '', '', 0, 'windows'),
+(75, '网站设置', 74, 1, 'Config/group', 0, '', '系统设置', 0, ''),
+(76, '配置管理', 74, 4, 'Config/index', 0, '', '系统设置', 0, ''),
+(77, '编辑', 76, 0, 'Config/edit', 0, '新增编辑和保存配置', '', 0, ''),
+(78, '删除', 76, 0, 'Config/del', 0, '删除配置', '', 0, ''),
+(79, '新增', 76, 0, 'Config/add', 0, '新增配置', '', 0, ''),
+(80, '保存', 76, 0, 'Config/save', 0, '保存配置', '', 0, ''),
+(81, '排序', 76, 0, 'Config/sort', 1, '', '', 0, ''),
+(82, '菜单管理', 2, 5, 'Menu/index', 0, '', '权限管理', 0, ''),
+(83, '新增', 82, 0, 'Menu/add', 0, '', '系统设置', 0, ''),
+(84, '编辑', 82, 0, 'Menu/edit', 0, '', '', 0, ''),
+(85, '导入', 82, 0, 'Menu/import', 0, '', '', 0, ''),
+(86, '排序', 82, 0, 'Menu/sort', 1, '', '', 0, ''),
+(87, '导航管理', 74, 6, 'Channel/index', 0, '', '系统设置', 0, ''),
+(88, '新增', 87, 0, 'Channel/add', 0, '', '', 0, ''),
+(89, '编辑', 87, 0, 'Channel/edit', 0, '', '', 0, ''),
+(90, '删除', 87, 0, 'Channel/del', 0, '', '', 0, ''),
+(91, '排序', 87, 0, 'Channel/sort', 1, '', '', 0, ''),
+(92, '备份数据库', 74, 20, 'Database/index?type=export', 0, '', '数据备份', 0, ''),
+(93, '备份', 92, 0, 'Database/export', 0, '备份数据库', '', 0, ''),
+(94, '优化表', 92, 0, 'Database/optimize', 0, '优化数据表', '', 0, ''),
+(95, '修复表', 92, 0, 'Database/repair', 0, '修复数据表', '', 0, ''),
+(96, '还原数据库', 74, 0, 'Database/index?type=import', 0, '', '数据备份', 0, ''),
+(97, '恢复', 96, 0, 'Database/import', 0, '数据库恢复', '', 0, ''),
+(98, '删除', 96, 0, 'Database/del', 0, '删除备份文件', '', 0, ''),
+(99, '规则管理', 74, 0, 'SEO/index', 0, '', 'SEO规则', 0, ''),
+(100, '新增、编辑', 99, 0, 'SEO/editRule', 0, '', '', 0, ''),
+(101, '排序', 99, 0, 'SEO/sortRule', 0, '', '', 0, ''),
+(102, '规则回收站', 74, 0, 'SEO/ruleTrash', 0, '', 'SEO规则', 0, ''),
+(103, '全部补丁', 74, 0, 'Admin/Update/quick', 0, '', '升级补丁', 0, ''),
+(104, '新增补丁', 74, 0, 'Admin/Update/addpack', 1, '', '升级补丁', 0, ''),
+(105, '云市场', 0, 5, 'module/lists', 1, '', '', 0, 'cloud'),
+(106, '模块安装', 105, 0, 'module/install', 1, '', '云市场', 0, ''),
+(107, '模块管理', 105, 0, 'module/lists', 0, '', '云市场', 0, ''),
+(108, '卸载模块', 105, 0, 'module/uninstall', 1, '', '云市场', 0, ''),
+(109, '授权', 0, 6, 'authorize/ssoSetting', 0, '', '', 0, 'lock'),
+(110, '单点登录配置', 109, 0, 'Authorize/ssoSetting', 0, '', '单点登录', 0, ''),
+(111, '应用列表', 109, 0, 'Authorize/ssolist', 0, '', '单点登录', 0, ''),
+(112, '新增/编辑应用', 109, 0, 'authorize/editssoapp', 1, '', '单点登录', 0, ''),
+(113, '安全', 0, 7, 'ActionLimit/limitList', 0, '', '', 0, 'shield'),
+(114, '行为限制列表', 113, 0, 'ActionLimit/limitList', 0, '', '行为限制', 0, ''),
+(115, '新增/编辑行为限制', 113, 0, 'ActionLimit/editLimit', 1, '', '行为限制', 0, '');
 
 
 
+DROP TABLE  IF EXISTS `ocenter_message`;
 CREATE TABLE IF NOT EXISTS `ocenter_message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `from_uid` int(11) NOT NULL,
@@ -897,10 +912,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_message` (
   `find_id` int(11) NOT NULL,
   `status` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='thinkox新增消息表' AUTO_INCREMENT=358 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='thinkox新增消息表' AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_module`;
 CREATE TABLE IF NOT EXISTS `ocenter_module` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL COMMENT '模块名',
@@ -920,10 +935,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_module` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `name_2` (`name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='模块管理表' AUTO_INCREMENT=53 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='模块管理表' AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_picture`;
 CREATE TABLE IF NOT EXISTS `ocenter_picture` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id自增',
   `type` varchar(50) NOT NULL,
@@ -934,9 +949,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_picture` (
   `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态',
   `create_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=111 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_rank`;
 CREATE TABLE IF NOT EXISTS `ocenter_rank` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL COMMENT '上传者id',
@@ -945,9 +960,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_rank` (
   `create_time` int(11) NOT NULL,
   `types` tinyint(2) NOT NULL DEFAULT '1' COMMENT '前台是否可申请',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_rank_user`;
 CREATE TABLE IF NOT EXISTS `ocenter_rank_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -957,10 +972,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_rank_user` (
   `create_time` int(11) NOT NULL,
   `status` tinyint(2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_seo_rule`;
 CREATE TABLE IF NOT EXISTS `ocenter_seo_rule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` text NOT NULL,
@@ -973,29 +988,29 @@ CREATE TABLE IF NOT EXISTS `ocenter_seo_rule` (
   `seo_title` text NOT NULL,
   `sort` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=21 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
 
 
 
 INSERT INTO `ocenter_seo_rule` (`id`, `title`, `app`, `controller`, `action`, `status`, `seo_keywords`, `seo_description`, `seo_title`, `sort`) VALUES
-(4, '整站标题', '', '', '', 1, '', '', 'OpenCenter', 7),
-(6, '论坛版块页', 'forum', 'index', 'forum', -1, '{$forum.title} ', '{$forum.title} ', '{$forum.title} —— ThinkOX论坛', 2),
-(7, '微博首页', '', 'Index', 'index', 1, '微博', '微博首页', 'OpenCenter轻量化社交框架', 5),
-(8, '微博详情页', '', 'Index', 'weiboDetail', 1, '{$weibo.title|op_t},OpenCenter,oc,微博', '{$weibo.content|op_t}\r\n', '{$weibo.content|op_t}——OpenCenter微博', 6),
-(9, '用户中心', 'Ucenter', 'index', 'index', 1, '{$user_info.nickname|op_t},OpenCenter', '{$user_info.username|op_t}的个人主页', '{$user_info.nickname|op_t}的个人主页', 3),
-(10, '会员页面', 'people', 'index', 'index', 1, '会员', '会员', '会员', 4),
-(11, '论坛帖子详情页', 'forum', 'index', 'detail', -1, '{$post.title|op_t},论坛,thinkox', '{$post.title|op_t}', '{$post.title|op_t} —— ThinkOX论坛', 1),
-(12, '商城首页', 'shop', 'index', 'index', -1, '商城,积分', '积分商城', '商城首页——ThinkOX', 0),
-(13, '商城商品详情页', 'shop', 'index', 'goodsdetail', -1, '{$content.goods_name|op_t},商城', '{$content.goods_name|op_t}', '{$content.goods_name|op_t}——ThinkOX商城', 0),
-(14, '资讯首页', 'blog', 'index', 'index', -1, '资讯首页', '资讯首页\r\n', '资讯——ThinkOX', 0),
-(15, '资讯列表页', 'blog', 'article', 'lists', -1, '{$category.title|op_t}', '{$category.title|op_t}', '{$category.title|op_t}', 0),
-(16, '资讯文章页', 'blog', 'article', 'detail', -1, '{$info.title|op_t}', '{$info.title|op_t}', '{$info.title|op_t}——ThinkOX', 0),
-(17, '活动首页', 'event', 'index', 'index', -1, '活动', '活动首页', '活动首页——ThinkOX', 0),
-(18, '活动详情页', 'event', 'index', 'detail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0),
-(19, '专辑首页', 'issue', 'index', 'index', -1, '专辑', '专辑首页', '专辑首页——ThinkOX', 0),
-(20, '专辑详情页', 'issue', 'index', 'issuecontentdetail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0);
+(1, '整站标题', '', '', '', 1, '', '', 'OpenCenter', 7),
+(2, '论坛版块页', 'forum', 'index', 'forum', -1, '{$forum.title} ', '{$forum.title} ', '{$forum.title} —— ThinkOX论坛', 2),
+(3, '微博首页', '', 'Index', 'index', 1, '微博', '微博首页', 'OpenCenter轻量化社交框架', 5),
+(4, '微博详情页', '', 'Index', 'weiboDetail', 1, '{$weibo.title|op_t},OpenCenter,oc,微博', '{$weibo.content|op_t}\r\n', '{$weibo.content|op_t}——OpenCenter微博', 6),
+(5, '用户中心', 'Ucenter', 'index', 'index', 1, '{$user_info.nickname|op_t},OpenCenter', '{$user_info.username|op_t}的个人主页', '{$user_info.nickname|op_t}的个人主页', 3),
+(6, '会员页面', 'people', 'index', 'index', 1, '会员', '会员', '会员', 4),
+(7, '论坛帖子详情页', 'forum', 'index', 'detail', -1, '{$post.title|op_t},论坛,thinkox', '{$post.title|op_t}', '{$post.title|op_t} —— ThinkOX论坛', 1),
+(8, '商城首页', 'shop', 'index', 'index', -1, '商城,积分', '积分商城', '商城首页——ThinkOX', 0),
+(9, '商城商品详情页', 'shop', 'index', 'goodsdetail', -1, '{$content.goods_name|op_t},商城', '{$content.goods_name|op_t}', '{$content.goods_name|op_t}——ThinkOX商城', 0),
+(10, '资讯首页', 'blog', 'index', 'index', -1, '资讯首页', '资讯首页\r\n', '资讯——ThinkOX', 0),
+(11, '资讯列表页', 'blog', 'article', 'lists', -1, '{$category.title|op_t}', '{$category.title|op_t}', '{$category.title|op_t}', 0),
+(12, '资讯文章页', 'blog', 'article', 'detail', -1, '{$info.title|op_t}', '{$info.title|op_t}', '{$info.title|op_t}——ThinkOX', 0),
+(13, '活动首页', 'event', 'index', 'index', -1, '活动', '活动首页', '活动首页——ThinkOX', 0),
+(14, '活动详情页', 'event', 'index', 'detail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0),
+(15, '专辑首页', 'issue', 'index', 'index', -1, '专辑', '专辑首页', '专辑首页——ThinkOX', 0),
+(16, '专辑详情页', 'issue', 'index', 'issuecontentdetail', -1, '{$content.title|op_t}', '{$content.title|op_t}', '{$content.title|op_t}——ThinkOX', 0);
 
-
+DROP TABLE  IF EXISTS `ocenter_super_links`;
 CREATE TABLE IF NOT EXISTS `ocenter_super_links` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `type` int(1) NOT NULL DEFAULT '1' COMMENT '类别（1：图片，2：普通）',
@@ -1006,7 +1021,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_super_links` (
   `status` tinyint(2) NOT NULL DEFAULT '1' COMMENT '状态（0：禁用，1：正常）',
   `create_time` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '添加时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='友情连接表' AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='友情连接表' AUTO_INCREMENT=5 ;
 
 
 INSERT INTO `ocenter_super_links` ( `type`, `title`, `cover_id`, `link`, `level`, `status`, `create_time`) VALUES
@@ -1016,7 +1031,7 @@ INSERT INTO `ocenter_super_links` ( `type`, `title`, `cover_id`, `link`, `level`
 ( 1, 'OpenSNS', 0, 'http://www.opensns.cn', 0, 1, 1407156830),;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_support`;
 CREATE TABLE IF NOT EXISTS `ocenter_support` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `appname` varchar(20) NOT NULL COMMENT '应用名',
@@ -1025,9 +1040,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_support` (
   `create_time` int(11) NOT NULL COMMENT '发布时间',
   `table` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='支持的表' AUTO_INCREMENT=52 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='支持的表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_sync_login`;
 CREATE TABLE IF NOT EXISTS `ocenter_sync_login` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -1040,7 +1055,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_sync_login` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_talk`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `create_time` int(11) NOT NULL,
@@ -1057,9 +1072,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk` (
   `other_uid` int(11) NOT NULL,
   `title` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会话表' AUTO_INCREMENT=166 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='会话表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_talk_message`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk_message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content` varchar(500) NOT NULL,
@@ -1067,10 +1082,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk_message` (
   `create_time` int(11) NOT NULL,
   `talk_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='聊天消息表' AUTO_INCREMENT=279 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='聊天消息表' AUTO_INCREMENT=1 ;
 
 
-
+DROP TABLE  IF EXISTS `ocenter_talk_message_push`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk_message_push` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -1079,9 +1094,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk_message_push` (
   `status` tinyint(4) NOT NULL,
   `talk_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=gbk COMMENT='状态，0为未提示，1为未点击，-1为已点击' AUTO_INCREMENT=112 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=gbk COMMENT='状态，0为未提示，1为未点击，-1为已点击' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_talk_push`;
 CREATE TABLE IF NOT EXISTS `ocenter_talk_push` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL COMMENT '接收推送的用户id',
@@ -1089,17 +1104,17 @@ CREATE TABLE IF NOT EXISTS `ocenter_talk_push` (
   `create_time` int(11) NOT NULL,
   `status` tinyint(4) NOT NULL COMMENT '状态，0为未提示，1为未点击，-1为已点击',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='对话推送表' AUTO_INCREMENT=100 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='对话推送表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_ucenter_admin`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_admin` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
   `member_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '管理员用户ID',
   `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '管理员状态',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='管理员表' AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='管理员表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_ucenter_member`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` char(16) NOT NULL COMMENT '用户名',
@@ -1116,9 +1131,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `step` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `status` (`status`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=60 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=100 ;
 
 
+DROP TABLE  IF EXISTS `ocenter_ucenter_setting`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_setting` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '设置ID',
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '配置类型（1-用户配置）',
@@ -1126,7 +1142,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_setting` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='设置表' AUTO_INCREMENT=1 ;
 
-
+DROP TABLE  IF EXISTS `ocenter_url`;
 CREATE TABLE IF NOT EXISTS `ocenter_url` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '链接唯一标识',
   `url` char(255) NOT NULL DEFAULT '' COMMENT '链接地址',
@@ -1138,14 +1154,16 @@ CREATE TABLE IF NOT EXISTS `ocenter_url` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='链接表' AUTO_INCREMENT=1 ;
 
 
+DROP TABLE  IF EXISTS `ocenter_user_token`;
 CREATE TABLE IF NOT EXISTS `ocenter_user_token` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `token` varchar(255) NOT NULL,
   `time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+DROP TABLE  IF EXISTS `ocenter_verify`;
 CREATE TABLE IF NOT EXISTS `ocenter_verify` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
@@ -1155,6 +1173,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_verify` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 DROP TABLE  IF EXISTS `ocenter_ucenter_score_type`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_score_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

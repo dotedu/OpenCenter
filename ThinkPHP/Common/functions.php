@@ -1463,8 +1463,8 @@ function load_ext_file($path) {
  */
 function get_client_ip($type = 0,$adv=false) {
     $type       =  $type ? 1 : 0;
-    static $ip  =   NULL;
-    if ($ip !== NULL) return $ip[$type];
+    //static $ip  =   NULL;
+   // if ($ip !== NULL) return $ip[$type];
     if($adv){
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $arr    =   explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
@@ -1478,6 +1478,9 @@ function get_client_ip($type = 0,$adv=false) {
         }
     }elseif (isset($_SERVER['REMOTE_ADDR'])) {
         $ip     =   $_SERVER['REMOTE_ADDR'];
+        if($ip == '127.0.0.1'){
+            $ip = get_client_ip(1,true);
+        }
     }
     // IP地址合法验证
     $long = sprintf("%u",ip2long($ip));

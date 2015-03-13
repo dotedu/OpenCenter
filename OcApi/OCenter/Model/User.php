@@ -8,7 +8,7 @@
  */
 
 
-require_once(OC_ROOT.'Model/base.php');
+require_once(OC_ROOT.'Model/Base.php');
 /**
  * Class User  用户操作类
  * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
@@ -45,10 +45,10 @@ class User extends base{
 
         if($this->think->thinkUcenterMd5($password) === $res['password']){
             $time = time();
-            $ip = get_client_ip(1);
+            $ip = $_SERVER['REMOTE_ADDR'];
             $uid= $res['id'];
-            $update_sql = "UPDATE `".$this->tablePre."ucenter_member` SET last_login_time=$time ,last_login_ip=$ip WHERE id=$uid;";
-            $this->db->query($update_sql);
+            //$update_sql = "UPDATE `".$this->tablePre."ucenter_member` SET last_login_time=$time ,last_login_ip=$ip WHERE id=$uid;";
+           // $this->db->query($update_sql);
 
             $user = $this->db->getOne("SELECT * FROM `".$this->tablePre."member` WHERE uid='$uid'");
             if (1 != $user['status']) {
@@ -56,17 +56,17 @@ class User extends base{
             }
 
 
-            $this->db->query("UPDATE `".$this->tablePre."member` SET last_login_time=$time ,last_login_ip=$ip，login=login+1 WHERE uid=$uid;");
+           // $this->db->query("UPDATE `".$this->tablePre."member` SET last_login_time=$time ,last_login_ip=$ip，login=login+1 WHERE uid=$uid;");
             /* 记录登录SESSION和COOKIES */
-            $auth = array(
+/*            $auth = array(
                 'uid' => $user['uid'],
                 'username' => $res['username'],
                 'last_login_time' => $user['last_login_time'],
-            );
+            );*/
 
-            session_start();
-            $_SESSION[$this->session_pre]['user_auth']=$auth;
-            $_SESSION[$this->session_pre]['user_auth_sign']=$this->think->dataAuthSign($auth);
+          //  session_start();
+          //  $_SESSION[$this->session_pre]['user_auth']=$auth;
+          //  $_SESSION[$this->session_pre]['user_auth_sign']=$this->think->dataAuthSign($auth);
             //TODO 记住登陆待做
 
             return $uid;

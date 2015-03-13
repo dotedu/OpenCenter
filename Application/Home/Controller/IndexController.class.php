@@ -39,11 +39,4 @@ class IndexController extends HomeController
         exit(json_encode(D('Common/ ')->getAllExpression()));
     }
 
-
-    public function test(){
-    $object = new \ActionLimit();
-        $object->checkOne(array('action' => 'user_login', 'model' => 'member', 'record_id' => 1, 'user_id' => 1));
-        exit;
-    }
-
 }
