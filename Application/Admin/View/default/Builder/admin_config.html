@@ -121,24 +121,6 @@
 
 
     <script>
-        $(function () {
-            var config = {
-                '.chosen-select'           : {search_contains: true, drop_width: 400,no_results_text:'找不到匹配的选项'},
-                '.chosen-select-deselect'  : {search_contains: true, allow_single_deselect:true},
-                '.chosen-select-no-single' : {search_contains: true, disable_search_threshold:10},
-                '.chosen-select-no-results': {search_contains: true, no_results_text:'找不到匹配的选项'},
-                '.chosen-select-width'     : {search_contains: true, width:"auto"}
-            };
-            for (var selector in config) {
-                $(selector).chosen(config[selector]);
-            }
-            prettyPrint();
-        });
-    </script>
-    <script src="__ZUI__/lib/chosen/chosen.js"></script>
-    <link href="__ZUI__/lib/chosen/chosen.css" type="text/css" rel="stylesheet">
-
-    <script>
         $(document).ready(function () {
             $('.popup-gallery').each(function () { // the containers for all your galleries
                 $(this).magnificPopup({

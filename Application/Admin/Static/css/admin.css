@@ -222,3 +222,21 @@ label {
   background: #000;
   opacity: 0.5;
 }
+.report_feedback {
+  cursor: pointer;
+}
+.report_feedback .report_icon {
+  background: url("../images/report_icon.png");
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  right: 35px;
+  bottom: 35px;
+  z-index: 998;
+}
+.report_feedback .report_point {
+  position: absolute;
+  right: 45px;
+  bottom: 120px;
+  z-index: 999;
+}

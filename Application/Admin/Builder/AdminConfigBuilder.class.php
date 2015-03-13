@@ -349,6 +349,7 @@ class AdminConfigBuilder extends AdminBuilder
      * @param $title
      * @param $subtitle
      * @param $config
+     * @param null $style
      * @return $this
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
