@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="with-padding" style="margin-top: 20px;">
-        <form action="__SELF__" method="post" class="form-horizontal">
+        <form action="__SELF__" enctype="application/x-www-form-urlencoded" method="POST" class="form-horizontal avatar-form">
             <input type="hidden" name="id" value="{$this_role.id}"/>
             <input class="attach" type="hidden" name="avatar_id" value="{$this_role.avatar}"/>
             <label class="item-label" style="font-size: 15px;font-weight: 400;">上传默认头像<span style="font-size: 12px;margin-left: 20px;color: rgb(253, 67, 67);">请上传256px*256px的png头像</span></label>
@@ -101,7 +101,7 @@
 
             <div class="form-item">
                 <div style="margin-top: 20px;"></div>
-                <button type="submit" class="btn submit-btn">确 定</button>
+                <button type="submit" class="btn submit-btn ajax-post" target-form="avatar-form">确 定</button>
                 <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
                 <button class="btn btn-return" data-role="set_null">使用系统默认头像</button>
             </div>

@@ -5,6 +5,7 @@
 namespace Ucenter\Controller;
 
 
+use Common\Model\FollowModel;
 use Think\Controller;
 use User\Api\UserApi;
 
@@ -32,21 +33,24 @@ class MemberController extends Controller
         $aRegVerify = I('post.reg_verify', 0, 'intval');
         $aRegType = I('post.reg_type', '', 'op_t');
         $aStep = I('get.step', 'start', 'op_t');
-
+        $aRole = I('post.role', 0, 'intval');
 
         if (!modC('REG_SWITCH', '', 'USERCONFIG')) {
             $this->error('注册已关闭');
         }
         if (IS_POST) { //注册用户
-            $return = check_action_limit('reg','ucenter_member',1,1,true);
-            if($return && !$return['state']){
-                $this->error($return['info'],$return['url']);
+            $return = check_action_limit('reg', 'ucenter_member', 1, 1, true);
+            if ($return && !$return['state']) {
+                $this->error($return['info'], $return['url']);
             }
             /* 检测验证码 */
             if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
                 if (!check_verify($aVerify)) {
                     $this->error('验证码输入错误。');
                 }
+            }
+            if (!$aRole) {
+                $this->error('请选择角色。');
             }
 
             if (($aRegType == 'mobile' && modC('MOBILE_VERIFY_TYPE', 0, 'USERCONFIG') == 1) || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 2 && $aRegType == 'email')) {
@@ -73,6 +77,7 @@ class MemberController extends Controller
             /* 注册用户 */
             $uid = UCenterMember()->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
             if (0 < $uid) { //注册成功
+                $this->initRoleUser($aRole,$uid); //初始化角色用户
                 if (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType == 2) {
                     set_user_status($uid, 3);
                     $verify = D('Verify')->addVerify($email, 'email', $uid);
@@ -81,7 +86,7 @@ class MemberController extends Controller
                 }
 
                 $uid = UCenterMember()->login($username, $aPassword, $aUnType); //通过账号密码取到uid
-                D('Member')->login($uid, false); //登陆
+                D('Member')->login($uid, false,$aRole); //登陆
 
                 exit;
                 $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
@@ -92,6 +97,14 @@ class MemberController extends Controller
             if (is_login()) {
                 redirect(U('Weibo/Index/index'));
             }
+
+            //角色
+            $map['status'] = 1;
+            $map['invite'] = 0;
+            $roleList = D('Admin/Role')->selectByMap($map, 'sort asc', 'id,title');
+            $this->assign('role_list', $roleList);
+            //角色end
+
             $aType = I('get.type', '', 'op_t');
             $regSwitch = modC('REG_SWITCH', '', 'USERCONFIG');
             $regSwitch = explode(',', $regSwitch);
@@ -107,7 +120,7 @@ class MemberController extends Controller
     {
         $aStep = I('get.step', '', 'op_t');
         $aUid = session('temp_login_uid');
-        if(empty($aUid)){
+        if (empty($aUid)) {
             $this->error('参数错误');
         }
         $ucenterMemberModel = UCenterMember();
@@ -116,13 +129,10 @@ class MemberController extends Controller
             $aStep = check_step($step);
             $_GET['step'] = $aStep;
             $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
-
-
         }
         $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
         if ($aStep == 'finish') {
             D('Member')->login($aUid, false);
-
         }
         $this->assign('step', $aStep);
         $this->display('register');
@@ -135,10 +145,10 @@ class MemberController extends Controller
         $this->setTitle('用户登录');
 
         if (IS_POST) {
-            $result = A('Ucenter/Login','Widget')->doLogin();
-            if($result['status']){
+            $result = A('Ucenter/Login', 'Widget')->doLogin();
+            if ($result['status']) {
                 $this->success($result['info'], get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
-            }else{
+            } else {
                 $this->error($result['info']);
             }
         } else { //显示登录页面
@@ -151,7 +161,7 @@ class MemberController extends Controller
     public function quickLogin()
     {
         if (IS_POST) {
-            $result = A('Ucenter/Login','Widget')->doLogin();
+            $result = A('Ucenter/Login', 'Widget')->doLogin();
             $this->ajaxReturn($result);
         } else { //显示登录弹出框
             $this->display();
@@ -523,7 +533,7 @@ class MemberController extends Controller
         A('Ucenter/UploadAvatar', 'Widget')->cropPicture($aUid, $aCrop, $aExt);
         $res = M('avatar')->where(array('uid' => $aUid))->save(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         if (!$res) {
-            M('avatar')->add(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
+            M('avatar')->add(array('uid' => $aUid,'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         }
         clean_query_user_cache($aUid, array('avatar256', 'avatar128', 'avatar64'));
         $this->success('头像更新成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
@@ -633,6 +643,89 @@ class MemberController extends Controller
         }
 
         $this->success('验证成功');
+    }
+
+    /**
+     * 初始化角色用户信息
+     * @param $role_id
+     * @param $uid
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function initRoleUser($role_id=0,$uid)
+    {
+        $role=D('Role')->where(array('id'=>$role_id))->find();
+        $user_role=array('uid'=>$uid,'role_id'=>$role_id);
+        if($role['audit']){//该角色需要审核
+            $user_role['status']=2;//未审核
+        }else{
+            $user_role['status']=1;
+            $this->setUserRoleInfo($role_id,$uid);
+        }
+        $result=D('UserRole')->add($user_role);
+        return $result;
+    }
+
+    /**
+     * 设置角色用户默认基本信息
+     * @param $role_id
+     * @param $uid
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function setUserRoleInfo($role_id,$uid){
+        $roleConfigModel=D('RoleConfig');
+        $map['role_id']=$role_id;
+        $map['name']=array('in',array('score','rank'));
+        $config=$roleConfigModel->where(array('role_id'=>$role_id))->select();
+        $config=array_combine(array_column($config,'name'),$config);
+
+        $data=array();
+
+        //默认显示哪一个角色的个人主页设置
+        $roles=D('UserRole')->where(array('uid'=>$uid,'status'=>1))->field('role_id')->select();
+        if(count($roles)){
+            $roles=array_merge(array_column($roles,'role_id'),array($role_id));
+            $role=D('Role')->where(array('id'=>array('in',$roles)))->order('sort asc')->find();
+            $show_role_id=intval($role['id']);
+            $data['show_role']=$show_role_id;
+        }else{
+            $data['show_role']=$role_id;
+        }
+        //默认积分设置
+        if(isset($config['score']['value'])){
+            $value=json_decode($config['score']['value'],true);
+            $data=array_merge($data,$value);
+        }
+
+        //执行member表默认值设置
+        D('Member')->where(array('uid'=>$uid))->save($data);
+
+        //默认头衔设置
+        if(isset($config['rank']['value'])&&$config['rank']['value']!=''){
+            $ranks=explode(',',$config['rank']['value']);
+            if(count($ranks)){
+                //查询已拥有头衔
+                $rankUserModel=D('RankUser');
+                $have_rank_ids=$rankUserModel->where(array('uid'=>$uid))->field('rank_id')->find();
+                $have_rank_ids=array_column($have_rank_ids,'rank_id');
+                //查询已拥有头衔 end
+
+                $reason=json_decode($config['rank']['data'],true);
+                $rank_user['uid']=$uid;
+                $rank_user['create_time']=time();
+                $rank_user['status']=1;
+                $rank_user['is_show']=1;
+                $rank_user['reason']=$reason['reason'];
+                $data_list=array();
+                foreach($ranks as $val){
+                    if($val!=''&&!in_array($val,$have_rank_ids)){//去除已拥有头衔
+                        $rank_user['rank_id']=$val;
+                        $data_list[]=$rank_user;
+                    }
+                }
+                $rankUserModel->addAll($data_list);
+            }
+        }
     }
 
 }

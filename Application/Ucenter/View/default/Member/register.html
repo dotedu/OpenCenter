@@ -30,6 +30,19 @@
                         </ul>
 
                         <div class="tab-content">
+                            <notempty name="role_list">
+                                <div class="form-group">
+                                    <label for="role" class=".sr-only col-xs-12" style="display: none"></label>
+                                    <select type="text" id="role" class="form-control" name="role">
+                                        <volist name="role_list" id="role">
+                                            <option value="{$role.id}">{$role.title}</option>
+                                        </volist>
+                                    </select>
+                                    <span class="help-block">选择角色注册</span>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                            </notempty>
                             <volist name="regSwitch" id="regSwitch">
                                 <switch name="regSwitch">
                                     <case value="username">

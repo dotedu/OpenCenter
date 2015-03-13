@@ -43,10 +43,10 @@ class RoleController extends AdminController
         $map['status'] = array('egt', 0);
         $roleList = $this->roleModel->selectPageByMap($map, &$totalCount, $page, $r, 'sort asc');
         $map_group['id']=array('in',array_column($roleList,'group_id'));
-        $group=$this->roleGroupModel->where($map_group)->field('id,name,title')->select();
+        $group=$this->roleGroupModel->where($map_group)->field('id,title')->select();
         $group=array_combine(array_column($group,'id'),$group);
         foreach($roleList as &$val){
-            $val['group']=$group[$val['group_id']]['title']."(".$group[$val['group_id']]['name'].")";
+            $val['group']=$group[$val['group_id']]['title'];
         }
         unset($val);
 
@@ -60,7 +60,7 @@ class RoleController extends AdminController
             ->keyText('group', '所属分组')
             ->keyText('description', '描述')
             ->keytext('sort', '排序')
-            ->keyYesNo('type', '是否需要邀请才能注册')
+            ->keyYesNo('invite', '是否需要邀请才能注册')
             ->keyYesNo('audit', '注册后是否需要审核')
             ->keyStatus()
             ->keyCreateTime()
@@ -69,7 +69,7 @@ class RoleController extends AdminController
             ->keyDoAction('Role/configAuth?id=###', '默认信息配置')
             ->data($roleList)
             ->pagination($totalCount, $r)
-            ->display('index');
+            ->display();
     }
 
     /**
@@ -85,8 +85,8 @@ class RoleController extends AdminController
             $data['name'] = I('post.name', '', 'op_t');
             $data['title'] = I('post.title', '', 'op_t');
             $data['description'] = I('post.description', '', 'op_t');
-            $data['group'] = I('post.group', 0, 'intval');
-            $data['type'] = I('post.type', 0, 'intval');
+            $data['group_id'] = I('post.group_id', 0, 'intval');
+            $data['invite'] = I('post.invite', 0, 'intval');
             $data['audit'] = I('post.audit', 0, 'intval');
             $data['status'] = I('post.status', 1, 'intval');
             if ($is_edit) {
@@ -103,7 +103,7 @@ class RoleController extends AdminController
             }
         } else {
             $data['status'] = 1;
-            $data['type'] = 0;
+            $data['invite'] = 0;
             $data['audit'] = 0;
             if ($is_edit) {
                 $data = $this->roleModel->getByMap(array('id' => $aId));
@@ -122,8 +122,8 @@ class RoleController extends AdminController
                 ->keyText('title', '角色名', '不能重复')
                 ->keyText('name', '英文标识', '由英文字母、下划线组成，且不能重复')
                 ->keyTextArea('description', '描述')
-                ->keySelect('group', '所属分组', '',$group)
-                ->keyRadio('type', '需要邀请注册', '默认为关闭，开启后，得到邀请的用户才能注册', array(1 => "开启", 0 => "关闭"))
+                ->keySelect('group_id', '所属分组', '',$group)
+                ->keyRadio('invite', '需要邀请注册', '默认为关闭，开启后，得到邀请的用户才能注册', array(1 => "开启", 0 => "关闭"))
                 ->keyRadio('audit', '需要审核', '默认为关闭，开启后，用户审核后才能拥有该角色', array(1 => "开启", 0 => "关闭"))
                 ->keyStatus()
                 ->data($data)
@@ -233,17 +233,40 @@ class RoleController extends AdminController
         return $result;
     }
 
+
+    /**
+     * 角色基本信息配置
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function config()
+    {
+        $builder=new AdminConfigBuilder;
+        $data=$builder->handleConfig();
+        empty($data['CLOSE_ROLE'])&&$data['CLOSE_ROLE']=0;
+
+        $builder->title('角色基本信息配置')
+            ->keyRadio('CLOSE_ROLE','网站角色功能：','部署网站时可修改，网站使用一段时间后谨慎修改！',array('0'=>'开启','1'=>'关闭'))
+            ->data($data)
+            ->buttonSubmit()
+            ->buttonBack()
+            ->display();
+    }
+
     //角色基本信息及配置 end
 
     //角色分组 start
 
+    /**
+     * 分组列表
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function group()
     {
         $group=$this->roleGroupModel->field('id,title,update_time')->select();
         foreach($group as &$val){
             $map['group_id']=$val['id'];
-            $roles=$this->roleModel->selectByMap($map,'id asc','id');
-            $val['roles']=explode(',',array_column($roles,'id'));
+            $roles=$this->roleModel->selectByMap($map,'id asc','title');
+            $val['roles']=implode(',',array_column($roles,'title'));
         }
         unset($roles,$val);
         $builder=new AdminListBuilder;
@@ -251,7 +274,7 @@ class RoleController extends AdminController
             ->buttonNew(U('Role/editGroup'))
             ->keyId()
             ->keyText('title','标题')
-            ->keyText('roles','分组下的角色id')
+            ->keyText('roles','分组下的角色')
             ->keyUpdateTime()
             ->keyDoActionEdit('Role/editGroup?id=###')
             ->keyDoAction('Role/deleteGroup?id=###','删除')
@@ -259,6 +282,10 @@ class RoleController extends AdminController
             ->display();
     }
 
+    /**
+     * 编辑分组
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function editGroup()
     {
         $aGroupId=I('id',0,'intval');
@@ -267,12 +294,23 @@ class RoleController extends AdminController
         if(IS_POST){
             $data['title']=I('post.title','','op_t');
             $data['update_time']=time();
+            $roles=I('post.roles');
             if($is_edit){
                 $result=$this->roleGroupModel->where(array('id'=>$aGroupId))->save($data);
+                if($result){
+                    $result=$aGroupId;
+                }
             }else{
+                if($this->roleGroupModel->where(array('title'=>$data['title']))->count()){
+                    $this->error("{$title}失败！该分组已存在！");
+                }
                 $result=$this->roleGroupModel->add($data);
             }
             if($result){
+                $this->roleModel->where(array('group_id'=>$result))->setField('group_id',0);//所有该分组下的角色全部移出
+                if(!is_null($roles)){
+                    $this->roleModel->where(array('id'=>array('in',$roles)))->setField('group_id',$result);//选中的角色全部移入分组
+                }
                 $this->success("{$title}成功！",U('Role/group'));
             }else{
                 $this->error("{$title}失败！".$this->roleGroupModel->getError());
@@ -281,11 +319,17 @@ class RoleController extends AdminController
             $data=array();
             if($is_edit){
                 $data=$this->roleGroupModel->where(array('id'=>$aGroupId))->find();
+                $map['group_id']=$aGroupId;
+                $roles=$this->roleModel->selectByMap($map,'id asc','id');
+                $data['roles']=array_column($roles,'id');
             }
-            $roles=$this->roleModel->field('id,title')->select();
-            dump($roles);exit;
+            $roles=$this->roleModel->field('id,group_id,title')->select();
+            foreach($roles as &$val){
+                $val['title']=$val['group_id']?$val['title']."  (当前分组id：{$val['group_id']})":$val['title'];
+            }
+            unset($val);
             $builder=new AdminConfigBuilder;
-            $builder->title($title);
+            $builder->title("$title（同组角色互斥，即同一分组下的角色不能同时被用户拥有）");
             $builder->keyId()
                 ->keyText('title','标题')
                 ->keyChosen('roles','分组下角色选择','',$roles)
@@ -395,7 +439,7 @@ class RoleController extends AdminController
      * 角色默认积分配置
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function config()
+    public function configScore()
     {
         $aRoleId = I('id', 0, 'intval');
         if (!$aRoleId) {
@@ -420,7 +464,7 @@ class RoleController extends AdminController
                 $result = $this->roleConfigModel->addData($data);
             }
             if ($result) {
-                $this->success('操作成功！', U('Admin/Role/config', array('id' => $aRoleId)));
+                $this->success('操作成功！', U('Admin/Role/configScore', array('id' => $aRoleId)));
             } else {
                 $this->error('操作失败！' . $this->roleConfigModel->getError());
             }
@@ -447,8 +491,8 @@ class RoleController extends AdminController
             $this->assign('post_key', $post_key);
             $this->assign('role_list', $mRole_list);
             $this->assign('this_role', array('id' => $aRoleId));
-            $this->assign('tab', 'config');
-            $this->display();
+            $this->assign('tab', 'score');
+            $this->display('score');
         }
     }
 
@@ -479,6 +523,7 @@ class RoleController extends AdminController
                 }
             }
             if ($result) {
+                clear_role_cache($aRoleId);
                 $this->success('操作成功！', U('Admin/Role/configAvatar', array('id' => $aRoleId)));
             } else {
                 $this->error('操作失败！' . $this->roleConfigModel->getError());
@@ -488,8 +533,8 @@ class RoleController extends AdminController
             $mRole_list = $this->roleModel->field('id,title')->select();
             $this->assign('role_list', $mRole_list);
             $this->assign('this_role', array('id' => $aRoleId, 'avatar' => $avatar_id));
-            $this->assign('tab', 'configAvatar');
-            $this->display();
+            $this->assign('tab', 'avatar');
+            $this->display('avatar');
         }
     }
 
@@ -560,7 +605,7 @@ class RoleController extends AdminController
             $this->assign('role_list', $mRole_list);
             $this->assign('this_role', array('id' => $aRoleId,'ranks'=>$rank['value']));
             $this->assign('tab', 'rank');
-            $this->display();
+            $this->display('rank');
         }
     }
 
@@ -597,6 +642,7 @@ class RoleController extends AdminController
             if ($result === false) {
                 $this->error('操作失败' . $this->roleConfigModel->getError());
             } else {
+                clear_role_cache($aRoleId);
                 $this->success('操作成功!');
             }
         } else {

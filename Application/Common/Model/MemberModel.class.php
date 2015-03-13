@@ -48,7 +48,7 @@ class MemberModel extends Model
     );
 
     protected $insertField = 'nickname,sex,birthday,qq,signature'; //新增数据时允许操作的字段
-    protected $updateField = 'nickname,sex,birthday,qq,signature,last_login_ip,login,last_login_ip,last_login_time,update_time,status,tox_money,score,pos_province,pos_city,pos_district,pos_community'; //编辑数据时允许操作的字段
+    protected $updateField = 'nickname,sex,birthday,qq,signature,last_login_ip,login,update_time,last_login_role,show_role,status,tox_money,score,pos_province,pos_city,pos_district,pos_community'; //编辑数据时允许操作的字段
 
     /**
      * 检测用户名是不是被禁止注册
@@ -96,9 +96,10 @@ class MemberModel extends Model
      * @param  integer $uid 用户ID
      * @return boolean      ture-登录成功，false-登录失败
      */
-    public function login($uid, $remember = false)
+    public function login($uid, $remember = false,$role_id=0)
     {
         session('temp_login_uid', $uid);
+        session('temp_login_role_id', $role_id);
         /* 检测是否在当前应用注册 */
         $user = $this->field(true)->find($uid);
         if ($user['status'] == 3 /*判断是否激活*/) {
@@ -127,6 +128,7 @@ class MemberModel extends Model
         $this->autoLogin($user, $remember);
 
         session('temp_login_uid',null);
+        session('temp_login_role_id', null);
         //记录行为
         action_log('user_login', 'member', $uid, $uid);
         return true;
@@ -147,14 +149,22 @@ class MemberModel extends Model
      * 自动登录用户
      * @param  integer $user 用户信息数组
      */
-    private function autoLogin($user, $remember = false)
+    private function autoLogin($user, $remember = false,$role_id=0)
     {
+        if($role_id!=0){
+            $to_login_role=$role_id;
+        }else{
+            if(!intval($user['last_login_role'])){
+                $to_login_role=$user['show_role'];
+            }
+        }
         /* 更新登录信息 */
         $data = array(
             'uid' => $user['uid'],
             'login' => array('exp', '`login`+1'),
             'last_login_time' => NOW_TIME,
             'last_login_ip' => get_client_ip(1),
+            'last_login_role'=>$to_login_role,
         );
         $this->save($data);
 
@@ -163,6 +173,7 @@ class MemberModel extends Model
             'uid' => $user['uid'],
             'username' => get_username($user['uid']),
             'last_login_time' => $user['last_login_time'],
+            'role_id'=>$to_login_role,
         );
 
         session('user_auth', $auth);

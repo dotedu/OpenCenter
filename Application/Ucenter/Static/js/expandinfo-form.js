@@ -32,7 +32,7 @@ function check(args,id){
                     check_error(id,"输入内容必须为数字");
                     return false;
                 }
-                check_success(id);
+                check_success(id,args.parent('form'));
                 return true;
             case "phone":
                 var reg =/^(1[3|4|5|8])[0-9]{9}$/;
@@ -40,7 +40,7 @@ function check(args,id){
                     check_error(id,"请输入正确的手机号码");
                     return false;
                 }
-                check_success(id);
+                check_success(id,args.parent('form'));
                 return true;
             case "email":
                 var reg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
@@ -48,7 +48,7 @@ function check(args,id){
                     check_error(id,"请输入正确的邮箱地址");
                     return false;
                 }
-                check_success(id);
+                check_success(id,args.parent('form'));
                 return true;
             case "string":
                 var min_length=args.getAttribute("min_length");
@@ -60,7 +60,7 @@ function check(args,id){
                     check_error(id,"长度必须在"+min_length+"-"+max_length+"之间");
                     return false;
                 }
-                check_success(id);
+                check_success(id,args.parent('form'));
 
                 return true;
         }
@@ -74,11 +74,11 @@ function check_error(id,info){
     $('#submit_btn').removeClass("btn-primary");
     $('#submit_btn').addClass("btn-default");
 }
-function check_success(id){
+function check_success(id,that){
     $('#alert_'+id).hide();
     $('#label_'+id).html('')
     $('#canSubmit_'+id).val(1);
-    checkCanSubmit();
+    checkCanSubmit(that);
 }
 
 
@@ -102,30 +102,30 @@ function check_textarea(args,id){
         }
 
     }
-    check_success(id);
+    check_success(id,$(this).parent('form'));
     return true;
 }
 
-function checkCanSubmit(){
+function checkCanSubmit(that){
     var canSubmit=true;
-    $('.canSubmit').each(function(){
+    that.find('.canSubmit').each(function(){
         if($(this).val()==0){
             canSubmit=false;
         }
     });
     if(!canSubmit){
-        $('#submit_btn').removeClass("btn-primary");
-        $('#submit_btn').addClass("btn-default");
+        that.find('#submit_btn').removeClass("btn-primary");
+        that.find('#submit_btn').addClass("btn-default");
         return false;
     }
-    $('#submit_btn').removeClass("btn-default");
-    $('#submit_btn').addClass("btn-primary");
+    that.find('#submit_btn').removeClass("btn-default");
+    that.find('#submit_btn').addClass("btn-primary");
     return true;
 }
 
 $(document).ready(function(){
     $('#submit_btn').click(function(check){
-        if(!checkCanSubmit()){
+        if(!checkCanSubmit($(this).parent('form'))){
             check.preventDefault();
             return false;
         }

@@ -24,7 +24,7 @@ class SkinController extends AddonsController
         $aSet_default = I('post.set_default', 0, 'intval');
         $msg['status'] = 0;
 
-        $map=getUserConfigMap(USER_CONFIG_MARK_NAME,USER_CONFIG_MARK_MODEL,get_login_role());
+        $map=getUserConfigMap(USER_CONFIG_MARK_NAME,USER_CONFIG_MARK_MODEL);
         $UserConfigModel = M('UserConfig');
         $exit = $UserConfigModel->where($map)->count();
         if ($aSet_default) { //设为默认

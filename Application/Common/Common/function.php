@@ -27,6 +27,7 @@ require_once(APP_PATH . '/Common/Common/vendors.php');
 require_once(APP_PATH . '/Common/Common/parse.php');
 require_once(APP_PATH . '/Common/Common/user.php');
 require_once(APP_PATH . '/Common/Common/limit.php');
+require_once(APP_PATH . '/Common/Common/role.php');
 /*require_once(APP_PATH . '/Common/Common/extend.php');*/
 
 
@@ -52,62 +53,25 @@ function is_login()
     }
 }
 
-/**
- * 获取当前用户登录的角色的标识(角色功能完成后修改)
- * @return int 角色id
- * @author 郑钟良<zzl@ourstu.com>
- */
-function get_login_role()
-{
-    //todo 获取当前用户登录的角色的标识
-    return 0;
-}
 
 /**
  * 构造用户配置表 D('UserConfig')查询条件
  * @param string $name 表中name字段的值(配置标识)
  * @param string $model 表中model字段的值(模块标识)
+ * @param int $uid 用户uid
  * @param int $role_id 登录的角色id
- * @param int $uid 用户id
  * @return array 查询条件 $map
  * @author 郑钟良<zzl@ourstu.com>
  */
-function getUserConfigMap($name='',$model='',$role_id=0,$uid=0){
+function getUserConfigMap($name='',$model='',$uid=0,$role_id=0){
     $uid=$uid?$uid:is_login();
-
+    $role_id=$role_id?$role_id:get_role_id($uid);
     $map=array();
     //构造查询条件
     $map['uid']=$uid;
     $map['name']=$name;
     $map['role_id']=$role_id;
     $map['model']=$model;
-    return $map;
-}
-
-/**
- * 获取角色配置表 D('RoleConfig')查询条件
- * @param $type 类型
- * @param int $role_id 角色id
- * @return mixed 查询条件 $map
- * @author 郑钟良<zzl@ourstu.com>
- */
-function getRoleConfigMap($type,$role_id=0){
-    $map['role_id']=$role_id;
-    $map['type']='';
-    $map['name']=$type;
-    switch($type){
-        case 'rules'://权限
-        case 'score'://积分
-        case 'avatar'://默认头像
-        case 'rank'://默认头衔
-            break;
-        case 'expend_field'://角色拥有的扩展字段
-            $map['type']='expend_field';
-        case 'register_expend_field'://注册时角色要填写的扩展字段
-            $map['type']='expend_field';
-            break;
-        default:;
-    }
     return $map;
 }
 
