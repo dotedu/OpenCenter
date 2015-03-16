@@ -43,13 +43,22 @@ class RoleController extends AdminController
         $map['status'] = array('egt', 0);
         $roleList = $this->roleModel->selectPageByMap($map, &$totalCount, $page, $r, 'sort asc');
         $map_group['id']=array('in',array_column($roleList,'group_id'));
+
         $group=$this->roleGroupModel->where($map_group)->field('id,title')->select();
         $group=array_combine(array_column($group,'id'),$group);
+
+        $authGroupList=M('AuthGroup')->where(array('status' => 1))->field('id,title')->select();
+        $authGroupList=array_combine(array_column($authGroupList,'id'),array_column($authGroupList,'title'));
         foreach($roleList as &$val){
+            $user_groups=explode(',',$val['user_groups']);
             $val['group']=$group[$val['group_id']]['title'];
+            foreach($user_groups as &$vl){
+                $vl=$authGroupList[$vl];
+            }
+            unset($vl);
+            $val['user_groups']=implode(',',$user_groups);
         }
         unset($val);
-
         $builder = new AdminListBuilder;
         $builder->meta_title = "角色列表";
         $builder->title("角色列表");
@@ -59,6 +68,7 @@ class RoleController extends AdminController
             ->keyText('name', '角色标识')
             ->keyText('group', '所属分组')
             ->keyText('description', '描述')
+            ->keyText('user_groups', '默认用户组')
             ->keytext('sort', '排序')
             ->keyYesNo('invite', '是否需要邀请才能注册')
             ->keyYesNo('audit', '注册后是否需要审核')
@@ -66,7 +76,7 @@ class RoleController extends AdminController
             ->keyCreateTime()
             ->keyUpdateTime()
             ->keyDoActionEdit('Role/editRole?id=###')
-            ->keyDoAction('Role/configAuth?id=###', '默认信息配置')
+            ->keyDoAction('Role/configScore?id=###', '默认信息配置')
             ->data($roleList)
             ->pagination($totalCount, $r)
             ->display();
@@ -89,6 +99,10 @@ class RoleController extends AdminController
             $data['invite'] = I('post.invite', 0, 'intval');
             $data['audit'] = I('post.audit', 0, 'intval');
             $data['status'] = I('post.status', 1, 'intval');
+            $data['user_groups'] = I('post.user_groups');
+            if($data['user_groups']!=''){
+                $data['user_groups']=implode(',',$data['user_groups']);
+            }
             if ($is_edit) {
                 $data['id'] = $aId;
                 $result = $this->roleModel->update($data);
@@ -108,6 +122,10 @@ class RoleController extends AdminController
             if ($is_edit) {
                 $data = $this->roleModel->getByMap(array('id' => $aId));
             }
+
+            $data['user_groups']=array(modC('DEFAULT_GROUP',0,'User'));//默认用户组
+            $authGroupList=M('AuthGroup')->where(array('status' => 1))->field('id,title')->select();//用户组列表
+
             $group=D('RoleGroup')->field('id,title')->select();
             $group=array_combine(array_column($group,'id'),array_column($group,'title'));
             if(!$group){
@@ -123,6 +141,7 @@ class RoleController extends AdminController
                 ->keyText('name', '英文标识', '由英文字母、下划线组成，且不能重复')
                 ->keyTextArea('description', '描述')
                 ->keySelect('group_id', '所属分组', '',$group)
+                ->keyChosen('user_groups', '默认用户组', '用户注册后的默认所在用户组,多选', $authGroupList)
                 ->keyRadio('invite', '需要邀请注册', '默认为关闭，开启后，得到邀请的用户才能注册', array(1 => "开启", 0 => "关闭"))
                 ->keyRadio('audit', '需要审核', '默认为关闭，开启后，用户审核后才能拥有该角色', array(1 => "开启", 0 => "关闭"))
                 ->keyStatus()
@@ -242,10 +261,10 @@ class RoleController extends AdminController
     {
         $builder=new AdminConfigBuilder;
         $data=$builder->handleConfig();
-        empty($data['CLOSE_ROLE'])&&$data['CLOSE_ROLE']=0;
+        //empty($data['CLOSE_ROLE'])&&$data['CLOSE_ROLE']=0;
 
         $builder->title('角色基本信息配置')
-            ->keyRadio('CLOSE_ROLE','网站角色功能：','部署网站时可修改，网站使用一段时间后谨慎修改！',array('0'=>'开启','1'=>'关闭'))
+            //->keyRadio('CLOSE_ROLE','网站角色功能：','部署网站时可修改，网站使用一段时间后谨慎修改！',array('0'=>'开启','1'=>'关闭'))
             ->data($data)
             ->buttonSubmit()
             ->buttonBack()
@@ -363,77 +382,6 @@ class RoleController extends AdminController
 
     //角色其他配置 start
 
-    /**
-     * 默认权限（前台、后台）配置
-     * @author 郑钟良<zzl@ourstu.com>
-     */
-    public function configAuth()
-    {
-        $aRoleId = I('id', 0, 'intval');
-        if (!$aRoleId) {
-            $this->error('请选择角色！');
-        }
-        $map = getRoleConfigMap('rules', $aRoleId);
-        $aType = I('type', 0, 'intval'); //权限设置类型：1为前台权限设置，0为后台权限设置
-        if (IS_POST) {
-            if (isset($_POST['rules'])) {
-                sort($_POST['rules']);
-                $_POST['rules'] = implode(',', array_unique($_POST['rules']));
-            }
-            $oldRule = $this->roleConfigModel->where($map)->find();
-            if ($oldRule) {
-                if ($aType == 1) { //前台
-                    $data['value'] = $this->getMergedRules($oldRule['value'], explode(',', $_POST['rules']), 'neq');
-                } else { //后台
-                    $data['value'] = $this->getMergedRules($oldRule['value'], explode(',', $_POST['rules']), 'eq');
-                }
-                $result = $this->roleConfigModel->saveData($map, $data);
-            } else {
-                $data = $map;
-                $data['value'] = $_POST['rules'];
-                $result = $this->roleConfigModel->addData($data);
-            }
-            if ($result === false) {
-                $this->error('操作失败' . $this->roleConfigModel->getError());
-            } else {
-                $this->success('操作成功!');
-            }
-        } else {
-
-            R('Admin/AuthManager/updateRules'); //远程调用控制器的操作方法，进行后台节点配置的url作为规则存入auth_rule，执行新节点的插入,已有节点的更新,无效规则的删除三项任务
-
-            $mRole_list = $this->roleModel->field('id,title')->select();
-
-            $rules = $this->roleConfigModel->where($map)->getField('value');
-
-            if ($aType == 1) { //前台
-                $node_list = A('Admin/AuthManager')->getNodeListFromModule(D('Common/Module')->getAll()); //预处理规则，去掉未安装的模块
-                $map_main = array('module' => array('neq', 'admin'), 'type' => AuthRuleModel::RULE_MAIN, 'status' => 1);
-                $map_child = array('module' => array('neq', 'admin'), 'type' => AuthRuleModel::RULE_URL, 'status' => 1);
-                $this->meta_title = '用户前台授权';
-                $tpl = 'auth'; //模板地址
-                $tab = 'auth';
-            } else { //后台
-                $node_list = $this->returnNodes();
-                $map_main = array('module' => 'admin', 'type' => AuthRuleModel::RULE_MAIN, 'status' => 1);
-                $map_child = array('module' => 'admin', 'type' => AuthRuleModel::RULE_URL, 'status' => 1);
-                $this->meta_title = '访问授权';
-                $tpl = 'authadmin'; //模板地址
-                $tab = 'authAdmin';
-            }
-
-            $main_rules = M('AuthRule')->where($map_main)->getField('name,id');
-            $child_rules = M('AuthRule')->where($map_child)->getField('name,id');
-            $this->assign('main_rules', $main_rules);
-            $this->assign('auth_rules', $child_rules);
-            $this->assign('node_list', $node_list);
-            $this->assign('role_list', $mRole_list);
-            $this->assign('this_role', array('id'=>$aRoleId,'rules'=>$rules));
-            $this->assign('tab', $tab);
-            $this->display($tpl);
-        }
-
-    }
 
     /**
      * 角色默认积分配置

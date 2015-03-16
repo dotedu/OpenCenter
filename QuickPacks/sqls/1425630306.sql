@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_role` (
   `name` varchar(25) NOT NULL COMMENT '英文标识',
   `title` varchar(25) NOT NULL COMMENT '中文标题',
   `description` varchar(500) NOT NULL COMMENT '描述',
+  `user_groups` varchar(200) NOT NULL COMMENT '默认用户组ids',
   `invite` tinyint(4) NOT NULL COMMENT '预留字段(类型：是否需要邀请注册等)',
   `audit` tinyint(2) NOT NULL DEFAULT '0' COMMENT '是否需要审核',
   `sort` int(10) NOT NULL DEFAULT '0',

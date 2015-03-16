@@ -26,6 +26,21 @@ function get_login_role()
 }
 
 /**
+ * 获取当前用户登录的角色的标识(角色功能完成后修改)
+ * @return int 角色id
+ * @author 郑钟良<zzl@ourstu.com>
+ */
+function get_login_role_audit()
+{
+    $user = session('user_auth');
+    if (empty($user)) {
+        return 0;
+    } else {
+        return session('user_auth_sign') == data_auth_sign($user) ? $user['audit'] : 0;
+    }
+}
+
+/**
  * 根据用户uid获取角色id
  * @param int $uid
  * @return int
@@ -55,7 +70,6 @@ function getRoleConfigMap($type,$role_id=0){
     $map['category']='';
     $map['name']=$type;
     switch($type){
-        case 'rules'://权限
         case 'score'://积分
         case 'avatar'://默认头像
         case 'rank'://默认头衔
@@ -73,7 +87,7 @@ function getRoleConfigMap($type,$role_id=0){
 /**
  * 清除角色缓存
  * @param int $role_id 角色id
- * @param $type 要清除的缓存，空：清除所有；字符串（Role_Expend_Info_）：清除一个缓存；数组array('Role_Expend_Info_','Role_Avatar_Id_')：清除多个缓存
+ * @param $type 要清除的缓存，空：清除所有；字符串（Role_Expend_Info_）：清除一个缓存；数组array('Role_Expend_Info_','Role_Avatar_Id_','Role_Register_Expend_Info_')：清除多个缓存
  * @return bool
  * @author 郑钟良<zzl@ourstu.com>
  */
@@ -90,6 +104,7 @@ function clear_role_cache($role_id=0,$type){
     }else{
         S('Role_Expend_Info_'.$role_id,null);
         S('Role_Avatar_Id_'.$role_id,null);
+        S('Role_Register_Expend_Info_'.$role_id,null);
     }
     return true;
 }

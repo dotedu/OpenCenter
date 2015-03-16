@@ -1,12 +1,6 @@
 <ul class="nav nav-secondary">
     <php>
         switch($tab){
-            case 'auth':
-                $authClass="active";
-                break;
-            case 'authAdmin':
-                $authAdminClass="active";
-                break;
             case 'score':
                 $scoreClass="active";
                 break;
@@ -26,8 +20,6 @@
                 break;
         }
     </php>
-    <li class="{$authAdminClass}"><a href="{:U('Role/configAuth',array('id'=>$this_role['id']))}">管理后台授权</a></li>
-    <li class="{$authClass}"><a href="{:U('Role/configAuth',array('id'=>$this_role['id'],'type'=>1))}">前台访问授权</a></li>
     <li class="{$scoreClass}"><a href="{:U('Role/configScore',array('id'=>$this_role['id']))}">用户积分配置</a></li>
     <li class="{$avatarClass}"><a href="{:U('Role/configAvatar',array('id'=>$this_role['id']))}">用户默认头像配置</a></li>
     <li class="{$rankClass}"><a href="{:U('Role/configRank',array('id'=>$this_role['id']))}">用户默认头衔配置</a></li>

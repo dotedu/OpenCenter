@@ -654,77 +654,32 @@ class MemberController extends Controller
      */
     public function initRoleUser($role_id=0,$uid)
     {
+        $memberModel=D('Member');
         $role=D('Role')->where(array('id'=>$role_id))->find();
         $user_role=array('uid'=>$uid,'role_id'=>$role_id);
+        $result=D('UserRole')->add($user_role);
         if($role['audit']){//该角色需要审核
             $user_role['status']=2;//未审核
         }else{
             $user_role['status']=1;
-            $this->setUserRoleInfo($role_id,$uid);
+            $memberModel->initUserRoleInfo($role_id,$uid);
         }
-        $result=D('UserRole')->add($user_role);
+        $memberModel->initDefaultShowRole($role_id,$uid);
+
         return $result;
     }
 
-    /**
-     * 设置角色用户默认基本信息
-     * @param $role_id
-     * @param $uid
+    /**修改用户扩展信息
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function setUserRoleInfo($role_id,$uid){
-        $roleConfigModel=D('RoleConfig');
-        $map['role_id']=$role_id;
-        $map['name']=array('in',array('score','rank'));
-        $config=$roleConfigModel->where(array('role_id'=>$role_id))->select();
-        $config=array_combine(array_column($config,'name'),$config);
-
-        $data=array();
-
-        //默认显示哪一个角色的个人主页设置
-        $roles=D('UserRole')->where(array('uid'=>$uid,'status'=>1))->field('role_id')->select();
-        if(count($roles)){
-            $roles=array_merge(array_column($roles,'role_id'),array($role_id));
-            $role=D('Role')->where(array('id'=>array('in',$roles)))->order('sort asc')->find();
-            $show_role_id=intval($role['id']);
-            $data['show_role']=$show_role_id;
-        }else{
-            $data['show_role']=$role_id;
-        }
-        //默认积分设置
-        if(isset($config['score']['value'])){
-            $value=json_decode($config['score']['value'],true);
-            $data=array_merge($data,$value);
-        }
-
-        //执行member表默认值设置
-        D('Member')->where(array('uid'=>$uid))->save($data);
-
-        //默认头衔设置
-        if(isset($config['rank']['value'])&&$config['rank']['value']!=''){
-            $ranks=explode(',',$config['rank']['value']);
-            if(count($ranks)){
-                //查询已拥有头衔
-                $rankUserModel=D('RankUser');
-                $have_rank_ids=$rankUserModel->where(array('uid'=>$uid))->field('rank_id')->find();
-                $have_rank_ids=array_column($have_rank_ids,'rank_id');
-                //查询已拥有头衔 end
-
-                $reason=json_decode($config['rank']['data'],true);
-                $rank_user['uid']=$uid;
-                $rank_user['create_time']=time();
-                $rank_user['status']=1;
-                $rank_user['is_show']=1;
-                $rank_user['reason']=$reason['reason'];
-                $data_list=array();
-                foreach($ranks as $val){
-                    if($val!=''&&!in_array($val,$have_rank_ids)){//去除已拥有头衔
-                        $rank_user['rank_id']=$val;
-                        $data_list[]=$rank_user;
-                    }
-                }
-                $rankUserModel->addAll($data_list);
-            }
+    public function edit_expandinfo()
+    {
+        $result=A('Ucenter/RegStep','Widget')->edit_expandinfo();
+        if ($result['status']) {
+            $this->success('保存成功！',session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('expand_info'))) : 'refresh');
+        } else {
+            !isset($result['info'])&&$result['info']='没有要保存的信息！';
+            $this->error($result['info']);
         }
     }
 

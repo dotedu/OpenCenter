@@ -34,8 +34,8 @@ class RoleModel extends Model
         array('update_time', NOW_TIME, self::MODEL_UPDATE),
         array('status', '1', self::MODEL_BOTH),
     );
-    protected $insertFields='group_id,name,title,description,invite,audit,sort,status,create_time';
-    protected $updateFields='id,group_id,name,title,description,invite,audit,sort,status,update_time';
+    protected $insertFields='group_id,name,title,description,user_groups,invite,audit,sort,status,create_time';
+    protected $updateFields='id,group_id,name,title,description,user_groups,invite,audit,sort,status,update_time';
     /**
      * 插入数据
      * @param $data
