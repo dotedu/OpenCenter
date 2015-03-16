@@ -7,14 +7,14 @@
 // | Author: 麦当苗儿 <zuojiazi@vip.qq.com> <http://www.zjzit.cn>
 // +----------------------------------------------------------------------
 
-namespace Home\Controller;
-
+namespace Core\Controller;
+use Think\Controller;
 /**
  * 文件控制器
  * 主要用于下载模型的文件上传和下载
  */
 
-class FileController extends HomeController
+class FileController extends Controller
 {
     /* 文件上传 */
     public function upload()
