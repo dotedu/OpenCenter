@@ -43,9 +43,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 INSERT INTO `ocenter_action_limit` (`title`, `name`, `frequency`, `time_number`, `time_unit`, `punish`, `if_message`, `message_content`, `action_list`, `status`, `create_time`) VALUES
-('reg', '注册限制', 1, 0, 'minute', 'ban_ip', 0, '', '[reg]', 1, 0),
-( 'input_password', '输密码', 1, 1, 'minute', 'ban_ip', 0, '', '[input_password]', 1, 0);
+('reg', '注册限制', 1, 1, 'minute', 'ban_ip', 0, '', '[reg]', 1, 0),
+('input_password', '输密码', 1, 1, 'minute', 'ban_ip', 0, '', '[input_password]', 1, 0);
 
 
 
