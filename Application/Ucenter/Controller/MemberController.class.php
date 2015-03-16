@@ -120,17 +120,20 @@ class MemberController extends Controller
     {
         $aStep = I('get.step', '', 'op_t');
         $aUid = session('temp_login_uid');
+        $aRoleId = session('temp_login_role_id');
         if (empty($aUid)) {
             $this->error('参数错误');
         }
-        $ucenterMemberModel = UCenterMember();
-        $step = $ucenterMemberModel->where('id=' . $aUid)->getField('step');
+        $userRoleModel=D('UserRole');
+        $map['uid']=$aUid;
+        $map['role_id']=$aRoleId;
+        $step = $userRoleModel->where($map)->getField('step');
         if (get_next_step($step) != $aStep) {
             $aStep = check_step($step);
             $_GET['step'] = $aStep;
-            $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
+            $userRoleModel->where($map)->setField('step', $aStep);
         }
-        $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
+        $userRoleModel->where($map)->setField('step', $aStep);
         if ($aStep == 'finish') {
             D('Member')->login($aUid, false);
         }
@@ -656,12 +659,14 @@ class MemberController extends Controller
     {
         $memberModel=D('Member');
         $role=D('Role')->where(array('id'=>$role_id))->find();
-        $user_role=array('uid'=>$uid,'role_id'=>$role_id);
-        $result=D('UserRole')->add($user_role);
+        $user_role=array('uid'=>$uid,'role_id'=>$role_id,'step'=>"start");
         if($role['audit']){//该角色需要审核
             $user_role['status']=2;//未审核
         }else{
             $user_role['status']=1;
+        }
+        $result=D('UserRole')->add($user_role);
+        if(!$role['audit']){//该角色不需要审核
             $memberModel->initUserRoleInfo($role_id,$uid);
         }
         $memberModel->initDefaultShowRole($role_id,$uid);

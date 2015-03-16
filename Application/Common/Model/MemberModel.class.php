@@ -122,7 +122,7 @@ class MemberModel extends Model
             return false;
         }
 
-        $step = UCenterMember()->where(array('id' => $uid))->getField('step');
+        $step = D('UserRole')->where(array('uid' => $uid,'role_id'=>$user['last_login_role']))->getField('step');
         if (!empty($step) && $step != 'finish') {
             header('Content-Type:application/json; charset=utf-8');
             $data['status'] = 1;

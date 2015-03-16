@@ -348,10 +348,10 @@ class RoleController extends AdminController
             }
             unset($val);
             $builder=new AdminConfigBuilder;
-            $builder->title("$title（同组角色互斥，即同一分组下的角色不能同时被用户拥有）");
+            $builder->title("{$title}（同组角色互斥，即同一分组下的角色不能同时被用户拥有）");
             $builder->keyId()
                 ->keyText('title','标题')
-                ->keyChosen('roles','分组下角色选择','',$roles)
+                ->keyChosen('roles','分组下角色选择','一个角色同时只能存在于一个分组下',$roles)
                 ->buttonSubmit()
                 ->buttonBack()
                 ->data($data)

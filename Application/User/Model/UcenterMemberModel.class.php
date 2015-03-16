@@ -61,7 +61,6 @@ class UcenterMemberModel extends Model
         array('reg_ip', 'get_client_ip', self::MODEL_INSERT, 'function', 1),
         array('update_time', NOW_TIME),
         array('status', 'getStatus', self::MODEL_BOTH, 'callback'),
-        array('step', 'start', self::MODEL_INSERT),
     );
 
     /**
