@@ -6,7 +6,7 @@
  * Time: PM9:01
  */
 
-namespace Common\Model;
+namespace Core\Model;
 
 use Think\Model;
 
@@ -17,6 +17,8 @@ class ExpressionModel extends Model
     {
         parent:: _initialize();
         $this->pkg = modC('EXPRESSION','miniblog','EXPRESSION');
+        define('ROOT_PATH', str_replace('/Application/Core/Model/ExpressionModel.class.php', '', str_replace('\\', '/', __FILE__)));
+
     }
 
     /**
@@ -26,8 +28,8 @@ class ExpressionModel extends Model
      */
     public function getAllExpression()
     {
-        define('ROOT_PATH', str_replace('/Application/Common/Model/ExpressionModel.class.php', '', str_replace('\\', '/', __FILE__)));
-        $pkg = $this->pkg; //TODO 临时写死
+
+        $pkg = $this->pkg;
 
         if($pkg =='all'){
             return $this->getAll();
@@ -40,9 +42,8 @@ class ExpressionModel extends Model
 
 
     public function getExpression($pkg){
-        define('ROOT_PATH', str_replace('/Application/Common/Model/ExpressionModel.class.php', '', str_replace('\\', '/', __FILE__)));
         if($pkg == 'miniblog'){
-            $filepath =  "/Public/static/image/expression/" . $pkg;
+            $filepath =  "/Application/Core/Static/image/expression/" . $pkg;
         }else{
             $filepath =  "/Uploads/expression/" . $pkg;
         }
@@ -68,7 +69,6 @@ class ExpressionModel extends Model
      */
     public function getAll()
     {
-        define('ROOT_PATH', str_replace('/Application/Common/Model/ExpressionModel.class.php', '', str_replace('\\', '/', __FILE__)));
 
         $res = $this->getExpression('miniblog');
 

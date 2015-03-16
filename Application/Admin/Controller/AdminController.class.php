@@ -527,7 +527,7 @@ class AdminController extends Controller
         $res = json_decode($result[1],true);
         if($res['status']){
             file_put_contents('./Application/Admin/Data/'.$res['data']['report_name'].'.txt',$result[1]);
-            $this->success('添加成功');
+            $this->success('报告提交成功，非常感谢您的合作！');
         }
         else{
             $this->error($res['info']);
