@@ -495,13 +495,13 @@ class AdminController extends Controller
         $result = S('os_report');
         if(!$result){
             $url = '/index.php?s=/report/index/check.html';
-            $result = $this->visit_url($url);
+            $result = $this->visitUrl($url);
             S('os_report',$result,60*60);
         }
         $report = json_decode($result[1],true);
         $ctime = filemtime("version.ini");
         $check_exists = file_exists('./Application/Admin/Data/'.$report['title'].'.txt');
-        if(!$check_exists && $ctime+60*60*24*2 <time() ){
+        if(!$check_exists ){
             $this_update = explode("\n",$report['this_update']);
             $future_update = explode("\n",$report['future_update']);
             $this->assign('this_update',$this_update);
@@ -523,7 +523,7 @@ class AdminController extends Controller
         $data['host'] = 'http://'.$_SERVER['HTTP_HOST'].__ROOT__;
         $data['ip'] = get_client_ip(1);
         $url = '/index.php?s=/report/index/addFeedback.html';
-        $result = $this->visit_url($url,$data);
+        $result = $this->visitUrl($url,$data);
         $res = json_decode($result[1],true);
         if($res['status']){
             file_put_contents('./Application/Admin/Data/'.$res['data']['report_name'].'.txt',$result[1]);
@@ -534,9 +534,9 @@ class AdminController extends Controller
         }
 
     }
-    private function visit_url($url,$data='')
+    private function visitUrl($url,$data='')
     {
-        $host = 'http://localhost/ocdev';
+        $host = 'http://demo.ocenter.cn';
         $url = $host.$url;
         $requester = new requester($url);
         $requester->charset = "utf-8";
