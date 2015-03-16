@@ -282,8 +282,9 @@
 
             </div>
             <div class="modal-footer">
+                <php>if(empty($report['url'])){</php>
                 <a class="pull-left" href="{$report['url']}" target="_blank" >查看更新详情</a>
-
+                <php>}</php>
                 <button type="submit" class="btn ajax-post" target-form="report_form">确定</button>
             </div>
 
