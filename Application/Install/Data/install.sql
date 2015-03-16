@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS `ocenter_action` (
 
 
 INSERT INTO `ocenter_action` ( `name`, `title`, `remark`, `rule`, `log`, `type`, `status`, `update_time`) VALUES
+('reg', '用户注册', '用户注册', '', '', 1, 1, 1426070545),
+('input_password', '输入密码', '记录输入密码的次数。', '', '', 1, 1, 1426122119);
 ('user_login', '用户登录', '积分+10，每天一次', 'table:member|field:score|condition:uid={$self} AND status>-1|rule:score+10|cycle:24|max:1;', '[user|get_nickname]在[time|time_format]登录了账号', 1, 1, 1387181220),
 ('update_config', '更新配置', '新增或修改或删除配置', '', '', 1, 1, 1383294988),
 ('update_model', '更新模型', '新增或修改模型', '', '', 1, 1, 1383295057),
@@ -40,6 +42,11 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+INSERT INTO `ocenter_action_limit` (`title`, `name`, `frequency`, `time_number`, `time_unit`, `punish`, `if_message`, `message_content`, `action_list`, `status`, `create_time`) VALUES
+('reg', '注册限制', 1, 0, 'minute', 'ban_ip', 0, '', '[reg]', 1, 0),
+( 'input_password', '输密码', 1, 1, 'minute', 'ban_ip', 0, '', '[input_password]', 1, 0);
+
+
 
 DROP TABLE  IF EXISTS `ocenter_action_log`;
 CREATE TABLE IF NOT EXISTS `ocenter_action_log` (
