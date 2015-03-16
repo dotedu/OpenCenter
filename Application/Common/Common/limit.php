@@ -16,7 +16,8 @@ class ActionLimit
     var $url;
     var $info = '';
     var $punish = array(
-        array('logout_account', '强制注销账户'),
+        array('warning','警告并禁止'),
+        array('logout_account', '强制退出登陆'),
         array('ban_account', '封停账户'),
         array('ban_ip', '封IP'),
     );
@@ -100,11 +101,14 @@ class ActionLimit
 
     function ban_ip($item,$val)
     {
+       //TODO 进行封停IP的操作
+    }
+
+    function warning($item,$val){
         $this->state = false;
         $this->info = '操作频繁，请'.$val['time_number'].get_time_unit($val['time_unit']).'后再试';
         $this->url = U('home/index/index');
     }
-
 }
 
 
