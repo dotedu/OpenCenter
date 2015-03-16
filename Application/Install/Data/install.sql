@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
   `title` varchar(100) NOT NULL,
   `name` varchar(50) NOT NULL,
   `frequency` int(11) NOT NULL,
+  `time_number` int(11) NOT NULL,
   `time_unit` varchar(50) NOT NULL,
   `punish` text NOT NULL,
   `if_message` tinyint(4) NOT NULL,
