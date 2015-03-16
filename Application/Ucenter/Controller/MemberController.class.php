@@ -649,13 +649,62 @@ class MemberController extends Controller
     }
 
     /**
+     * 切换登录身份
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function changeLoginRole()
+    {
+        $memberModel=D('Member');
+        $aRoleId=I('post.role_id',0,'intval');
+        $uid=is_login();
+        $data['status']=0;
+        if($uid&&$aRoleId!=get_login_role()){
+            $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
+            if($roleUser){
+                $memberModel->logout();
+                $result=$memberModel->login($uid,false,$aRoleId);
+                if($result){
+                    $data['info']="身份切换成功！";
+                    $data['status']=1;
+                }
+            }
+        }
+        $data['info']="非法操作！";
+        $this->ajaxReturn($data);
+    }
+
+    /**
+     * 持有新身份
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function registerRole()
+    {
+        $aRoleId=I('post.role_id',0,'intval');
+        $uid=is_login();
+        $data['status']=0;
+        if($uid&&$aRoleId!=get_login_role()){
+            $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
+            if($roleUser){
+                $data['info']="已持有该身份！";
+                $this->ajaxReturn($data);
+            }else{
+                $this->initRoleUser($aRoleId,$uid);
+                D('Member')->login($uid, false,$aRoleId); //登陆
+            }
+        }else{
+            $data['info']="非法操作！";
+            $this->ajaxReturn($data);
+        }
+    }
+
+    /**
      * 初始化角色用户信息
      * @param $role_id
      * @param $uid
      * @return bool
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function initRoleUser($role_id=0,$uid)
+    private function initRoleUser($role_id=0,$uid)
     {
         $memberModel=D('Member');
         $role=D('Role')->where(array('id'=>$role_id))->find();

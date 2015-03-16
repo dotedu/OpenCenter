@@ -58,6 +58,55 @@ class ConfigController extends BaseController
         $this->display();
     }
 
+    public function role()
+    {
+        $userRoleModel=D('UserRole');
+        if(IS_POST){
+            $aShowRole=I('post.show_role',0,'intval');
+            $map['role_id']=$aShowRole;
+            $map['uid']=is_login();
+            $map['status']=array('egt',1);
+            if(!$userRoleModel->where($map)->count()){
+                $this->error('参数错误！');
+            }
+            $result=D('Member')->where(array('uid'=>is_login()))->setField('show_role',$aShowRole);
+            if($result){
+                $this->success('设置成功！');
+            }else{
+                $this->error('设置失败！');
+            }
+        }else{
+            $role_id=get_login_role();//当前登录角色
+            $roleModel=D('Role');
+            $userRoleModel=D('UserRole');
+
+            $already_role_list=$userRoleModel->where(array('uid'=>is_login()))->field('role_id,status')->select();
+            $already_role_ids=array_column($already_role_list,'role_id');
+            $already_role_list=array_combine($already_role_ids,$already_role_list);
+
+            $map_already_roles['id']=array('in',$already_role_ids);
+            $already_roles=$roleModel->where($map_already_roles)->order('sort asc')->select();
+            $already_group_ids=array_unique(array_column($already_roles,'group_id'));
+
+            foreach($already_roles as &$val){
+                $val['user_status']=$already_role_list[$val['id']]['status']==1?'<span style="color: green;">已审核</span>':'<span style="color: #ff0000;">正在审核</span>';
+                $val['can_login']=$val['id']==$role_id?0:1;
+            }
+            unset($val);
+
+            $map_can_have_roles['group_id']=array('not in',$already_group_ids);//同组内的角色不显示
+            $map_can_have_roles['invite']=0;//不需要邀请注册
+            $can_have_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();
+
+            $this->assign('already_roles',$already_roles);
+            $this->assign('can_have_roles',$can_have_roles);
+
+            $this->_setTab('role');
+            $this->display();
+        }
+
+    }
+
     public function index()
     {
 
