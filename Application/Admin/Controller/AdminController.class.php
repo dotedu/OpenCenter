@@ -501,7 +501,7 @@ class AdminController extends Controller
         $report = json_decode($result[1],true);
         $ctime = filemtime("version.ini");
         $check_exists = file_exists('./Application/Admin/Data/'.$report['title'].'.txt');
-        if(!$check_exists && $ctime+60*60*24*2 <time() ){
+        if(!$check_exists && $ctime+60*60*24*2*0 <time() ){
             $this_update = explode("\n",$report['this_update']);
             $future_update = explode("\n",$report['future_update']);
             $this->assign('this_update',$this_update);
@@ -527,7 +527,7 @@ class AdminController extends Controller
         $res = json_decode($result[1],true);
         if($res['status']){
             file_put_contents('./Application/Admin/Data/'.$res['data']['report_name'].'.txt',$result[1]);
-            $this->success('添加成功');
+            $this->success('报告提交成功，非常感谢您的合作！');
         }
         else{
             $this->error($res['info']);

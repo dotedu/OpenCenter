@@ -80,7 +80,7 @@ function parse_expression_callback($data)
     if (preg_match("/#.+#/i", $data[0])) {
         return $data[0];
     }
-    $allexpression = D('Common/Expression')->getAll();
+    $allexpression = D('Core/Expression')->getAll();
 /*    if(!stristr($data[0],":")){
         $data[0] = str_replace(']',':miniblog]',$data[0]);
     }*/
