@@ -1212,3 +1212,16 @@ CREATE TABLE IF NOT EXISTS `ocenter_user_config` (
   `value` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户配置信息表' AUTO_INCREMENT=1 ;
+
+
+
+CREATE TABLE IF NOT EXISTS `ocenter_sso_app` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  `config` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

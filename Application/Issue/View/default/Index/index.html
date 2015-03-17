@@ -22,8 +22,7 @@
                 <volist name="tree" id="top">
                     <if condition="$top['status'] eq 1">
                         <li>
-                            <a
-                            <eq name="top_issue" value="$top['id']">class="cur"</eq>
+                            <a  <eq name="top_issue" value="$top['id']">class="cur"</eq>
                             href="{:U('index',array('issue_id'=>$top['id']))}" data="{$top.id}">{$top.title}</a>
                         </li>
                     </if>

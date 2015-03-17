@@ -1,0 +1,11 @@
+<script type="text/plain" name="{$name}" id="{$id}" style="width:{$width};height:{$height};{$style}">{$default}</script>
+
+<script>
+    $(function () {
+        var config = {{$config}};
+        var ue_{$id} = UE.getEditor('{$id}', config);
+    })
+</script>
+
+<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/ueditor.all.min.js"></script>

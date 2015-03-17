@@ -77,8 +77,6 @@ str;
             ->keyText('SMS_UID', '短信平台帐号', '短信平台帐号')
             ->keyText('SMS_PWD', '短信平台密码', '短信平台密码')
             ->keyTextArea('SMS_CONTENT', '短信内容', '短信内容')
-
-
             ->keyTextArea('LEVEL', '等级配置', '每行一条，名称和积分之间用冒号分隔')
             ->keyCheckBox('DEFAULT_GROUP', '默认用户组', '设置用户注册后的默认所在用户组', $groupOption)
 
