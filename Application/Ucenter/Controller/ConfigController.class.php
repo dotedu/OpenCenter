@@ -85,6 +85,7 @@ class ConfigController extends BaseController
             $already_role_list=array_combine($already_role_ids,$already_role_list);
 
             $map_already_roles['id']=array('in',$already_role_ids);
+            $map_already_roles['status']=1;
             $already_roles=$roleModel->where($map_already_roles)->order('sort asc')->select();
             $already_group_ids=array_unique(array_column($already_roles,'group_id'));
 
@@ -96,6 +97,7 @@ class ConfigController extends BaseController
 
             $map_can_have_roles['group_id']=array('not in',$already_group_ids);//同组内的角色不显示
             $map_can_have_roles['invite']=0;//不需要邀请注册
+            $map_can_have_roles['status']=1;
             $can_have_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();
 
             $this->assign('already_roles',$already_roles);
