@@ -222,10 +222,8 @@
         </volist>
     </case>
     <case value="editor">
-        <label class="textarea">
-            <textarea name="{$field.name}" class="form-control" style="width: 400px;height: 200px">{$field.value|htmlspecialchars}</textarea>
-            {:hook('adminArticleEdit', array('name'=>$field['name'],'value'=>$field['value']))}
-        </label>
+            {:W('Common/Ueditor/editor',array($field['name'],$field['name'],$field['value'],$field['style']['width'],$field['style']['height'],$field['config']))}
+
     </case>
     <case value="textarea">
         <textarea name="{$field.name}" class="text input-large form-control"
