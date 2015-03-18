@@ -1,7 +1,7 @@
 <extend name="Public/base"/>
 
 <block name="body">
-    <link type="text/css" rel="stylesheet" href="__PUBLIC__/Core/js/ext/magnific/magnific-popup.css"/>
+    <link type="text/css" rel="stylesheet" href="__PUBLIC__/js/ext/magnific/magnific-popup.css"/>
     <!-- 标题 -->
     <div class="main-title">
         <h2>
@@ -42,7 +42,7 @@
                   		<option value="">全部</option>
                   		<volist name="search['arrvalue']" id="svo">
                   			<option value="{$svo.id}" <eq name="svo.id" value="$_GET[$search['name']]">selected</eq>>{$svo.value}</option>
-                  		</volist>	
+                  		</volist>
 					</select>
                   </td>
                   <td>
@@ -85,8 +85,54 @@
             <volist name="buttonList" id="button">
                 <{$button.tag} {$button.attr}>{$button.title|htmlspecialchars}</{$button.tag}>&nbsp;
             </volist>
+
+
+
+            <php>
+                foreach($selects as $select){
+                if($_REQUEST[$select['name']])
+                {
+                $show=1;
+                }
+                }
+            </php>
+            <!-- 选择框select -->
+            <div style="float: right;" >
+                <style>
+                    .oneselect{
+                        display: inline-block;
+                        margin-left: 10px;
+                    }
+                    .oneselect .title{
+                        float: left;
+                        line-height: 35px;;
+                    }
+                    .oneselect .select_box{
+                        float: left;
+                    }
+                    .oneselect .select_box select{
+                        min-width: 200px;
+                    }
+                </style>
+                <form id="selectForm" method="get" action="{$selectPostUrl}" class="form-dont-clear-url-param">
+                    <volist name="selects" id="select">
+                        <div class="oneselect">
+                            <div class="title">{$select.title}：</div>
+                            <div class="select_box">
+                            <select name="{$select['name']}" data-role="select_text" class="form-control">
+                                <volist name="select['arrvalue']" id="svo">
+                                    <option value="{$svo.id}" <eq name="svo.id" value="$_GET[$select['name']]">selected</eq>>{$svo.value}</option>
+                                </volist>
+                            </select>
+                            </div>
+                        </div>
+                    </volist>
+                </form>
+            </div>
         </div>
+
     </div>
+
 
     <!-- 数据表格 -->
     <div class="with-padding">
@@ -148,7 +194,6 @@
             $('#search_form').toggle('slide');
         }
 
-
         $(document).on('submit', '.form-dont-clear-url-param', function(e){
             e.preventDefault();
 
@@ -171,6 +216,38 @@
 
     <script>
         $(function(){
+            $('[data-role="select_text"]').change(function(){
+                $('#selectForm').submit();
+            });
+            //模态弹窗
+            $('[data-role="modal_popup"]').click(function(){
+                var target_form=$(this).attr('target-form');
+                var target_url=$(this).attr('modal-url');
+                var data_title=$(this).attr('data-title');
+                var form=$('.'+target_form);
+
+                if (form.get(0) == undefined) {
+                    updateAlert('没有可操作数据。','danger');
+                    return false;
+                } else if (form.get(0).nodeName == 'FORM') {
+                    query = form.serialize();
+                } else if (form.get(0).nodeName == 'INPUT' || form.get(0).nodeName == 'SELECT' || form.get(0).nodeName == 'TEXTAREA') {
+                    query = form.serialize();
+                } else {
+                    query = form.find('input,select,textarea').serialize();
+                }
+                if(!query.length){
+                    updateAlert('没有可操作数据。','danger');
+                    return false;
+                }
+                target_url=target_url+'&'+query;
+                var myModalTrigger = new ModalTrigger({
+                    'type':'ajax',
+                    'url':target_url,
+                    'title':data_title
+                });
+                myModalTrigger.show();
+            });
             $('.tox-confirm').click(function(e){
                 var text = $(this).attr('data-confirm');
                 var result = confirm(text);
@@ -187,7 +264,6 @@
 
 
         $(document).ready(function () {
-
             $('.popup-gallery').each(function () { // the containers for all your galleries
                 $(this).magnificPopup({
                     delegate: 'a',
@@ -212,5 +288,5 @@
             });
         });
     </script>
-    <script type="text/javascript" src="__PUBLIC__/Core/js/ext/magnific/jquery.magnific-popup.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/js/ext/magnific/jquery.magnific-popup.min.js"></script>
 </block>

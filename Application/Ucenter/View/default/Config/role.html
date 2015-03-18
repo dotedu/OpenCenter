@@ -21,7 +21,6 @@
                 $('#' + name + '_toggle_right').show();
                 $('#' + name + '_toggle_bottom').hide()
             }
-
         }
     </script>
     <div id="center">
@@ -44,8 +43,8 @@
                                 <volist name="already_roles" id="role">
                                     <tr class="col-xs-12" style="line-height: 40px;">
                                         <td style="width: 20%">{$role.title}</td>
-                                        <td style="width: 10%">{$role.user_status}</td>
-                                        <td style="width: 30%"><eq name="role.can_login" value="1"><a data-role="changeLoginRole" data-id="{$role.id}">切换登录</a><else/>当前登录</eq></td>
+                                        <td style="width: 50%">{$role.user_status}</td>
+                                        <td style="width: 30%"><neq name="role.user_role_status" value="0"><eq name="role.can_login" value="1"><a data-role="changeLoginRole" data-id="{$role.id}">切换登录</a><else/>当前登录</neq></eq></td>
                                     </tr>
                                 </volist>
                                 </tbody>
@@ -58,7 +57,7 @@
                                 <volist name="can_have_roles" id="role">
                                     <tr class="col-xs-12" style="line-height: 40px;">
                                         <td style="width: 20%">{$role.title}</td>
-                                        <td style="width: 40%"><a data-role="hold_role" data-id="{$role.id}">持有该身份</a></td>
+                                        <td style="width: 80%"><a data-role="hold_role" data-id="{$role.id}">持有该身份</a></td>
                                     </tr>
                                 </volist>
                                 <if condition="!count($can_have_roles)">
@@ -77,9 +76,15 @@
                             </label>
 
                             <div class="col-xs-4">
+
                                 <select class="form-control" id="show_role" name="show_role">
-                                    <volist name="already_roles" id="role">
-                                        <option value="{$role.id}" <eq name="role.can_login" value="0">selected</eq>>{$role.title|htmlspecialchars}</option>
+                                    <volist name="already_roles" id="onerole">
+                                        <if condition="$onerole['id'] eq $show_role">
+                                            <option value="{$onerole.id}" selected>{$onerole.title|htmlspecialchars}</option>
+                                            <else/>
+                                            <option value="{$onerole.id}">{$onerole.title|htmlspecialchars}</option>
+                                        </if>
+
                                     </volist>
                                 </select>
                                 <div class="clearfix"></div>

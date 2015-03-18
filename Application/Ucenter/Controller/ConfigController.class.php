@@ -71,6 +71,7 @@ class ConfigController extends BaseController
             }
             $result=D('Member')->where(array('uid'=>is_login()))->setField('show_role',$aShowRole);
             if($result){
+                clean_query_user_cache(is_login(),array('show_role'));
                 $this->success('设置成功！');
             }else{
                 $this->error('设置失败！');
@@ -90,8 +91,9 @@ class ConfigController extends BaseController
             $already_group_ids=array_unique(array_column($already_roles,'group_id'));
 
             foreach($already_roles as &$val){
-                $val['user_status']=$already_role_list[$val['id']]['status']==1?'<span style="color: green;">已审核</span>':'<span style="color: #ff0000;">正在审核</span>';
+                $val['user_status']=$already_role_list[$val['id']]['status']!=2?($already_role_list[$val['id']]['status']==1)?'<span style="color: green;">已审核</span>':'<span style="color: #ff0000;">已禁用<span style="color: 333">(如有疑问，请联系管理员)</span></span>':'<span style="color: #0003FF;">正在审核</span>';;
                 $val['can_login']=$val['id']==$role_id?0:1;
+                $val['user_role_status']=$already_role_list[$val['id']]['status'];
             }
             unset($val);
 
@@ -100,6 +102,8 @@ class ConfigController extends BaseController
             $map_can_have_roles['status']=1;
             $can_have_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();
 
+            $show_role=query_user(array('show_role'));
+            $this->assign('show_role',$show_role['show_role']);
             $this->assign('already_roles',$already_roles);
             $this->assign('can_have_roles',$can_have_roles);
 

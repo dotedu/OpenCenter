@@ -352,7 +352,7 @@ class MemberModel extends Model
         $roleModel=D('Role');
         $roleConfigModel=D('RoleConfig');
         $authGroupAccessModel=D('AuthGroupAccess');
-
+        D('UserRole')->where(array('role_id'=>$role_id,'uid'=>$uid))->setField('init',1);
         //默认用户组设置
         $role=$roleModel->where(array('id'=>$role_id))->find();
         if($role['user_groups']!=''){
@@ -425,15 +425,16 @@ class MemberModel extends Model
         //默认头衔设置 end
     }
 
+    //默认显示哪一个角色的个人主页设置
     public function initDefaultShowRole($role_id,$uid)
     {
         $roleModel=D('Role');
         $userRoleModel=D('UserRole');
-        //默认显示哪一个角色的个人主页设置
+
         $roles=$userRoleModel->where(array('uid'=>$uid,'status'=>1))->field('role_id')->select();
         if(count($roles)){
             $roles=array_merge(array_column($roles,'role_id'),array($role_id));
-            $show_role=$roleModel->where(array('id'=>array('in',$roles),'audit'=>0))->order('sort asc')->find();
+            $show_role=$roleModel->where(array('id'=>array('in',$roles)))->order('sort asc')->find();
             if($show_role){
                 $show_role_id=intval($show_role['id']);
                 $data['show_role']=$show_role_id;
@@ -443,10 +444,8 @@ class MemberModel extends Model
         }else{
             $data['show_role']=$role_id;
         }
-        //默认显示哪一个角色的个人主页设置 end
-
         //执行member表默认值设置
         $this->where(array('uid'=>$uid))->save($data);
     }
-
+    //默认显示哪一个角色的个人主页设置 end
 }

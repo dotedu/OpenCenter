@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS `ocenter_user_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `status` tinyint(4) NOT NULL COMMENT '2：未审核，1:启用，
+  `status` tinyint(4) NOT NULL COMMENT '2：未审核，1:启用，0：禁用，-1：删除',
   `step` varchar(50) NOT NULL COMMENT '记录当前执行步骤',
+  `init` tinyint(2) NOT NULL DEFAULT '0' COMMENT '是否初始化',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户角色关联' AUTO_INCREMENT=1 ;

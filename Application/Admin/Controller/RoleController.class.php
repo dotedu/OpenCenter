@@ -33,7 +33,7 @@ class RoleController extends AdminController
         $this->roleModel = D("Admin/Role");
         $this->userRoleModel = D('UserRole');
         $this->roleConfigModel = D('RoleConfig');
-        $this->roleGroupModel=D('RoleGroup');
+        $this->roleGroupModel = D('RoleGroup');
     }
 
     //角色基本信息及配置 start
@@ -42,21 +42,21 @@ class RoleController extends AdminController
     {
         $map['status'] = array('egt', 0);
         $roleList = $this->roleModel->selectPageByMap($map, &$totalCount, $page, $r, 'sort asc');
-        $map_group['id']=array('in',array_column($roleList,'group_id'));
+        $map_group['id'] = array('in', array_column($roleList, 'group_id'));
 
-        $group=$this->roleGroupModel->where($map_group)->field('id,title')->select();
-        $group=array_combine(array_column($group,'id'),$group);
+        $group = $this->roleGroupModel->where($map_group)->field('id,title')->select();
+        $group = array_combine(array_column($group, 'id'), $group);
 
-        $authGroupList=M('AuthGroup')->where(array('status' => 1))->field('id,title')->select();
-        $authGroupList=array_combine(array_column($authGroupList,'id'),array_column($authGroupList,'title'));
-        foreach($roleList as &$val){
-            $user_groups=explode(',',$val['user_groups']);
-            $val['group']=$group[$val['group_id']]['title'];
-            foreach($user_groups as &$vl){
-                $vl=$authGroupList[$vl];
+        $authGroupList = M('AuthGroup')->where(array('status' => 1))->field('id,title')->select();
+        $authGroupList = array_combine(array_column($authGroupList, 'id'), array_column($authGroupList, 'title'));
+        foreach ($roleList as &$val) {
+            $user_groups = explode(',', $val['user_groups']);
+            $val['group'] = $group[$val['group_id']]['title'];
+            foreach ($user_groups as &$vl) {
+                $vl = $authGroupList[$vl];
             }
             unset($vl);
-            $val['user_groups']=implode(',',$user_groups);
+            $val['user_groups'] = implode(',', $user_groups);
         }
         unset($val);
         $builder = new AdminListBuilder;
@@ -100,8 +100,8 @@ class RoleController extends AdminController
             $data['audit'] = I('post.audit', 0, 'intval');
             $data['status'] = I('post.status', 1, 'intval');
             $data['user_groups'] = I('post.user_groups');
-            if($data['user_groups']!=''){
-                $data['user_groups']=implode(',',$data['user_groups']);
+            if ($data['user_groups'] != '') {
+                $data['user_groups'] = implode(',', $data['user_groups']);
             }
             if ($is_edit) {
                 $data['id'] = $aId;
@@ -123,15 +123,15 @@ class RoleController extends AdminController
                 $data = $this->roleModel->getByMap(array('id' => $aId));
             }
 
-            $data['user_groups']=array(modC('DEFAULT_GROUP',0,'User'));//默认用户组
-            $authGroupList=M('AuthGroup')->where(array('status' => 1))->field('id,title')->select();//用户组列表
+            $data['user_groups'] = array(modC('DEFAULT_GROUP', 0, 'User')); //默认用户组
+            $authGroupList = M('AuthGroup')->where(array('status' => 1))->field('id,title')->select(); //用户组列表
 
-            $group=D('RoleGroup')->field('id,title')->select();
-            $group=array_combine(array_column($group,'id'),array_column($group,'title'));
-            if(!$group){
-                $group=array(0=>'无分组');
-            }else{
-                $group=array_merge(array(0=>'无分组'),$group);
+            $group = D('RoleGroup')->field('id,title')->select();
+            $group = array_combine(array_column($group, 'id'), array_column($group, 'title'));
+            if (!$group) {
+                $group = array(0 => '无分组');
+            } else {
+                $group = array_merge(array(0 => '无分组'), $group);
             }
             $builder = new AdminConfigBuilder;
             $builder->meta_title = $title;
@@ -140,7 +140,7 @@ class RoleController extends AdminController
                 ->keyText('title', '角色名', '不能重复')
                 ->keyText('name', '英文标识', '由英文字母、下划线组成，且不能重复')
                 ->keyTextArea('description', '描述')
-                ->keySelect('group_id', '所属分组', '',$group)
+                ->keySelect('group_id', '所属分组', '', $group)
                 ->keyChosen('user_groups', '默认用户组', '用户注册后的默认所在用户组,多选', $authGroupList)
                 ->keyRadio('invite', '需要邀请注册', '默认为关闭，开启后，得到邀请的用户才能注册', array(1 => "开启", 0 => "关闭"))
                 ->keyRadio('audit', '需要审核', '默认为关闭，开启后，用户审核后才能拥有该角色', array(1 => "开启", 0 => "关闭"))
@@ -194,17 +194,18 @@ class RoleController extends AdminController
             } else {
                 $this->error('角色' . $result['role']['name'] . '（' . $result["role"]["id"] . '）【' . $result["role"]["title"] . '】中存在单角色用户，移出单角色用户后才能禁用该角色！');
             }
-        } else if ($status == -1) {//（真删除）
+        } else if ($status == -1) { //（真删除）
             $result = $this->checkSingleRoleUser($ids);
             if ($result['status']) {
                 $result = $this->roleModel->where(array('id' => array('in', $ids)))->delete();
                 if ($result) {
+                    $this->userRoleModel->where(array('role_id'=>array('in',$ids)))->delete();
                     $this->success('删除成功！', U('Role/index'));
                 } else {
                     $this->error('删除失败！');
                 }
             } else {
-                $this->error('角色' . $result['role']['name'] . '（' . $result["role"]["id"] . '）【' . $result["role"]["title"] . '】中存在单角色用户，移出单角色用户后才能禁用该角色！');
+                $this->error('角色' . $result['role']['name'] . '（' . $result["role"]["id"] . '）【' . $result["role"]["title"] . '】中存在单角色用户，移出单角色用户后才能删除该角色！');
             }
         }
     }
@@ -252,15 +253,14 @@ class RoleController extends AdminController
         return $result;
     }
 
-
     /**
      * 角色基本信息配置
      * @author 郑钟良<zzl@ourstu.com>
      */
     public function config()
     {
-        $builder=new AdminConfigBuilder;
-        $data=$builder->handleConfig();
+        $builder = new AdminConfigBuilder;
+        $data = $builder->handleConfig();
         //empty($data['CLOSE_ROLE'])&&$data['CLOSE_ROLE']=0;
 
         $builder->title('角色基本信息配置')
@@ -273,6 +273,235 @@ class RoleController extends AdminController
 
     //角色基本信息及配置 end
 
+    //角色用户管理 start
+
+    public function userList($page = 1, $r = 20)
+    {
+        $aRoleId = I('role_id', 0, 'intval');
+        $aUserStatus = I('user_status', 0, 'intval');
+        $role_list = $this->roleModel->field('id,title as value')->order('sort asc')->select();
+        $role_id_list = array_column($role_list, 'id');
+        if ($aRoleId && in_array($aRoleId, $role_id_list)) {
+            $map_user_list['role_id'] = $aRoleId;
+        } else {
+            $map_user_list['role_id'] = $role_list[0]['id'];
+        }
+        if ($aUserStatus) {
+            $map_user_list['status'] = $aUserStatus == 3 ? 0 : $aUserStatus;
+        }
+        $user_list = $this->userRoleModel->where($map_user_list)->page($page, $r)->order('id desc')->select();
+        $totalCount = $this->userRoleModel->where($map_user_list)->count();
+        foreach ($user_list as &$val) {
+            $user = query_user(array('nickname', 'avatar64'), $val['uid']);
+            $val['nickname'] = $user['nickname'];
+            $val['avatar'] = $user['avatar64'];
+        }
+        unset($user, $val);
+
+        $statusOptions = array(
+            0 => array('id' => 0, 'value' => '全部'),
+            1 => array('id' => 1, 'value' => '启用'),
+            2 => array('id' => 2, 'value' => '未审核'),
+            3 => array('id' => 3, 'value' => '禁用'),
+        );
+
+        $builder = new AdminListBuilder();
+        $builder->title('角色用户列表')
+            ->setSelectPostUrl('Role/userList');
+        if ($map_user_list['status'] == 2) {
+            $builder->setStatusUrl(U('Role/setUserAudit', array('role_id' => $map_user_list['role_id'])))->buttonEnable('', '审核通过')->buttonDelete('', '审核失败');
+        } else {
+            $builder->setStatusUrl(U('Role/setUserStatus', array('role_id' => $map_user_list['role_id'])))->buttonEnable()->buttonDisable();
+        }
+
+        $builder->modalPopupButton(U('Role/changeRole',array('role_id'=>$map_user_list['role_id'])), array(), '迁移用户',array('data-title'=>'迁移用户到其他角色'))
+            ->select('角色', 'role_id', 'select', '', '', '', $role_list)->select('状态', 'user_status', 'select', '', '', '', $statusOptions)
+            ->keyId()
+            ->keyImage('avatar', '头像')
+            ->keyLink('nickname', '昵称', 'ucenter/index/information?uid=###')
+            ->keyStatus()
+            ->pagination($totalCount, $r)
+            ->data($user_list)
+            ->display();
+    }
+
+    /**
+     * 移动用户
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function changeRole()
+    {
+        if(IS_POST){
+            $aIds=I('post.ids');
+            $aRole_id=I('post.role_id',0,'intval');
+            $aRole=I('post.role',0,'intval');
+            $result['status']=0;
+            if($aRole_id==$aRole||$aRole==0){
+                $result['info']='非法操作！';
+                $this->ajaxReturn($result);
+            }
+            $ids=explode(',',$aIds);
+            if(!count($ids)){
+                $result['info']='没有要转移用户！';
+                $this->ajaxReturn($result);
+            }
+
+            $map['id']=array('in',$ids);
+            $uids=$this->userRoleModel->where($map)->field('uid')->select();
+            $uids=array_column($uids,'uid');
+
+            $map_already['uid']=array('in',$uids);
+            $map_already['role_id']=$aRole;
+            $already_uids=$this->userRoleModel->where($map_already)->field('uid')->select();
+            $already_uids=array_column($already_uids,'uid');
+
+            $uids=array_diff($uids,$already_uids);//去除已存在的
+
+            $data['role_id']=$aRole;
+            $data['status']=1;
+            $data['step']='finish';
+            $data['init']=1;
+            foreach($uids as $val){
+                $data['uid']=$val;
+                $data_list[]=$data;
+            }
+            unset($val);
+            if(isset($data_list)){
+                $this->userRoleModel->addAll($data_list);
+            }
+            $res=$this->userRoleModel->where($map)->delete();
+            if($res){
+                $result['status']=1;
+            }else{
+                $result['info']='操作失败！';
+            }
+            $this->ajaxReturn($result);
+        }else{
+            $aIds=I('get.ids');
+            $aRole_id=I('get.role_id',0,'intval');
+            $ids=implode(',',$aIds);
+            $map['id']=array('neq',$aRole_id);
+            $map['status']=1;
+            $role_list=$this->roleModel->where($map)->field('id,title as value')->order('sort asc')->select();
+            $this->assign('role_list',$role_list);
+            $this->assign('ids',$ids);
+            $this->display();
+        }
+    }
+
+    /**
+     * 设置用户角色状态，启用、禁用
+     * @param $ids
+     * @param int $status
+     * @param int $role_id
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function setUserStatus($ids, $status = 1, $role_id = 0)
+    {
+        if ($status == 1) {
+            $map_role['role_id'] = $role_id;
+            foreach ($ids as $val) {
+                $map_role['id'] = $val;
+                $user_role=$this->userRoleModel->where($map_role)->find();
+                if($user_role['init']==0){
+                    D('Common/Member')->initUserRoleInfo($role_id,$user_role['uid']);
+                }
+            }
+            $builder = new AdminListBuilder;
+            $builder->doSetStatus('UserRole', $ids, $status);
+        } else if ($status == 0) {
+            $uids = $this->userRoleModel->where(array('id' => array('in', $ids)))->field('uid')->select();
+            if (count($uids)) {
+                $uids = array_column($uids, 'uid');
+                $map['role_id'] = array('neq', $role_id);
+                $map['uid'] = array('in', $uids);
+                $map['status'] = array('gt', 0);
+                $has_other_role_user_ids = $this->userRoleModel->where($map)->field('uid')->select();
+                $unHave = array_diff($ids, array_column($has_other_role_user_ids, 'uid'));
+                if (count($unHave) > 0) {
+                    $unHave = implode(',', $unHave);
+                    $this->error("id为{$unHave}的用户只拥有该角色，不能被禁用！");
+                }
+                foreach($uids as $val){
+                    $this->setDefaultShowRole($role_id,$val);
+                }
+                unset($val);
+                $builder = new AdminListBuilder;
+                $builder->doSetStatus('UserRole', $ids, $status);
+            } else {
+                $this->info('没有可操作数据！');
+            }
+        } else {
+            $this->error('非法操作！');
+        }
+    }
+
+    /**
+     * 审核用户，通过，不通过
+     * @param $ids
+     * @param int $status
+     * @param int $role_id
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function setUserAudit($ids,$status=1,$role_id=0)
+    {
+        if ($status == 1) {
+            $map_role['role_id'] = $role_id;
+            foreach ($ids as $val) {
+                $map_role['id'] = $val;
+                $user_role=$this->userRoleModel->where($map_role)->find();
+                if($user_role['init']==0){
+                    D('Common/Member')->initUserRoleInfo($role_id,$user_role['uid']);
+                }
+            }
+            $builder = new AdminListBuilder;
+            $builder->doSetStatus('UserRole', $ids, $status);
+        } else if ($status == 0) {
+            $uids = $this->userRoleModel->where(array('id' => array('in', $ids)))->field('uid')->select();
+            if (count($uids)) {
+                $builder = new AdminListBuilder;
+                $builder->doSetStatus('UserRole', $ids, $status);
+            } else {
+                $this->info('没有可操作数据！');
+            }
+        } else {
+            $this->error('非法操作！');
+        }
+    }
+
+
+    /**
+     * 重新设置用户默认角色及最后登录角色
+     * @param $role_id
+     * @param $uid
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    private function setDefaultShowRole($role_id,$uid)
+    {
+        $memberModel=D('Member');
+        $user=query_user(array('show_role','last_login_role'),$uid);
+        if($role_id==$user['show_role']){
+            $roles=$this->userRoleModel->where(array('role_id'=>array('neq',$role_id),'uid'=>$uid,'status'=>array('gt',0)))->field('role_id')->select();
+            $roles=array_merge(array_column($roles,'role_id'),array($role_id));
+            $show_role=$this->roleModel->where(array('id'=>array('in',$roles)))->order('sort asc')->find();
+            $show_role_id=intval($show_role['id']);
+            $data['show_role']=$show_role_id;
+            if($role_id==$user['last_login_role']){
+                $data['last_login_role']=$data['show_role'];
+            }
+            $memberModel->where(array('uid'=>$uid))->save($data);
+        }else{
+            if($role_id==$user['last_login_role']){
+                $data['last_login_role']=$user['show_role'];
+            }
+            $memberModel->where(array('uid'=>$uid))->save($data);
+        }
+        return true;
+    }
+
+    //角色用户管理 end
+
     //角色分组 start
 
     /**
@@ -281,22 +510,22 @@ class RoleController extends AdminController
      */
     public function group()
     {
-        $group=$this->roleGroupModel->field('id,title,update_time')->select();
-        foreach($group as &$val){
-            $map['group_id']=$val['id'];
-            $roles=$this->roleModel->selectByMap($map,'id asc','title');
-            $val['roles']=implode(',',array_column($roles,'title'));
+        $group = $this->roleGroupModel->field('id,title,update_time')->select();
+        foreach ($group as &$val) {
+            $map['group_id'] = $val['id'];
+            $roles = $this->roleModel->selectByMap($map, 'id asc', 'title');
+            $val['roles'] = implode(',', array_column($roles, 'title'));
         }
-        unset($roles,$val);
-        $builder=new AdminListBuilder;
+        unset($roles, $val);
+        $builder = new AdminListBuilder;
         $builder->title('角色分组（同组角色互斥，即同一分组下的角色不能同时被用户拥有）')
             ->buttonNew(U('Role/editGroup'))
             ->keyId()
-            ->keyText('title','标题')
-            ->keyText('roles','分组下的角色')
+            ->keyText('title', '标题')
+            ->keyText('roles', '分组下的角色')
             ->keyUpdateTime()
             ->keyDoActionEdit('Role/editGroup?id=###')
-            ->keyDoAction('Role/deleteGroup?id=###','删除')
+            ->keyDoAction('Role/deleteGroup?id=###', '删除')
             ->data($group)
             ->display();
     }
@@ -307,51 +536,51 @@ class RoleController extends AdminController
      */
     public function editGroup()
     {
-        $aGroupId=I('id',0,'intval');
-        $is_edit=$aGroupId?1:0;
-        $title=$is_edit?'编辑分组':'新增分组';
-        if(IS_POST){
-            $data['title']=I('post.title','','op_t');
-            $data['update_time']=time();
-            $roles=I('post.roles');
-            if($is_edit){
-                $result=$this->roleGroupModel->where(array('id'=>$aGroupId))->save($data);
-                if($result){
-                    $result=$aGroupId;
+        $aGroupId = I('id', 0, 'intval');
+        $is_edit = $aGroupId ? 1 : 0;
+        $title = $is_edit ? '编辑分组' : '新增分组';
+        if (IS_POST) {
+            $data['title'] = I('post.title', '', 'op_t');
+            $data['update_time'] = time();
+            $roles = I('post.roles');
+            if ($is_edit) {
+                $result = $this->roleGroupModel->where(array('id' => $aGroupId))->save($data);
+                if ($result) {
+                    $result = $aGroupId;
                 }
-            }else{
-                if($this->roleGroupModel->where(array('title'=>$data['title']))->count()){
+            } else {
+                if ($this->roleGroupModel->where(array('title' => $data['title']))->count()) {
                     $this->error("{$title}失败！该分组已存在！");
                 }
-                $result=$this->roleGroupModel->add($data);
+                $result = $this->roleGroupModel->add($data);
             }
-            if($result){
-                $this->roleModel->where(array('group_id'=>$result))->setField('group_id',0);//所有该分组下的角色全部移出
-                if(!is_null($roles)){
-                    $this->roleModel->where(array('id'=>array('in',$roles)))->setField('group_id',$result);//选中的角色全部移入分组
+            if ($result) {
+                $this->roleModel->where(array('group_id' => $result))->setField('group_id', 0); //所有该分组下的角色全部移出
+                if (!is_null($roles)) {
+                    $this->roleModel->where(array('id' => array('in', $roles)))->setField('group_id', $result); //选中的角色全部移入分组
                 }
-                $this->success("{$title}成功！",U('Role/group'));
-            }else{
-                $this->error("{$title}失败！".$this->roleGroupModel->getError());
+                $this->success("{$title}成功！", U('Role/group'));
+            } else {
+                $this->error("{$title}失败！" . $this->roleGroupModel->getError());
             }
-        }else{
-            $data=array();
-            if($is_edit){
-                $data=$this->roleGroupModel->where(array('id'=>$aGroupId))->find();
-                $map['group_id']=$aGroupId;
-                $roles=$this->roleModel->selectByMap($map,'id asc','id');
-                $data['roles']=array_column($roles,'id');
+        } else {
+            $data = array();
+            if ($is_edit) {
+                $data = $this->roleGroupModel->where(array('id' => $aGroupId))->find();
+                $map['group_id'] = $aGroupId;
+                $roles = $this->roleModel->selectByMap($map, 'id asc', 'id');
+                $data['roles'] = array_column($roles, 'id');
             }
-            $roles=$this->roleModel->field('id,group_id,title')->select();
-            foreach($roles as &$val){
-                $val['title']=$val['group_id']?$val['title']."  (当前分组id：{$val['group_id']})":$val['title'];
+            $roles = $this->roleModel->field('id,group_id,title')->select();
+            foreach ($roles as &$val) {
+                $val['title'] = $val['group_id'] ? $val['title'] . "  (当前分组id：{$val['group_id']})" : $val['title'];
             }
             unset($val);
-            $builder=new AdminConfigBuilder;
+            $builder = new AdminConfigBuilder;
             $builder->title("{$title}（同组角色互斥，即同一分组下的角色不能同时被用户拥有）");
             $builder->keyId()
-                ->keyText('title','标题')
-                ->keyChosen('roles','分组下角色选择','一个角色同时只能存在于一个分组下',$roles)
+                ->keyText('title', '标题')
+                ->keyChosen('roles', '分组下角色选择', '一个角色同时只能存在于一个分组下', $roles)
                 ->buttonSubmit()
                 ->buttonBack()
                 ->data($data)
@@ -365,15 +594,15 @@ class RoleController extends AdminController
      */
     public function deleteGroup()
     {
-        $aGroupId=I('id',0,'intval');
-        if(!$aGroupId){
+        $aGroupId = I('id', 0, 'intval');
+        if (!$aGroupId) {
             $this->error('参数错误！');
         }
-        $this->roleModel->where(array('group_id'=>$aGroupId))->setField('group_id',0);
-        $result=$this->roleGroupModel->where(array('id'=>$aGroupId))->delete();
-        if($result){
+        $this->roleModel->where(array('group_id' => $aGroupId))->setField('group_id', 0);
+        $result = $this->roleGroupModel->where(array('id' => $aGroupId))->delete();
+        if ($result) {
             $this->success('删除成功！');
-        }else{
+        } else {
             $this->error('删除失败！');
         }
     }
@@ -381,7 +610,6 @@ class RoleController extends AdminController
     //角色分组end
 
     //角色其他配置 start
-
 
     /**
      * 角色默认积分配置
@@ -399,7 +627,7 @@ class RoleController extends AdminController
             $post_key = explode(',', $aPostKey);
             $config_value = array();
             foreach ($post_key as $val) {
-                if($val!=''){
+                if ($val != '') {
                     $config_value[$val] = I('post.' . $val, 0, 'intval');
                 }
             }
@@ -498,13 +726,13 @@ class RoleController extends AdminController
         }
         $map = getRoleConfigMap('rank', $aRoleId);
         if (IS_POST) {
-            $data['value']='';
+            $data['value'] = '';
             if (isset($_POST['ranks'])) {
                 sort($_POST['ranks']);
-                $data['value']= implode(',', array_unique($_POST['ranks']));
+                $data['value'] = implode(',', array_unique($_POST['ranks']));
             }
             $aReason['reason'] = I('post.reason', '', 'op_t');
-            $data['data']=json_encode($aReason,true);
+            $data['data'] = json_encode($aReason, true);
             if ($this->roleConfigModel->where($map)->find()) {
                 $result = $this->roleConfigModel->saveData($map, $data);
             } else {
@@ -518,31 +746,31 @@ class RoleController extends AdminController
             }
         } else {
             $mRole_list = $this->roleModel->field('id,title')->select();
-            $mRole_list=array_combine(array_column($mRole_list,'id'),$mRole_list);
+            $mRole_list = array_combine(array_column($mRole_list, 'id'), $mRole_list);
 
             //获取默认配置值
             $rank = $this->roleConfigModel->where($map)->field('value,data')->find();
-            if($rank){
+            if ($rank) {
                 $rank['data'] = json_decode($rank['data'], true);
-                if(!$rank['data']['reason']){
-                    $rank['data']['reason']="{$mRole_list[$aRoleId]['title']}(角色)默认拥有该头衔！";
+                if (!$rank['data']['reason']) {
+                    $rank['data']['reason'] = "{$mRole_list[$aRoleId]['title']}(角色)默认拥有该头衔！";
                 }
-            }else{
-                $rank['data']['reason']="{$mRole_list[$aRoleId]['title']}(角色)默认拥有该头衔！";
-                $rank['value']=array();
+            } else {
+                $rank['data']['reason'] = "{$mRole_list[$aRoleId]['title']}(角色)默认拥有该头衔！";
+                $rank['value'] = array();
             }
 
             //获取头衔列表
             $model = D('Rank');
             $list = $model->field('id,uid,title,logo,create_time,types')->select();
-            $canApply=$unApply=array();
+            $canApply = $unApply = array();
             foreach ($list as $val) {
-                $val['name'] =query_user(array('nickname'),$val['uid']);
-                $val['name']=$val['name']['nickname'];
-                if($val['types']){
-                    $canApply[]=$val;
-                }else{
-                    $unApply[]=$val;
+                $val['name'] = query_user(array('nickname'), $val['uid']);
+                $val['name'] = $val['name']['nickname'];
+                if ($val['types']) {
+                    $canApply[] = $val;
+                } else {
+                    $unApply[] = $val;
                 }
             }
             unset($val);
@@ -551,7 +779,7 @@ class RoleController extends AdminController
             $this->assign('un_apply', $unApply);
             $this->assign('reason', $rank['data']['reason']);
             $this->assign('role_list', $mRole_list);
-            $this->assign('this_role', array('id' => $aRoleId,'ranks'=>$rank['value']));
+            $this->assign('this_role', array('id' => $aRoleId, 'ranks' => $rank['value']));
             $this->assign('tab', 'rank');
             $this->display('rank');
         }
@@ -569,14 +797,14 @@ class RoleController extends AdminController
         }
         $aType = I('get.type', 0, 'intval'); //扩展资料设置类型：1注册时要填写资料配置，0扩展资料字段设置
 
-        if($aType){//注册时要填写资料配置
-            $type='register_expend_field';
-        }else{//扩展资料字段设置
-            $type='expend_field';
+        if ($aType) { //注册时要填写资料配置
+            $type = 'register_expend_field';
+        } else { //扩展资料字段设置
+            $type = 'expend_field';
         }
         $map = getRoleConfigMap($type, $aRoleId);
         if (IS_POST) {
-            $data['value']='';
+            $data['value'] = '';
             if (isset($_POST['fields'])) {
                 sort($_POST['fields']);
                 $data['value'] = implode(',', array_unique($_POST['fields']));
@@ -584,7 +812,7 @@ class RoleController extends AdminController
             if ($this->roleConfigModel->where($map)->find()) {
                 $result = $this->roleConfigModel->saveData($map, $data);
             } else {
-                $data=array_merge($map,$data);
+                $data = array_merge($map, $data);
                 $result = $this->roleConfigModel->addData($data);
             }
             if ($result === false) {
@@ -603,52 +831,25 @@ class RoleController extends AdminController
             if ($aType == 1) { //注册时要填写资料配置
                 $map_fields = getRoleConfigMap('expend_field', $aRoleId);
                 $expend_fields = $this->roleConfigModel->where($map_fields)->getField('value');
-                $field_list=$expend_fields?$this->getExpendField($expend_fields):array();
+                $field_list = $expend_fields ? $this->getExpendField($expend_fields) : array();
                 $this->meta_title = '注册时要填写资料配置';
                 $tpl = 'fieldregister'; //模板地址
                 $tab = 'fieldRegister';
             } else { //扩展资料字段设置
-                $field_list=$this->getExpendField();
+                $field_list = $this->getExpendField();
                 $this->meta_title = '扩展资料字段设置';
                 $tpl = 'field'; //模板地址
                 $tab = 'field';
             }
             $this->assign('field_list', $field_list);
             $this->assign('role_list', $mRole_list);
-            $this->assign('this_role', array('id'=>$aRoleId,'fields'=>$fields));
+            $this->assign('this_role', array('id' => $aRoleId, 'fields' => $fields));
             $this->assign('tab', $tab);
             $this->display($tpl);
         }
     }
+
     //角色其他配置 end
-
-    /**
-     * 拼接权限ids
-     * @param $oldRules
-     * @param $rules
-     * @param string $isAdmin 是否为后台权限，neq：前台，eq:后台
-     * @return mixed
-     * @author 郑钟良<zzl@ourstu.com>
-     */
-    private function getMergedRules($oldRules, $rules, $isAdmin = 'neq')
-    {
-        $map = array('module' => array($isAdmin, 'admin'), 'status' => 1);
-        $otherRules = M('AuthRule')->where($map)->field('id')->select();
-        $oldRulesArray = explode(',', $oldRules);
-        $otherRulesArray = getSubByKey($otherRules, 'id');
-
-        //1.删除全部非Admin模块下的权限，排除老的权限的影响
-        //2.合并新的规则
-        foreach ($otherRulesArray as $key => $v) {
-            if (in_array($v, $oldRulesArray)) {
-                $key_search = array_search($v, $oldRulesArray);
-                if ($key_search !== false)
-                    array_splice($oldRulesArray, $key_search, 1);
-            }
-        }
-
-        return str_replace(',,', ',', implode(',', array_unique(array_merge($oldRulesArray, $rules))));
-    }
 
     /**
      * 获取扩展字段列表
@@ -656,16 +857,16 @@ class RoleController extends AdminController
      * @return mixed
      * @author 郑钟良<zzl@ourstu.com>
      */
-    private function getExpendField($in='')
+    private function getExpendField($in = '')
     {
-        if($in!=''){
-            $in=is_array($in)?$in:explode(',',$in);
-            $map_field['id']=array('in',$in);
+        if ($in != '') {
+            $in = is_array($in) ? $in : explode(',', $in);
+            $map_field['id'] = array('in', $in);
         }
         $map['status'] = array('egt', 0);
-        $profileList = D('field_group')->where($map)->order("sort asc")->select();//获取扩展字段分组
+        $profileList = D('field_group')->where($map)->order("sort asc")->select(); //获取扩展字段分组
 
-        $fieldSettingModel=D('field_setting');
+        $fieldSettingModel = D('field_setting');
         $type_default = array(
             'input' => '单行文本框',
             'radio' => '单选按钮',
@@ -674,30 +875,22 @@ class RoleController extends AdminController
             'time' => '日期',
             'textarea' => '多行文本框'
         );
-        $child_type = array(
-            'string' => '字符串',
-            'phone' => '手机号码',
-            'email' => '邮箱',
-            'number' => '数字'
-        );
-
-        $map_field['status']= array('egt', 0);
-        foreach($profileList as $key=>&$val){
+        $map_field['status'] = array('egt', 0);
+        foreach ($profileList as $key => &$val) {
             //获取分组下字段列表
             $map_field['profile_group_id'] = $val['id'];
             $field_list = $fieldSettingModel->where($map_field)->order("sort asc")->select();
             foreach ($field_list as &$vl) {
                 $vl['form_type'] = $type_default[$vl['form_type']];
-                $vl['child_form_type'] = $child_type[$vl['child_form_type']];
             }
             unset($vl);
-            if($field_list){
-                $val['field_list']=$field_list;
-            }else{
+            if ($field_list) {
+                $val['field_list'] = $field_list;
+            } else {
                 unset($profileList[$key]);
             }
         }
-        unset($key,$val,$field_list);
+        unset($key, $val, $field_list);
         return $profileList;
     }
 
