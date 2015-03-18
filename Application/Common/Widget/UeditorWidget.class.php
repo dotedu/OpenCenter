@@ -16,9 +16,12 @@ class UeditorWidget extends Controller
         $this->assign('style',$style);
         if($config=='')
         {
-            $config="toolbars:[['source','|','bold','italic','underline','fontsize','forecolor','fontfamily','|','insertimage','insertcode']]";
+            $config="toolbars:[['source','|','bold','italic','underline','fontsize','forecolor','fontfamily','backcolor','|','insertimage','insertcode','link','emotion','scrawl']]";
         }
-        $config.=',zIndex:1200';
+        if($config == 'all'){
+            $config='';
+        }
+        $config.=(empty($config)?'':',').'zIndex:1200';
         is_bool(strpos($width,'%')) && $config.=',initialFrameWidth:'.str_replace('px','',$width);
         is_bool(strpos($height,'%')) && $config.=',initialFrameHeight:'.str_replace('px','',$height);
 

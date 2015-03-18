@@ -16,7 +16,7 @@
 			<script type="text/javascript">
 				var editor;
 				KindEditor.ready(function(K) {
-					editor = K.create('textarea[name="{$addons_data.name}"]', {
+					editor = K.create('#{$addons_data.id}', {
 						allowFileManager : false,
 						themesPath: K.basePath,
 						width: '100%',
@@ -32,7 +32,7 @@
 
 				$(function(){
 					//传统表单提交同步
-					$('textarea[name="{$addons_data.name}"]').closest('form').submit(function(){
+					$('#{$addons_data.id}').closest('form').submit(function(){
 						editor.sync();
 					});
 					//ajax提交之前同步

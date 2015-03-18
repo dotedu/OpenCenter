@@ -41,6 +41,7 @@ class UserConfigController extends AdminController
         $data['REG_STEP'] = $admin_config->parseKanbanArray($data['REG_STEP'],$step,$default);
 
         $groups = M('AuthGroup')->where(array('status' => 1))->select();
+        $groupOption=array();
         foreach ($groups as $g) {
             $groupOption[$g['id']] = $g['title'];
         }
@@ -70,7 +71,7 @@ str;
 
             ->keyCheckBox('REG_CAN_SKIP', '注册步骤是否可跳过', '勾选为可跳过，默认不可跳过',$mStep)
 
-            ->keyEditor('REG_EMAIL_VERIFY', '邮箱验证模版', '用于进行邮箱的验证')
+            ->keyEditor('REG_EMAIL_VERIFY', '邮箱验证模版', '用于进行邮箱的验证','all')
             ->keyEditor('REG_EMAIL_ACTIVATE', '邮箱激活模版', '用于进行用户的激活')
 
             ->keyText('SMS_HTTP', '短信平台HTTP', '短信平台HTTP')

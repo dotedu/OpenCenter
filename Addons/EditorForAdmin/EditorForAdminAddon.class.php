@@ -38,7 +38,7 @@ use Common\Controller\Addon;
 		 * 编辑器挂载的后台文档模型文章内容钩子
 		 * @param array('name'=>'表单name','value'=>'表单对应的值')
 		 */
-		public function adminArticleEdit($data){
+		public function adminEditor($data){
 			$this->assign('addons_data', $data);
 			$this->assign('addons_config', $this->getConfig());
 			$this->display('content');
