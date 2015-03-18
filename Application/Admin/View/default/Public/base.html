@@ -203,6 +203,118 @@
     </div>
 </div>
 
+
+
+<php>if($report){</php>
+<div  class="report_feedback" title="填写四格体验报告" data-toggle="modal" data-target="#myModal">
+    <div class="report_icon" ></div>
+    <span class="label label-badge label-danger report_point">1</span>
+</div>
+
+
+
+
+<div class="modal fade in" id="myModal" aria-hidden="false"  style="display: none">
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <form class="report_form"  action="{:U('admin/admin/submitReport')}" method="post">
+
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+                <h4 class="modal-title">四格体验报告</h4>
+            </div>
+
+            <div class="modal-body">
+
+                    <div class="row">
+                        <!-- 帖子分类 -->
+                        <div class="col-sm-12">
+<div>这里是提示文字</div>
+
+                                <label class="item-label">我的更新心情</label>
+                            <div>
+                                <select name="q1" class="report-select" style="width:400px;">
+                                    <option value="0">请选择</option>
+                                    <option>开心</option>
+                                    <option>悲伤</option>
+                                    <option>超有爱</option>
+                                    <option>期待</option>
+                                </select>
+                        </div>
+
+                                <label class="item-label">我选择的最有爱更新</label>
+                            <div>
+                                <select name="q2" class="report-select" style="width:400px;">
+                                    <option value="0">请选择</option>
+                                    <volist name="this_update" id="option">
+                                        <option value="{$option|htmlspecialchars}">{$option|htmlspecialchars}</option>
+                                    </volist>
+                                </select>
+                            </div>
+
+                                <label class="item-label">我选择的最不给力更新
+                                </label>
+                            <div>
+                                <select name="q3" class="report-select" style="width:400px;">
+                                    <option value="0">请选择</option>
+                                    <volist name="this_update" id="option">
+                                        <option value="{$option|htmlspecialchars}">{$option|htmlspecialchars}</option>
+                                    </volist>
+                                </select>
+                            </div>
+
+
+                                <label class="item-label">我选择的期待功能
+                                </label>
+                            <div>
+                                <select name="q4" class="report-select" style="width:400px;">
+                                    <option value="0">请选择</option>
+                                    <volist name="future_update" id="option">
+                                        <option value="{$option|htmlspecialchars}">{$option|htmlspecialchars}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                    </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <php>if(empty($report['url'])){</php>
+                <a class="pull-left" href="{$report['url']}" target="_blank" >查看更新详情</a>
+                <php>}</php>
+                <button type="submit" class="btn ajax-post" target-form="report_form">确定</button>
+            </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<php>}</php>
+
+
+<script>
+    $(function () {
+        var config = {
+            '.chosen-select'           : {search_contains: true, drop_width: 400,no_results_text:'找不到匹配的选项'},
+            '.report-select'           : {search_contains: true, width: '400px',no_results_text:'找不到匹配的选项'}
+        };
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+
+    });
+</script>
+
+
+<script src="__ZUI__/lib/chosen/chosen.js"></script>
+<link href="__ZUI__/lib/chosen/chosen.css" type="text/css" rel="stylesheet">
+
+
+
+
 <!-- 内容区 -->
 
 <!-- /内容区 -->

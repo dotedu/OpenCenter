@@ -54,11 +54,8 @@
                                 </select>
                             </case>
                             <case value="5"><!--增加富文本和非明文-->
-                                <label class="textarea">
-                                    <textarea name="config[{$config.name}]">{$config.value}</textarea>
-                                    {:hook('adminArticleEdit',
-                                    array('name'=>$field['names'],'value'=>$config.name,'id'=>$config.name))}
-                                </label>
+
+                                {:W('Common/Ueditor/editor',array($config['name'],'config['.$config['name'].']',$config['value'],'500px','300px'))}
                             </case>
                             <case value="6">
                                 <input type="password" class="text input-large form-control" style="width:400px;" name="config[{$config.name}]" autoComplete="off"

@@ -16,9 +16,10 @@ class ActionLimit
     var $url;
     var $info = '';
     var $punish = array(
-        array('logout_account', '强制注销账户'),
+        array('warning','警告并禁止'),
+        array('logout_account', '强制退出登陆'),
         array('ban_account', '封停账户'),
-        array('ban_ip', '防止该IP注册'),
+        array('ban_ip', '封IP'),
     );
 
     function __construct()
@@ -58,7 +59,7 @@ class ActionLimit
         $limitList = D('ActionLimit')->getList($map);
         !empty($item['action']) && $item['action_id'] = M('action')->where(array('name' => $item['action']))->getField('id');
         foreach ($limitList as &$val) {
-            $ago = get_time_ago($val['time_unit'], 1, $time);
+            $ago = get_time_ago($val['time_unit'], $val['time_number'], $time);
             $item['create_time'] = array('egt', $ago);
             $log = M('action_log')->where($item)->order('create_time desc')->select();
             if (count($log) >= $val['frequency']) {
@@ -66,7 +67,7 @@ class ActionLimit
                 foreach ($punishes as $punish) {
                     //执行惩罚
                     if (method_exists($this, $punish)) {
-                        $this->$punish($item);
+                        $this->$punish($item,$val);
                     }
                 }
                 unset($punish);
@@ -98,13 +99,16 @@ class ActionLimit
         set_user_status($item['user_id'], 0);
     }
 
-    function ban_ip($item)
+    function ban_ip($item,$val)
     {
-        $this->state = false;
-        $this->info = '频繁注册，请1分钟后再注册';
-        $this->url = U('home/index/index');
+       //TODO 进行封停IP的操作
     }
 
+    function warning($item,$val){
+        $this->state = false;
+        $this->info = '操作频繁，请'.$val['time_number'].get_time_unit($val['time_unit']).'后再试';
+        $this->url = U('home/index/index');
+    }
 }
 
 
@@ -150,4 +154,9 @@ function get_time_ago($type = 'second', $some = 1, $time = null)
             $result = $time - $some;
     }
     return $result;
+}
+
+function get_time_unit($key = null){
+    $array = array('second' => '秒', 'minute' => '分', 'hour' => '小时', 'day' => '天', 'week' => '周', 'month' => '月', 'year' => '年');
+    return empty($key)?$array:$array[$key];
 }

@@ -134,9 +134,18 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->key($name, $title, $subtitle, 'checkbox', $options);
     }
 
-    public function keyEditor($name, $title, $subtitle = null)
+    public function keyEditor($name, $title, $subtitle = null,$config='',$style = array('width'=>'500px','height'=>'400px'))
     {
-        return $this->key($name, $title, $subtitle, 'editor');
+        $toolbars ="toolbars:[[".$config."]]";
+        if(empty($config)){
+            $toolbars ="toolbars:[['source','|','bold','italic','underline','fontsize','forecolor','justifyleft','fontfamily','|','map','emotion','insertimage','insertcode']]";
+        }
+        if($config =='all'){
+            $toolbars='all';
+        }
+        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'editor', 'config' => $toolbars,'style'=>$style);
+        $this->_keyList[] = $key;
+        return $this;
     }
 
     public function keyTime($name, $title, $subtitle = null)
@@ -273,6 +282,10 @@ class AdminConfigBuilder extends AdminBuilder
     {
         //将数据融入到key中
         foreach ($this->_keyList as &$e) {
+            if($e['type'] == 'multiInput'){
+                $e['name'] = explode(',',$e['name']);
+            }
+
             //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
             if(is_array($e['name'])){
                 $i=0;
@@ -301,6 +314,7 @@ class AdminConfigBuilder extends AdminBuilder
         $this->assign('keyList', $this->_keyList);
         $this->assign('buttonList', $this->_buttonList);
         $this->assign('savePostUrl', $this->_savePostUrl);
+
         parent::display('admin_config');
     }
 
@@ -335,6 +349,24 @@ class AdminConfigBuilder extends AdminBuilder
             unset($key, $val);
         }
         return $this->key($name, $title, $subtitle, 'chosen', $options);
+    }
+
+
+    /**
+     * keyMultiInput  输入组组件
+     * @param $name
+     * @param $title
+     * @param $subtitle
+     * @param $config
+     * @param null $style
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function keyMultiInput($name,$title,$subtitle,$config,$style = null){
+        empty($style) && $style = 'width:400px;';
+        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'multiInput', 'config' => $config,'style'=>$style);
+        $this->_keyList[] = $key;
+        return $this;
     }
 
     /**插入配置分组

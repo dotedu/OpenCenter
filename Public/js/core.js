@@ -432,7 +432,7 @@ var face_chose = function (obj) {
 }
 
 var getFace = function (obj) {
-    $.post(U('Home/Index/getSmile'), {}, function (data) {
+    $.post(U('Core/Expression/getSmile'), {}, function (data) {
         var _imgHtml = '';
         for (var k in data) {
             _imgHtml += '<a href="javascript:void(0)" data-type="' + data[k].type + '" title="' + data[k].title + '" onclick="face_chose($(this))";><img src="' + data[k].src + '" width="24" height="24" /></a>';

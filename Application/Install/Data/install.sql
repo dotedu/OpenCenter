@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS `ocenter_action` (
 
 
 INSERT INTO `ocenter_action` ( `name`, `title`, `remark`, `rule`, `log`, `type`, `status`, `update_time`) VALUES
+('reg', '用户注册', '用户注册', '', '', 1, 1, 1426070545),
+('input_password', '输入密码', '记录输入密码的次数。', '', '', 1, 1, 1426122119),
 ('user_login', '用户登录', '积分+10，每天一次', 'table:member|field:score|condition:uid={$self} AND status>-1|rule:score+10|cycle:24|max:1;', '[user|get_nickname]在[time|time_format]登录了账号', 1, 1, 1387181220),
 ('update_config', '更新配置', '新增或修改或删除配置', '', '', 1, 1, 1383294988),
 ('update_model', '更新模型', '新增或修改模型', '', '', 1, 1, 1383295057),
@@ -31,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
   `title` varchar(100) NOT NULL,
   `name` varchar(50) NOT NULL,
   `frequency` int(11) NOT NULL,
+  `time_number` int(11) NOT NULL,
   `time_unit` varchar(50) NOT NULL,
   `punish` text NOT NULL,
   `if_message` tinyint(4) NOT NULL,
@@ -40,6 +43,12 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
   `create_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+INSERT INTO `ocenter_action_limit` (`title`, `name`, `frequency`, `time_number`, `time_unit`, `punish`, `if_message`, `message_content`, `action_list`, `status`, `create_time`) VALUES
+('reg', '注册限制', 1, 1, 'minute', 'warning', 0, '', '[reg]', 1, 0),
+('input_password', '输密码', 3, 1, 'minute', 'warning', 0, '', '[input_password]', 1, 0);
+
+
 
 DROP TABLE  IF EXISTS `ocenter_action_log`;
 CREATE TABLE IF NOT EXISTS `ocenter_action_log` (
@@ -538,7 +547,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_config` (
 
 INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `remark`, `create_time`, `update_time`, `status`, `value`, `sort`) VALUES
 (1, 'WEB_SITE_CLOSE', 4, '关闭站点', 1, '0:关闭,1:开启', '站点关闭后其他用户不能访问，管理员可以正常访问', 1378898976, 1379235296, 1, '1', 1),
-(2 ,  'SITE_LOGO',  '7',  '网站LOGO',  '1',  '',  '网站的logo设置，建议尺寸156*50',  '1388332311',  '1388501500',  '1',  '100',  '3'),
+(2 ,  'SITE_LOGO',  '7',  '网站LOGO',  '1',  '',  '网站的logo设置，建议尺寸156*50',  '1388332311',  '1388501500',  '1',  '',  '3'),
 (3, 'CONFIG_TYPE_LIST', 3, '配置类型列表', 4, '', '主要用于数据解析和页面表单的生成', 1378898976, 1379235348, 1, '0:数字\r\n1:字符\r\n2:文本\r\n3:数组\r\n4:枚举', 8),
 (4, 'WEB_SITE_ICP', 1, '网站备案号', 1, '', '设置在网站底部显示的备案号，如“沪ICP备12007941号-2', 1378900335, 1379235859, 1, '浙ICP备XX号', 12),
 (5, 'CONFIG_GROUP_LIST', 3, '配置分组', 4, '', '配置分组', 1379228036, 1384418383, 1, '1:基本\r\n2:内容\r\n3:用户\r\n4:系统\r\n5:邮件', 15),
@@ -688,7 +697,7 @@ INSERT INTO `ocenter_hooks` (`id`, `name`, `description`, `type`, `update_time`,
 (5, 'documentDetailBefore', '页面内容前显示用钩子', 1, 0, ''),
 (6, 'documentSaveComplete', '保存文档数据后的扩展钩子', 2, 0, ''),
 (7, 'documentEditFormContent', '添加编辑表单的内容显示钩子', 1, 0, ''),
-(8, 'adminArticleEdit', '后台内容编辑页编辑器', 1, 1378982734, 'EditorForAdmin'),
+(8, 'adminEditor', '后台内容编辑页编辑器', 1, 1378982734, 'EditorForAdmin'),
 (13, 'AdminIndex', '首页小格子个性化显示', 1, 1382596073, 'SiteStat,SyncLogin,DevTeam,SystemInfo'),
 (14, 'topicComment', '评论提交方式扩展钩子。', 1, 1380163518, ''),
 (16, 'app_begin', '应用开始', 2, 1384481614, 'Iswaf'),
@@ -831,7 +840,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (53, '充值积分', 2, 0, 'user/recharge', 1, '', '', 0, '用户管理'),
 (54, '头衔列表', 2, 10, 'Rank/index', 0, '', '头衔管理', 0, ''),
 (55, '添加头衔', 2, 2, 'Rank/editRank', 1, '', '头衔管理', 0, ''),
-(56, '插件', 0, 3, 'Addons/index', 0, '', '', 0, 'cogs'),
+(56, '插件', 0, 5, 'Addons/index', 0, '', '', 0, 'cogs'),
 (57, '插件管理', 56, 1, 'Addons/index', 0, '', '扩展', 0, ''),
 (58, '钩子管理', 56, 2, 'Addons/hooks', 0, '', '扩展', 0, ''),
 (59, '创建', 57, 0, 'Addons/create', 0, '服务器上创建插件结构向导', '', 0, ''),
@@ -848,7 +857,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (71, 'URL方式访问插件', 57, 0, 'Addons/execute', 0, '控制是否有权限通过url访问插件控制器方法', '', 0, ''),
 (72, '新增钩子', 58, 0, 'Addons/addHook', 0, '', '', 0, ''),
 (73, '编辑钩子', 58, 0, 'Addons/edithook', 0, '', '', 0, ''),
-(74, '系统', 0, 4, 'Config/group', 0, '', '', 0, 'windows'),
+(74, '系统', 0, 6, 'Config/group', 0, '', '', 0, 'windows'),
 (75, '网站设置', 74, 1, 'Config/group', 0, '', '系统设置', 0, ''),
 (76, '配置管理', 74, 4, 'Config/index', 0, '', '系统设置', 0, ''),
 (77, '编辑', 76, 0, 'Config/edit', 0, '新增编辑和保存配置', '', 0, ''),
@@ -883,11 +892,11 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (106, '模块安装', 105, 0, 'module/install', 1, '', '云市场', 0, ''),
 (107, '模块管理', 105, 0, 'module/lists', 0, '', '云市场', 0, ''),
 (108, '卸载模块', 105, 0, 'module/uninstall', 1, '', '云市场', 0, ''),
-(109, '授权', 0, 6, 'authorize/ssoSetting', 0, '', '', 0, 'lock'),
+(109, '授权', 0, 3, 'authorize/ssoSetting', 0, '', '', 0, 'lock'),
 (110, '单点登录配置', 109, 0, 'Authorize/ssoSetting', 0, '', '单点登录', 0, ''),
 (111, '应用列表', 109, 0, 'Authorize/ssolist', 0, '', '单点登录', 0, ''),
 (112, '新增/编辑应用', 109, 0, 'authorize/editssoapp', 1, '', '单点登录', 0, ''),
-(113, '安全', 0, 7, 'ActionLimit/limitList', 0, '', '', 0, 'shield'),
+(113, '安全', 0, 4, 'ActionLimit/limitList', 0, '', '', 0, 'shield'),
 (114, '行为限制列表', 113, 0, 'ActionLimit/limitList', 0, '', '行为限制', 0, ''),
 (115, '新增/编辑行为限制', 113, 0, 'ActionLimit/editLimit', 1, '', '行为限制', 0, '');
 
@@ -1203,3 +1212,16 @@ CREATE TABLE IF NOT EXISTS `ocenter_user_config` (
   `value` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户配置信息表' AUTO_INCREMENT=1 ;
+
+
+
+CREATE TABLE IF NOT EXISTS `ocenter_sso_app` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  `config` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

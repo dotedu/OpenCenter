@@ -214,12 +214,19 @@ class UcenterMemberModel extends Model
         }
         /* 获取用户数据 */
         $user = $this->where($map)->find();
+
+        $return = check_action_limit('input_password','ucenter_member',$user['id'],$user['id']);
+        if($return && !$return['state']){
+            return $return['info'];
+        }
+
         if (is_array($user) && $user['status']) {
             /* 验证用户密码 */
             if (think_ucenter_md5($password, UC_AUTH_KEY) === $user['password']) {
                 $this->updateLogin($user['id']); //更新用户登录信息
                 return $user['id']; //登录成功，返回用户ID
             } else {
+                action_log('input_password','ucenter_member',$user['id'],$user['id']);
                 return -2; //密码错误
             }
         } else {

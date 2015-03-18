@@ -35,6 +35,7 @@ class LoginWidget extends Action
         $aPassword = I('post.password', '', 'op_t');
         $aVerify = I('post.verify', '', 'op_t');
         $aRemember = I('post.remember', 0, 'intval');
+
         $res['status']=0;
         /* 检测验证码 */
         if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 3) {
