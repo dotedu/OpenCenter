@@ -119,14 +119,16 @@ class RoleController extends AdminController
             $data['status'] = 1;
             $data['invite'] = 0;
             $data['audit'] = 0;
+            $data['user_groups'] = array(modC('DEFAULT_GROUP', 0, 'User')); //默认用户组
             if ($is_edit) {
                 $data = $this->roleModel->getByMap(array('id' => $aId));
+                $data['user_groups']=explode(',',$data['user_groups']);
             }
 
-            $data['user_groups'] = array(modC('DEFAULT_GROUP', 0, 'User')); //默认用户组
             $authGroupList = M('AuthGroup')->where(array('status' => 1))->field('id,title')->select(); //用户组列表
 
             $group = D('RoleGroup')->field('id,title')->select();
+
             $group = array_combine(array_column($group, 'id'), array_column($group, 'title'));
             if (!$group) {
                 $group = array(0 => '无分组');
@@ -261,10 +263,8 @@ class RoleController extends AdminController
     {
         $builder = new AdminConfigBuilder;
         $data = $builder->handleConfig();
-        //empty($data['CLOSE_ROLE'])&&$data['CLOSE_ROLE']=0;
 
         $builder->title('角色基本信息配置')
-            //->keyRadio('CLOSE_ROLE','网站角色功能：','部署网站时可修改，网站使用一段时间后谨慎修改！',array('0'=>'开启','1'=>'关闭'))
             ->data($data)
             ->buttonSubmit()
             ->buttonBack()
@@ -279,15 +279,25 @@ class RoleController extends AdminController
     {
         $aRoleId = I('role_id', 0, 'intval');
         $aUserStatus = I('user_status', 0, 'intval');
+        $aSingleRole=I('single_role',0,'intval');
         $role_list = $this->roleModel->field('id,title as value')->order('sort asc')->select();
         $role_id_list = array_column($role_list, 'id');
-        if ($aRoleId && in_array($aRoleId, $role_id_list)) {
+        if ($aRoleId && in_array($aRoleId, $role_id_list)) {//筛选角色
             $map_user_list['role_id'] = $aRoleId;
         } else {
             $map_user_list['role_id'] = $role_list[0]['id'];
         }
-        if ($aUserStatus) {
+        if ($aUserStatus) {//筛选状态
             $map_user_list['status'] = $aUserStatus == 3 ? 0 : $aUserStatus;
+        }
+        if($aSingleRole){//单角色筛选
+            $uids=$this->userRoleModel->group('uid')->field('uid')->having('count(uid)=1')->select();
+            $uids=array_column($uids,'uid');//单角色用户id列表
+            if($aSingleRole==1){
+                $map_user_list['uid']=array('in',$uids);
+            }else{
+                $map_user_list['uid']=array('not in',$uids);
+            }
         }
         $user_list = $this->userRoleModel->where($map_user_list)->page($page, $r)->order('id desc')->select();
         $totalCount = $this->userRoleModel->where($map_user_list)->count();
@@ -305,6 +315,12 @@ class RoleController extends AdminController
             3 => array('id' => 3, 'value' => '禁用'),
         );
 
+        $singleRoleOptions = array(
+            0 => array('id' => 0, 'value' => '全部'),
+            1 => array('id' => 1, 'value' => '单角色用户'),
+            2 => array('id' => 2, 'value' => '非单角色用户'),
+        );
+
         $builder = new AdminListBuilder();
         $builder->title('角色用户列表')
             ->setSelectPostUrl('Role/userList');
@@ -315,7 +331,7 @@ class RoleController extends AdminController
         }
 
         $builder->modalPopupButton(U('Role/changeRole',array('role_id'=>$map_user_list['role_id'])), array(), '迁移用户',array('data-title'=>'迁移用户到其他角色'))
-            ->select('角色', 'role_id', 'select', '', '', '', $role_list)->select('状态', 'user_status', 'select', '', '', '', $statusOptions)
+            ->select('角色：', 'role_id', 'select', '', '', '', $role_list)->select('状态：', 'user_status', 'select', '', '', '', $statusOptions)->select('', 'single_role', 'select', '', '', '', $singleRoleOptions)
             ->keyId()
             ->keyImage('avatar', '头像')
             ->keyLink('nickname', '昵称', 'ucenter/index/information?uid=###')
@@ -483,7 +499,7 @@ class RoleController extends AdminController
         $user=query_user(array('show_role','last_login_role'),$uid);
         if($role_id==$user['show_role']){
             $roles=$this->userRoleModel->where(array('role_id'=>array('neq',$role_id),'uid'=>$uid,'status'=>array('gt',0)))->field('role_id')->select();
-            $roles=array_merge(array_column($roles,'role_id'),array($role_id));
+            $roles=array_column($roles,'role_id');
             $show_role=$this->roleModel->where(array('id'=>array('in',$roles)))->order('sort asc')->find();
             $show_role_id=intval($show_role['id']);
             $data['show_role']=$show_role_id;

@@ -97,7 +97,9 @@ class ConfigController extends BaseController
             }
             unset($val);
 
+            $already_group_ids=array_diff($already_group_ids,array(0));//去除无分组角色组
             $map_can_have_roles['group_id']=array('not in',$already_group_ids);//同组内的角色不显示
+            $map_can_have_roles['id']=array('not in',$already_role_ids);//去除已有角色
             $map_can_have_roles['invite']=0;//不需要邀请注册
             $map_can_have_roles['status']=1;
             $can_have_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();
@@ -115,7 +117,6 @@ class ConfigController extends BaseController
 
     public function index()
     {
-
         $aUid = I('get.uid', is_login(), 'intval');
         $aTab = I('get.tab', '', 'op_t');
         $aNickname = I('post.nickname', '', 'op_t');
