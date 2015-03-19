@@ -119,7 +119,6 @@ class RoleController extends AdminController
             $data['status'] = 1;
             $data['invite'] = 0;
             $data['audit'] = 0;
-            $data['user_groups'] = array(modC('DEFAULT_GROUP', 0, 'User')); //默认用户组
             if ($is_edit) {
                 $data = $this->roleModel->getByMap(array('id' => $aId));
                 $data['user_groups']=explode(',',$data['user_groups']);
