@@ -342,6 +342,9 @@ str;
         $id     =   (int)I('id');
         $config =   I('config');
         $flag = M('Addons')->where("id={$id}")->setField('config',json_encode($config));
+        if(isset($config['addons_cache'])){//清除缓存
+            S($config['addons_cache'],null);
+        }
         if($flag !== false){
             $this->success('保存成功', Cookie('__forward__'));
         }else{

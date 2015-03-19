@@ -4,7 +4,7 @@
 <block name="body">
     <link href="__CSS__/center.css" type="text/css" rel="stylesheet">
     <section>
-        <div class="col-xs-12 col-xs-offset-1 register" style="margin-top: 60px;margin-bottom: 120px;">
+        <div class="col-xs-12 col-xs-offset-1 register clearfix" style="margin-top: 50px;margin-bottom: 110px;background-color: white;padding: 10px;">
             <div class="col-xs-12"><h1 style="font-size: 18px;color: #333333;">欢迎注册{:C('WEB_SITE')}账号</h1></div>
 
             <style>
@@ -30,6 +30,19 @@
                         </ul>
 
                         <div class="tab-content">
+                            <notempty name="role_list">
+                                <div class="form-group">
+                                    <label for="role" class=".sr-only col-xs-12" style="display: none"></label>
+                                    <select type="text" id="role" class="form-control" name="role">
+                                        <volist name="role_list" id="role">
+                                            <option value="{$role.id}">{$role.title}</option>
+                                        </volist>
+                                    </select>
+                                    <span class="help-block">选择角色注册</span>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                            </notempty>
                             <volist name="regSwitch" id="regSwitch">
                                 <switch name="regSwitch">
                                     <case value="username">
@@ -183,7 +196,8 @@
 
 <block name="script">
     <script type="text/javascript">
-        if (MID == 0) {
+        var step="{$step}";
+        if (MID == 0&&step=='start') {
             $(document)
                     .ajaxStart(function () {
                         $("button:submit").addClass("log-in").attr("disabled", true);

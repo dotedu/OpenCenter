@@ -13,18 +13,20 @@ require_once('ThinkPHP/Library/Vendor/PHPImageWorkshop/ImageWorkshop.php');
 use Think\Controller;
 use PHPImageWorkshop\Core\ImageWorkshopLayer;
 use PHPImageWorkshop\ImageWorkshop;
+
 class UploadAvatarWidget extends Controller
 {
 
-    public function render($uid=0)
+    public function render($uid = 0)
     {
-        $this->assign('user',query_user(array('avatar256','avatar128','avatar64'),$uid));
-        $this->assign('uid',$uid);
+        $this->assign('user', query_user(array('avatar256', 'avatar128', 'avatar64'), $uid));
+        $this->assign('uid', $uid);
         $this->display(T('Application://Ucenter@Widget/uploadavatar'));
     }
 
-    public function getAvatar($uid=0,$size=256){
-       $avatar = M('avatar')->where( array('uid'=>$uid, 'status'=>1, 'is_temp'=>0))->getField('path');
+    public function getAvatar($uid = 0, $size = 256)
+    {
+        $avatar = M('avatar')->where(array('uid' => $uid, 'status' => 1, 'is_temp' => 0))->getField('path');
         if ($avatar) {
             if (is_sae()) {
                 $avatar_path = $avatar;
@@ -38,20 +40,15 @@ class UploadAvatarWidget extends Controller
             return $this->getImageUrlByPath($avatar_path, $size);
         } else {
             //如果没有头像，返回默认头像
-            if ($size != 0) {
-                $default_avatar =  "Public/images/default_avatar.jpg";
-                return $this->getImageUrlByPath($default_avatar, $size);
-            } else {
-                return getRootUrl() . "Public/images/default_avatar.jpg";
-            }
+            $role_id = session('temp_login_role_id') ? session('temp_login_role_id') : get_role_id();
+            return $this->getImageUrlByRoleId($role_id, $size);
         }
     }
 
-
-   private  function getImageUrlByPath($path, $size)
+    private function getImageUrlByPath($path, $size)
     {
         //TODO 重新开启缩略
-        $thumb = getThumbImage($path, $size, $size,0,true);
+        $thumb = getThumbImage($path, $size, $size, 0, true);
         // $thumb['src']=$path;
         $thumb = $thumb['src'];
         if (!is_sae()) {
@@ -60,19 +57,51 @@ class UploadAvatarWidget extends Controller
         return $thumb;
     }
 
-    public function cropPicture($uid, $crop = null,$ext='jpg')
+    /**
+     * 根据角色获取默认头像
+     * @param $role_id
+     * @param $size
+     * @return mixed|string
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    private function getImageUrlByRoleId($role_id, $size)
+    {
+        $avatar_id=S('Role_Avatar_Id_'.$role_id);
+        if(!$avatar_id){
+            $map = getRoleConfigMap('avatar', $role_id);
+            $avatar_id = D('RoleConfig')->where($map)->field('value')->find();
+            S('Role_Avatar_Id_'.$role_id,$avatar_id,600);
+        }
+        if ($avatar_id) {
+            if ($size != 0) {
+                $path=getThumbImageById($avatar_id['value'], $size, $size);
+            }else{
+                $path=getThumbImageById($avatar_id['value']);
+            }
+        }else{//角色没有默认
+            if ($size != 0) {
+                $default_avatar = "Public/images/default_avatar.jpg";
+                $path=$this->getImageUrlByPath($default_avatar, $size);
+            } else {
+                $path=getRootUrl() . "Public/images/default_avatar.jpg";
+            }
+        }
+        return $path;
+    }
+
+    public function cropPicture($uid, $crop = null, $ext = 'jpg')
     {
         //如果不裁剪，则发生错误
         if (!$crop) {
             $this->error('必须裁剪');
         }
 
-        $path =   "/Uploads/Avatar/".$uid."/original.".$ext;
+        $path = "/Uploads/Avatar/" . $uid . "/original." . $ext;
         //获取文件路径
-        $fullPath = substr($path,0,1) =='/'?'.' . $path : $path;
+        $fullPath = substr($path, 0, 1) == '/' ? '.' . $path : $path;
         $savePath = str_replace('original', 'crop', $fullPath);
         $returnPath = str_replace('original', 'crop', $path);
-        $returnPath = substr($returnPath,0,1) =='/'?'.' . $returnPath : $returnPath;
+        $returnPath = substr($returnPath, 0, 1) == '/' ? '.' . $returnPath : $returnPath;
 
         //解析crop参数
         $crop = explode(',', $crop);

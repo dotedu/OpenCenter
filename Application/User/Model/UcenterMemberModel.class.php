@@ -61,7 +61,6 @@ class UcenterMemberModel extends Model
         array('reg_ip', 'get_client_ip', self::MODEL_INSERT, 'function', 1),
         array('update_time', NOW_TIME),
         array('status', 'getStatus', self::MODEL_BOTH, 'callback'),
-        array('step', 'start', self::MODEL_INSERT),
     );
 
     /**
@@ -151,7 +150,6 @@ class UcenterMemberModel extends Model
             if ($result > 0) {
                 $usercenter_member['id'] = $result;
                 $uid = $this->add($usercenter_member);
-                $this->setDefaultGroup($uid);//设置默认用户组
                 if ($uid === false) {
                     //如果注册失败，则回去Memeber表删除掉错误的记录
                     D('Common/Member')->where(array('uid' => $result))->delete();
@@ -163,23 +161,6 @@ class UcenterMemberModel extends Model
             }
         } else {
             return $this->getError(); //错误详情见自动验证注释
-        }
-    }
-
-    /**设置默认用户组
-     * @param $uid UID
-     * @auth 陈一枭
-     */
-    public function setDefaultGroup($uid)
-    {
-        //将该用户加入用户组
-        $defaultGroup = modC('DEFAULT_GROUP', '1', 'USERCONFIG');
-        $authGroupAccessModel = M('AuthGroupAccess');
-        $defaultGroupArray = explode(',', $defaultGroup);
-        foreach ($defaultGroupArray as $g) {
-            $access['uid'] = $uid;
-            $access['group_id'] = $g;
-            $authGroupAccessModel->add($access);
         }
     }
 
@@ -520,7 +501,6 @@ class UcenterMemberModel extends Model
         $data1 = $this->create($data);
 
         $uid = $this->add($data1);
-        $this->setDefaultGroup($uid);//设置默认用户组
         return $uid;
     }
 

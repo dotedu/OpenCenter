@@ -58,9 +58,67 @@ class ConfigController extends BaseController
         $this->display();
     }
 
+    public function role()
+    {
+        $userRoleModel=D('UserRole');
+        if(IS_POST){
+            $aShowRole=I('post.show_role',0,'intval');
+            $map['role_id']=$aShowRole;
+            $map['uid']=is_login();
+            $map['status']=array('egt',1);
+            if(!$userRoleModel->where($map)->count()){
+                $this->error('参数错误！');
+            }
+            $result=D('Member')->where(array('uid'=>is_login()))->setField('show_role',$aShowRole);
+            if($result){
+                clean_query_user_cache(is_login(),array('show_role'));
+                $this->success('设置成功！');
+            }else{
+                $this->error('设置失败！');
+            }
+        }else{
+            $role_id=get_login_role();//当前登录角色
+            $roleModel=D('Role');
+            $userRoleModel=D('UserRole');
+
+            $already_role_list=$userRoleModel->where(array('uid'=>is_login()))->field('role_id,status')->select();
+            $already_role_ids=array_column($already_role_list,'role_id');
+            $already_role_list=array_combine($already_role_ids,$already_role_list);
+
+            $map_already_roles['id']=array('in',$already_role_ids);
+            $map_already_roles['status']=1;
+            $already_roles=$roleModel->where($map_already_roles)->order('sort asc')->select();
+            $already_group_ids=array_unique(array_column($already_roles,'group_id'));
+
+            foreach($already_roles as &$val){
+                $val['user_status']=$already_role_list[$val['id']]['status']!=2?($already_role_list[$val['id']]['status']==1)?'<span style="color: green;">已审核</span>':'<span style="color: #ff0000;">已禁用<span style="color: 333">(如有疑问，请联系管理员)</span></span>':'<span style="color: #0003FF;">正在审核</span>';;
+                $val['can_login']=$val['id']==$role_id?0:1;
+                $val['user_role_status']=$already_role_list[$val['id']]['status'];
+            }
+            unset($val);
+
+            $already_group_ids=array_diff($already_group_ids,array(0));//去除无分组角色组
+            if(count($already_group_ids)){
+                $map_can_have_roles['group_id']=array('not in',$already_group_ids);//同组内的角色不显示
+            }
+            $map_can_have_roles['id']=array('not in',$already_role_ids);//去除已有角色
+            $map_can_have_roles['invite']=0;//不需要邀请注册
+            $map_can_have_roles['status']=1;
+            $can_have_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();
+
+            $show_role=query_user(array('show_role'));
+            $this->assign('show_role',$show_role['show_role']);
+            $this->assign('already_roles',$already_roles);
+            $this->assign('can_have_roles',$can_have_roles);
+
+            $this->_setTab('role');
+            $this->display();
+        }
+
+    }
+
     public function index()
     {
-
         $aUid = I('get.uid', is_login(), 'intval');
         $aTab = I('get.tab', '', 'op_t');
         $aNickname = I('post.nickname', '', 'op_t');
@@ -206,8 +264,15 @@ class ConfigController extends BaseController
      */
     public function edit_expandinfo($profile_group_id)
     {
-
-        $field_setting_list = D('field_setting')->where(array('profile_group_id' => $profile_group_id, 'status' => '1'))->order('sort asc')->select();
+        $field_list=$this->getRoleFieldIds();
+        if($field_list){
+            $map_field['id']=array('in',$field_list);
+        }else{
+            $this->error('没有要保存的信息！');
+        }
+        $map_field['profile_group_id']=$profile_group_id;
+        $map_field['status']=1;
+        $field_setting_list = D('field_setting')->where($map_field)->order('sort asc')->select();
 
         if (!$field_setting_list) {
             $this->error('没有要修改的信息！');
@@ -273,8 +338,11 @@ class ConfigController extends BaseController
             }
         }
         $map['uid'] = is_login();
+        $map['role_id']=get_login_role();
         $is_success = false;
         foreach ($data as $dl) {
+            $dl['role_id']=$map['role_id'];
+
             $map['field_id'] = $dl['field_id'];
             $res = D('field')->where($map)->find();
             if (!$res) {
@@ -392,18 +460,20 @@ class ConfigController extends BaseController
      */
     public function _info_list($id = null, $uid = null)
     {
+
+        $fields_list=$this->getRoleFieldIds($uid);
         $info_list = null;
 
         if (isset($uid) && $uid != is_login()) {
             //查看别人的扩展信息
-            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1', 'visiable' => '1'))->order('sort asc')->select();
+            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1', 'visiable' => '1','id'=>array('in',$fields_list)))->order('sort asc')->select();
 
             if (!$field_setting_list) {
                 return null;
             }
             $map['uid'] = $uid;
         } else if (is_login()) {
-            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1'))->order('sort asc')->select();
+            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1','id'=>array('in',$fields_list)))->order('sort asc')->select();
 
             if (!$field_setting_list) {
                 return null;
@@ -424,6 +494,20 @@ class ConfigController extends BaseController
         return $info_list;
     }
 
+    private function getRoleFieldIds($uid=null){
+        $role_id=get_role_id($uid);
+        $fields_list=S('Role_Expend_Info_'.$role_id);
+        if(!$fields_list){
+            $map_role_config=getRoleConfigMap('expend_field',$role_id);
+            $fields_list=D('RoleConfig')->where($map_role_config)->getField('value');
+            if($fields_list){
+                $fields_list=explode(',',$fields_list);
+                S('Role_Expend_Info_'.$role_id,$fields_list,600);
+            }
+        }
+        return $fields_list;
+    }
+
 
     /**扩展信息分组列表获取
      * @return mixed
@@ -431,12 +515,21 @@ class ConfigController extends BaseController
      */
     public function _profile_group_list($uid = null)
     {
-        if (isset($uid) && $uid != is_login()) {
-            $map['visiable'] = 1;
-        }
-        $map['status'] = 1;
-        $profile_group_list = D('field_group')->where($map)->order('sort asc')->select();
+        $profile_group_list=array();
+        $fields_list=$this->getRoleFieldIds($uid);
+        if($fields_list){
+            $fields_group_ids=D('FieldSetting')->where(array('id'=>array('in',$fields_list), 'status' => '1'))->field('profile_group_id')->select();
+            if($fields_group_ids){
+                $fields_group_ids=array_unique(array_column($fields_group_ids,'profile_group_id'));
+                $map['id']=array('in',$fields_group_ids);
 
+                if (isset($uid) && $uid != is_login()) {
+                    $map['visiable'] = 1;
+                }
+                $map['status'] = 1;
+                $profile_group_list = D('field_group')->where($map)->order('sort asc')->select();
+            }
+        }
         return $profile_group_list;
     }
 

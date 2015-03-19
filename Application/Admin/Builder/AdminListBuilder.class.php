@@ -13,9 +13,11 @@ class AdminListBuilder extends AdminBuilder
     private $_data = array();
     private $_setStatusUrl;
     private $_searchPostUrl;
+    private $_selectPostUrl;
     private $_setClearUrl;
 
     private $_search = array();
+    private $_select = array();
 
     /**设置页面标题
      * @param $title 标题文本
@@ -58,6 +60,18 @@ class AdminListBuilder extends AdminBuilder
     public function setClearUrl($url)
     {
         $this->_setClearUrl = $url;
+        return $this;
+    }
+
+    /**
+     * 筛选下拉选择url
+     * @param $url
+     * @return $this
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function setSelectPostUrl($url)
+    {
+        $this->_selectPostUrl = U($url);
         return $this;
     }
 
@@ -119,6 +133,23 @@ class AdminListBuilder extends AdminBuilder
         return $this->button($title, $attr);
     }
 
+    /**加入模态弹窗按钮
+     * @param $url
+     * @param $params
+     * @param $title
+     * @param array $attr
+     * @return $this
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function modalPopupButton($url, $params, $title, $attr = array())
+    {
+        $attr['modal-url'] = $this->addUrlParam($url, $params);
+        $attr['target-form'] = 'ids';
+        $attr['data-title']=$attr['data-title'];//模态框标题
+        $attr['data-role']='modal_popup';
+        return $this->button($title, $attr);
+    }
+
     public function buttonSetStatus($url, $status, $title, $attr)
     {
         $attr['class'] = 'btn ajax-post';
@@ -155,7 +186,6 @@ class AdminListBuilder extends AdminBuilder
     }
 
     /**彻底删除回收站
-     * @param null $model 要清空回收站的模型
      * @param null $url
      * @return $this
      * @author 陈一枭 -> 郑钟良<zzl@ourstu.com>
@@ -219,6 +249,28 @@ class AdminListBuilder extends AdminBuilder
             }
         }
          return $this;
+    }
+
+    /**
+     * 添加筛选功能
+     * @param string $title 标题
+     * @param string $name  键名
+     * @param string $type  类型，默认文本
+     * @param string $des   描述
+     * @param        $attr  标签文本
+     * @param string $arrdb 择筛选项数据来源
+     * @param string $arrvalue 筛选数据（包含ID 和value的数组:array(array('id'=>1,'value'=>'系统'),array('id'=>2,'value'=>'项目'),array('id'=>3,'value'=>'机构'));）
+     * @return $this
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function select($title='筛选',$name = 'key', $type = 'select', $des = '', $attr ,$arrdb = '',$arrvalue = null)
+    {
+        if (empty($arrdb)) {
+            $this->_select[] = array('title' => $title, 'name' => $name, 'type' => $type, 'des' => $des, 'attr' => $attr,'arrvalue'=>$arrvalue);
+        } else {
+            //TODO:呆完善如果$arrdb存在的就把当前数据表的$name字段的信息全部查询出来供筛选。
+        }
+        return $this;
     }
 
     public function key($name, $title, $type, $opt = null)
@@ -453,12 +505,18 @@ class AdminListBuilder extends AdminBuilder
         //image转换为图片
 
         $this->convertKey('image', 'html', function ($value, $key, $item) {
-            $value = htmlspecialchars($value);
-            $sc_src = get_cover($value, 'path');
+            if(intval($value)){//value是图片id
+                $value = htmlspecialchars($value);
+                $sc_src = get_cover($value, 'path');
 
-            $src = getThumbImageById($value, 80, 80);
-            $sc_src = $sc_src == '' ? $src : $sc_src;
-            return "<div class='popup-gallery'><a title=\"查看大图\" href=\"$sc_src\"><img src=\"$src\"/ style=\"width:80px;height:80px\"></a></div>";
+                $src = getThumbImageById($value, 80, 80);
+                $sc_src = $sc_src == '' ? $src : $sc_src;
+                $html="<div class='popup-gallery'><a title=\"查看大图\" href=\"$sc_src\"><img src=\"$sc_src\"/ style=\"width:80px;height:80px\"></a></div>";
+            }else{//value是图片路径
+                $sc_src=$value;
+                $html="<div class='popup-gallery'><a title=\"查看大图\" href=\"$sc_src\"><img src=\"$sc_src\"/ style=\"border-radius:100%;\"></a></div>";
+            }
+            return $html;
         });
 
         //doaction转换为html
@@ -538,6 +596,10 @@ class AdminListBuilder extends AdminBuilder
         /*加入搜索 陈一枭*/
         $this->assign('searches', $this->_search);
         $this->assign('searchPostUrl', $this->_searchPostUrl);
+
+        /*加入筛选select 郑钟良*/
+        $this->assign('selects', $this->_select);
+        $this->assign('selectPostUrl', $this->_selectPostUrl);
         //如果是选择返回数据的列表页就调用admin_solist模板文件，否则编译原有模板
         if($solist){
             parent::display('admin_solist');
