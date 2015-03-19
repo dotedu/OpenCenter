@@ -1350,6 +1350,13 @@ class Model
                 if (!empty($data[$pk]) && is_string($pk)) { // 完善编辑的时候验证唯一
                     $map[$pk] = array('neq', $data[$pk]);
                 }
+                if (isset($val[6])&&is_array($val[6])) { // 验证唯一时根据array查询（例：根据array('status'=>array('neq',-1))排除已删除数据
+                    if(count($map)>0){
+                        $map=array_merge($map,$val[6]);
+                    }else{
+                        $map=$val[6];
+                    }
+                }
                 if ($this->where($map)->find()) return false;
                 return true;
             default:  // 检查附加规则

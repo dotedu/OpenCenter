@@ -5,6 +5,7 @@
 namespace Ucenter\Controller;
 
 
+use Common\Model\FollowModel;
 use Think\Controller;
 use User\Api\UserApi;
 
@@ -32,21 +33,24 @@ class MemberController extends Controller
         $aRegVerify = I('post.reg_verify', 0, 'intval');
         $aRegType = I('post.reg_type', '', 'op_t');
         $aStep = I('get.step', 'start', 'op_t');
-
+        $aRole = I('post.role', 0, 'intval');
 
         if (!modC('REG_SWITCH', '', 'USERCONFIG')) {
             $this->error('注册已关闭');
         }
         if (IS_POST) { //注册用户
-            $return = check_action_limit('reg','ucenter_member',1,1,true);
-            if($return && !$return['state']){
-                $this->error($return['info'],$return['url']);
+            $return = check_action_limit('reg', 'ucenter_member', 1, 1, true);
+            if ($return && !$return['state']) {
+                $this->error($return['info'], $return['url']);
             }
             /* 检测验证码 */
             if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
                 if (!check_verify($aVerify)) {
                     $this->error('验证码输入错误。');
                 }
+            }
+            if (!$aRole) {
+                $this->error('请选择角色。');
             }
 
             if (($aRegType == 'mobile' && modC('MOBILE_VERIFY_TYPE', 0, 'USERCONFIG') == 1) || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 2 && $aRegType == 'email')) {
@@ -73,6 +77,7 @@ class MemberController extends Controller
             /* 注册用户 */
             $uid = UCenterMember()->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
             if (0 < $uid) { //注册成功
+                $this->initRoleUser($aRole,$uid); //初始化角色用户
                 if (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType == 2) {
                     set_user_status($uid, 3);
                     $verify = D('Verify')->addVerify($email, 'email', $uid);
@@ -81,7 +86,7 @@ class MemberController extends Controller
                 }
 
                 $uid = UCenterMember()->login($username, $aPassword, $aUnType); //通过账号密码取到uid
-                D('Member')->login($uid, false); //登陆
+                D('Member')->login($uid, false,$aRole); //登陆
 
                 $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
             } else { //注册失败，显示错误信息
@@ -91,6 +96,14 @@ class MemberController extends Controller
             if (is_login()) {
                 redirect(U('Weibo/Index/index'));
             }
+
+            //角色
+            $map['status'] = 1;
+            $map['invite'] = 0;
+            $roleList = D('Admin/Role')->selectByMap($map, 'sort asc', 'id,title');
+            $this->assign('role_list', $roleList);
+            //角色end
+
             $aType = I('get.type', '', 'op_t');
             $regSwitch = modC('REG_SWITCH', '', 'USERCONFIG');
             $regSwitch = explode(',', $regSwitch);
@@ -106,22 +119,22 @@ class MemberController extends Controller
     {
         $aStep = I('get.step', '', 'op_t');
         $aUid = session('temp_login_uid');
-        if(empty($aUid)){
+        $aRoleId = session('temp_login_role_id');
+        if (empty($aUid)) {
             $this->error('参数错误');
         }
-        $ucenterMemberModel = UCenterMember();
-        $step = $ucenterMemberModel->where('id=' . $aUid)->getField('step');
+        $userRoleModel=D('UserRole');
+        $map['uid']=$aUid;
+        $map['role_id']=$aRoleId;
+        $step = $userRoleModel->where($map)->getField('step');
         if (get_next_step($step) != $aStep) {
             $aStep = check_step($step);
             $_GET['step'] = $aStep;
-            $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
-
-
+            $userRoleModel->where($map)->setField('step', $aStep);
         }
-        $ucenterMemberModel->where('id=' . $aUid)->setField('step', $aStep);
+        $userRoleModel->where($map)->setField('step', $aStep);
         if ($aStep == 'finish') {
             D('Member')->login($aUid, false);
-
         }
         $this->assign('step', $aStep);
         $this->display('register');
@@ -134,10 +147,10 @@ class MemberController extends Controller
         $this->setTitle('用户登录');
 
         if (IS_POST) {
-            $result = A('Ucenter/Login','Widget')->doLogin();
-            if($result['status']){
+            $result = A('Ucenter/Login', 'Widget')->doLogin();
+            if ($result['status']) {
                 $this->success($result['info'], get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
-            }else{
+            } else {
                 $this->error($result['info']);
             }
         } else { //显示登录页面
@@ -150,7 +163,7 @@ class MemberController extends Controller
     public function quickLogin()
     {
         if (IS_POST) {
-            $result = A('Ucenter/Login','Widget')->doLogin();
+            $result = A('Ucenter/Login', 'Widget')->doLogin();
             $this->ajaxReturn($result);
         } else { //显示登录弹出框
             $this->display();
@@ -522,7 +535,7 @@ class MemberController extends Controller
         A('Ucenter/UploadAvatar', 'Widget')->cropPicture($aUid, $aCrop, $aExt);
         $res = M('avatar')->where(array('uid' => $aUid))->save(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         if (!$res) {
-            M('avatar')->add(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
+            M('avatar')->add(array('uid' => $aUid,'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         }
         clean_query_user_cache($aUid, array('avatar256', 'avatar128', 'avatar64'));
         $this->success('头像更新成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
@@ -632,6 +645,95 @@ class MemberController extends Controller
         }
 
         $this->success('验证成功');
+    }
+
+    /**
+     * 切换登录身份
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function changeLoginRole()
+    {
+        $memberModel=D('Member');
+        $aRoleId=I('post.role_id',0,'intval');
+        $uid=is_login();
+        $data['status']=0;
+        if($uid&&$aRoleId!=get_login_role()){
+            $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
+            if($roleUser){
+                $memberModel->logout();
+                $result=$memberModel->login($uid,false,$aRoleId);
+                if($result){
+                    $data['info']="身份切换成功！";
+                    $data['status']=1;
+                }
+            }
+        }
+        $data['info']="非法操作！";
+        $this->ajaxReturn($data);
+    }
+
+    /**
+     * 持有新身份
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function registerRole()
+    {
+        $aRoleId=I('post.role_id',0,'intval');
+        $uid=is_login();
+        $data['status']=0;
+        if($uid&&$aRoleId!=get_login_role()){
+            $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
+            if($roleUser){
+                $data['info']="已持有该身份！";
+                $this->ajaxReturn($data);
+            }else{
+                $this->initRoleUser($aRoleId,$uid);
+                D('Member')->login($uid, false,$aRoleId); //登陆
+            }
+        }else{
+            $data['info']="非法操作！";
+            $this->ajaxReturn($data);
+        }
+    }
+
+    /**
+     * 初始化角色用户信息
+     * @param $role_id
+     * @param $uid
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    private function initRoleUser($role_id=0,$uid)
+    {
+        $memberModel=D('Member');
+        $role=D('Role')->where(array('id'=>$role_id))->find();
+        $user_role=array('uid'=>$uid,'role_id'=>$role_id,'step'=>"start");
+        if($role['audit']){//该角色需要审核
+            $user_role['status']=2;//未审核
+        }else{
+            $user_role['status']=1;
+        }
+        $result=D('UserRole')->add($user_role);
+        if(!$role['audit']){//该角色不需要审核
+            $memberModel->initUserRoleInfo($role_id,$uid);
+        }
+        $memberModel->initDefaultShowRole($role_id,$uid);
+
+        return $result;
+    }
+
+    /**修改用户扩展信息
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function edit_expandinfo()
+    {
+        $result=A('Ucenter/RegStep','Widget')->edit_expandinfo();
+        if ($result['status']) {
+            $this->success('保存成功！',session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('expand_info'))) : 'refresh');
+        } else {
+            !isset($result['info'])&&$result['info']='没有要保存的信息！';
+            $this->error($result['info']);
+        }
     }
 
 }

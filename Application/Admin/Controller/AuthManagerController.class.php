@@ -493,7 +493,7 @@ class AuthManagerController extends AdminController
     }
 
     //预处理规则，去掉未安装的模块
-    private function getNodeListFromModule($modules)
+    public function getNodeListFromModule($modules)
     {
         $node_list = array();
         foreach ($modules as $module) {

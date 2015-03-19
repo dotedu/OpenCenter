@@ -117,13 +117,36 @@ class IndexController extends BaseController
      */
     public function _profile_group_list($uid = null)
     {
-        if (isset($uid) && $uid != is_login()) {
-            $map['visiable'] = 1;
-        }
-        $map['status'] = 1;
-        $profile_group_list = D('field_group')->where($map)->order('sort asc')->select();
+        $profile_group_list=array();
+        $fields_list=$this->getRoleFieldIds($uid);
+        if($fields_list){
+            $fields_group_ids=D('FieldSetting')->where(array('id'=>array('in',$fields_list),'status' => '1'))->field('profile_group_id')->select();
+            if($fields_group_ids){
+                $fields_group_ids=array_unique(array_column($fields_group_ids,'profile_group_id'));
+                $map['id']=array('in',$fields_group_ids);
 
+                if (isset($uid) && $uid != is_login()) {
+                    $map['visiable'] = 1;
+                }
+                $map['status'] = 1;
+                $profile_group_list = D('field_group')->where($map)->order('sort asc')->select();
+            }
+        }
         return $profile_group_list;
+    }
+
+    private function getRoleFieldIds($uid=null){
+        $role_id=get_role_id($uid);
+        $fields_list=S('Role_Expend_Info_'.$role_id);
+        if(!$fields_list){
+            $map_role_config=getRoleConfigMap('expend_field',$role_id);
+            $fields_list=D('RoleConfig')->where($map_role_config)->getField('value');
+            if($fields_list){
+                $fields_list=explode(',',$fields_list);
+                S('Role_Expend_Info_'.$role_id,$fields_list,600);
+            }
+        }
+        return $fields_list;
     }
 
     /**分组下的字段信息及相应内容
@@ -134,18 +157,19 @@ class IndexController extends BaseController
      */
     public function _info_list($id = null, $uid = null)
     {
+        $fields_list=$this->getRoleFieldIds($uid);
         $info_list = null;
 
         if (isset($uid) && $uid != is_login()) {
             //查看别人的扩展信息
-            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1', 'visiable' => '1'))->order('sort asc')->select();
+            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1', 'visiable' => '1','id'=>array('in',$fields_list)))->order('sort asc')->select();
 
             if (!$field_setting_list) {
                 return null;
             }
             $map['uid'] = $uid;
         } else if (is_login()) {
-            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1'))->order('sort asc')->select();
+            $field_setting_list = D('field_setting')->where(array('profile_group_id' => $id, 'status' => '1','id'=>array('in',$fields_list)))->order('sort asc')->select();
 
             if (!$field_setting_list) {
                 return null;

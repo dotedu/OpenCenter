@@ -138,7 +138,7 @@
             return false;
             function success(data) {
                 if (data.status) {
-                    if (quickLogin == "quickLogin") {
+                    if (data.url==undefined&&quickLogin == "quickLogin") {
                         $('[data-role="login_info"]').append(data.info);
                         toast.success('欢迎回来。', '温馨提示');
                         setTimeout(function () {
