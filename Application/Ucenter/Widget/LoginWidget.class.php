@@ -36,11 +36,12 @@ class LoginWidget extends Action
         $aVerify = I('post.verify', '', 'op_t');
         $aRemember = I('post.remember', 0, 'intval');
 
-        $res['status']=0;
+
         /* 检测验证码 */
-        if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 3) {
+        if (intval(C('VERIFY_OPEN')) == 1 or intval(C('VERIFY_OPEN')) == 3) {
             if (!check_verify($aVerify)) {
                 $res['info']="验证码输入错误。";
+                return $res;
             }
         }
 
