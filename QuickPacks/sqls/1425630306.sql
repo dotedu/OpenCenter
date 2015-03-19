@@ -71,3 +71,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_user_role` (
   `init` tinyint(2) NOT NULL DEFAULT '0' COMMENT '是否初始化',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户角色关联' AUTO_INCREMENT=1 ;
+
+REPLACE INTO `ocenter_role` (`id`, `group_id`, `name`, `title`, `description`, `user_groups`, `invite`, `audit`, `sort`, `status`, `create_time`, `update_time`) VALUES
+(1, 0, 'default', '默认角色', '默认角色', '', 0, 0, 0, 1, 1426664188, 1426741608);
+REPLACE INTO `ocenter_user_role` (`id`, `uid`, `role_id`, `status`, `step`, `init`) VALUES
+(1, 1, 1, 1, 'finish', 1);
+UPDATE `ocenter_member` SET `show_role`=1 WHERE `uid`=1;
