@@ -120,7 +120,7 @@ class IndexController extends BaseController
         $profile_group_list=array();
         $fields_list=$this->getRoleFieldIds($uid);
         if($fields_list){
-            $fields_group_ids=D('FieldSetting')->where(array('id'=>array('in',$fields_list)))->field('profile_group_id')->select();
+            $fields_group_ids=D('FieldSetting')->where(array('id'=>array('in',$fields_list),'status' => '1'))->field('profile_group_id')->select();
             if($fields_group_ids){
                 $fields_group_ids=array_unique(array_column($fields_group_ids,'profile_group_id'));
                 $map['id']=array('in',$fields_group_ids);

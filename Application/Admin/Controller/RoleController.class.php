@@ -185,6 +185,9 @@ class RoleController extends AdminController
      */
     public function setStatus($ids, $status)
     {
+        if(in_array(1,$ids)){
+            $this->error('id为 1 的角色是系统默认角色，不能被禁用或删除！');
+        }
         if ($status == 1) {
             $builder = new AdminListBuilder;
             $builder->doSetStatus('Role', $ids, $status);

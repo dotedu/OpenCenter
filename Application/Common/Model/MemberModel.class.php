@@ -387,9 +387,14 @@ class MemberModel extends Model
         if(isset($config['score']['value'])){
             $value=json_decode($config['score']['value'],true);
             $data=$this->getUserScore($role_id,$uid,$value);
+            $user=$this->where(array('uid'=>$uid))->find();
             foreach($data as $key=>$val){
                 if($val>0){
-                    $this->where(array('uid'=>$uid))->setInc($key,$val);
+                    if(isset($user[$key])){
+                        $this->where(array('uid'=>$uid))->setInc($key,$val);
+                    }else{
+                        $this->where(array('uid'=>$uid))->setField($key,$val);
+                    }
                 }
             }
             unset($val);
