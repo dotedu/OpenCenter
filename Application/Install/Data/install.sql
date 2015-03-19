@@ -1213,8 +1213,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_user_config` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户配置信息表' AUTO_INCREMENT=1 ;
 
-
-
+DROP TABLE IF EXISTS `ocenter_sso_app`;
 CREATE TABLE IF NOT EXISTS `ocenter_sso_app` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
