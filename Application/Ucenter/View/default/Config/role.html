@@ -107,10 +107,17 @@
                 var role_id=$(this).attr('data-id');
                 $.post(U('Ucenter/Member/changeLoginRole'),{role_id:role_id},function(data){
                     if(data.status){
-                        toast.success('切换身份登录成功！');
-                        setTimeout(function(){
-                            window.location.reload();
-                        },1500);
+                        if(data.url!=undefined){
+                            toast.success('切换身份登录成功！页面即将跳转~');
+                            setTimeout(function(){
+                                window.location.href=data.url;
+                            },1500);
+                        }else{
+                            toast.success('切换身份登录成功！');
+                            setTimeout(function(){
+                                window.location.reload();
+                            },1500);
+                        }
                     }else{
                         handleAjax(data);
                     }

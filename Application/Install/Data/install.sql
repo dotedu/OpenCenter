@@ -597,12 +597,9 @@ CREATE TABLE IF NOT EXISTS `ocenter_field` (
   `field_data` varchar(1000) NOT NULL,
   `createTime` int(11) NOT NULL,
   `changeTime` int(11) NOT NULL,
-
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-INSERT INTO `ocenter_field` (`id`, `uid`, `field_id`, `field_data`, `createTime`, `changeTime`) VALUES
-(1, 1, 36, 'ad', 1423034721, 1423034721);
 
 DROP TABLE  IF EXISTS `ocenter_field_group`;
 CREATE TABLE IF NOT EXISTS `ocenter_field_group` (

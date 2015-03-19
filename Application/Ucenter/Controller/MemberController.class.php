@@ -134,7 +134,7 @@ class MemberController extends Controller
         }
         $userRoleModel->where($map)->setField('step', $aStep);
         if ($aStep == 'finish') {
-            D('Member')->login($aUid, false);
+            D('Member')->login($aUid, false,$aRoleId);
         }
         $this->assign('step', $aStep);
         $this->display('register');
@@ -653,13 +653,13 @@ class MemberController extends Controller
      */
     public function changeLoginRole()
     {
-        $memberModel=D('Member');
         $aRoleId=I('post.role_id',0,'intval');
         $uid=is_login();
         $data['status']=0;
         if($uid&&$aRoleId!=get_login_role()){
             $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
             if($roleUser){
+                $memberModel=D('Common/Member');
                 $memberModel->logout();
                 $result=$memberModel->login($uid,false,$aRoleId);
                 if($result){
@@ -681,14 +681,16 @@ class MemberController extends Controller
         $aRoleId=I('post.role_id',0,'intval');
         $uid=is_login();
         $data['status']=0;
-        if($uid&&$aRoleId!=get_login_role()){
+        if($uid>0&&$aRoleId!=get_login_role()){
             $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
             if($roleUser){
                 $data['info']="已持有该身份！";
                 $this->ajaxReturn($data);
             }else{
+                $memberModel=D('Common/Member');
+                $memberModel->logout();
                 $this->initRoleUser($aRoleId,$uid);
-                D('Member')->login($uid, false,$aRoleId); //登陆
+                $memberModel->login($uid, false,$aRoleId); //登陆
             }
         }else{
             $data['info']="非法操作！";

@@ -676,7 +676,7 @@ class RoleController extends AdminController
             $post_key = '';
             foreach ($score_keys as &$val) {
                 $post_key .= ',score' . $val['id'];
-                $val['value'] = $score['score' . $val['id']]; //写入默认值
+                $val['value'] = $score['score' . $val['id']]?$score['score' . $val['id']]:0; //写入默认值
             }
             unset($val);
 
@@ -704,16 +704,22 @@ class RoleController extends AdminController
         $data['data'] = '';
         if (IS_POST) {
             $data['value'] = I('post.avatar_id', 0, 'intval');
-            if ($this->roleConfigModel->where($map)->find()) {
-                if ($data['value'] == 0) { //使用系统默认头像
-                    $result = $this->roleConfigModel->where($map)->delete();
-                } else {
-                    $result = $this->roleConfigModel->saveData($map, $data);
+            $aSetNull = I('post.set_null', 0, 'intval');
+            if (!$aSetNull) {
+                if($data['value']==0){
+                    $this->error('请先上传头像！');
                 }
-            } else {
-                if ($data['value'] != 0) {
+                if ($this->roleConfigModel->where($map)->find()) {
+                    $result = $this->roleConfigModel->saveData($map, $data);
+                } else {
                     $data = array_merge($map, $data);
                     $result = $this->roleConfigModel->addData($data);
+                }
+            } else {//使用系统默认头像
+                if ($this->roleConfigModel->where($map)->find()) {
+                    $result = $this->roleConfigModel->where($map)->delete();
+                }else{
+                    $this->error('当前使用的已经是系统默认头像了！');
                 }
             }
             if ($result) {

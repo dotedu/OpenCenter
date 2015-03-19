@@ -94,6 +94,8 @@ class MemberModel extends Model
     /**
      * 登录指定用户
      * @param  integer $uid 用户ID
+     * @param bool $remember
+     * @param int $role_id 有值代表强制登录这个角色
      * @return boolean      ture-登录成功，false-登录失败
      */
     public function login($uid, $remember = false,$role_id=0)
