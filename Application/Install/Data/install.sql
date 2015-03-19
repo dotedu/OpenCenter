@@ -82,13 +82,12 @@ CREATE TABLE IF NOT EXISTS `ocenter_addons` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='插件表' AUTO_INCREMENT=7 ;
 
-INSERT INTO `ocenter_addons` (`id`, `name`, `title`, `description`, `status`, `config`, `author`, `version`, `create_time`, `has_adminlist`) VALUES
-(1, 'EditorForAdmin', '后台编辑器', '用于增强整站长文本的输入和显示', 1, '{"editor_type":"2","editor_wysiwyg":"1","editor_height":"500px","editor_resize_type":"1"}', 'thinkphp', '0.1', 1383126253, 0),
-(2, 'SiteStat', '站点统计信息', '统计站点的基础信息', 1, '{"title":"\\u7cfb\\u7edf\\u4fe1\\u606f","width":"1","display":"1","status":"0"}', 'thinkphp', '0.1', 1379512015, 0),
-(3, 'SystemInfo', '系统环境信息', '用于显示一些服务器的信息', 1, '{"title":"\\u7cfb\\u7edf\\u4fe1\\u606f","width":"6","display":"1"}', 'thinkphp', '0.1', 1420609113, 0),
-(4, 'DevTeam', '开发团队信息', '开发团队成员信息', 1, '{"title":"ThinkOX\\u5f00\\u53d1\\u56e2\\u961f","width":"6","display":"1"}', 'thinkphp', '0.1', 1420609089, 0),
-(5, 'SyncLogin', '同步登陆', '同步登陆', 1, '{"type":null,"meta":"","bind":"0","QqKEY":"","QqSecret":"","SinaKEY":"","SinaSecret":""}', 'xjw129xjt', '0.1', 1406598876, 0),
-(6, 'LocalComment', '本地评论', '本地评论插件，不依赖社会化评论平台', 1, '{"can_guest_comment":"1"}', 'caipeichao', '0.1', 1399440324, 0);
+INSERT INTO `ocenter_addons` ( `name`, `title`, `description`, `status`, `config`, `author`, `version`, `create_time`, `has_adminlist`) VALUES
+( 'SiteStat', '站点统计信息', '统计站点的基础信息', 1, '{"title":"\\u7cfb\\u7edf\\u4fe1\\u606f","width":"1","display":"1","status":"0"}', 'thinkphp', '0.1', 1379512015, 0),
+( 'SystemInfo', '系统环境信息', '用于显示一些服务器的信息', 1, '{"title":"\\u7cfb\\u7edf\\u4fe1\\u606f","width":"6","display":"1"}', 'thinkphp', '0.1', 1420609113, 0),
+( 'DevTeam', '开发团队信息', '开发团队成员信息', 1, '{"title":"ThinkOX\\u5f00\\u53d1\\u56e2\\u961f","width":"6","display":"1"}', 'thinkphp', '0.1', 1420609089, 0),
+( 'SyncLogin', '同步登陆', '同步登陆', 1, '{"type":null,"meta":"","bind":"0","QqKEY":"","QqSecret":"","SinaKEY":"","SinaSecret":""}', 'xjw129xjt', '0.1', 1406598876, 0),
+( 'LocalComment', '本地评论', '本地评论插件，不依赖社会化评论平台', 1, '{"can_guest_comment":"1"}', 'caipeichao', '0.1', 1399440324, 0);
 
 
 DROP TABLE  IF EXISTS `ocenter_attachment`;
@@ -593,11 +592,13 @@ INSERT INTO `ocenter_config` (`id`, `name`, `type`, `title`, `group`, `extra`, `
 DROP TABLE  IF EXISTS `ocenter_field`;
 CREATE TABLE IF NOT EXISTS `ocenter_field` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` INT( 11 ) NOT NULL ,
   `uid` int(11) NOT NULL,
   `field_id` int(11) NOT NULL,
   `field_data` varchar(1000) NOT NULL,
   `createTime` int(11) NOT NULL,
   `changeTime` int(11) NOT NULL,
+
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
@@ -689,38 +690,33 @@ CREATE TABLE IF NOT EXISTS `ocenter_hooks` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
 
-INSERT INTO `ocenter_hooks` (`id`, `name`, `description`, `type`, `update_time`, `addons`) VALUES
-(1, 'pageHeader', '页面header钩子，一般用于加载插件CSS文件和代码', 1, 0, ''),
-(2, 'pageFooter', '页面footer钩子，一般用于加载插件JS文件和JS代码', 1, 0, 'SuperLinks'),
-(3, 'documentEditForm', '添加编辑表单的 扩展内容钩子', 1, 0, ''),
-(4, 'documentDetailAfter', '文档末尾显示', 1, 0, 'Avatar'),
-(5, 'documentDetailBefore', '页面内容前显示用钩子', 1, 0, ''),
-(6, 'documentSaveComplete', '保存文档数据后的扩展钩子', 2, 0, ''),
-(7, 'documentEditFormContent', '添加编辑表单的内容显示钩子', 1, 0, ''),
-(8, 'adminEditor', '后台内容编辑页编辑器', 1, 1378982734, 'EditorForAdmin'),
-(13, 'AdminIndex', '首页小格子个性化显示', 1, 1382596073, 'SiteStat,SyncLogin,DevTeam,SystemInfo'),
-(14, 'topicComment', '评论提交方式扩展钩子。', 1, 1380163518, ''),
-(16, 'app_begin', '应用开始', 2, 1384481614, 'Iswaf'),
-(17, 'checkin', '签到', 1, 1395371353, ''),
-(18, 'Rank', '签到排名钩子', 1, 1395387442, 'Rank_checkin'),
-(20, 'support', '赞', 1, 1398264759, ''),
-(21, 'localComment', '本地评论插件', 1, 1399440321, 'LocalComment'),
-(22, 'weiboType', '微博类型', 1, 1409121894, ''),
-(23, 'repost', '转发钩子', 1, 1403668286, ''),
-(24, 'syncLogin', '第三方登陆位置', 1, 1403700579, 'SyncLogin'),
-(25, 'syncMeta', '第三方登陆meta接口', 1, 1403700633, 'SyncLogin'),
-(26, 'J_China_City', '每个系统都需要的一个中国省市区三级联动插件。', 1, 1403841931, 'ChinaCity'),
-(27, 'Advs', '广告位插件', 1, 1406687667, ''),
-(28, 'imageSlider', '图片轮播钩子', 1, 1407144022, ''),
-(29, 'friendLink', '友情链接插件', 1, 1407156413, 'SuperLinks'),
-(30, 'beforeSendWeibo', '在发微博之前预处理微博', 2, 1408084504, 'InsertFile'),
-(31, 'beforeSendRepost', '转发微博前的预处理钩子', 2, 1408085689, ''),
-(32, 'parseWeiboContent', '解析微博内容钩子', 2, 1409121261, ''),
-(33, 'userConfig', '用户配置页面钩子', 1, 1417137557, 'SyncLogin'),
-(34, 'weiboSide', '微博侧边钩子', 1, 1417063425, 'Retopic'),
-(35, 'personalMenus', '顶部导航栏个人下拉菜单', 1, 1417146501, ''),
-(36, 'dealPicture', '上传图片处理', 2, 1417139975, ''),
-(37, 'ucenterSideMenu', '用户中心左侧菜单', 1, 1417161205, '');
+INSERT INTO `ocenter_hooks` (`name`, `description`, `type`, `update_time`, `addons`) VALUES
+( 'pageHeader', '页面header钩子，一般用于加载插件CSS文件和代码', 1, 0, ''),
+( 'pageFooter', '页面footer钩子，一般用于加载插件JS文件和JS代码', 1, 0, 'SuperLinks'),
+( 'adminEditor', '后台内容编辑页编辑器', 1, 1378982734, 'EditorForAdmin'),
+( 'AdminIndex', '首页小格子个性化显示', 1, 1382596073, 'SiteStat,SyncLogin,DevTeam,SystemInfo'),
+( 'topicComment', '评论提交方式扩展钩子。', 1, 1380163518, ''),
+( 'app_begin', '应用开始', 2, 1384481614, 'Iswaf'),
+( 'checkin', '签到', 1, 1395371353, ''),
+( 'Rank', '签到排名钩子', 1, 1395387442, 'Rank_checkin'),
+( 'support', '赞', 1, 1398264759, ''),
+( 'localComment', '本地评论插件', 1, 1399440321, 'LocalComment'),
+( 'weiboType', '微博类型', 1, 1409121894, ''),
+( 'repost', '转发钩子', 1, 1403668286, ''),
+( 'syncLogin', '第三方登陆位置', 1, 1403700579, 'SyncLogin'),
+( 'syncMeta', '第三方登陆meta接口', 1, 1403700633, 'SyncLogin'),
+( 'J_China_City', '每个系统都需要的一个中国省市区三级联动插件。', 1, 1403841931, 'ChinaCity'),
+( 'Advs', '广告位插件', 1, 1406687667, ''),
+( 'imageSlider', '图片轮播钩子', 1, 1407144022, ''),
+( 'friendLink', '友情链接插件', 1, 1407156413, 'SuperLinks'),
+( 'beforeSendWeibo', '在发微博之前预处理微博', 2, 1408084504, 'InsertFile'),
+( 'beforeSendRepost', '转发微博前的预处理钩子', 2, 1408085689, ''),
+( 'parseWeiboContent', '解析微博内容钩子', 2, 1409121261, ''),
+( 'userConfig', '用户配置页面钩子', 1, 1417137557, 'SyncLogin'),
+( 'weiboSide', '微博侧边钩子', 1, 1417063425, 'Retopic'),
+( 'personalMenus', '顶部导航栏个人下拉菜单', 1, 1417146501, ''),
+( 'dealPicture', '上传图片处理', 2, 1417139975, ''),
+( 'ucenterSideMenu', '用户中心左侧菜单', 1, 1417161205, '');
 
 DROP TABLE  IF EXISTS `ocenter_local_comment`;
 CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
@@ -753,6 +749,8 @@ CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `last_login_ip` bigint(20) NOT NULL DEFAULT '0' COMMENT '最后登录IP',
   `last_login_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最后登录时间',
   `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '会员状态',
+  `last_login_role` INT( 11 ) NOT NULL,
+  `show_role` INT( 11 ) NOT NULL COMMENT  '个人主页显示角色',
   `signature` text NOT NULL,
   `pos_province` int(11) NOT NULL,
   `pos_city` int(11) NOT NULL,
@@ -786,7 +784,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_menu` (
 
 INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`, `icon`) VALUES
 (1, '首页', 0, 1, 'Index/index', 0, '', '', 0, 'home'),
-(2, '用户', 0, 2, 'User/index', 0, '', '', 0, 'group'),
+(2, '用户', 0, 2, 'User/index', 0, '', '', 0, 'user'),
 (3, '用户信息', 2, 0, 'User/index', 0, '', '用户管理', 0, ''),
 (4, '用户行为', 2, 0, 'User/action', 0, '', '行为管理', 0, ''),
 (5, '新增用户行为', 4, 0, 'User/addaction', 0, '', '', 0, ''),
@@ -898,7 +896,26 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (112, '新增/编辑应用', 109, 0, 'authorize/editssoapp', 1, '', '单点登录', 0, ''),
 (113, '安全', 0, 4, 'ActionLimit/limitList', 0, '', '', 0, 'shield'),
 (114, '行为限制列表', 113, 0, 'ActionLimit/limitList', 0, '', '行为限制', 0, ''),
-(115, '新增/编辑行为限制', 113, 0, 'ActionLimit/editLimit', 1, '', '行为限制', 0, '');
+(115, '新增/编辑行为限制', 113, 0, 'ActionLimit/editLimit', 1, '', '行为限制', 0, ''),
+(116, '角色', 0, 3, 'Role/index', 0, '', '', 0, 'group'),
+(117, '角色列表', 116, 0, 'Role/index', 0, '', '角色管理', 0, ''),
+(118, '编辑角色', 116, 0, 'Role/editRole', 1, '', '', 0, ''),
+(119, '启用、禁用、删除角色', 116, 0, 'Role/setStatus', 1, '', '', 0, ''),
+(120, '角色排序', 116, 0, 'Role/sort', 1, '', '', 0, ''),
+(121, '默认积分配置', 117, 0, 'Role/configScore', 1, '', '', 0, ''),
+(122, '默认权限配置', 117, 0, 'Role/configAuth', 1, '', '', 0, ''),
+(123, '默认头像配置', 117, 0, 'Role/configAvatar', 1, '', '', 0, ''),
+(124, '默认头衔配置', 117, 0, 'Role/configRank', 1, '', '', 0, ''),
+(125, '默认字段管理', 117, 0, 'Role/configField', 1, '', '', 0, ''),
+(126, '角色分组', 116, 0, 'Role/group', 0, '', '角色管理', 0, ''),
+(127, '编辑分组', 126, 0, 'Role/editGroup', 1, '', '', 0, ''),
+(128, '删除分组', 126, 0, 'Role/deleteGroup', 1, '', '', 0, ''),
+(129, '角色基本信息配置', 116, 0, 'Role/config', 1, '', '角色管理', 0, ''),
+(130, '用户列表', 116, 0, 'Role/userList', 0, '', '角色用户管理', 0, ''),
+(131, '设置用户状态', 130, 0, 'Role/setUserStatus', 1, '', '', 0, ''),
+(132, '审核用户', 130, 0, 'Role/setUserAudit', 1, '', '', 0, ''),
+(133, '迁移用户', 130, 0, 'Role/changeRole', 1, '', '', 0, ''),
+(134, '上传默认头像', 123, 0, 'Role/uploadPicture', 1, '', '', 0, '');
 
 
 
@@ -1137,7 +1154,6 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `update_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '更新时间',
   `status` tinyint(4) DEFAULT '0' COMMENT '用户状态',
   `type` tinyint(4) NOT NULL COMMENT '1为用户名注册，2为邮箱注册，3为手机注册',
-  `step` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `status` (`status`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=100 ;
@@ -1198,9 +1214,6 @@ INSERT INTO `ocenter_ucenter_score_type` (`id`, `title`, `status`, `unit`) VALUE
 (3, '贡献', 1, '元'),
 (4, '余额', 1, '点');
 
---
--- 表的结构 `ocenter_user_config`
---
 
 DROP TABLE IF EXISTS `ocenter_user_config`;
 CREATE TABLE IF NOT EXISTS `ocenter_user_config` (
@@ -1224,3 +1237,52 @@ CREATE TABLE IF NOT EXISTS `ocenter_sso_app` (
   `config` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS `ocenter_role_config`;
+CREATE TABLE IF NOT EXISTS `ocenter_role_config` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL,
+  `name` varchar(25) NOT NULL COMMENT '标识',
+  `category` varchar(25) NOT NULL COMMENT '归类标识',
+  `value` text NOT NULL COMMENT '配置值',
+  `data` text NOT NULL COMMENT '该配置的其它值',
+  `update_time` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4 COMMENT='角色配置表' AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ocenter_role_group`;
+CREATE TABLE IF NOT EXISTS `ocenter_role_group` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(25) NOT NULL,
+  `update_time` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4 COMMENT='角色分组' AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ocenter_user_role`;
+CREATE TABLE IF NOT EXISTS `ocenter_user_role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `status` tinyint(4) NOT NULL COMMENT '2：未审核，1:启用，0：禁用，-1：删除',
+  `step` varchar(50) NOT NULL COMMENT '记录当前执行步骤',
+  `init` tinyint(2) NOT NULL DEFAULT '0' COMMENT '是否初始化',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户角色关联' AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS `ocenter_role`;
+CREATE TABLE IF NOT EXISTS `ocenter_role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `group_id` int(11) NOT NULL COMMENT '角色组id',
+  `name` varchar(25) NOT NULL COMMENT '英文标识',
+  `title` varchar(25) NOT NULL COMMENT '中文标题',
+  `description` varchar(500) NOT NULL COMMENT '描述',
+  `user_groups` varchar(200) NOT NULL COMMENT '默认用户组ids',
+  `invite` tinyint(4) NOT NULL COMMENT '预留字段(类型：是否需要邀请注册等)',
+  `audit` tinyint(2) NOT NULL DEFAULT '0' COMMENT '是否需要审核',
+  `sort` int(10) NOT NULL DEFAULT '0',
+  `status` tinyint(2) NOT NULL,
+  `create_time` int(11) NOT NULL,
+  `update_time` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='角色表' AUTO_INCREMENT=1 ;
+
+
+
