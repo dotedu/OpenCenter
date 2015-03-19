@@ -244,7 +244,7 @@ sql;
     /*初始化角色表*/
     $sql=<<<sql
 REPLACE INTO `[PREFIX]role` (`id`, `group_id`, `name`, `title`, `description`, `user_groups`, `invite`, `audit`, `sort`, `status`, `create_time`, `update_time`) VALUES
-    (1, 0, 'default', '默认角色', '默认角色', '1', 0, 0, 0, 1, [TIME], [TIME]);
+    (1, 0, 'default', '普通用户', '普通用户', '1', 0, 0, 0, 1, [TIME], [TIME]);
 sql;
     $sql = str_replace(
         array('[PREFIX]', '[TIME]','[UID]'),
