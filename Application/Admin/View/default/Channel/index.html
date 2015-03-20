@@ -34,7 +34,7 @@
 
             <select name="nav[1][module][]" class="form-control module" style="width: 100px;">
                 <php>foreach($module as $k=>$v){</php>
-                <option value="{$v.entry}" >{$v.alias}</option>
+                <option value="{$v.entry}"  data-icon="{$v.icon}" >{$v.alias}</option>
                 <php>}unset($k,$v)</php>
             </select>
 
@@ -92,7 +92,7 @@
 
                 <select name="nav[2][module][]" class="form-control module" style="width: 100px;">
                     <php>foreach($module as $k=>$v){</php>
-                    <option value="{$v.entry}" >{$v.alias}</option>
+                    <option value="{$v.entry}" data-icon="{$v.icon}" >{$v.alias}</option>
                     <php>}unset($k,$v)</php>
                 </select>
 

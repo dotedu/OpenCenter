@@ -31,6 +31,7 @@ var target_change = function(){
 }
 
 var bind_chose_icon = function(){
+
     $('.chosen-container').remove()
     $('form select.chosen-icons').attr('class','chosen-icons');
     $('form select.chosen-icons').data('zui.chosenIcons',null);
@@ -50,6 +51,7 @@ var bind_color = function () {
     });
 }
 var change_select = function () {
+    $('.nav-type').unbind('change')
     $('.nav-type').change(function () {
         var obj = $(this);
         switch (obj.val()) {
@@ -69,12 +71,16 @@ var change_select = function () {
 
 
 var change_module = function () {
+    $('.module').unbind('change')
     $('.module').change(function () {
         var obj = $(this);
         var text = obj.find("option:selected").text();
         var value = obj.val();
         obj.closest('li>div').children('input.title').val(text);
         obj.closest('li>div').children('input.url').val(value);
+
+        obj.closest('li>div').next().children('select.chosen-icons').attr('data-value','icon-'+obj.find("option:selected").data('icon'));
+        re_bind()
     })
 
 }
