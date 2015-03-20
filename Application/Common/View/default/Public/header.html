@@ -38,8 +38,9 @@
                                style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i>
 
                                 {$nav.title} <span class="caret"></span>
-                                <neq name="nav.band_text" value=""><span class="badge"
-                                                                         style="background: {$nav.band_color}">{$nav.band_text}</span>
+                                <neq name="nav.band_text" value="">
+
+                                    <span class="label label-badge" style="background: {$nav.band_color}">{$nav.band_text}</span>
                                 </neq>
                             </a>
                             <ul class="dropdown-menu">
@@ -61,7 +62,7 @@
                             <a href="{$nav.url|get_nav_url}"
                                target="<eq name='nav.target' value='1'>_blank<else/>_self</eq>"
                                style="color:{$nav.color}"><i class="icon-{$nav.icon}"></i> {$nav.title}
-                                <neq name="nav.band_text" value=""><span class="badge"
+                                <neq name="nav.band_text" value=""><span class="label label-badge "
                                                                          style="background: {$nav.band_color}">{$nav.band_text}</span>
                                 </neq>
                             </a>

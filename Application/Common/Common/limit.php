@@ -160,3 +160,28 @@ function get_time_unit($key = null){
     $array = array('second' => '秒', 'minute' => '分', 'hour' => '小时', 'day' => '天', 'week' => '周', 'month' => '月', 'year' => '年');
     return empty($key)?$array:$array[$key];
 }
+
+
+function get_punish_name($key){
+    !is_array($key) && $key = explode(',',$key);
+    $obj =new \ActionLimit();
+    $punish = $obj->punish;
+    $return = array();
+    foreach($key as $val){
+        foreach($punish as $v){
+            if($v[0] == $val){
+                $return[]= $v[1];
+            }
+        }
+    }
+    return implode(',',$return);
+}
+
+function get_action_name($key){
+    !is_array($key) && $key = explode(',',str_replace(array('[',']'),'',$key));
+    $return = array();
+    foreach($key as $val){
+        $return[] = D('Action')->where(array('name'=>$val))->getField('title');
+    }
+    return implode(',',$return);
+}
