@@ -272,3 +272,48 @@ label {
     z-index: 999;
   }
 }
+
+
+/*后台导航修改*/
+
+.channel-ul{
+  .target_input{display: none}
+  >li{
+    background: #fff;
+  }
+  li{
+    &.dragging{
+      background-color:#fff4e5 ;
+      opacity: 0.35;
+    }
+
+    border-left: 1px #ccc dashed;
+    border-bottom: 1px #ccc dashed;
+    padding: 10px 30px;
+    list-style: none;
+    select , input{
+      display: inline-block;
+    }
+  }
+.new-blank{
+  margin-top: 7px;
+  margin-left: 10px;
+}
+  .i-list{
+    margin-top: 7px;
+    a{
+
+      margin-left: 10px;
+    }
+  }
+ .icon-chose{
+   margin-left: 20px;
+ }
+.band-text{
+  margin-left: 20px;
+}
+  .color-chose{
+    margin-top: 10px;
+    margin-left: 20px;
+  }
+}
