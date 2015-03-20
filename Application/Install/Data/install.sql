@@ -161,8 +161,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_auth_group_access` (
 
 
 INSERT INTO `ocenter_auth_group_access` (`uid`, `group_id`) VALUES
-(1, 1),
-(58, 1);
+(1, 1);
 
 
 DROP TABLE  IF EXISTS `ocenter_auth_rule`;
