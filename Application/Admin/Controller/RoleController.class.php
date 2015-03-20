@@ -184,6 +184,7 @@ class RoleController extends AdminController
      */
     public function setStatus($ids, $status)
     {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
         if(in_array(1,$ids)){
             $this->error('id为 1 的角色是系统默认角色，不能被禁用或删除！');
         }
@@ -417,6 +418,7 @@ class RoleController extends AdminController
      */
     public function setUserStatus($ids, $status = 1, $role_id = 0)
     {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
         if ($status == 1) {
             $map_role['role_id'] = $role_id;
             foreach ($ids as $val) {
@@ -467,6 +469,7 @@ class RoleController extends AdminController
      */
     public function setUserAudit($ids,$status=1,$role_id=0)
     {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
         if ($status == 1) {
             $map_role['role_id'] = $role_id;
             foreach ($ids as $val) {
