@@ -30,7 +30,7 @@
                 <li class="active"><a href="#base" data-toggle="tab">基本资料</a></li>
                 <volist name="profile_group_list" id="vl">
                     <li>
-                        <a href="#expand_{$vl.id}" data-toggle="tab">{$vl.profile_name}</a>
+                        <a href="#expand_tab_{$vl.id}" data-toggle="tab">{$vl.profile_name}</a>
                     </li>
                 </volist>
             </ul>
@@ -175,7 +175,7 @@
 
             <volist name="profile_group_list" id="vo">
 
-                <div class="tab-pane" id="expand_{$vo.id}">
+                <div class="tab-pane" id="expand_tab_{$vo.id}">
                     <form action="{:U('Config/edit_expandinfo')}" method="post" class="ajax-form">
                     <div class="with-padding">
                         <div class="row">

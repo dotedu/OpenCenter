@@ -79,13 +79,9 @@ class RegStepWidget extends Action
         $fields_list=$this->getRoleFieldIds($uid);
         if($fields_list){
             $fields_group_ids=D('FieldSetting')->where(array('id'=>array('in',$fields_list), 'status' => '1'))->field('profile_group_id')->select();
-            if($fields_group_ids){
+            if(count($fields_group_ids)){
                 $fields_group_ids=array_unique(array_column($fields_group_ids,'profile_group_id'));
                 $map['id']=array('in',$fields_group_ids);
-
-                if (isset($uid) && $uid != is_login()) {
-                    $map['visiable'] = 1;
-                }
                 $map['status'] = 1;
                 $profile_group_list = D('field_group')->where($map)->order('sort asc')->select();
             }

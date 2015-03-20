@@ -61,10 +61,14 @@
                             </dd>
                         </dl>
                     </notempty>
-                    <if condition="isset($un_apply)||isset($can_apply)">
+                    <if condition="count($un_apply)||count($can_apply)">
                         <label class="item-label">头衔颁发原因</label>
                         <div class="controls">
                             <textarea name="reason" style="width: 500px;min-height: 100px;">{$reason}</textarea>
+                        </div>
+                        <else/>
+                        <div style="color: #B5B4B4;font-size: 16px;margin: 10px;">
+                            请先到 用户》头衔管理》头衔列表 中添加头衔~
                         </div>
                     </if>
                     <div style="margin-top: 20px;"></div>

@@ -40,13 +40,6 @@ class UserConfigController extends AdminController
         //$default=array('禁用'=>$step,'启用并可跳过'=>array(),'启用但不可跳过'=>array());
         $data['REG_STEP'] = $admin_config->parseKanbanArray($data['REG_STEP'],$step,$default);
 
-        $groups = M('AuthGroup')->where(array('status' => 1))->select();
-        $groupOption=array();
-        foreach ($groups as $g) {
-            $groupOption[$g['id']] = $g['title'];
-        }
-
-            empty($data['DEFAULT_GROUP']) && $data['DEFAULT_GROUP'] = 1;
             empty($data['LEVEL']) && $data['LEVEL'] = <<<str
 0:Lv1 实习
 50:Lv2 试用
@@ -79,7 +72,6 @@ str;
             ->keyText('SMS_PWD', '短信平台密码', '短信平台密码')
             ->keyTextArea('SMS_CONTENT', '短信内容', '短信内容')
             ->keyTextArea('LEVEL', '等级配置', '每行一条，名称和积分之间用冒号分隔')
-            ->keyCheckBox('DEFAULT_GROUP', '默认用户组', '设置用户注册后的默认所在用户组', $groupOption)
 
             ->keyRadio('OPEN_QUICK_LOGIN','快捷登录','默认关闭，开启后用户登录方式更换成快捷登录！', array(0 => '关闭', 1 => '开启'))
 
@@ -88,7 +80,7 @@ str;
             ->group('邮箱验证模版', 'REG_EMAIL_VERIFY')
             ->group('邮箱激活模版', 'REG_EMAIL_ACTIVATE')
             ->group('短信配置', 'SMS_HTTP,SMS_UID,SMS_PWD,SMS_CONTENT')
-            ->group('基础设置', 'LEVEL,DEFAULT_GROUP')
+            ->group('基础设置', 'LEVEL')
             ->buttonSubmit('', '保存')->data($data);
         $admin_config->display();
     }
