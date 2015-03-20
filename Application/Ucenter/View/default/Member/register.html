@@ -30,7 +30,9 @@
                         </ul>
 
                         <div class="tab-content">
-                            <notempty name="role_list">
+                            <if condition="count($role_list)==1">
+                                <input type="hidden" name="role" value="{$role_list[0]['id']}">
+                                <else/>
                                 <div class="form-group">
                                     <label for="role" class=".sr-only col-xs-12" style="display: none"></label>
                                     <select type="text" id="role" class="form-control" name="role">
@@ -39,10 +41,9 @@
                                         </volist>
                                     </select>
                                     <span class="help-block">选择角色注册</span>
-
                                     <div class="clearfix"></div>
                                 </div>
-                            </notempty>
+                            </if>
                             <volist name="regSwitch" id="regSwitch">
                                 <switch name="regSwitch">
                                     <case value="username">

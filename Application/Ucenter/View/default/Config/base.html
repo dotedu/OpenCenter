@@ -33,7 +33,9 @@
                             <li id="info" ><a href="{:U('index')}"><i class="icon-th"></i> 资料设置</a></li>
                             <li id="avatar"><a href="{:U('avatar')}"><i class="icon-user"></i> 头像修改</a></li>
                             <li id="password"><a href="{:U('password')}"><i class="icon-lock"></i> 密码修改</a></li>
-                            <li id="role"><a href="{:U('role')}"><i class="icon-group"></i> 角色设置</a></li>
+                            <eq name="can_show_role" value="1">
+                                <li id="role"><a href="{:U('role')}"><i class="icon-group"></i> 角色设置</a></li>
+                            </eq>
                             <li id="other"><a href="{:U('other')}"><i class="icon-list-ul"></i> 其他</a></li>
                         </ul>
                     </nav>
@@ -51,12 +53,8 @@
             </div>
             <div class="clearfix"></div>
         </div>
-
-
-
     </div>
 </div>
-
     <script type="text/javascript">
         $(function () {
             $(window).resize(function () {
