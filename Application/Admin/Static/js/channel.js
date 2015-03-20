@@ -112,8 +112,13 @@ var add_two = function () {
 var remove_li = function () {
     $('.remove-li').unbind('click');
     $('.remove-li').click(function () {
-        $(this).closest('li').remove()
-        re_bind()
+        if( $(this).parents('form').find('.pLi').length > 1){
+            $(this).closest('li').remove()
+            re_bind()
+        }else{
+            updateAlert('不能再减了~');
+        }
+
     })
 }
 
