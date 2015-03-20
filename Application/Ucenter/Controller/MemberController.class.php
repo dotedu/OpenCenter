@@ -184,8 +184,9 @@ class MemberController extends Controller
     /* 验证码，用于登录和注册 */
     public function verify()
     {
-        $verify = new \Think\Verify();
-        $verify->entry(1);
+        verify();
+      //  $verify = new \Think\Verify();
+      //  $verify->entry(1);
     }
 
     /* 用户密码找回首页 */

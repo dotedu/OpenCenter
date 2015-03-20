@@ -26,7 +26,12 @@ class ActionLimitController extends AdminController
         foreach($List as &$val){
             $timeUnit = $this->getTimeUnit();
             $val['time_unit'] = $timeUnit[$val['time_unit']];
+            $val['action_list'] = get_action_name($val['action_list']);
             empty( $val['action_list']) &&  $val['action_list'] = '所有行为';
+
+            $val['punish'] = get_punish_name($val['punish']);
+
+
         }
         unset($val);
         //显示页面
@@ -105,7 +110,7 @@ class ActionLimitController extends AdminController
                 ->keyChosen('punish', '处罚', '可多选', $opt_punish)
                 ->keyBool('if_message', '是否发送提醒')
                 ->keyTextArea('message_content', '消息提示内容')
-                ->keyChosen('action_list', '行为', '可多选', $opt)
+                ->keyChosen('action_list', '行为', '可多选,不选为全部行为', $opt)
                 ->keyStatus()
                 ->data($limit)
                 ->buttonSubmit(U('editLimit'))->buttonBack()->display();
