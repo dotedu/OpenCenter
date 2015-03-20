@@ -68,13 +68,14 @@
                         </div>
                         <else/>
                         <div style="color: #B5B4B4;font-size: 16px;margin: 10px;">
-                            请先到 用户》头衔管理》头衔列表 中添加头衔~
+                            请先到 用户》头衔管理》头衔列表 中<a href="{:U('admin/rank/editrank')}" target="_blank" title="立刻去添加头衔" style="color: #B5B4B4;text-decoration: underline;">添加头衔</a>~
                         </div>
                     </if>
                     <div style="margin-top: 20px;"></div>
                     <input type="hidden" name="id" value="{$this_role.id}" />
                     <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
                     <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <span style="color: #BABABA;margin: 11px;">请先保存以上配置后再切换到其它界面</span>
                 </form>
             </div>
         </div>

@@ -204,6 +204,11 @@ class RoleController extends AdminController
             if ($result['status']) {
                 $result = $this->roleModel->where(array('id' => array('in', $ids)))->delete();
                 if ($result) {
+                    $userRoleList=$this->userRoleModel->where(array('role_id'=>array('in',$ids)))->select();
+                    foreach($userRoleList as $val){
+                        $this->setDefaultShowRole($val['role_id'],$val['uid']);
+                    }
+                    unset($val);
                     $this->userRoleModel->where(array('role_id'=>array('in',$ids)))->delete();
                     $this->success('删除成功！', U('Role/index'));
                 } else {
@@ -726,7 +731,7 @@ class RoleController extends AdminController
                 if ($this->roleConfigModel->where($map)->find()) {
                     $result = $this->roleConfigModel->where($map)->delete();
                 }else{
-                    $this->error('当前使用的已经是系统默认头像了！');
+                    $this->success('当前使用的已经是系统默认头像了！');
                 }
             }
             if ($result) {
