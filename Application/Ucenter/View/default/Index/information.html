@@ -5,6 +5,23 @@
 </block>
 
 <block name="body">
+    <script>
+        function center_toggle(name) {
+            var show = $('#' + name + '_panel').css('display');
+            $('.center_panel').hide();
+            $('.center_arrow_right').show();
+            $('.center_arrow_bottom').hide()
+            if (show == 'none') {
+                $('#' + name + '_panel').show();
+                $('#' + name + '_toggle_right').hide();
+                $('#' + name + '_toggle_bottom').show()
+            } else {
+                $('#' + name + '_toggle_right').show();
+                $('#' + name + '_toggle_bottom').hide()
+            }
+
+        }
+    </script>
     <div class="col-md-12 usercenter">
         <div class="uc">
             <include file="_top"/>
@@ -15,18 +32,15 @@
                     <div class="row" style="margin-bottom: 20px;">
                         <div class="col-xs-12 uc_information" style="margin-left: 10px;">
                             <ul class="nav nav-pills ucenter-tab">
-                                <li <eq name="info_type" value="base_info"> class="active"</eq>>
-                                    <a href="{:U('Ucenter/Index/information',array('uid'=>$uid,'info_type'=>'base_info'))}"
-
-                                    >基本资料</a></li>
-                                <li <eq name="info_type" value="expand_info"> class="active"</eq>>
-                                    <a href="{:U('Ucenter/Index/information',array('uid'=>$uid,'info_type'=>'expand_info'))}">扩展资料</a></li>
+                                <li class="active"><a href="#base" data-toggle="tab">基本资料</a></li>
+                                <volist name="profile_group_list" id="vl">
+                                    <li><a href="#expand_tab_{$vl.id}" data-toggle="tab">{$vl.profile_name}</a></li>
+                                </volist>
                             </ul>
-
                         </div>
                     </div>
-                    <eq name="info_type" value="base_info">
-                        <div class="base_info">
+                    <div class="tab-content">
+                        <div class="base_info tab-pane active" id="base">
                             <dl class="dl-horizontal">
                                 <dt>昵称：</dt>
                                 <dd>{$user.nickname}</dd>
@@ -57,13 +71,8 @@
                                 <dd>{$user.signature|htmlspecialchars}</dd>
                             </dl>
                         </div>
-                    </eq>
-                    <eq name="info_type" value="expand_info">
                         <volist name="profile_group_list" id="group_vl">
-                            <div class="panel panel-default" style="margin-left: 10px">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">{$group_vl.profile_name}</h3>
-                                </div>
+                            <div class="tab-pane" id="expand_tab_{$group_vl.id}">
                                 <div class="panel-body expand_info">
                                     <volist name="group_vl['info_list']" id="info_vl">
                                         <dl class="dl-horizontal">
@@ -80,14 +89,7 @@
                                 </div>
                             </div>
                         </volist>
-                        <if condition="count($profile_group_list) eq 0"><p class="text-muted"
-                                                                           style="text-align: center; font-size: 24px;">
-                            <br><br>
-                            还没有扩展信息！
-                            <br><br><br>
-                        </p></if>
-
-                    </eq>
+                    </div>
                 </div>
                 <div class="col-md-5 col-sm-9 col-xs-12 uc_other_link">
                     <include file="_right_link"/>

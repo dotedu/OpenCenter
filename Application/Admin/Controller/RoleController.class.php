@@ -435,10 +435,13 @@ class RoleController extends AdminController
                 $map['uid'] = array('in', $uids);
                 $map['status'] = array('gt', 0);
                 $has_other_role_user_ids = $this->userRoleModel->where($map)->field('uid')->select();
-                $unHave = array_diff($ids, array_column($has_other_role_user_ids, 'uid'));
+                $unHave = array_diff($uids, array_column($has_other_role_user_ids, 'uid'));
                 if (count($unHave) > 0) {
-                    $unHave = implode(',', $unHave);
-                    $this->error("id为{$unHave}的用户只拥有该角色，不能被禁用！");
+                    $map_ids['uid']=array('in',$unHave);
+                    $map_ids['role_id']=$role_id;
+                    $error_ids=$this->userRoleModel->where($map_ids)->field('id')->select();
+                    $error_ids=array_column($error_ids,'id');
+                    $this->error("id为{$error_ids}的角色用户只拥有该角色，不能被禁用！");
                 }
                 foreach($uids as $val){
                     $this->setDefaultShowRole($role_id,$val);

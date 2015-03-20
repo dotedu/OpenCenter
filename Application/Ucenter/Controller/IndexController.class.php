@@ -66,26 +66,20 @@ class IndexController extends BaseController
         return $user_info;
     }
 
-    public function information($uid = null, $info_type = "base_info")
+    public function information($uid = null)
     {
-        $info_type = op_t($info_type);
-        if ($info_type == "base_info") {
-            //调用API获取基本信息
-            //TODO tox 获取省市区数据
-            $user = query_user(array('nickname', 'signature', 'email', 'mobile', 'rank_link', 'sex', 'pos_province', 'pos_city', 'pos_district', 'pos_community'), $uid);
-            if ($user['pos_province'] != 0) {
-                $user['pos_province'] = D('district')->where(array('id' => $user['pos_province']))->getField('name');
-                $user['pos_city'] = D('district')->where(array('id' => $user['pos_city']))->getField('name');
-                $user['pos_district'] = D('district')->where(array('id' => $user['pos_district']))->getField('name');
-                $user['pos_community'] = D('district')->where(array('id' => $user['pos_community']))->getField('name');
-            }
-            //显示页面
-            $this->assign('user', $user);
-        } else {
-            $info_type = "expand_info";
-
-            $this->getExpandInfo($uid);
+        //调用API获取基本信息
+        //TODO tox 获取省市区数据
+        $user = query_user(array('nickname', 'signature', 'email', 'mobile', 'rank_link', 'sex', 'pos_province', 'pos_city', 'pos_district', 'pos_community'), $uid);
+        if ($user['pos_province'] != 0) {
+            $user['pos_province'] = D('district')->where(array('id' => $user['pos_province']))->getField('name');
+            $user['pos_city'] = D('district')->where(array('id' => $user['pos_city']))->getField('name');
+            $user['pos_district'] = D('district')->where(array('id' => $user['pos_district']))->getField('name');
+            $user['pos_community'] = D('district')->where(array('id' => $user['pos_community']))->getField('name');
         }
+        //显示页面
+        $this->assign('user', $user);
+        $this->getExpandInfo($uid);
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
         $this->setTitle($str . "的个人资料页");
@@ -93,7 +87,6 @@ class IndexController extends BaseController
         $this->setDescription($str . "的个人资料页");
         //四处一词 seo end
 
-        $this->assign('info_type', $info_type);
         $this->display();
     }
 
