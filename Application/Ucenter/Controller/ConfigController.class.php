@@ -20,7 +20,7 @@ class ConfigController extends BaseController
         }
         $this->setTitle('编辑资料');
         $this->_assignSelf();
-
+        $this->_haveOtherRole();
     }
 
     /**关联自己的信息
@@ -30,6 +30,37 @@ class ConfigController extends BaseController
     {
         $self = query_user(array('avatar128', 'nickname', 'space_url', 'space_link'));
         $this->assign('self', $self);
+    }
+
+    /**
+     * 是否拥有其他角色或可拥有角色
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    private function _haveOtherRole()
+    {
+        $have=0;
+
+        $roleModel=D('Role');
+        $userRoleModel=D('UserRole');
+        $map['status']=1;
+        $map['invite']=0;
+        if($roleModel->where($map)->count()>1){
+            $have=1;
+        }else{
+            $map_user['uid']=is_login();
+            $map_user['role_id']=array('neq',get_login_role());
+            $map_user['status']=array('egt',0);
+            $role_ids=$userRoleModel->where($map_user)->field('role_id')->select();
+            if($role_ids){
+                $role_ids=array_column($role_ids,'role_id');
+                $map_can['status']=1;
+                $map_can['id']=array('in',$role_ids);
+                if($roleModel->where($map_can)->count()){
+                    $have=1;
+                }
+            }
+        }
+        $this->assign('can_show_role',$have);
     }
 
     private function _setTab($name)

@@ -64,7 +64,7 @@ class RoleController extends AdminController
         $builder->title("角色列表");
         $builder->buttonNew(U('Role/editRole'))->setStatusUrl(U('setStatus'))->buttonEnable()->buttonDisable()->button('删除', array('class' => 'btn ajax-post confirm', 'url' => U('setStatus', array('status' => -1)), 'target-form' => 'ids', 'confirm-info' => "确认删除角色？删除后不可恢复！"))->buttonSort(U('sort'));
         $builder->keyId()
-            ->keyLink('title', '角色名', 'admin/role/user?id=###')
+            ->keyText('title', '角色名')
             ->keyText('name', '角色标识')
             ->keyText('group', '所属分组')
             ->keyText('description', '描述')
@@ -184,6 +184,7 @@ class RoleController extends AdminController
      */
     public function setStatus($ids, $status)
     {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
         if(in_array(1,$ids)){
             $this->error('id为 1 的角色是系统默认角色，不能被禁用或删除！');
         }
@@ -228,11 +229,12 @@ class RoleController extends AdminController
             //获取拥有该角色的用户ids
             $uids = $this->userRoleModel->where(array('role_id' => $role_id))->field('uid')->select();
             if (count($uids) > 0) { //拥有该角色
+                $uids=array_column($uids,'uid');
                 $uids = array_unique($uids);
-
                 //获取拥有其他角色的用户ids
                 $have_uids = $this->userRoleModel->where(array('role_id' => array('not in', $ids), 'uid' => array('in', $uids)))->field('uid')->select();
                 if ($have_uids) {
+                    $have_uids=array_column($have_uids,'uid');
                     $have_uids = array_unique($have_uids);
 
                     //获取不拥有其他角色的用户ids
@@ -416,6 +418,7 @@ class RoleController extends AdminController
      */
     public function setUserStatus($ids, $status = 1, $role_id = 0)
     {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
         if ($status == 1) {
             $map_role['role_id'] = $role_id;
             foreach ($ids as $val) {
@@ -435,10 +438,13 @@ class RoleController extends AdminController
                 $map['uid'] = array('in', $uids);
                 $map['status'] = array('gt', 0);
                 $has_other_role_user_ids = $this->userRoleModel->where($map)->field('uid')->select();
-                $unHave = array_diff($ids, array_column($has_other_role_user_ids, 'uid'));
+                $unHave = array_diff($uids, array_column($has_other_role_user_ids, 'uid'));
                 if (count($unHave) > 0) {
-                    $unHave = implode(',', $unHave);
-                    $this->error("id为{$unHave}的用户只拥有该角色，不能被禁用！");
+                    $map_ids['uid']=array('in',$unHave);
+                    $map_ids['role_id']=$role_id;
+                    $error_ids=$this->userRoleModel->where($map_ids)->field('id')->select();
+                    $error_ids=array_column($error_ids,'id');
+                    $this->error("id为{$error_ids}的角色用户只拥有该角色，不能被禁用！");
                 }
                 foreach($uids as $val){
                     $this->setDefaultShowRole($role_id,$val);
@@ -463,6 +469,7 @@ class RoleController extends AdminController
      */
     public function setUserAudit($ids,$status=1,$role_id=0)
     {
+        $ids = is_array($ids) ? $ids : explode(',', $ids);
         if ($status == 1) {
             $map_role['role_id'] = $role_id;
             foreach ($ids as $val) {

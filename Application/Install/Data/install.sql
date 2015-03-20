@@ -161,8 +161,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_auth_group_access` (
 
 
 INSERT INTO `ocenter_auth_group_access` (`uid`, `group_id`) VALUES
-(1, 1),
-(58, 1);
+(1, 1);
 
 
 DROP TABLE  IF EXISTS `ocenter_auth_rule`;
@@ -1243,7 +1242,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_role_config` (
   `data` text NOT NULL COMMENT '该配置的其它值',
   `update_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4 COMMENT='角色配置表' AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='角色配置表' AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ocenter_role_group`;
 CREATE TABLE IF NOT EXISTS `ocenter_role_group` (
@@ -1251,7 +1250,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_role_group` (
   `title` varchar(25) NOT NULL,
   `update_time` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8mb4 COMMENT='角色分组' AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='角色分组' AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ocenter_user_role`;
 CREATE TABLE IF NOT EXISTS `ocenter_user_role` (
