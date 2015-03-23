@@ -101,9 +101,13 @@
 
             <div class="form-item">
                 <div style="margin-top: 20px;"></div>
-                <button type="submit" class="btn submit-btn ajax-post" target-form="avatar-form" data-role="submit_button">确 定</button>
+
+                <button type="submit" class="btn submit-btn ajax-post" target-form="avatar-form" data-role="submit_button" style="display: none;">确 定</button>
+
+                <button class="btn submit-btn" data-role="do_submit">确 定</button>
                 <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
-                <button class="btn btn-return" data-role="set_null">使用系统默认头像</button>
+                <button class="btn submit-btn" data-role="set_null">使用系统默认头像</button>
+                <span style="color: #BABABA;margin: 11px;">请先保存以上配置后再切换到其它界面</span>
             </div>
         </form>
 
@@ -117,6 +121,12 @@
         $(function () {
             $('[data-role="set_null"]').click(function(){
                 $('[name="set_null"]').val(1);
+                $('[data-role="submit_button"]').click();
+                return false;
+            });
+
+            $('[data-role="do_submit"]').click(function(){
+                $('[name="set_null"]').val(0);
                 $('[data-role="submit_button"]').click();
                 return false;
             });
