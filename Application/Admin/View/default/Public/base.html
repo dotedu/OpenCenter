@@ -374,7 +374,17 @@
     }();
     highlight_subnav("{:U('Admin'.'/'.CONTROLLER_NAME.'/'.ACTION_NAME,$_GET)}")
 </script>
-
+<!--优化系统DUMP显示方式@mingyangliu-->
+<script type="text/javascript">
+if ( $("pre").length > 0 ) { 
+document.writeln("<div id=\"mydump\"  style=\"position: fixed;z-index: 999;height:400px;width: 500px;OVERFLOW:auto;\" ></div>");
+$("pre").appendTo('#mydump'); 
+document.writeln("<div style=\"z-index:9999;height:30px;float:right;text-align: right;overflow:hidden;position:fixed;bottom:0;right:150px;color:#000;line-height:30px;cursor:pointer;\">");
+document.writeln("<a style=\"background-color: rgb(255, 255, 255);float: right;\"href=JavaScript:; class=\"STYLE1\" onclick=\"document.all.mydump.style.display=`none`;\">[隐藏DUMP数据]</a>");
+document.writeln("<a style=\"background-color: rgb(255, 255, 255);float: right;\"href=JavaScript:; class=\"STYLE1\" onclick=\"document.all.mydump.style.display=`block`;\">[显示DUMP数据]</a>");
+document.writeln("</div>");
+}
+</script>
 <block name="script"></block>
 <block name="modal">
 </block>
