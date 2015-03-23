@@ -217,9 +217,11 @@
             <label for="{$inputId}"> <input type="checkbox" value="{$key}" id="{$inputId}" class="oneplus-checkbox"
                                             data-field-name="{$field.name}" {$checked}/>
                 {$option|htmlspecialchars}</label>
-            <input type="hidden" name="{$field.name}" class="oneplus-checkbox-hidden"
-                   data-field-name="{$field.name}" value="{$field.value}"/>
+
         </volist>
+        <input type="hidden" name="{$field.name}" class="oneplus-checkbox-hidden"
+               data-field-name="{$field.name}" value="{$field.value}"/>
+
     </case>
     <case value="editor">
             {:W('Common/Ueditor/editor',array($field['name'],$field['name'],$field['value'],$field['style']['width'],$field['style']['height'],$field['config']))}
