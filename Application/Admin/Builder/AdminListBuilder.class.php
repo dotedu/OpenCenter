@@ -499,7 +499,12 @@ class AdminListBuilder extends AdminBuilder
             $value = htmlspecialchars($value);
             $getUrl = $key['opt'];
             $url = $getUrl($item);
-            return "<a href=\"$url\">$value</a>";
+            //允许字段为空，如果字段名为空将标题名填充到A变现里
+            if(!$value){
+                return "<a href=\"$url\">".$key['title']."</a>";
+            } else {
+                return "<a href=\"$url\">$value</a>";
+            }
         });
 
         //image转换为图片
