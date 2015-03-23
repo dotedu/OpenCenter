@@ -122,8 +122,63 @@
                                         });
                                     })
                                 </script>
+                            </case>
+
+
+                            <case value="8">
+
+                                <php>
+                                        $config['value_array'] = explode(',', $config['value']);
+                                    $config['extra'] = explode("\r\n", $config['extra']);
+                                    $config['opt'] = array();
+                                    foreach( $config['extra'] as &$val){
+                                    $val =  explode(':', $val);
+                                    $config['opt'][$val[0]] =  $val[1];
+                                    }
+                                </php>
+                                <volist name="config.opt" id="option">
+                                    <php>
+                                        $checked = in_array($key,$config['value_array']) ? 'checked' : '';
+                                        $inputId = "id_$config[name]_$key";
+                                    </php>
+                                    <label for="{$inputId}">
+                                        <input type="checkbox" value="{$key}" id="{$inputId}" class="oneplus-checkbox" data-field-name="{$config.name}" {$checked}/>
+                                        {$option|htmlspecialchars}</label>
+                                </volist>
+                                <input type="hidden" name="config[{$config.name}]" class="oneplus-checkbox-hidden"
+                                       data-field-name="{$config.name}" value="{$config.value}"/>
+
+                                    <script>
+                                        $(function () {
+                                            function implode(x, list) {
+                                                var result = "";
+                                                for (var i = 0; i < list.length; i++) {
+                                                    if (result == "") {
+                                                        result += list[i];
+                                                    } else {
+                                                        result += ',' + list[i];
+                                                    }
+                                                }
+                                                return result;
+                                            }
+
+                                            $('.oneplus-checkbox').change(function (e) {
+                                                var fieldName = $(this).attr('data-field-name');
+                                                var checked = $('.oneplus-checkbox[data-field-name=' + fieldName + ']:checked');
+                                                var result = [];
+                                                for (var i = 0; i < checked.length; i++) {
+                                                    var checkbox = $(checked.get(i));
+                                                    result.push(checkbox.attr('value'));
+                                                }
+                                                result = implode(',', result);
+                                                $('.oneplus-checkbox-hidden[data-field-name=' + fieldName + ']').val(result);
+                                            });
+                                        })
+                                    </script>
 
                             </case>
+
+
                         </switch>
 
                     </div>

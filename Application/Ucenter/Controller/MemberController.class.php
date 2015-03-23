@@ -44,7 +44,7 @@ class MemberController extends Controller
                 $this->error($return['info'], $return['url']);
             }
             /* 检测验证码 */
-            if (C('VERIFY_OPEN') == 1 or C('VERIFY_OPEN') == 2) {
+            if (check_verify_open('reg')) {
                 if (!check_verify($aVerify)) {
                     $this->error('验证码输入错误。');
                 }
