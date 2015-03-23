@@ -4,7 +4,6 @@
 /*.sh
 /.idea
 /Application/Install/Data/install.lock
-/Runtime
 /_runtime
 /Data
 /Uploads
