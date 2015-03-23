@@ -426,12 +426,13 @@ class RoleController extends AdminController
         $ids = is_array($ids) ? $ids : explode(',', $ids);
         if ($status == 1) {
             $map_role['role_id'] = $role_id;
-            foreach ($ids as $val) {
-                $map_role['id'] = $val;
-                $user_role=$this->userRoleModel->where($map_role)->find();
-                if($user_role['init']==0){
-                    D('Common/Member')->initUserRoleInfo($role_id,$user_role['uid']);
-                }
+            $map_role['init'] = 0;
+            $user_role=$this->userRoleModel->where($map_role)->field('id,uid')->select();
+            $to_init_ids=array_column($user_role,'id');
+            $to_init_uids=array_combine($to_init_ids,$user_role);
+            $to_init_ids=array_intersect($ids,$to_init_ids);//交集获得需要初始化的ids
+            foreach($to_init_ids as $val){
+                D('Common/Member')->initUserRoleInfo($role_id,$to_init_uids[$val]['uid']);
             }
             $builder = new AdminListBuilder;
             $builder->doSetStatus('UserRole', $ids, $status);
@@ -789,10 +790,10 @@ class RoleController extends AdminController
             if ($rank) {
                 $rank['data'] = json_decode($rank['data'], true);
                 if (!$rank['data']['reason']) {
-                    $rank['data']['reason'] = "{$mRole_list[$aRoleId]['title']}(角色)默认拥有该头衔！";
+                    $rank['data']['reason'] = "{$mRole_list[$aRoleId]['title']}(身份)默认拥有该头衔！";
                 }
             } else {
-                $rank['data']['reason'] = "{$mRole_list[$aRoleId]['title']}(角色)默认拥有该头衔！";
+                $rank['data']['reason'] = "{$mRole_list[$aRoleId]['title']}(身份)默认拥有该头衔！";
                 $rank['value'] = array();
             }
 
