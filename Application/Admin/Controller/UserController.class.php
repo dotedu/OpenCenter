@@ -663,6 +663,7 @@ class UserController extends AdminController
                 break;
             default:
                 $this->error('参数非法');
+
         }
     }
 

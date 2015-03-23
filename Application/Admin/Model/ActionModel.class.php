@@ -40,6 +40,15 @@ class ActionModel extends Model {
      * @author huajie <banhuajie@163.com>
      */
     public function update(){
+
+
+        $action_rule = $_POST['action_rule'];
+        for($i=0;$i<count($action_rule['table']);$i++){
+            $_POST['rule'][] = array('table'=>$action_rule['table'][$i],'field'=>$action_rule['field'][$i],'rule'=>$action_rule['rule'][$i],'cycle'=>$action_rule['cycle'][$i],'max'=>$action_rule['max'][$i],);
+        }
+
+        $_POST['rule'] = serialize($_POST['rule']);
+
         /* 获取数据对象 */
         $data = $this->create($_POST);
         if(empty($data)){

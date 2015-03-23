@@ -19,6 +19,7 @@
 		<th class="">编号</th>
 		<th class="">行为名称</th>
 		<th class="">执行者</th>
+        <th class="">日志内容</th>
 		<th class="">执行时间</th>
 		<th class="">操作</th>
 		</tr>
@@ -31,6 +32,7 @@
 			<td>{$vo.id} </td>
 			<td>{:get_action($vo['action_id'],'title')}</td>
 			<td>{:get_nickname($vo['user_id'])}</td>
+            <td>{$vo['remark']}</td>
 			<td><span>{$vo.create_time|time_format}</span></td>
 			<td><a href="{:U('Action/edit?id='.$vo['id'])}">详细</a>
 				<a class="confirm ajax-get" href="{:U('Action/remove?ids='.$vo['id'])}">删除</a>
