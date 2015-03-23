@@ -19,7 +19,6 @@ class InviteController extends AdminController
     public function index()
     {
         $builder=new AdminListBuilder();
-        $builder->success();
         $builder->display();
     }
 
