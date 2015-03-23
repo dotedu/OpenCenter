@@ -123,7 +123,7 @@ class UserController extends AdminController
         $builder = new AdminListBuilder();
         $builder->title("用户扩展资料列表");
         $builder->meta_title = '用户扩展资料列表';
-        $builder->setSearchPostUrl(U('Admin/User/expandinfo_select'))->search('搜索', 'nickname', 'text', '请输入用户昵称或者ID');
+        $builder->setSearchPostUrl(U('Admin/User/expandinfo_select'),'','')->search('搜索', 'nickname', 'text', '请输入用户昵称或者ID');
         $builder->keyId()->keyLink('nickname', "昵称", 'User/expandinfo_details?uid=###');
         foreach ($fields_list as $vt) {
             $builder->keyText($vt['field_name'], $vt['field_name']);

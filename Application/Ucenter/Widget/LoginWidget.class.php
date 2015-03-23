@@ -38,7 +38,7 @@ class LoginWidget extends Action
 
 
         /* 检测验证码 */
-        if (intval(C('VERIFY_OPEN')) == 1 or intval(C('VERIFY_OPEN')) == 3) {
+        if (check_verify_open('login')) {
             if (!check_verify($aVerify)) {
                 $res['info']="验证码输入错误。";
                 return $res;

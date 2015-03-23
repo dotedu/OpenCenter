@@ -1568,3 +1568,15 @@ function verify(){
     }
     $verify->entry(1);
 }
+
+function check_verify_open($open){
+    $config = C('VERIFY_OPEN');
+
+    if($config){
+        $config = explode(',',$config);
+        if(in_array($open,$config)){
+            return true;
+        }
+    }
+    return false;
+}
