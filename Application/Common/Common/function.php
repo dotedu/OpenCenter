@@ -1547,3 +1547,24 @@ function get_data_field_id($map = null ,$field = null,$table = null,$yesnoid = '
 function UCenterMember(){
     return D('User/UcenterMember');
 }
+
+
+function verify(){
+    $type= C('VERIFY_TYPE');
+    $verify = new \Think\Verify();
+    switch($type){
+        case 1 :
+            $verify->useZh =true;
+            break;
+        case 2 :
+            $verify->codeSet = 'abcdefhijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXY';
+            break;
+        case 3 :
+            $verify->codeSet = '0123456789';
+            break;
+        case 4 : break;
+        default:
+
+    }
+    $verify->entry(1);
+}

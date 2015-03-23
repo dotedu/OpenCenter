@@ -9,7 +9,7 @@
 
         <select name="nav[1][modul][]" class="form-control module" style="width: 100px;<php>if(!$nav['module_name']){</php>display:none<php>}</php>">
             <php>foreach($module as $k=>$v){</php>
-            <option value="{$v.entry}" <if condition="strtolower($nav['url']) eq strtolower($v['entry'])">selected</if>>{$v.alias}</option>
+            <option value="{$v.entry}" data-icon="{$v.icon}" <if condition="strtolower($nav['url']) eq strtolower($v['entry'])">selected</if>>{$v.alias}</option>
             <php>}unset($k,$v)</php>
         </select>
 
