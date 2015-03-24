@@ -326,6 +326,11 @@ class AdminListBuilder extends AdminBuilder
         if (is_string($getUrl)) {
             $getUrl = $this->createDefaultGetUrlFunction($getUrl);
         }
+        
+        //修整添加多个空字段时显示不正常的BUG@mingyangliu
+        if(empty($name)){
+            $name = $title;
+        }
 
         //添加key
         return $this->key($name, $title, 'link', $getUrl);
