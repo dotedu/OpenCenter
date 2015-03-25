@@ -143,9 +143,8 @@ class AdminListBuilder extends AdminBuilder
      */
     public function modalPopupButton($url, $params, $title, $attr = array())
     {
+        //$attr中可选参数，data-title：模态框标题，target-form：要传输的数据
         $attr['modal-url'] = $this->addUrlParam($url, $params);
-        $attr['target-form'] = 'ids';
-        $attr['data-title']=$attr['data-title'];//模态框标题
         $attr['data-role']='modal_popup';
         return $this->button($title, $attr);
     }

@@ -60,9 +60,10 @@ DROP TABLE IF EXISTS `ocenter_invite_type`;
 CREATE TABLE IF NOT EXISTS `ocenter_invite_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'PRIMARY_KEY',
   `title` varchar(25) NOT NULL COMMENT '标题',
-  `time` int(11) NOT NULL COMMENT '有效时长',
+  `length` int(10) NOT NULL DEFAULT '11' COMMENT '验证码长度',
+  `time` varchar(50) NOT NULL COMMENT '有效时长，带单位的时间',
   `cycle_num` int(10) NOT NULL COMMENT '周期内可购买个数',
-  `cycle_time` int(11) NOT NULL COMMENT '周期时长',
+  `cycle_time` varchar(50) NOT NULL COMMENT '周期时长，带单位的时间',
   `roles` varchar(50) NOT NULL COMMENT '绑定角色ids',
   `auth_groups` varchar(50) NOT NULL COMMENT '允许购买的用户组ids',
   `pay_score` int(10) NOT NULL COMMENT '购买消耗积分',
@@ -70,10 +71,11 @@ CREATE TABLE IF NOT EXISTS `ocenter_invite_type` (
   `income_score` int(10) NOT NULL COMMENT '每邀请成功一个用户，邀请者增加积分',
   `income_score_type` int(11) NOT NULL COMMENT '邀请成功后增加积分类型id',
   `is_follow` tinyint(2) NOT NULL COMMENT '邀请成功后是否互相关注',
+  `status` tinyint(2) NOT NULL,
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   `update_time` int(11) NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='邀请注册码类型表' AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='邀请注册码类型表' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
