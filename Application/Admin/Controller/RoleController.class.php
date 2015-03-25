@@ -12,7 +12,6 @@ namespace Admin\Controller;
 use Admin\Builder\AdminListBuilder;
 use Admin\Builder\AdminSortBuilder;
 use Admin\Builder\AdminConfigBuilder;
-use Admin\Model\AuthRuleModel;
 
 /**
  * 后台角色控制器
