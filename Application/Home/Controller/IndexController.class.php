@@ -29,4 +29,8 @@ class IndexController extends HomeController
         $this->display();
     }
 
+/*    public function test(){
+        action_log('reg','member',1);
+    }*/
+
 }
