@@ -3,7 +3,7 @@
 --
 
 REPLACE INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`, `icon`) VALUES
-(16, '用户', 0, 2, 'User/index', 0, '', '', 0, 'user'),
+(2, '用户', 0, 2, 'User/index', 0, '', '', 0, 'user'),
 (2344, '角色', 0, 3, 'Role/index', 0, '', '', 0, 'group'),
 (2345, '角色列表', 2344, 0, 'Role/index', 0, '', '角色管理', 0, ''),
 (2346, '编辑角色', 2344, 0, 'Role/editRole', 1, '', '', 0, ''),
