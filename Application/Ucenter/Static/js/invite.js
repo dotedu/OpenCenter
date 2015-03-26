@@ -25,8 +25,8 @@ $(function(){
         var title=$(this).attr('data-title');
         var myModalTrigger = new ModalTrigger({
             'type':'ajax',
-            'url':U('Ucenter/Invite/exchange')+'&id='+id,
-            'title':'兑换 '+title+' 邀请名额'
+            'url':U('Ucenter/Invite/createCode')+'&id='+id,
+            'title':'生成 '+title+' 邀请码'
         });
         myModalTrigger.show();
     });

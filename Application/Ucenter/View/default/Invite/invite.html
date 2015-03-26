@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-xs-12">
             <p>&nbsp;</p>
-            <h4>获取邀请码</h4>
+            <h4>邀请码列表</h4>
             <hr class="oneuser-title-hr"/>
 
             <include file="_top"/>
@@ -14,10 +14,8 @@
 
 
     <div style="min-height: 400px;margin-top: 30px;">
-        <if condition="!$list"><p class="text-muted" style="text-align: center; font-size: 3em;">
-            <br><br>
-            暂无该类型收藏～
-            <br><br><br>
+        <if condition="!$list"><p class="text-muted" style="text-align: center; font-size: 18px;">
+            暂无可用邀请码，先去 <a href="{:U('Ucenter/Invite/index')}" style="text-decoration: underline;">生成邀请码</a> ～
         </p></if>
 
         <volist name="list" id="vl">

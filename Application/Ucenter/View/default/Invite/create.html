@@ -11,26 +11,22 @@
     .select_box_this .form-group{
         margin-top: 5px;;
     }
+    .select_box_this .title{
+        width: 100%;
+        text-align: center;
+        margin-top: -17px;
+        margin-bottom: 10px;
+        color: #A8A7A7;
+    }
 </style>
 
 <div>
-    <form id="exchange_form" action="__SELF__" method="post" class="ajax-form">
+    <form id="create_code" action="__SELF__" method="post" class="ajax-form">
         <div class="select_box_this">
-            <notempty name="type_list">
-                <div class="form-group">
-                    <label class="col-xs-4 control-label" style="text-align: right;">
-                        邀请码类型：
-                    </label>
-                    <div class="col-xs-8">
-                        <select class="form-control"  name="invite">
-                            <volist name="type_list" id="invite">
-                                <option value="{$invite.id}">{$invite.title}</option>
-                            </volist>
-                        </select>
-                        <div class="clearfix"></div>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
+            <notempty name="invite_type['can_num']">
+                <div class="title"><span style="font-size: 14px;">你当前该类型的可用邀请名额为{$invite_type['can_num']}~</span></div>
+                <input type="hidden" name="invite_type" value="{$invite_type.id}">
+                <div data-role="can_num" data-value="{$invite_type['can_num']}"></div>
                 <div class="form-group">
                     <label class="col-xs-4 control-label" style="text-align: right;">
                         生成个数：
@@ -56,7 +52,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <else/>
-                没有可选邀请码类型，请先创建并启用邀请码类型~
+                <span style="font-size: 14px;">你当前没有该类型的可用邀请名额，请先兑换邀请名额~</span>
             </notempty>
 
         </div>
@@ -69,8 +65,14 @@
 <script>
     $(function(){
         $('[data-role="submit"]').click(function(){
-            query=$('#migration').serialize();
-            var url=$('#migration').attr('action');
+            query=$('#create_code').serialize();
+            var url=$('#create_code').attr('action');
+            var num=$('[data-role="can_num"]').attr('data-value');
+            var num_buy=$('[name="code_num"]').val();
+            var can_num=$('[name="can_num"]').val();
+            if(num_buy*can_num>num){
+                toast.error('邀请名额超过限制！');
+            }
             $.post(url,query,function(msg){
                 if(msg.status){
                     toast.success('生成成功！');

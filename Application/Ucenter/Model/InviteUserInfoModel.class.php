@@ -32,6 +32,14 @@ class InviteUserInfoModel extends Model
         return $res;
     }
 
+    public function decNum($type_id=0,$num=0){
+        $map['uid']=is_login();
+        $map['invite_type']=$type_id;
+        $res=$this->where($map)->setDec('num',$num);//减少可邀请数目
+        $this->where($map)->setInc('already_num',$num);//增加已邀请数目
+        return $res;
+    }
+
     public function getInfo($map='')
     {
         $data=$this->where($map)->find();

@@ -49,6 +49,36 @@ class InviteModel extends Model
         return $result;
     }
 
+    /**
+     * 用户前台生成邀请码
+     * @param array $data
+     * @param int $num
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function createCodeUser($data=array(),$num=1)
+    {
+        $map['status']=1;
+        $map['id']=$data['invite_type'];
+        $invite_type=D('Ucenter/InviteType')->getSimpleList($map,'length,time');
+        $data['end_time']=unitTime_to_time($invite_type[0]['time'],'+');
+        $data['uid']=is_login();//用户前台生成，以正数uid标记
+
+        $dataList=array();
+        do{
+            $dataList[]=$this->createOneCode($data,$invite_type[0]['length']);
+        }while(count($dataList)<$num);
+        $res=$this->addAll($dataList);
+        if($res){
+            $result['status']=1;
+            $result['url']=U('Ucenter/Invite/invite');
+        }else{
+            $result['status']=0;
+            $result['info']="生成邀请码时失败！".$this->getError();
+        }
+        return $result;
+    }
+
     public function getList($map=array(),$page=1,&$totalCount,$r=20,$order='id desc')
     {
         $totalCount=$this->where($map)->count();

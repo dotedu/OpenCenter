@@ -40,15 +40,17 @@ class InviteController extends BaseController
 
     public function invite()
     {
+        $typeList=$this->mInviteTypeModel->getUserTypeSimpleList();
+        foreach($typeList as $key=>&$val){
+            $val['codes']=$this->_getUserCode($val['id']);
+            if(!$val['codes']){
+                unset($typeList[$key]);
+            }
+        }
+        unset($val);
+        $this->assign('type_list',$typeList);
         $this->defaultTabHash('invite');
         $this->assign('type','invite');
-        $this->display();
-    }
-
-    public function info()
-    {
-        $this->defaultTabHash('invite');
-        $this->assign('type','info');
         $this->display();
     }
 
@@ -78,6 +80,56 @@ class InviteController extends BaseController
         }
     }
 
+    public function createCode()
+    {
+        if(IS_POST){
+            $aTypeId=I('post.invite_type',0,'intval');
+            $aCodeNum=I('post.code_num',0,'intval');
+            $aCanNum=I('post.can_num',0,'intval');
+
+            //判断合法性
+            $result['status']=0;
+            if($aTypeId<=0){
+                $result['info']="参数错误！";
+                $this->ajaxReturn($result);
+            }
+            $userInfo=$this->mInviteUserInfoModel->getInfo(array('uid'=>is_login(),'invite_type'=>$aTypeId));
+            if($aCodeNum<=0||$aCanNum<=0||$aCodeNum*$aCanNum>$userInfo['num']){
+                $result['info']="请填写正确数据！";
+                $this->ajaxReturn($result);
+            }
+            //判断合法性 end
+
+            $this->mInviteUserInfoModel->decNum($aTypeId,$aCanNum*$aCodeNum);//修改用户信息
+            $data['can_num']=$aCanNum;
+            $data['invite_type']=$aTypeId;
+            $result=$this->mInviteModel->createCodeUser($data,$aCodeNum);
+            $this->ajaxReturn($result);
+        }else{
+            $aId=I('id',0,'intval');
+            $inviteType=$this->mInviteTypeModel->where(array('id'=>$aId))->find();
+            $userInfo=$this->mInviteUserInfoModel->getInfo(array('uid'=>is_login(),'invite_type'=>$aId));
+            if($userInfo){
+                $inviteType['can_num']=$userInfo['num'];
+                $inviteType['already_num']=$userInfo['already_num'];
+                $inviteType['success_num']=$userInfo['success_num'];
+            }
+            $this->assign('invite_type',$inviteType);
+            $this->assign('id',$aId);
+            $this->display('create');
+        }
+    }
+
+    private function _getUserCode($type_id=0)
+    {
+        $map['uid']=is_login();
+        $map['end_time']=array('gt',time());
+        $map['invite_type']=$type_id;
+        $map['status']=1;
+        $inviteList=$this->mInviteModel->where($map)->select();
+        return $inviteList;
+    }
+
     /**
      * 判断是否可兑换
      * @param int $inviteType
@@ -98,6 +150,17 @@ class InviteController extends BaseController
         }
         if($num>($this->_getCanBuyNum($inviteType))){
             $result['info']="您要兑换的名额超过了你当前可兑换的最大值！";
+            $this->ajaxReturn($result);
+        }
+        //验证是否有权限兑换
+        $inviteType=$this->mInviteTypeModel->where(array('id'=>$inviteType))->find();
+        $inviteType['auth_groups']=str_replace('[','',$inviteType['auth_groups']);
+        $inviteType['auth_groups']=str_replace(']','',$inviteType['auth_groups']);
+        $inviteType['auth_groups']=explode(',',$inviteType['auth_groups']);
+        $map['group_id']=array('in',$inviteType['auth_groups']);
+        $map['uid']=is_login();
+        if(!D('AuthGroupAccess')->where($map)->count()){
+            $result['info']="你没有权限兑换该类型邀请码名额！";
             $this->ajaxReturn($result);
         }
         return true;

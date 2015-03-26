@@ -87,6 +87,18 @@ class InviteTypeModel extends Model
         return true;
     }
 
+    public function getUserTypeSimpleList($field = 'id,title'){
+        $group_ids=D('AuthGroupAccess')->where(array('uid'=>is_login()))->field('group_id')->select();
+        foreach($group_ids as &$val){
+            $val='%['.$val['group_id'].']%';
+        }
+        unset($val);
+        $map['auth_groups']=array('like',$group_ids);
+        $map['status']=1;
+        $list=$this->where($map)->field($field)->select();
+        return $list;
+    }
+
     public function getUserTypeList()
     {
         $group_ids=D('AuthGroupAccess')->where(array('uid'=>is_login()))->field('group_id')->select();

@@ -41,7 +41,7 @@ class RoleController extends AdminController
     public function index($page = 1, $r = 20)
     {
         $map['status'] = array('egt', 0);
-        $roleList = $this->roleModel->selectPageByMap($map, &$totalCount, $page, $r, 'sort asc');
+        $roleList = $this->roleModel->selectPageByMap($map, $totalCount, $page, $r, 'sort asc');
         $map_group['id'] = array('in', array_column($roleList, 'group_id'));
 
         $group = $this->roleGroupModel->where($map_group)->field('id,title')->select();
