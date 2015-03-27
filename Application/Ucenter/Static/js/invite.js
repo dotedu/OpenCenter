@@ -30,4 +30,39 @@ $(function(){
         });
         myModalTrigger.show();
     });
+    $('[data-role="copy_code_url"]').click(function(){
+        var element=$(this).attr('data-code-url');
+        if(window.clipboardData){
+            window.clipboardData.setData('text',element);
+            $(this).html('已复制');
+            toast.success("复制成功");
+        }else{
+            toast.error("非IE浏览器请手动复制。");
+        }
+    });
+    $('[data-role="copy_code"]').click(function(){
+        var element=$(this).attr('data-code');
+        if(window.clipboardData){
+            window.clipboardData.setData('text',element);
+            $(this).html('已复制');
+            toast.success("复制成功");
+        }else{
+            toast.error("非IE浏览器请手动复制。");
+        }
+    });
+    $('[data-role="back_copy_code"]').click(function(){
+        if(confirm('确定退还邀请码？')){
+            var data_id=$(this).attr('data-id');
+            $.post(U('Ucenter/Invite/backCode'),{id:data_id},function(msg){
+                if(msg.status){
+                    toast.success('操作成功！');
+                    setTimeout(function(){
+                        window.location.reload();
+                    },1500);
+                }else{
+                    handleAjax(msg);
+                }
+            },'json');
+        }
+    });
 });

@@ -164,7 +164,7 @@ class InviteController extends AdminController
             ->buttonDelete(U('Invite/delete'))
             ->modalPopupButton(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
             ->buttonDelete(U('Invite/deleteTrue'),'删除无用邀请码(真删除)')
-            ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'2','value'=>'已取消'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
+            ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
             ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>'管理员生成'),array('id'=>'1','value'=>'用户购买')))
             ->keyId()
             ->keyText('code','邀请码')

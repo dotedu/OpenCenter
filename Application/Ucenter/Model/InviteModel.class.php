@@ -89,6 +89,22 @@ class InviteModel extends Model
         return null;
     }
 
+    public function backCode($id=0)
+    {
+        $result=$this->where(array('id'=>$id))->setField('status',2);
+        if($result){
+            $invite=$this->where(array('id'=>$id))->find();
+            $num=$invite['can_num']-$invite['already_num'];
+            if($num>0){
+                $map['invite_type']=$invite['invite_type'];
+                $map['uid']=$invite['uid'];
+                D('InviteUserInfo')->where($map)->setDec('already_num',$num);
+                D('InviteUserInfo')->where($map)->setInc('num',$num);
+            }
+        }
+        return $result;
+    }
+
     private function _initSelectData($dataList=array())
     {
         $invite_type_id=array_column($dataList,'invite_type');

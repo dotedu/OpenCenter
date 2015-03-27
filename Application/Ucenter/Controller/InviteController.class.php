@@ -120,6 +120,19 @@ class InviteController extends BaseController
         }
     }
 
+    public function backCode()
+    {
+        $aId=I('post.id',0,'intval');
+        $result=$this->mInviteModel->backCode($aId);
+        if($result){
+            $data['status']=1;
+        }else{
+            $data['info']="退还失败！";
+            $data['status']=0;
+        }
+        $this->ajaxReturn($data);
+    }
+
     private function _getUserCode($type_id=0)
     {
         $map['uid']=is_login();
@@ -127,6 +140,10 @@ class InviteController extends BaseController
         $map['invite_type']=$type_id;
         $map['status']=1;
         $inviteList=$this->mInviteModel->where($map)->select();
+        foreach($inviteList as &$val){
+            $val['num']=$val['can_num']-$val['already_num'];
+            $val['code_url']=U('Ucenter/Member/register',array('code'=>$val['code']));
+        }
         return $inviteList;
     }
 
@@ -182,7 +199,7 @@ class InviteController extends BaseController
         //以积分算，获取最多购买 end
 
         //以周期算，获取最多购买
-        $map['invite_type']=$inviteType;
+        $map['invite_type']=$inviteType['id'];
         $map['create_time']=array('gt',unitTime_to_time($inviteType['cycle_time'],'-'));
         $buyList=$this->mInviteBuyLogModel->where($map)->select();
         $can_buy_num=0;
@@ -193,6 +210,9 @@ class InviteController extends BaseController
         //以周期算，获取最多购买 end
 
         $can_buy_num=$max_num_score>$can_buy_num?$can_buy_num:$max_num_score;
+        if($can_buy_num<0){
+            $can_buy_num=0;
+        }
         return $can_buy_num;
     }
 } 

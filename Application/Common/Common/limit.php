@@ -162,7 +162,7 @@ function get_time_unit($key = null){
 }
 
 /**
- * 单位格式时间转换成时间撮
+ * 单位格式时间转换成时间戳
  * @param string $str 单位格式时间
  * @param string $type +:生成的是之后的时间撮，-:生成的是之前的时间撮
  * @param null $time 基准时间点
@@ -214,6 +214,7 @@ function unitTime_to_time($str='1 day',$type='-',$time=null)
 }
 
 /**
+ * 30 day -> 30 天
  * 单位格式时间转换成可显示的中文单位格式时间
  * @param string $str
  * @return string
