@@ -114,4 +114,39 @@ class FollowModel extends Model
         return $i_follow;
     }
 
+    /**关注
+     * @param $who_follow
+     * @param $follow_who
+     * @return int|mixed
+     */
+    public function addFollow($who_follow,$follow_who)
+    {
+        $follow['who_follow'] = $who_follow;
+        $follow['follow_who'] = $follow_who;
+        if($follow['who_follow']==$follow['follow_who'] ){
+            //禁止关注和被关注都为同一个人的情况。
+            return 0;
+        }
+        if ($this->where($follow)->count() > 0) {
+            return 0;
+        }
+        $follow = $this->create($follow);
+
+        clean_query_user_cache($follow_who,'fans');
+        clean_query_user_cache($who_follow,'following');
+        S('atUsersJson_'.$who_follow,null);
+        /**
+         * @param $to_uid 接受消息的用户ID
+         * @param string $content 内容
+         * @param string $title 标题，默认为  您有新的消息
+         * @param $url 链接地址，不提供则默认进入消息中心
+         * @param $int $from_uid 发起消息的用户，根据用户自动确定左侧图标，如果为用户，则左侧显示头像
+         * @param int $type 消息类型，0系统，1用户，2应用
+         */
+        $user = query_user(array('id', 'username', 'space_url'),$who_follow);
+
+        D('Message')->sendMessage($follow_who, $user['username'] . ' 关注了你。', '粉丝数增加', $user['space_url'], $who_follow, 0);
+        return $this->add($follow);
+    }
+
 } 

@@ -105,6 +105,23 @@ class InviteModel extends Model
         return $result;
     }
 
+    public function getByCode($code='')
+    {
+        $map['code']=$code;
+        $map['status']=1;
+        $data=$this->where($map)->find();
+        if($data){
+            $data['user']=query_user(array('uid','nickname'),abs($data['uid']));
+            return $data;
+        }
+        return null;
+    }
+
+    public function initInviteUser($uid=0)
+    {
+
+    }
+
     private function _initSelectData($dataList=array())
     {
         $invite_type_id=array_column($dataList,'invite_type');

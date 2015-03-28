@@ -40,6 +40,13 @@ class InviteUserInfoModel extends Model
         return $res;
     }
 
+    public function addSuccessNum($type_id=0,$uid=0){
+        $map['uid']=$uid;
+        $map['invite_type']=$type_id;
+        $res=$this->where($map)->setInc('success_num');//增加邀请成功数目
+        return $res;
+    }
+
     public function getInfo($map='')
     {
         $data=$this->where($map)->find();

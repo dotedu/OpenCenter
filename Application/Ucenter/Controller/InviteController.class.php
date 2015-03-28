@@ -147,6 +147,7 @@ class InviteController extends BaseController
         return $inviteList;
     }
 
+
     /**
      * 判断是否可兑换
      * @param int $inviteType

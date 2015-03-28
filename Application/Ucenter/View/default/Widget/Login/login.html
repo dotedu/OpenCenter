@@ -84,17 +84,36 @@
     <div class="hidden-xs hidden-sm" style="margin: 21px 0 16px 40px;">
 
         <h2>没有账号？</h2>
+        <php>
+            $register_type=modC('REGISTER_TYPE','normal','Invite');
+            $register_type=explode(',',$register_type);
+            if(in_array('invite',$register_type)&&!in_array('normal',$register_type)){
+        </php>
         <php>if(check_reg_type('username')){</php>
-        <a href="{:U('ucenter/member/register',array('type'=>'username'))}"
-           class="btn btn-block btn-danger btn-lg">用户名注册</a>
-        <php>}</php>
-        <php>if(check_reg_type('email')){</php>
-        <a href="{:U('ucenter/member/register',array('type'=>'email'))}"
-           class="btn btn-block btn-primary btn-lg">邮箱注册</a>
-        <php>}</php>
-        <php>if(check_reg_type('mobile')){</php>
-        <a href="{:U('ucenter/member/register',array('type'=>'mobile'))}"
-           class="btn btn-block btn-success btn-lg">手机号注册</a>
+            <a data-type="ajax" data-url="{:U('Ucenter/Member/inCode',array('type'=>'username'))}" data-title="邀请用户才能注册！" data-toggle="modal"
+               class="btn btn-block btn-danger btn-lg">用户名注册</a>
+            <php>}</php>
+            <php>if(check_reg_type('email')){</php>
+            <a data-type="ajax" data-url="{:U('Ucenter/Member/inCode',array('type'=>'email'))}" data-title="邀请用户才能注册！" data-toggle="modal"
+               class="btn btn-block btn-primary btn-lg">邮箱注册</a>
+            <php>}</php>
+            <php>if(check_reg_type('mobile')){</php>
+            <a data-type="ajax" data-url="{:U('Ucenter/Member/inCode',array('type'=>'mobile'))}" data-title="邀请用户才能注册！" data-toggle="modal"
+               class="btn btn-block btn-success btn-lg">手机号注册</a>
+            <php>}</php>
+        <php>}else{</php>
+            <php>if(check_reg_type('username')){</php>
+            <a href="{:U('ucenter/member/register',array('type'=>'username'))}"
+               class="btn btn-block btn-danger btn-lg">用户名注册</a>
+            <php>}</php>
+            <php>if(check_reg_type('email')){</php>
+            <a href="{:U('ucenter/member/register',array('type'=>'email'))}"
+               class="btn btn-block btn-primary btn-lg">邮箱注册</a>
+            <php>}</php>
+            <php>if(check_reg_type('mobile')){</php>
+            <a href="{:U('ucenter/member/register',array('type'=>'mobile'))}"
+               class="btn btn-block btn-success btn-lg">手机号注册</a>
+            <php>}</php>
         <php>}</php>
     </div>
 

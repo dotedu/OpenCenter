@@ -183,7 +183,15 @@
                         <a data-login="do_login">登录</a>
                     </li>
                     <li class="hidden-xs">
+                        <php>
+                            $register_type=modC('REGISTER_TYPE','normal','Invite');
+                            $register_type=explode(',',$register_type);
+                            if(in_array('invite',$register_type)&&!in_array('normal',$register_type)){
+                        </php>
+                        <a data-type="ajax" data-url="{:U('Ucenter/Member/inCode')}" data-title="邀请用户才能注册！" data-toggle="modal">注册</a>
+                        <php>}else{</php>
                         <a href="{:U('Ucenter/Member/register')}">注册</a>
+                        <php>}</php>
                     </li>
                     <li class="spliter hidden-xs"></li>
                 </if>

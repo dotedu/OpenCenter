@@ -40,7 +40,11 @@ class UploadAvatarWidget extends Controller
             return $this->getImageUrlByPath($avatar_path, $size);
         } else {
             //如果没有头像，返回默认头像
-            $role_id = session('temp_login_role_id') ? session('temp_login_role_id') : get_role_id();
+            if($uid==session('temp_login_uid')||$uid==is_login()){
+                $role_id = session('temp_login_role_id') ? session('temp_login_role_id') : get_role_id();
+            }else{
+                $role_id=query_user('show_role',$uid);
+            }
             return $this->getImageUrlByRoleId($role_id, $size);
         }
     }

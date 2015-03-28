@@ -60,7 +60,13 @@
                                         <td style="width: 80%"><a data-role="hold_role" data-id="{$role.id}">持有该身份</a></td>
                                     </tr>
                                 </volist>
-                                <if condition="!count($can_have_roles)">
+                                <volist name="can_up_roles" id="role">
+                                    <tr class="col-xs-12" style="line-height: 40px;">
+                                        <td style="width: 20%">{$role.title}</td>
+                                        <td style="width: 80%"><a data-role="up_role" data-url="{:U('Ucenter/Member/upRole',array('role_id'=>$role['id']))}">升级该身份</a></td>
+                                    </tr>
+                                </volist>
+                                <if condition="!count($can_have_roles)&&!count($can_up_roles)">
                                     <div style="width: 100%;margin-left: 60px;color: #cdcdcd;font-size: 18px;">已经没有可以持有的身份！</div>
                                 </if>
                                 </tbody>
@@ -135,6 +141,16 @@
                         handleAjax(data);
                     }
                 });
+            });
+            $('[data-role="up_role"]').click(function(){
+                var url=$(this).attr('data-url');
+                alert(url);
+                var myModalTrigger = new ModalTrigger({
+                    'type':'ajax',
+                    'url':url,
+                    'title':'升级身份'
+                });
+                myModalTrigger.show();
             });
         });
     </script>

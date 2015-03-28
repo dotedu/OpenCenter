@@ -42,22 +42,32 @@ class ConfigController extends BaseController
 
         $roleModel=D('Role');
         $userRoleModel=D('UserRole');
-        $map['status']=1;
-        $map['invite']=0;
-        if($roleModel->where($map)->count()>1){
-            $have=1;
-        }else{
-            $map_user['uid']=is_login();
-            $map_user['role_id']=array('neq',get_login_role());
-            $map_user['status']=array('egt',0);
-            $role_ids=$userRoleModel->where($map_user)->field('role_id')->select();
-            if($role_ids){
-                $role_ids=array_column($role_ids,'role_id');
-                $map_can['status']=1;
-                $map_can['id']=array('in',$role_ids);
-                if($roleModel->where($map_can)->count()){
-                    $have=1;
+
+        $register_type=modC('REGISTER_TYPE','normal','Invite');
+        $register_type=explode(',',$register_type);
+        if(!in_array('invite',$register_type)){//开启邀请注册
+            $map['status']=1;
+            $map['invite']=0;
+            if($roleModel->where($map)->count()>1){
+                $have=1;
+            }else{
+                $map_user['uid']=is_login();
+                $map_user['role_id']=array('neq',get_login_role());
+                $map_user['status']=array('egt',0);
+                $role_ids=$userRoleModel->where($map_user)->field('role_id')->select();
+                if($role_ids){
+                    $role_ids=array_column($role_ids,'role_id');
+                    $map_can['status']=1;
+                    $map_can['id']=array('in',$role_ids);
+                    if($roleModel->where($map_can)->count()){
+                        $have=1;
+                    }
                 }
+            }
+        }else{
+            $map['status']=1;
+            if($roleModel->where($map)->count()>1){
+                $have=1;
             }
         }
         $this->assign('can_show_role',$have);
@@ -135,7 +145,15 @@ class ConfigController extends BaseController
             $map_can_have_roles['id']=array('not in',$already_role_ids);//去除已有角色
             $map_can_have_roles['invite']=0;//不需要邀请注册
             $map_can_have_roles['status']=1;
-            $can_have_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();
+            $can_have_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();//可持有角色
+
+            $register_type=modC('REGISTER_TYPE','normal','Invite');
+            $register_type=explode(',',$register_type);
+            if(in_array('invite',$register_type)){//开启邀请注册
+                $map_can_have_roles['invite']=1;
+                $can_up_roles=$roleModel->where($map_can_have_roles)->order('sort asc')->select();//可升级角色
+                $this->assign('can_up_roles',$can_up_roles);
+            }
 
             $show_role=query_user(array('show_role'));
             $this->assign('show_role',$show_role['show_role']);

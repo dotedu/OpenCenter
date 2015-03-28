@@ -26,6 +26,28 @@ class InviteController extends AdminController
     }
 
     /**
+     * 邀请注册基本配置
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function config()
+    {
+        $builder = new AdminConfigBuilder;
+        $data = $builder->handleConfig();
+        !isset($data['REGISTER_TYPE'])&&$data['REGISTER_TYPE']='normal';
+
+        $register_options=array(
+            'normal'=>'普通注册',
+            'invite'=>'邀请注册'
+        );
+        $builder->title('角色基本信息配置')
+            ->keyCheckBox('REGISTER_TYPE', '注册类型', '勾选为开启',$register_options)
+            ->data($data)
+            ->buttonSubmit()
+            ->buttonBack()
+            ->display();
+    }
+
+    /**
      * 邀请码类型列表
      * @author 郑钟良<zzl@ourstu.com>
      */
@@ -154,7 +176,15 @@ class InviteController extends AdminController
         }else{
             $map['uid']=array('lt',0);
         }
-        $map['status']=I('status',1,'intval');
+        $aStatus=I('status',1,'intval');
+
+        if($aStatus==3){
+            $aStatus=1;
+            $map['end_time']=array('lt',time());
+        }else if($aStatus==1){
+            $map['end_time']=array('egt',time());
+        }
+        $map['status']=$aStatus;
 
         $list=$this->inviteModel->getList($map,$page,&$totalCount,$r);
 
@@ -164,7 +194,7 @@ class InviteController extends AdminController
             ->buttonDelete(U('Invite/delete'))
             ->modalPopupButton(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
             ->buttonDelete(U('Invite/deleteTrue'),'删除无用邀请码(真删除)')
-            ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
+            ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'3','value'=>'已过期'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
             ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>'管理员生成'),array('id'=>'1','value'=>'用户购买')))
             ->keyId()
             ->keyText('code','邀请码')
@@ -228,6 +258,8 @@ class InviteController extends AdminController
     public function deleteTrue()
     {
         $map['status']=array('neq',1);
+        $map['end_time']=array('lt',time());
+        $map['_logic']='OR';
         $result=$this->inviteModel->where($map)->delete();
         if($result){
             $this->success('操作成功！');

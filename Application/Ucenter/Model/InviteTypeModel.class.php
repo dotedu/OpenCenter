@@ -49,12 +49,21 @@ class InviteTypeModel extends Model
 
     public function getData($map = array())
     {
-        if (count($map)) {
-            $data = $this->where($map)->find();
-        } else {
-            $data = $this->find();
+        $data = $this->where($map)->find();
+        if($data){
+            $data = $this->_initSelectData($data);
         }
-        $data = $this->_initSelectData($data);
+        return $data;
+    }
+
+    public function getSimpleData($map=array())
+    {
+        $data = $this->where($map)->find();
+        if($data['roles']!=''){
+            $data['roles']=str_replace('[','',$data['roles']);
+            $data['roles']=str_replace(']','',$data['roles']);
+            $data['roles']=explode(',',$data['roles']);
+        }
         return $data;
     }
 
