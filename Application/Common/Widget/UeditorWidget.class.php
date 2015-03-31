@@ -21,7 +21,7 @@ class UeditorWidget extends Controller
         if($config == 'all'){
             $config='';
         }
-        $config.=(empty($config)?'':',').'zIndex:1200';
+        $config.=(empty($config)?'':',').'zIndex:1020';
         is_bool(strpos($width,'%')) && $config.=',initialFrameWidth:'.str_replace('px','',$width);
         is_bool(strpos($height,'%')) && $config.=',initialFrameHeight:'.str_replace('px','',$height);
 

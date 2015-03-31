@@ -364,16 +364,16 @@
     <case value="multiInput">
         <div class="clearfix" style="{$field['style']}">
         <php>
-            $field['name'] = is_array($field['name'])?$field['name']:explode(',',$field['name']);
+            $field['name'] = is_array($field['name'])?$field['name']:explode('|',$field['name']);
             foreach($field['name'] as $key=>$val){
         </php>
         <switch name="field['config'][$key]['type']">
             <case value="text">
                 <input type="text" name="{$val}" value="{$field['value'][$key]|htmlspecialchars}"
-                       class=" pull-left text input-large form-control" style="{$field['config'][$key]['style']}"/>
+                       class=" pull-left text input-large form-control" style="{$field['config'][$key]['style']}" placeholder="{$field['config'][$key]['placeholder']}"/>
             </case>
             <case value="select">
-                <select name="{$val}" class="pull-left form-control" style="{$field['config'][$key]['style']}">
+                <select name="{$val}" class="pull-left form-control" style="{$field['config'][$key]['style']}" >
                     <php>foreach($field['config'][$key]['opt'] as $key_opt =>$option){</php>
                     <php>
                         $selected = $field['value'][$key]==$key_opt ? 'selected' : '';
