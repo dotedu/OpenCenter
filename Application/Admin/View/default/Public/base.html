@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{$meta_title}|Open Center管理后台</title>
+    <title>{$meta_title}|OpenCenter管理后台</title>
     <link href="__ROOT__/Public/favicon.ico" type="image/x-icon" rel="shortcut icon">
 
 
@@ -230,7 +230,7 @@
                     <div class="row">
                         <!-- 帖子分类 -->
                         <div class="col-sm-12">
-<div>这里是提示文字</div>
+<div>感谢您使用我们的产品，希望您的认真反馈有助于我们改善产品。</div>
 
                                 <label class="item-label">我的更新心情</label>
                             <div>
@@ -279,7 +279,7 @@
                     </div>
             </div>
             <div class="modal-footer">
-                <php>if(empty($report['url'])){</php>
+                <php>if(strval($report['url'])!=''){</php>
                 <a class="pull-left" href="{$report['url']}" target="_blank" >查看更新详情</a>
                 <php>}</php>
                 <button type="submit" class="btn ajax-post" target-form="report_form">确定</button>
@@ -374,7 +374,17 @@
     }();
     highlight_subnav("{:U('Admin'.'/'.CONTROLLER_NAME.'/'.ACTION_NAME,$_GET)}")
 </script>
-
+<!--优化系统DUMP显示方式@mingyangliu-->
+<script type="text/javascript">
+if ( $("pre").length > 0 ) { 
+document.writeln("<div id=\"mydump\"  style=\"position: fixed;z-index: 999;top:0;height:400px;width: 500px;OVERFLOW:auto;\" ></div>");
+$("pre").appendTo('#mydump'); 
+document.writeln("<div style=\"z-index:9999;height:30px;float:right;text-align: right;overflow:hidden;position:fixed;bottom:0;right:150px;color:#000;line-height:30px;cursor:pointer;\">");
+document.writeln("<a style=\"background-color: rgb(255, 255, 255);float: right;\"href=JavaScript:; class=\"STYLE1\" onclick=\"document.all.mydump.style.display=`none`;\">[隐藏DUMP数据]</a>");
+document.writeln("<a style=\"background-color: rgb(255, 255, 255);float: right;\"href=JavaScript:; class=\"STYLE1\" onclick=\"document.all.mydump.style.display=`block`;\">[显示DUMP数据]</a>");
+document.writeln("</div>");
+}
+</script>
 <block name="script"></block>
 <block name="modal">
 </block>

@@ -26,7 +26,7 @@
                                errormsg="密码为6-20位" nullmsg="请填写密码" datatype="*6-20" name="repassword">
                     </div>
                 </div>
-                <if condition="C(VERIFY_OPEN) eq 5">
+                <if condition="check_verify_open('reset')">
                     <div class="control-group login-input">
                         <div class="controls">
                             <input type="text" id="inputPassword" class="form-control" placeholder="请输入验证码"

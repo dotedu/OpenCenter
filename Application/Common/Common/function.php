@@ -720,14 +720,15 @@ function action_log($action = null, $model = null, $record_id = null, $user_id =
         $data['remark'] = '操作url：' . $_SERVER['REQUEST_URI'];
     }
 
-    M('ActionLog')->add($data);
+
+
+    $log_id = M('ActionLog')->add($data);
 
     if (!empty($action_info['rule'])) {
         //解析行为
         $rules = parse_action($action, $user_id);
-
         //执行行为
-        $res = execute_action($rules, $action_info['id'], $user_id);
+        $res = execute_action($rules, $action_info['id'], $user_id,$log_id);
     }
 }
 
@@ -761,13 +762,26 @@ function parse_action($action = null, $self)
 
     //查询行为信息
     $info = M('Action')->where($map)->find();
+
     if (!$info || $info['status'] != 1) {
         return false;
     }
 
+
+
     //解析规则:table:$table|field:$field|condition:$condition|rule:$rule[|cycle:$cycle|max:$max][;......]
-    $rules = $info['rule'];
-    $rules = str_replace('{$self}', $self, $rules);
+    $rules = unserialize($info['rule']);
+    foreach ($rules as $key => &$rule) {
+        foreach($rule as $k=>&$v){
+            if(empty($v)){
+                unset($rule[$k]);
+            }
+        }
+        unset($k,$v);
+    }
+unset($key,$rule);
+
+/*    $rules = str_replace('{$self}', $self, $rules);
     $rules = explode(';', $rules);
     $return = array();
     foreach ($rules as $key => &$rule) {
@@ -782,9 +796,10 @@ function parse_action($action = null, $self)
         if (!array_key_exists('cycle', $return[$key]) || !array_key_exists('max', $return[$key])) {
             unset($return[$key]['cycle'], $return[$key]['max']);
         }
-    }
+    }*/
 
-    return $return;
+
+    return $rules;
 }
 
 /**
@@ -795,15 +810,14 @@ function parse_action($action = null, $self)
  * @return boolean false 失败 ， true 成功
  * @author huajie <banhuajie@163.com>
  */
-function execute_action($rules = false, $action_id = null, $user_id = null)
+function execute_action($rules = false, $action_id = null, $user_id = null,$log_id=null)
 {
+    $log_score = '';
     if (!$rules || empty($action_id) || empty($user_id)) {
         return false;
     }
-
     $return = true;
     foreach ($rules as $rule) {
-
         //检查执行周期
         $map = array('action_id' => $action_id, 'user_id' => $user_id);
         $map['create_time'] = array('gt', NOW_TIME - intval($rule['cycle']) * 3600);
@@ -811,24 +825,22 @@ function execute_action($rules = false, $action_id = null, $user_id = null)
         if ($exec_count > $rule['max']) {
             continue;
         }
-
         //执行数据库操作
         $Model = M(ucfirst($rule['table']));
-        /**
-         * 判断是否加入了货币规则
-         * @author 郑钟良<zzl@ourstu.com>
-         */
-        if ($rule['tox_money_rule'] != '' && $rule['tox_money_rule'] != null) {
-            $change = array($rule['field'] => array('exp', $rule['rule']), $rule['tox_money_field'] => array('exp', $rule['tox_money_rule']));
-            $res = $Model->where($rule['condition'])->setField($change);
-        } else {
-            $field = $rule['field'];
-            $res = $Model->where($rule['condition'])->setField($field, array('exp', $rule['rule']));
-        }
+        $field = 'score'.$rule['field'];
+        $res = $Model->where(array('uid'=>is_login(),'status'=>1))->setField($field, array('exp', $field.(is_bool(strpos($rule['rule'],'+'))?'+':'').$rule['rule']));
+
+
+        $sType = D('ucenter_score_type')->where(array('id'=>$rule['field']))->find();
+        $log_score .='【'.$sType['title'].'：'.$rule['rule'].$sType['unit'].'】';
+
         if (!$res) {
             $return = false;
         }
     }
+    if($log_score){
+    M('ActionLog')->where(array('id'=>$log_id))->setField('remark',array('exp',"CONCAT(remark,'".$log_score."')"));
+}
     return $return;
 }
 
@@ -1569,3 +1581,14 @@ function verify(){
     $verify->entry(1);
 }
 
+function check_verify_open($open){
+    $config = C('VERIFY_OPEN');
+
+    if($config){
+        $config = explode(',',$config);
+        if(in_array($open,$config)){
+            return true;
+        }
+    }
+    return false;
+}

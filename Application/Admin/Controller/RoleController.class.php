@@ -12,7 +12,6 @@ namespace Admin\Controller;
 use Admin\Builder\AdminListBuilder;
 use Admin\Builder\AdminSortBuilder;
 use Admin\Builder\AdminConfigBuilder;
-use Admin\Model\AuthRuleModel;
 
 /**
  * 后台角色控制器
@@ -340,6 +339,7 @@ class RoleController extends AdminController
         }
 
         $builder->modalPopupButton(U('Role/changeRole',array('role_id'=>$map_user_list['role_id'])), array(), '迁移用户',array('data-title'=>'迁移用户到其他角色','target-form'=>'ids'))
+            ->button('初始化没角色的用户', array('href' => U('Role/initUnhaveUser')))
             ->select('角色：', 'role_id', 'select', '', '', '', $role_list)->select('状态：', 'user_status', 'select', '', '', '', $statusOptions)->select('', 'single_role', 'select', '', '', '', $singleRoleOptions)
             ->keyId()
             ->keyImage('avatar', '头像')
@@ -966,5 +966,40 @@ class RoleController extends AdminController
         }
         /* 返回JSON数据 */
         $this->ajaxReturn($return);
+    }
+
+
+    /**
+     * 初始化没角色的用户
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function initUnhaveUser()
+    {
+        $memberModel=D('Common/Member');
+
+        $uids=$memberModel->field('uid')->select();
+        $uids=array_column($uids,'uid');
+
+        $have_uids=$this->userRoleModel->field('uid')->select();
+        $have_uids=array_column($have_uids,'uid');
+        $have_uids=array_unique($have_uids);
+
+        $not_have_uids=array_diff($uids,$have_uids);
+
+        $data['status']=1;
+        $data['role_id']=1;
+        $data['step']="finish";
+        $data['init']=1;
+        $dataList=array();
+
+        foreach($not_have_uids as $val){
+            $data['uid']=$val;
+            $dataList[]=$data;
+            $memberModel->initUserRoleInfo(1,$val);
+            $memberModel->initDefaultShowRole(1,$val);
+        }
+        unset($val);
+        $this->userRoleModel->addAll($dataList);
+        $this->success('操作成功！');
     }
 } 

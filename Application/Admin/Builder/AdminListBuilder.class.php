@@ -325,6 +325,11 @@ class AdminListBuilder extends AdminBuilder
         if (is_string($getUrl)) {
             $getUrl = $this->createDefaultGetUrlFunction($getUrl);
         }
+        
+        //修整添加多个空字段时显示不正常的BUG@mingyangliu
+        if(empty($name)){
+            $name = $title;
+        }
 
         //添加key
         return $this->key($name, $title, 'link', $getUrl);
@@ -498,7 +503,12 @@ class AdminListBuilder extends AdminBuilder
             $value = htmlspecialchars($value);
             $getUrl = $key['opt'];
             $url = $getUrl($item);
-            return "<a href=\"$url\">$value</a>";
+            //允许字段为空，如果字段名为空将标题名填充到A变现里
+            if(!$value){
+                return "<a href=\"$url\">".$key['title']."</a>";
+            } else {
+                return "<a href=\"$url\">$value</a>";
+            }
         });
 
         //image转换为图片
