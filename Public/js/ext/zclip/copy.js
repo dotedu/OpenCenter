@@ -3,8 +3,9 @@
  * @author 郑钟良<zzl@ourstu.com>
  */
 $(function(){
+
     $('[data-role="copy_code"]').zclip({
-        path: "__PUBLIC__/js/ext/zclip/ZeroClipboard.swf",
+        path: PUB+"/js/ext/zclip/ZeroClipboard.swf",
         copy: function () {
             return $(this).attr('data-code');
         },
@@ -14,7 +15,7 @@ $(function(){
         }
     });
     $('[data-role="copy_code_url"]').zclip({
-        path: "__PUBLIC__/js/ext/zclip/ZeroClipboard.swf",
+        path: PUB+"/js/ext/zclip/ZeroClipboard.swf",
         copy: function () {
             return $(this).attr('data-code-url');
         },
