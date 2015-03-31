@@ -30,27 +30,6 @@ $(function () {
         });
         myModalTrigger.show();
     });
-
-    /*$('[data-role="copy_code"]').zclip({
-        path: "__PUBLIC__/js/ext/zclip/ZeroClipboard.swf",
-        copy: function () {
-            return $(this).attr('data-code');
-        },
-        afterCopy: function () {
-            $(this).html('已复制');
-            toast.success('复制成功');
-        }
-    });
-    $('[data-role="copy_code_url"]').zclip({
-        path: "__PUBLIC__/js/ext/zclip/ZeroClipboard.swf",
-        copy: function () {
-            return $(this).attr('data-code-url');
-        },
-        afterCopy: function () {
-            $(this).html('链接已复制');
-            toast.success('复制链接成功');
-        }
-    });*/
     $('[data-role="back_copy_code"]').click(function () {
         if (confirm('确定退还邀请码？')) {
             var data_id = $(this).attr('data-id');

@@ -27,4 +27,28 @@ class InviteLogModel extends Model
         return $result;
     }
 
+    public function getList(&$totalCount,$page=1,$r=20)
+    {
+        $totalCount=$this->count();
+        if($totalCount){
+            $list=$this->page($page,$r)->order('create_time desc')->select();
+        }
+        $list=$this->_initSelectData($list);
+        return $list;
+    }
+
+    private function _initSelectData($list=array())
+    {
+        $inviteTypeModel=D('Ucenter/InviteType');
+        foreach($list as &$val){
+            $inviteType=$inviteTypeModel->getSimpleData();
+            $val['invite_type_title']=$inviteType['title'];
+            $val['user']=query_user('nickname',$val['uid']);
+            $val['user']='['.$val['uid'].']'.$val['user'];
+            $val['inviter']=query_user('nickname',$val['inviter_id']);
+            $val['inviter']='['.$val['inviter_id'].']'.$val['inviter'];
+        }
+        unset($val);
+        return $list;
+    }
 } 

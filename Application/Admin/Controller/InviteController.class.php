@@ -18,12 +18,18 @@ class InviteController extends AdminController
 {
     protected $inviteModel;
     protected $inviteTypeModel;
+    protected $inviteBuyLogModel;
+    protected $inviteLogModel;
+    protected $inviteUserInfoModel;
 
     public function _initialize()
     {
         parent::_initialize();
         $this->inviteModel=D('Ucenter/Invite');
         $this->inviteTypeModel=D('Ucenter/InviteType');
+        $this->inviteBuyLogModel=D('Ucenter/InviteBuyLog');
+        $this->inviteLogModel=D('Ucenter/InviteLog');
+        $this->inviteUserInfoModel=D('Ucenter/InviteUserInfo');
     }
 
     /**
@@ -187,11 +193,23 @@ class InviteController extends AdminController
         }
         $map['status']=$status;
 
-        $list=$this->inviteModel->getList($map,$page,&$totalCount,$r);
+        $aType=I('type',0,'intval');
+        if($aType!=0){
+            $map['invite_type']=$aType;
+        }
 
+        $list=$this->inviteModel->getList($map,$page,&$totalCount,$r);
+        $typeOptions=$this->_getTypeList();
+        foreach($typeOptions as &$val){
+            $val['value']=$val['title'];
+        }
+        unset($val);
+        $typeOptions=array_merge(array(array('id'=>0,'value'=>'全部')),$typeOptions);
         if($aStatus==1){
             $this->assign('invite_list',$list);
             $this->assign('buyer',$aBuyer);
+            $this->assign('type_list',$typeOptions);
+            $this->assign('now_type',$aType);
             //生成翻页HTML代码
             C('VAR_PAGE', 'page');
             $pager = new \Think\Page($this->_pagination['totalCount'], $this->_pagination['listRows'], $_REQUEST);
@@ -206,6 +224,7 @@ class InviteController extends AdminController
                 ->buttonDelete(U('Invite/delete'))
                 ->modalPopupButton(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
                 ->buttonDelete(U('Invite/deleteTrue'),'删除无用邀请码(真删除)')
+                ->select('邀请码类型：','type','select','','','',$typeOptions)
                 ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'3','value'=>'已过期'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
                 ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>'管理员生成'),array('id'=>'1','value'=>'用户购买')))
                 ->keyId()
@@ -242,8 +261,7 @@ class InviteController extends AdminController
             }
             $this->ajaxReturn($result);
         }else{
-            $map['status']=1;
-            $type_list=$this->inviteTypeModel->getSimpleList($map);
+            $type_list=$this->_getTypeList();
             $this->assign('type_list',$type_list);
             $this->display('create');
         }
@@ -282,6 +300,96 @@ class InviteController extends AdminController
         }
     }
 
+    public function buyLog($page=1,$r=20)
+    {
+        $aInviteType=I('invite_type',0,'intval');
+        $aOrder=I('order',0,'intval');
+        if($aInviteType){
+            $map['invite_type']=$aInviteType;
+        }
+        if($aOrder==0){
+            $order='create_time desc';
+        }elseif($aOrder==1){
+            $order='create_time asc';
+        }elseif($aOrder==2){
+            $order='uid asc,invite_type asc,create_time desc';
+        }
+        $list=$this->inviteBuyLogModel->getList($map,$totalCount,$page,$order,$r);
+
+        $orderOptions=array(
+            array('id'=>0,'value'=>'最新创建'),
+            array('id'=>1,'value'=>'最早创建'),
+            array('id'=>2,'value'=>'用户')
+        );
+        $typeOptions=$this->_getTypeList();
+        foreach($typeOptions as &$val){
+            $val['value']=$val['title'];
+        }
+        unset($val);
+        $typeOptions=array_merge(array(array('id'=>0,'value'=>'全部')),$typeOptions);
+
+        $builder=new AdminListBuilder();
+        $builder->title('用户兑换名额记录')
+            ->setSelectPostUrl('Invite/buyLog')
+            ->select('邀请码类型：','invite_type','select','','','',$typeOptions)
+            ->select('排序方式：','order','select','','','',$orderOptions)
+            ->keyId()
+            ->keyText('user','购买者')
+            ->keyText('invite_type_title','邀请码类型')
+            ->keyText('num','兑换数量（名额）')
+            ->keyText('content','信息')
+            ->keyCreateTime()
+            ->pagination($totalCount,$r)
+            ->data($list)
+            ->display();
+    }
+
+    public function userInfo($page=1,$r=20)
+    {
+        $aInviteType=I('invite_type',0,'intval');
+        if($aInviteType){
+            $map['invite_type']=$aInviteType;
+        }
+        $list=$this->inviteUserInfoModel->getList($map,$totalCount,$page,$r);
+
+        $typeOptions=$this->_getTypeList();
+        foreach($typeOptions as &$val){
+            $val['value']=$val['title'];
+        }
+        unset($val);
+        $typeOptions=array_merge(array(array('id'=>0,'value'=>'全部')),$typeOptions);
+
+        $builder=new AdminListBuilder();
+        $builder->title('用户信息')
+            ->setSelectPostUrl('Invite/userInfo')
+            ->select('邀请码类型：','invite_type','select','','','',$typeOptions)
+            ->keyId()
+            ->keyText('user','用户')
+            ->keyText('invite_type_title','邀请码类型')
+            ->keyText('num','可邀请名额')
+            ->keyText('already_num','已经邀请名额')
+            ->keyText('success_num','成功邀请名额')
+            ->pagination($totalCount,$r)
+            ->data($list)
+            ->display();
+    }
+
+    public function inviteLog($page=1,$r=20)
+    {
+        $list=$this->inviteLogModel->getList($totalCount,$page,$r);
+        $builder=new AdminListBuilder();
+        $builder->title('邀请注册记录')
+            ->keyId()
+            ->keyText('user','注册者')
+            ->keyText('inviter','邀请者')
+            ->keyText('invite_type_title','邀请码类型')
+            ->keyText('content','信息')
+            ->keyCreateTime('create_time','注册时间')
+            ->pagination($totalCount,$r)
+            ->data($list)
+            ->display();
+    }
+
     //私有函数 start
 
     /**
@@ -316,6 +424,12 @@ class InviteController extends AdminController
         $score_option=D('UcenterScoreType')->where(array('status'=>1))->field('id,title')->select();
         $score_option=array_combine(array_column($score_option,'id'),array_column($score_option,'title'));
         return $score_option;
+    }
+
+    private function _getTypeList(){
+        $map['status']=1;
+        $type_list=$this->inviteTypeModel->getSimpleList($map);
+        return $type_list;
     }
 
     //私有函数 end

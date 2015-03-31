@@ -117,11 +117,6 @@ class InviteModel extends Model
         return null;
     }
 
-    public function initInviteUser($uid=0)
-    {
-
-    }
-
     private function _initSelectData($dataList=array())
     {
         $invite_type_id=array_column($dataList,'invite_type');
@@ -130,7 +125,7 @@ class InviteModel extends Model
         $invite_types=array_combine(array_column($invite_types,'id'),$invite_types);
         foreach($dataList as &$val){
             $val['invite']=$invite_types[$val['invite_type']]['title'];
-            $val['code_url']=U('Ucenter/Member/register',array('code'=>$val['code']));
+            $val['code_url']=U('Ucenter/Member/register',array('code'=>$val['code']),true,true);
             if($val['uid']>0){
                 $val['buyer']=query_user('nickname',$val['uid']);
             }else{

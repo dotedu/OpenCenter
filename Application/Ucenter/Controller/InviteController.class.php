@@ -142,7 +142,7 @@ class InviteController extends BaseController
         $inviteList=$this->mInviteModel->where($map)->select();
         foreach($inviteList as &$val){
             $val['num']=$val['can_num']-$val['already_num'];
-            $val['code_url']=U('Ucenter/Member/register',array('code'=>$val['code']));
+            $val['code_url']=U('Ucenter/Member/register',array('code'=>$val['code']),true,true);
         }
         return $inviteList;
     }
