@@ -14,7 +14,11 @@ CREATE TABLE IF NOT EXISTS `ocenter_invite` (
   `status` tinyint(2) NOT NULL COMMENT '0：已用完，1：还可注册，2：用户取消邀请，-1：管理员删除',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='邀请码表' AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='邀请码表' AUTO_INCREMENT=1 ;
+
+--
+-- 转存表中的数据 `ocenter_invite`
+--
 
 -- --------------------------------------------------------
 
@@ -31,7 +35,11 @@ CREATE TABLE IF NOT EXISTS `ocenter_invite_buy_log` (
   `content` varchar(200) NOT NULL COMMENT '记录信息',
   `create_time` int(11) NOT NULL COMMENT '创建时间（做频率用）',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户购买邀请名额记录' AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户购买邀请名额记录' AUTO_INCREMENT=1 ;
+
+--
+-- 转存表中的数据 `ocenter_invite_buy_log`
+--
 
 -- --------------------------------------------------------
 
@@ -48,7 +56,11 @@ CREATE TABLE IF NOT EXISTS `ocenter_invite_log` (
   `content` varchar(200) NOT NULL COMMENT '记录内容',
   `create_time` int(11) NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='邀请注册成功记录表' AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='邀请注册成功记录表' AUTO_INCREMENT=1 ;
+
+--
+-- 转存表中的数据 `ocenter_invite_log`
+--
 
 -- --------------------------------------------------------
 
@@ -77,6 +89,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_invite_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='邀请注册码类型表' AUTO_INCREMENT=1 ;
 
+--
+-- 转存表中的数据 `ocenter_invite_type`
+--
+
 -- --------------------------------------------------------
 
 --
@@ -92,4 +108,4 @@ CREATE TABLE IF NOT EXISTS `ocenter_invite_user_info` (
   `already_num` int(11) NOT NULL COMMENT '已邀请名额',
   `success_num` int(11) NOT NULL COMMENT '成功邀请名额',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='邀请注册用户信息' AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='邀请注册用户信息' AUTO_INCREMENT=1 ;

@@ -21,6 +21,7 @@ class InviteController extends AdminController
 
     public function _initialize()
     {
+        parent::_initialize();
         $this->inviteModel=D('Ucenter/Invite');
         $this->inviteTypeModel=D('Ucenter/InviteType');
     }
@@ -177,37 +178,50 @@ class InviteController extends AdminController
             $map['uid']=array('lt',0);
         }
         $aStatus=I('status',1,'intval');
-
+        $status=$aStatus;
         if($aStatus==3){
-            $aStatus=1;
+            $status=1;
             $map['end_time']=array('lt',time());
         }else if($aStatus==1){
             $map['end_time']=array('egt',time());
         }
-        $map['status']=$aStatus;
+        $map['status']=$status;
 
         $list=$this->inviteModel->getList($map,$page,&$totalCount,$r);
 
-        $builder=new AdminListBuilder();
-        $builder->title('邀请码列表页面')
-            ->setSelectPostUrl('Invite/invite')
-            ->buttonDelete(U('Invite/delete'))
-            ->modalPopupButton(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
-            ->buttonDelete(U('Invite/deleteTrue'),'删除无用邀请码(真删除)')
-            ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'3','value'=>'已过期'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
-            ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>'管理员生成'),array('id'=>'1','value'=>'用户购买')))
-            ->keyId()
-            ->keyText('code','邀请码')
-            ->keyText('code_url','邀请码链接')
-            ->keyText('invite','邀请码类型')
-            ->keyText('buyer','购买者')
-            ->keyText('can_num','可注册几个')
-            ->keyText('already_num','已注册几个')
-            ->keyTime('end_time','有效期至')
-            ->keyCreateTime()
-            ->data($list)
-            ->pagination($totalCount,$r)
-            ->display();
+        if($aStatus==1){
+            $this->assign('invite_list',$list);
+            $this->assign('buyer',$aBuyer);
+            //生成翻页HTML代码
+            C('VAR_PAGE', 'page');
+            $pager = new \Think\Page($this->_pagination['totalCount'], $this->_pagination['listRows'], $_REQUEST);
+            $pager->setConfig('theme', '%FIRST% %UP_PAGE% %LINK_PAGE% %DOWN_PAGE% %END% %HEADER%');
+            $paginationHtml = $pager->show();
+            $this->assign('pagination', $paginationHtml);
+            $this->display();
+        }else{
+            $builder=new AdminListBuilder();
+            $builder->title('邀请码列表页面')
+                ->setSelectPostUrl('Invite/invite')
+                ->buttonDelete(U('Invite/delete'))
+                ->modalPopupButton(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
+                ->buttonDelete(U('Invite/deleteTrue'),'删除无用邀请码(真删除)')
+                ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'3','value'=>'已过期'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
+                ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>'管理员生成'),array('id'=>'1','value'=>'用户购买')))
+                ->keyId()
+                ->keyText('code','邀请码')
+                ->keyText('code_url','邀请码链接')
+                ->keyText('invite','邀请码类型')
+                ->keyText('buyer','购买者')
+                ->keyText('can_num','可注册几个')
+                ->keyText('already_num','已注册几个')
+                ->keyTime('end_time','有效期至')
+                ->keyCreateTime()
+                ->data($list)
+                ->pagination($totalCount,$r)
+                ->display();
+        }
+
     }
 
     /**
