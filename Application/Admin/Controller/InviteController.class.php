@@ -138,13 +138,13 @@ class InviteController extends AdminController
 
             $builder->title($title.'邀请码类型');
             $builder->keyId()->keyTitle()->keyText('length','邀请码长度')
-                ->keyMultiInput('time_num,time_unit','有效时长','时间+单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
+                ->keyMultiInput('time_num|time_unit','有效时长','时间+单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
                 ->keyInteger('cycle_num','周期内可购买个数')
-                ->keyMultiInput('cycle_time_num,cycle_time_unit','周期时长','时间+单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
+                ->keyMultiInput('cycle_time_num|cycle_time_unit','周期时长','时间+单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
                 ->keyChosen('roles','绑定角色','',$role_option)
                 ->keyChosen('auth_groups','允许购买的用户组','',$auth_group_option)
-                ->keyMultiInput('pay_score_type,pay_score','每个邀请额度消费','积分类型+个数',array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
-                ->keyMultiInput('income_score_type,income_score','每个邀请成功后获得','积分类型+个数',array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
+                ->keyMultiInput('pay_score_type|pay_score','每个邀请额度消费','积分类型+个数',array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
+                ->keyMultiInput('income_score_type|income_score','每个邀请成功后获得','积分类型+个数',array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
                 ->keyRadio('is_follow','成功后是否互相关注','',$is_follow_option)
                 ->buttonSubmit()->buttonBack()
                 ->data($data)
