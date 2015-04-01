@@ -252,6 +252,14 @@ str;
      * @param string $name 插件名
      */
     public function adminList($name){
+
+        if(method_exists(A('Addons://'.$name.'/Admin') ,'buildList')){
+            A('Addons://'.$name.'/Admin')->buildList();
+            exit;
+        }
+
+
+
         // 记录当前列表页的cookie
         Cookie('__forward__',$_SERVER['REQUEST_URI']);
         $class = get_addon_class($name);
@@ -371,7 +379,8 @@ str;
         }
         $addonsModel    =   D('Addons');
         $data           =   $addonsModel->create($info);
-        if(is_array($addons->admin_list) && $addons->admin_list !== array()){
+
+        if((is_array($addons->admin_list) && $addons->admin_list !== array()) || method_exists(A('Addons://'.$addon_name.'/Admin') ,'buildList')){
             $data['has_adminlist'] = 1;
         }else{
             $data['has_adminlist'] = 0;
