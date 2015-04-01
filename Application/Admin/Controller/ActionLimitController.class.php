@@ -105,7 +105,7 @@ class ActionLimitController extends AdminController
                 ->keyText('name', '名称')
                 ->keyText('frequency', '频率')
                // ->keySelect('time_unit', '时间单位', '', $this->getTimeUnit())
-                ->keyMultiInput('time_number,time_unit','时间单位','时间单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>$this->getTimeUnit(),'style'=>'width:100px')))
+                ->keyMultiInput('time_number|time_unit','时间单位','时间单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>$this->getTimeUnit(),'style'=>'width:100px')))
 
                 ->keyChosen('punish', '处罚', '可多选', $opt_punish)
                 ->keyBool('if_message', '是否发送提醒')
