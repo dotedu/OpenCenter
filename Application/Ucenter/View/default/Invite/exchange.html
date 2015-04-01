@@ -14,12 +14,12 @@
 
             <div class="col-xs-8">
                 <input type="text" name="exchange_num" class="form-control" value="1">
-                <div style="color: #C3C3C3;">您当前最多还可以兑换 {$can_buy_num} 个</div>
+                <div style="color: #C3C3C3;">您当前最多还可以兑换 {$can_buy_num} 个。每个用户每 {$long} 最多兑换 {$num_buy} 个</div>
                 <div class="clearfix"></div>
             </div>
         </div>
         <div style="width: 100%;text-align: center;">
-            <a class="btn btn-primary" data-role="submit">兑换</a>
+            <a class="btn btn-primary" data-role="submit" <if condition="$can_buy_num eq 0">disabled="disabled"</if>>兑换</a>
             <a onclick="$('.close').click();" class="btn btn-default">取消</a>
         </div>
     </form>

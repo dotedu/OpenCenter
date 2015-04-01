@@ -92,8 +92,8 @@ class InviteController extends AdminController
             $data['cycle_num']=I('post.cycle_num',0,'intval');
             $data['cycle_time_num']=I('post.cycle_time_num',0,'intval');
             $data['cycle_time_unit']=I('post.cycle_time_unit','second','op_t');
-            $data['roles']=I('post.roles');
-            $data['auth_groups']=I('post.auth_groups');
+            $data['roles']=I('post.roles',array());
+            $data['auth_groups']=I('post.auth_groups',array());
             $data['pay_score_type']=I('post.pay_score_type',1,'intval');
             $data['pay_score']=I('post.pay_score',0,'intval');
             $data['income_score_type']=I('post.income_score_type',1,'intval');
@@ -388,6 +388,53 @@ class InviteController extends AdminController
             ->pagination($totalCount,$r)
             ->data($list)
             ->display();
+    }
+
+    public function cvs()
+    {
+        $aIds=I('ids',array());
+
+        if(count($aIds)){
+            $map['id']=array('in',$aIds);
+        }else{
+            $map['id']=array('gt',0);
+        }
+        $dataList=$this->inviteModel->getList($map);
+        if(!count($dataList)){
+            $this->error('没有数据！');
+        }
+        $data="id,邀请码类型,邀请码,邀请链接,购买者,可注册数,已经注册数,有效期,状态,生成时间\n";
+        foreach ($dataList as $val) {
+            if($val['status']==-1){
+                $val['status']="管理员删除";
+            }elseif($val['status']==0){
+                $val['status']="用完无效";
+            }elseif($val['status']==1){
+                if($val['end_time']<=time()){
+                    $val['status']="已过期";
+                }else{
+                    $val['status']="可注册";
+                }
+            }elseif($val['status']==2){
+                $val['status']="已退还";
+            }
+            $val['end_time']=time_format($val['end_time']);
+            $val['create_time']=time_format($val['create_time']);
+            $data.=$val['id'].",[".$val['invite_type']."]".$val['invite'].",".$val['code'].",".$val['code_url'].",[".$val['uid']."]".$val['buyer'].",".$val['can_num'].",".$val['already_num'].",".$val['end_time'].",".$val['status'].",".$val['create_time']."\n";
+        }
+        $data=iconv('utf-8','gb2312',$data);
+        $filename = date('Ymd').'.csv'; //设置文件名
+        $this->export_csv($filename,$data); //导出
+    }
+
+    private function export_csv($filename,$data) {
+        header("Content-type:text/csv");
+        header("Content-Disposition:attachment;filename=".$filename);
+        header('Cache-Control:must-revalidate,post-check=0,pre-check=0');
+        header('Expires:0');
+        header('Pragma:public');
+        header("Content-type:application/vnd.ms-excel;charset=utf-8");
+        echo $data;
     }
 
     //私有函数 start

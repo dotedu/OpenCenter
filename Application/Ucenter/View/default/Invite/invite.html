@@ -41,9 +41,11 @@
                                 <td>{$vl.already_num|default=0} 个</td>
                                 <td>{$vl.end_time|time_format}</td>
                                 <td>
-                                    <a data-role="copy_code" data-code="{$vl.code}">复制邀请码</a>
-                                    <a data-role="copy_code_url" data-code-url="{$vl.code_url}" style="margin-left: 10px;">复制邀请链接</a>
-                                    <a data-role="back_copy_code" data-id="{$vl.id}" style="margin-left: 10px;">退还</a>
+                                    <div style="position: relative;">
+                                        <a data-role="copy_code" data-code="{$vl.code}">复制邀请码</a>
+                                        <a data-role="copy_code_url" data-code-url="{$vl.code_url}" style="margin-left: 10px;">复制邀请链接</a>
+                                        <a data-role="back_copy_code" data-id="{$vl.id}" style="margin-left: 10px;">退还</a>
+                                    </div>
                                 </td>
                             </tr>
                         </volist>
@@ -57,9 +59,27 @@
 
     </div>
     <script type="text/javascript" src="__JS__/invite.js"></script>
-    <script>
-        var PUB="__PUBLIC__";
-    </script>
     <script type="text/javascript" src="__PUBLIC__/js/ext/zclip/jquery.zclip.min.js"></script>
-    <script type="text/javascript" src="__PUBLIC__/js/ext/zclip/copy.js"></script>
+    <script>
+        $(function(){
+            $('[data-role="copy_code"]').zclip({
+                copy: function () {
+                    return $(this).attr('data-code');
+                },
+                afterCopy: function () {
+                    $(this).html('已复制');
+                    toast.success('复制成功');
+                }
+            });
+            $('[data-role="copy_code_url"]').zclip({
+                copy: function () {
+                    return $(this).attr('data-code-url');
+                },
+                afterCopy: function () {
+                    $(this).html('链接已复制');
+                    toast.success('复制链接成功');
+                }
+            });
+        });
+    </script>
 </block>

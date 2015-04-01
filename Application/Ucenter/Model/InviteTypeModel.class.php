@@ -63,6 +63,8 @@ class InviteTypeModel extends Model
             $data['roles']=str_replace('[','',$data['roles']);
             $data['roles']=str_replace(']','',$data['roles']);
             $data['roles']=explode(',',$data['roles']);
+        }else{
+            $data['roles']=array();
         }
         return $data;
     }
@@ -102,6 +104,11 @@ class InviteTypeModel extends Model
             $val='%['.$val['group_id'].']%';
         }
         unset($val);
+        if(count($group_ids)){
+            $group_ids=array_merge(array(''),$group_ids);
+        }else{
+            $group_ids=array('');
+        }
         $map['auth_groups']=array('like',$group_ids);
         $map['status']=1;
         $list=$this->where($map)->field($field)->select();
@@ -115,6 +122,11 @@ class InviteTypeModel extends Model
             $val='%['.$val['group_id'].']%';
         }
         unset($val);
+        if(count($group_ids)){
+            $group_ids=array_merge(array(''),$group_ids);
+        }else{
+            $group_ids=array('');
+        }
         $map['auth_groups']=array('like',$group_ids);
         $map['status']=1;
         $list=$this->where($map)->select();
@@ -176,6 +188,8 @@ class InviteTypeModel extends Model
             }
             unset($val);
             $data['roles_show'] = implode(',', $data['roles_show']);
+        }else{
+            $data['roles']=array();
         }
 
         if ($data['auth_groups'] != '') {
@@ -187,6 +201,8 @@ class InviteTypeModel extends Model
             }
             unset($val);
             $data['auth_groups_show'] = implode(',', $data['auth_groups_show']);
+        }else{
+            $data['auth_groups']=array();
         }
         return $data;
     }

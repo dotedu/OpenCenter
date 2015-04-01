@@ -155,9 +155,16 @@
                             <li><a href="{:U('ucenter/Index/rank')}"><span
                                     class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;我的头衔</a>
                             </li>
+                            <php>
+                                $register_type=modC('REGISTER_TYPE','normal','Invite');
+                                $register_type=explode(',',$register_type);
+                                if(in_array('invite',$register_type)){
+                            </php>
                             <li><a href="{:U('ucenter/Invite/invite')}"><span
-                                    class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;邀请好友</a>
+                                class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;邀请好友</a>
                             </li>
+                            <php>}</php>
+
                             {:hook('personalMenus')}
                             <if condition="is_administrator()">
                                 <li><a href="{:U('Admin/Index/index')}" target="_blank"><span

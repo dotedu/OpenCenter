@@ -172,15 +172,18 @@ class InviteController extends BaseController
         }
         //验证是否有权限兑换
         $inviteType=$this->mInviteTypeModel->where(array('id'=>$inviteType))->find();
-        $inviteType['auth_groups']=str_replace('[','',$inviteType['auth_groups']);
-        $inviteType['auth_groups']=str_replace(']','',$inviteType['auth_groups']);
-        $inviteType['auth_groups']=explode(',',$inviteType['auth_groups']);
-        $map['group_id']=array('in',$inviteType['auth_groups']);
-        $map['uid']=is_login();
-        if(!D('AuthGroupAccess')->where($map)->count()){
-            $result['info']="你没有权限兑换该类型邀请码名额！";
-            $this->ajaxReturn($result);
+        if($inviteType['auth_groups']!=''){
+            $inviteType['auth_groups']=str_replace('[','',$inviteType['auth_groups']);
+            $inviteType['auth_groups']=str_replace(']','',$inviteType['auth_groups']);
+            $inviteType['auth_groups']=explode(',',$inviteType['auth_groups']);
+            $map['group_id']=array('in',$inviteType['auth_groups']);
+            $map['uid']=is_login();
+            if(!D('AuthGroupAccess')->where($map)->count()){
+                $result['info']="你没有权限兑换该类型邀请码名额！";
+                $this->ajaxReturn($result);
+            }
         }
+
         return true;
     }
 
@@ -193,12 +196,8 @@ class InviteController extends BaseController
     private function _getCanBuyNum($inviteType=0)
     {
         $inviteType=$this->mInviteTypeModel->where(array('id'=>$inviteType))->find();
-
-        //以积分算，获取最多购买
-        $max_num_score=query_user('score'.$inviteType['pay_score_type']);
-        $max_num_score=intval($max_num_score/$inviteType['pay_score']);
-        //以积分算，获取最多购买 end
-
+        $this->assign('long',unitTime_to_showUnitTime($inviteType['cycle_time']));
+        $this->assign('num_buy',$inviteType['cycle_num']);
         //以周期算，获取最多购买
         $map['invite_type']=$inviteType['id'];
         $map['create_time']=array('gt',unitTime_to_time($inviteType['cycle_time'],'-'));
@@ -209,8 +208,11 @@ class InviteController extends BaseController
         }
         $can_buy_num=$inviteType['cycle_num']-$can_buy_num;
         //以周期算，获取最多购买 end
-
-        $can_buy_num=$max_num_score>$can_buy_num?$can_buy_num:$max_num_score;
+        $max_num_score=query_user('score'.$inviteType['pay_score_type']);
+        if($inviteType['pay_score']!=0){
+            $max_num_score=intval($max_num_score/$inviteType['pay_score']);//以积分算，获取最多购买
+            $can_buy_num=$max_num_score>$can_buy_num?$can_buy_num:$max_num_score;
+        }
         if($can_buy_num<0){
             $can_buy_num=0;
         }

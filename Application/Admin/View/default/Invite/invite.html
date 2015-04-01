@@ -22,6 +22,18 @@
                 删除无用邀请码(真删除)
             </button>
             &nbsp;
+            <button class="btn" data-role="copy_code_list">
+                批量复制邀请码
+            </button>
+            &nbsp;
+            <button class="btn"  data-role="copy_code_url_list">
+                批量复制邀请链接
+            </button>
+            &nbsp;
+            <button class="btn" data-role="cvs" data-url="{:U('admin/invite/cvs')}">
+                导出cvs
+            </button>
+            &nbsp;
             <!-- 选择框select -->
             <div style="float: right;">
                 <style>
@@ -110,7 +122,7 @@
             <tbody>
             <volist name="invite_list" id="invite">
                 <tr>
-                    <td><input class="ids" type="checkbox" value="{$invite.id}" name="ids[]"></td>
+                    <td><input class="ids" type="checkbox" value="{$invite.id}" name="ids[]" data-code="{$invite.code}" data-code-url="{$invite.code_url}"></td>
                     <td>{$invite.id}</td>
                     <td>{$invite.code}</td>
                     <td>{$invite.code_url}</td>
@@ -120,7 +132,11 @@
                     <td>{$invite.already_num}</td>
                     <td>{$invite.end_time|time_format}</td>
                     <td>{$invite.create_time|time_format}</td>
-                    <td><a data-role="copy_code" data-code="{$invite.code}">复制邀请码</a> <a data-role="copy_code_url" data-code-url="{$invite.code_url}" style="margin-left: 10px;">复制邀请链接</a></td>
+                    <td>
+                        <div style="position: relative;">
+                            <a data-role="copy_code" data-code="{$invite.code}">复制邀请码</a> <a data-role="copy_code_url" data-code-url="{$invite.code_url}" style="margin-left: 10px;">复制邀请链接</a>
+                        </div>
+                    </td>
                 </tr>
             </volist>
 
@@ -135,11 +151,7 @@
 </block>
 <block name="script">
     <script type="text/javascript" src="__STATIC__/thinkbox/jquery.thinkbox.js"></script>
-    <script>
-        var PUB="__PUBLIC__";
-    </script>
     <script type="text/javascript" src="__PUBLIC__/js/ext/zclip/jquery.zclip.min.js"></script>
-    <script type="text/javascript" src="__PUBLIC__/js/ext/zclip/copy.js"></script>
     <script type="text/javascript">
         function toggle_search(){
             $('#search_form').toggle('slide');
@@ -165,6 +177,74 @@
     </script>
     <script>
         $(function(){
+            $('[data-role="copy_code"]').zclip({
+                copy: function () {
+                    return $(this).attr('data-code');
+                },
+                afterCopy: function () {
+                    $(this).html('已复制');
+                    toast.success('复制成功');
+                }
+            });
+            $('[data-role="copy_code_url"]').zclip({
+                copy: function () {
+                    return $(this).attr('data-code-url');
+                },
+                afterCopy: function () {
+                    $(this).html('链接已复制');
+                    toast.success('复制链接成功');
+                }
+            });
+            $('[data-role="copy_code_list"]').zclip({
+                copy: function () {
+                    var code_list='';
+                    $('.ids').each(function(){
+                        if($(this).is(":checked")){
+                            code_list+=$(this).attr('data-code')+'\n';
+                        }
+                    });
+                    if(code_list!=''){
+                        return code_list;
+                    }else{
+                        toast.error('请选择数据！');
+                    }
+                },
+                afterCopy: function () {
+                    toast.success('批量复制成功');
+                }
+            });
+            $('[data-role="copy_code_url_list"]').zclip({
+                copy: function () {
+                    var code_list_url='';
+                    $('.ids').each(function(){
+                        if($(this).is(":checked")){
+                            code_list_url+=$(this).attr('data-code-url')+'\n\n';
+                        }
+                    });
+                    if(code_list_url!=''){
+                        return code_list_url;
+                    }else{
+                        toast.error('请选择数据！');
+                    }
+                },
+                afterCopy: function () {
+                    toast.success('批量复制成功');
+                }
+            });
+            $('[data-role="cvs"]').click(function(){
+                var data_url=$(this).attr('data-url');
+                var form=$('.ids');
+                if (form.get(0) == undefined) {
+                } else if (form.get(0).nodeName == 'FORM') {
+                    query = form.serialize();
+                } else if (form.get(0).nodeName == 'INPUT' || form.get(0).nodeName == 'SELECT' || form.get(0).nodeName == 'TEXTAREA') {
+                    query = form.serialize();
+                } else {
+                    query = form.find('input,select,textarea').serialize();
+                }
+                data_url+='&'+query;
+                window.open(data_url);
+            });
             $('[data-role="select_text"]').change(function(){
                 $('#selectForm').submit();
             });
