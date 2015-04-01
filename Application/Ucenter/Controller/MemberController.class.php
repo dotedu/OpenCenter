@@ -848,18 +848,18 @@ class MemberController extends Controller
                     if ($invite_type) {
                         if (count($invite_type['roles'])) {
                             //角色
-                            $map['status'] = 1;
-                            $map['id'] = array('in', $invite_type['roles']);
-                            $roleList = D('Admin/Role')->selectByMap($map, 'sort asc', 'id,title');
+                            $map_role['status'] = 1;
+                            $map_role['id'] = array('in', $invite_type['roles']);
+                            $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
                             if (!count($roleList)) {
                                 $this->error('邀请码绑定角色错误！');
                             }
                             //角色end
                         } else {
                             //角色
-                            $map['status'] = 1;
-                            $map['invite'] = 0;
-                            $roleList = D('Admin/Role')->selectByMap($map, 'sort asc', 'id,title');
+                            $map_role['status'] = 1;
+                            $map_role['invite'] = 0;
+                            $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
                             //角色end
                         }
                         $this->assign('code', $aCode);
@@ -878,9 +878,9 @@ class MemberController extends Controller
 
             if (in_array('normal', $register_type)) {
                 //角色
-                $map['status'] = 1;
-                $map['invite'] = 0;
-                $roleList = D('Admin/Role')->selectByMap($map, 'sort asc', 'id,title');
+                $map_role['status'] = 1;
+                $map_role['invite'] = 0;
+                $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
                 //角色end
             } else { //（只开启了邀请注册）
                 $this->error("收到邀请的用户才能注册该网站！");
@@ -898,6 +898,9 @@ class MemberController extends Controller
      */
     private function checkInviteCode($code = '')
     {
+        if($code==''){
+            return true;
+        }
         $invite = D('Ucenter/Invite')->getByCode($code);
         if ($invite['end_time'] >= time()) {
             $map['id'] = $invite['invite_type'];
