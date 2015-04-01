@@ -44,8 +44,21 @@
                         min-width: 200px;
                     }
                 </style>
-                <form id="selectForm" method="get" action="/ocenter_developer/index.php?s=/admin/invite/invite.html"
-                      class="form-dont-clear-url-param">
+                <form id="selectForm" method="get" action="{:U('Admin/Invite/invite')}" class="form-dont-clear-url-param">
+                    <div class="oneselect">
+                        <div class="title">邀请码类型：</div>
+                        <div class="select_box">
+                            <select name="type" data-role="select_text" class="form-control">
+                                <volist name="type_list" id="type">
+                                    <php>if($type['id']==$now_type){</php>
+                                    <option value="{$type.id}" selected>{$type.value}</option>
+                                    <php>}else{</php>
+                                    <option value="{$type.id}">{$type.value}</option>
+                                    <php>}</php>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
                     <div class="oneselect">
                         <div class="select_box">
                             <select name="status" data-role="select_text" class="form-control">
@@ -82,13 +95,14 @@
                 </th>
                 <th>ID</th>
                 <th>邀请码</th>
-                <th>邀请码链接</th>
+                <th style="width: 250px;">邀请码链接</th>
                 <th>邀请码类型</th>
                 <th>购买者</th>
                 <th>可注册几个</th>
                 <th>已注册几个</th>
                 <th>有效期至</th>
                 <th>创建时间</th>
+                <th>操作</th>
             </tr>
             </thead>
 
@@ -106,6 +120,7 @@
                     <td>{$invite.already_num}</td>
                     <td>{$invite.end_time|time_format}</td>
                     <td>{$invite.create_time|time_format}</td>
+                    <td><a data-role="copy_code" data-code="{$invite.code}">复制邀请码</a> <a data-role="copy_code_url" data-code-url="{$invite.code_url}" style="margin-left: 10px;">复制邀请链接</a></td>
                 </tr>
             </volist>
 
@@ -118,8 +133,13 @@
     </div>
     </div>
 </block>
-        <block name="script">
+<block name="script">
     <script type="text/javascript" src="__STATIC__/thinkbox/jquery.thinkbox.js"></script>
+    <script>
+        var PUB="__PUBLIC__";
+    </script>
+    <script type="text/javascript" src="__PUBLIC__/js/ext/zclip/jquery.zclip.min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/js/ext/zclip/copy.js"></script>
     <script type="text/javascript">
         function toggle_search(){
             $('#search_form').toggle('slide');
@@ -196,4 +216,4 @@
             highlight_subnav("{:U('Invite/invite')}");
         });
     </script>
-    </block>
+</block>

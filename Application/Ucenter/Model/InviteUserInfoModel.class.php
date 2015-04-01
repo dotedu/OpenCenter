@@ -53,4 +53,33 @@ class InviteUserInfoModel extends Model
         return $data;
     }
 
+    public function getList($map=array(),&$totalCount,$page=1,$r=20,$order='uid asc,invite_type asc')
+    {
+        if(count($map)){
+            $totalCount=$this->where($map)->count();
+            if($totalCount){
+                $list=$this->where($map)->page($page,$r)->order($order)->select();
+            }
+        }else{
+            $totalCount=$this->count();
+            if($totalCount){
+                $list=$this->page($page,$r)->order($order)->select();
+            }
+        }
+        $list=$this->_initSelectData($list);
+        return $list;
+    }
+
+    private function _initSelectData($list=array())
+    {
+        $inviteTypeModel=D('Ucenter/InviteType');
+        foreach($list as &$val){
+            $inviteType=$inviteTypeModel->getSimpleData();
+            $val['invite_type_title']=$inviteType['title'];
+            $val['user']=query_user('nickname',$val['uid']);
+            $val['user']='['.$val['uid'].']'.$val['user'];
+        }
+        unset($val);
+        return $list;
+    }
 } 
