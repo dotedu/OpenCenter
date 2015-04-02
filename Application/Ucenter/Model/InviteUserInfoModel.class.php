@@ -40,6 +40,12 @@ class InviteUserInfoModel extends Model
         return $res;
     }
 
+    public function saveData($data=array(),$id=0)
+    {
+        $result=$this->where(array('id'=>$id))->save($data);
+        return $result;
+    }
+
     public function addSuccessNum($type_id=0,$uid=0){
         $map['uid']=$uid;
         $map['invite_type']=$type_id;

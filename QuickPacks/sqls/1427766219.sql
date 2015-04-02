@@ -10,4 +10,5 @@ REPLACE INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`,
 (1016, '删除邀请码', 1009, 0, 'Invite/delete', 1, '', '', 0, ''),
 (1017, '生成邀请码', 1009, 0, 'Invite/createCode', 1, '', '', 0, ''),
 (1018, '删除无用邀请码', 1009, 0, 'Invite/deleteTrue', 1, '', '', 0, ''),
-(1019, '导出cvs', 1009, 0, 'Invite/cvs', 1, '', '', 0, '');
+(1019, '导出cvs', 1009, 0, 'Invite/cvs', 1, '', '', 0, ''),
+(1020, '用户信息编辑', 1013, 0, 'Invite/editUserInfo', 1, '', '', 0, '');

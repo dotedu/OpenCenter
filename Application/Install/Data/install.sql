@@ -923,7 +923,8 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (143, '删除邀请码', 136, 0, 'Invite/delete', 1, '', '', 0, ''),
 (144, '生成邀请码', 136, 0, 'Invite/createCode', 1, '', '', 0, ''),
 (145, '删除无用邀请码', 136, 0, 'Invite/deleteTrue', 1, '', '', 0, ''),
-(146, '导出cvs', 136, 0, 'Invite/cvs', 1, '', '', 0, '');
+(146, '导出cvs', 136, 0, 'Invite/cvs', 1, '', '', 0, ''),
+(147, '用户信息编辑', 140, 0, 'Invite/editUserInfo', 1, '', '', 0, '');
 
 
 

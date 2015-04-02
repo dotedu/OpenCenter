@@ -369,9 +369,47 @@ class InviteController extends AdminController
             ->keyText('num','可邀请名额')
             ->keyText('already_num','已经邀请名额')
             ->keyText('success_num','成功邀请名额')
+            ->keyDoActionEdit('Invite/editUserInfo?id=###')
             ->pagination($totalCount,$r)
             ->data($list)
             ->display();
+    }
+
+    public function editUserInfo()
+    {
+        $aId=I('id',0,'intval');
+        if($aId<=0){
+            $this->error('参数错误！');
+        }
+        if(IS_POST){
+            $data['num']=I('num',0,'intval');
+            $data['already_num']=I('already_num',0,'intval');
+            $data['success_num']=I('success_num',0,'intval');
+            if($data['num']<0||$data['already_num']<0||$data['success_num']<0){
+                $this->error('请填入正确数据！');
+            }
+            $result=$this->inviteUserInfoModel->saveData($data,$aId);
+            if($result){
+                $this->success('编辑成功！',U('Admin/Invite/userInfo'));
+            }else{
+                $this->error('编辑失败！');
+            }
+        }else{
+            $map['id']=$aId;
+            $data=$this->inviteUserInfoModel->getInfo($map);
+
+            $builder=new AdminConfigBuilder();
+            $builder->title('编辑用户邀请信息')
+                ->keyId()
+                ->keyReadOnly('uid','用户id')
+                ->keyReadOnly('invite_type','邀请码类型id')
+                ->keyInteger('num','可邀请名额')
+                ->keyInteger('already_num','已邀请名额')
+                ->keyInteger('success_num','成功邀请名额')
+                ->data($data)
+                ->buttonSubmit()->buttonBack()
+                ->display();
+        }
     }
 
     public function inviteLog($page=1,$r=20)

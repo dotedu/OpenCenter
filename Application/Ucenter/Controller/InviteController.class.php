@@ -199,6 +199,7 @@ class InviteController extends BaseController
         $this->assign('long',unitTime_to_showUnitTime($inviteType['cycle_time']));
         $this->assign('num_buy',$inviteType['cycle_num']);
         //以周期算，获取最多购买
+        $map['uid']=is_login();
         $map['invite_type']=$inviteType['id'];
         $map['create_time']=array('gt',unitTime_to_time($inviteType['cycle_time'],'-'));
         $buyList=$this->mInviteBuyLogModel->where($map)->select();
