@@ -898,6 +898,9 @@ class MemberController extends Controller
      */
     private function checkInviteCode($code = '')
     {
+        if($code==''){
+            return true;
+        }
         $invite = D('Ucenter/Invite')->getByCode($code);
         if ($invite['end_time'] >= time()) {
             $map['id'] = $invite['invite_type'];
