@@ -46,7 +46,7 @@ class InviteController extends AdminController
             'normal'=>'普通注册',
             'invite'=>'邀请注册'
         );
-        $builder->title('角色基本信息配置')
+        $builder->title('邀请注册信息配置')
             ->keyCheckBox('REGISTER_TYPE', '注册类型', '勾选为开启',$register_options)
             ->data($data)
             ->buttonSubmit()
