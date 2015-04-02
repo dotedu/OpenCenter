@@ -80,7 +80,7 @@ class InviteUserInfoModel extends Model
     {
         $inviteTypeModel=D('Ucenter/InviteType');
         foreach($list as &$val){
-            $inviteType=$inviteTypeModel->getSimpleData();
+            $inviteType=$inviteTypeModel->getSimpleData(array('id'=>$val['invite_type']));
             $val['invite_type_title']=$inviteType['title'];
             $val['user']=query_user('nickname',$val['uid']);
             $val['user']='['.$val['uid'].']'.$val['user'];

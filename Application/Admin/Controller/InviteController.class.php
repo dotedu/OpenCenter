@@ -315,7 +315,6 @@ class InviteController extends AdminController
             $order='uid asc,invite_type asc,create_time desc';
         }
         $list=$this->inviteBuyLogModel->getList($map,$totalCount,$page,$order,$r);
-
         $orderOptions=array(
             array('id'=>0,'value'=>'最新创建'),
             array('id'=>1,'value'=>'最早创建'),
