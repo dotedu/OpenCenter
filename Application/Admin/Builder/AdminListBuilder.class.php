@@ -506,9 +506,9 @@ class AdminListBuilder extends AdminBuilder
             $url = $getUrl($item);
             //允许字段为空，如果字段名为空将标题名填充到A变现里
             if(!$value){
-                return "<a href=\"$url\">".$key['title']."</a>";
+                return "<a href=\"$url\" target=\"_blank\">".$key['title']."</a>";
             } else {
-                return "<a href=\"$url\">$value</a>";
+                return "<a href=\"$url\" target=\"_blank\">$value</a>";
             }
         });
 
