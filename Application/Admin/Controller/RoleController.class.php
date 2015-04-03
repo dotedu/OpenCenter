@@ -338,7 +338,7 @@ class RoleController extends AdminController
             $builder->setStatusUrl(U('Role/setUserStatus', array('role_id' => $map_user_list['role_id'])))->buttonEnable()->buttonDisable();
         }
 
-        $builder->modalPopupButton(U('Role/changeRole',array('role_id'=>$map_user_list['role_id'])), array(), '迁移用户',array('data-title'=>'迁移用户到其他角色','target-form'=>'ids'))
+        $builder->buttonModalPopup(U('Role/changeRole',array('role_id'=>$map_user_list['role_id'])), array(), '迁移用户',array('data-title'=>'迁移用户到其他角色','target-form'=>'ids'))
             ->button('初始化没角色的用户', array('href' => U('Role/initUnhaveUser')))
             ->select('角色：', 'role_id', 'select', '', '', '', $role_list)->select('状态：', 'user_status', 'select', '', '', '', $statusOptions)->select('', 'single_role', 'select', '', '', '', $singleRoleOptions)
             ->keyId()
