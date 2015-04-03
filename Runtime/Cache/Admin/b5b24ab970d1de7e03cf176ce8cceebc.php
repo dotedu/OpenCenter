@@ -1,1 +1,0 @@
-<?php if (!defined('THINK_PATH')) exit();?>Role/editRole?id=1
