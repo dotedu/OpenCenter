@@ -17,6 +17,7 @@ $.getScript('Public/js/com/com.toast.class.js', function () {
                 bindMessageChecker();//绑定用户消息
             } else {
                 bindLogin();//快捷登录
+                bindRegister();
             }
             checkMessage();//检查一次消息
 
@@ -522,6 +523,21 @@ var doLogin = function () {//登录界面
         } else {
             window.location.href = U('Ucenter/Member/login');
         }
+    }
+}
+function bindRegister(){
+         $('[data-role="do_register"]').click(doRegister);
+}
+var doRegister=function(){
+    if(ONLY_OPEN_REGISTER==1){
+        var myModalTrigger = new ModalTrigger({
+            remote: U('Ucenter/Member/inCode'),
+            title: "邀请用户才能注册！"
+        });
+        myModalTrigger.show();
+    }else{
+        var url=$(this).attr('data-url');
+        location.href=url;
     }
 }
 /*登录end*/
