@@ -939,8 +939,8 @@
                     position: 'absolute',
                     top: '0px',
                     left: '0px',
-                    width: '1px',
-                    height: '1px',
+                    width: '64px',
+                    height: '28px',
                     overflow: 'hidden'
                 });
     

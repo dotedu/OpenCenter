@@ -38,7 +38,7 @@ class ReportController extends AdminController
             ->keyUpdateTime('update_time',"更新时间")
             ->keyUpdateTime('handle_time',"处理时间")
             ->keyDoAction(' ','','操作')
-         //   ->keyDoActionModalPopup('RoleangeRole?id=###','测试','操作',array('data-title'=>'迁移用户到其他角色'))
+            ->keyDoActionModalPopup('RoleangeRole?id=###','测试','操作',array('data-title'=>'迁移用户到其他角色'))
             ->keyDoActionEdit(' ','处理')
             ->keyDoActionEdit(' ','忽略处理')
             ->key('status', '状态', 'status',array('0'=>'忽略处理','1'=>'已处理','2'=>'正在处理'));

@@ -127,6 +127,10 @@ class ScoreModel extends Model
                 $res = false;
                 break;
         }
+        foreach($uids as $val){
+            clean_query_user_cache($val,'score'.$type);
+        }
+        unset($val);
         return $res;
     }
 

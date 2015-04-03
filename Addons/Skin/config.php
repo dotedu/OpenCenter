@@ -35,6 +35,6 @@ return array(
     ),
     'addons_cache'=>array(
         'type'=>'hidden',
-        'value'=>'addons_cache',
+        'value'=>'SKIN_ADDON_CONFIG',
     )
 );

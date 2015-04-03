@@ -30,6 +30,16 @@
                         </ul>
 
                         <div class="tab-content">
+                            <php>
+                                if(isset($invite_user)){
+                            </php>
+                                <div class="alert alert-info" style="padding: 5px;margin-bottom: 10px;letter-spacing: 2px;">用户 {$invite_user['nickname']} 邀请您注册{:C('WEB_SITE')}，请填写注册信息~</div>
+                                <input type="hidden" name="code" value="{$code}">
+                            <php>}else{</php>
+                                <if condition="$open_invite_register">
+                                    <div class="alert alert-info" style="padding: 5px;margin-bottom: 10px;letter-spacing: 2px;">邀请注册用户请先<strong><a data-type="ajax" data-url="{:U('Ucenter/Member/inCode')}" data-title="输入邀请码" data-toggle="modal">输入邀请码</a></strong>，再填写注册信息~</div>
+                                </if>
+                            <php>}</php>
                             <if condition="count($role_list)==1">
                                 <input type="hidden" name="role" value="{$role_list[0]['id']}">
                                 <else/>

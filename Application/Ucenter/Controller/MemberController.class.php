@@ -35,9 +35,12 @@ class MemberController extends Controller
         $aStep = I('get.step', 'start', 'op_t');
         $aRole = I('post.role', 0, 'intval');
 
+
         if (!modC('REG_SWITCH', '', 'USERCONFIG')) {
             $this->error('注册已关闭');
         }
+
+
         if (IS_POST) { //注册用户
             $return = check_action_limit('reg', 'ucenter_member', 1, 1, true);
             if ($return && !$return['state']) {
@@ -74,10 +77,17 @@ class MemberController extends Controller
             if (!check_reg_type($aUnType)) {
                 $this->error('该类型未开放注册。');
             }
+
+            $aCode = I('post.code', '', 'op_t');
+            if (!$this->checkInviteCode($aCode)) {
+                $this->error('非法邀请码！');
+            }
+
             /* 注册用户 */
             $uid = UCenterMember()->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
             if (0 < $uid) { //注册成功
-                $this->initRoleUser($aRole,$uid); //初始化角色用户
+                $this->initInviteUser($uid, $aCode, $aRole);
+                $this->initRoleUser($aRole, $uid); //初始化角色用户
                 if (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType == 2) {
                     set_user_status($uid, 3);
                     $verify = D('Verify')->addVerify($email, 'email', $uid);
@@ -86,7 +96,7 @@ class MemberController extends Controller
                 }
 
                 $uid = UCenterMember()->login($username, $aPassword, $aUnType); //通过账号密码取到uid
-                D('Member')->login($uid, false,$aRole); //登陆
+                D('Member')->login($uid, false, $aRole); //登陆
 
                 $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
             } else { //注册失败，显示错误信息
@@ -96,14 +106,7 @@ class MemberController extends Controller
             if (is_login()) {
                 redirect(U('Weibo/Index/index'));
             }
-
-            //角色
-            $map['status'] = 1;
-            $map['invite'] = 0;
-            $roleList = D('Admin/Role')->selectByMap($map, 'sort asc', 'id,title');
-            $this->assign('role_list', $roleList);
-            //角色end
-
+            $this->checkRegisterType();
             $aType = I('get.type', '', 'op_t');
             $regSwitch = modC('REG_SWITCH', '', 'USERCONFIG');
             $regSwitch = explode(',', $regSwitch);
@@ -123,9 +126,9 @@ class MemberController extends Controller
         if (empty($aUid)) {
             $this->error('参数错误');
         }
-        $userRoleModel=D('UserRole');
-        $map['uid']=$aUid;
-        $map['role_id']=$aRoleId;
+        $userRoleModel = D('UserRole');
+        $map['uid'] = $aUid;
+        $map['role_id'] = $aRoleId;
         $step = $userRoleModel->where($map)->getField('step');
         if (get_next_step($step) != $aStep) {
             $aStep = check_step($step);
@@ -134,12 +137,90 @@ class MemberController extends Controller
         }
         $userRoleModel->where($map)->setField('step', $aStep);
         if ($aStep == 'finish') {
-            D('Member')->login($aUid, false,$aRoleId);
+            D('Member')->login($aUid, false, $aRoleId);
         }
         $this->assign('step', $aStep);
         $this->display('register');
     }
 
+    public function inCode()
+    {
+        if (IS_POST) {
+            $aType = I('get.type', '', 'op_t');
+            $aCode = I('post.code', '', 'op_t');
+            $result['status'] = 0;
+            if (!mb_strlen($aCode)) {
+                $result['info'] = "请输入邀请码！";
+                $this->ajaxReturn($result);
+            }
+            $invite = D('Ucenter/Invite')->getByCode($aCode);
+            if ($invite) {
+                if ($invite['end_time'] > time()) {
+                    $result['status'] = 1;
+                    $result['url'] = U('Ucenter/Member/register', array('code' => $aCode, 'type' => $aType));
+                } else {
+                    $result['info'] = "该邀请码已过期！请更换其他邀请码！";
+                }
+            } else {
+                $result['info'] = "不存在该邀请码！请核对邀请码！";
+            }
+            $this->ajaxReturn($result);
+        } else {
+            $this->display();
+        }
+    }
+
+    public function upRole()
+    {
+        $aRoleId = I('role_id', 0, 'intval');
+        if (IS_POST) {
+            $uid = is_login();
+            $data['status'] = 0;
+            if ($uid > 0 && $aRoleId != get_login_role()) {
+                $aCode = I('post.code', '', 'op_t');
+                $result['status'] = 0;
+                if (!mb_strlen($aCode)) {
+                    $result['info'] = "请输入邀请码！";
+                    $this->ajaxReturn($result);
+                }
+                $invite = D('Ucenter/Invite')->getByCode($aCode);
+                if ($invite) {
+                    if ($invite['end_time'] > time()) {
+                        $map['id'] = $invite['invite_type'];
+                        $map['roles'] = array('like', '%[' . $aRoleId . ']%');
+                        $invite_type = D('Ucenter/InviteType')->getSimpleData($map);
+                        if ($invite_type) {
+                            $roleUser = D('UserRole')->where(array('uid' => $uid, 'role_id' => $aRoleId))->find();
+                            if ($roleUser) {
+                                $data['info'] = "已持有该身份！";
+                            } else {
+                                $memberModel = D('Common/Member');
+                                $memberModel->logout();
+                                $this->initInviteUser($uid, $aCode, $aRoleId);
+                                $this->initRoleUser($aRoleId, $uid);
+                                clean_query_user_cache($uid,array('avatar64','avatar128','avatar32','avatar256','avatar512','rank_link'));
+                                $memberModel->login($uid, false, $aRoleId); //登陆
+                                $result['status'] = 1;
+                                $result['url'] = U('Ucenter/Member/register', array('code' => $aCode));
+                            }
+                        } else {
+                            $result['info'] = "该身份需要更高级的邀请码才能升级！";
+                        }
+                    } else {
+                        $result['info'] = "该邀请码已过期！请更换其他邀请码！";
+                    }
+                } else {
+                    $result['info'] = "不存在该邀请码！请核对邀请码！";
+                }
+            } else {
+                $data['info'] = "非法操作！";
+            }
+            $this->ajaxReturn($result);
+        } else {
+            $this->assign('role_id', $aRoleId);
+            $this->display();
+        }
+    }
 
     /* 登录页面 */
     public function login()
@@ -185,8 +266,8 @@ class MemberController extends Controller
     public function verify()
     {
         verify();
-      //  $verify = new \Think\Verify();
-      //  $verify->entry(1);
+        //  $verify = new \Think\Verify();
+        //  $verify->entry(1);
     }
 
     /* 用户密码找回首页 */
@@ -536,7 +617,7 @@ class MemberController extends Controller
         A('Ucenter/UploadAvatar', 'Widget')->cropPicture($aUid, $aCrop, $aExt);
         $res = M('avatar')->where(array('uid' => $aUid))->save(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         if (!$res) {
-            M('avatar')->add(array('uid' => $aUid,'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
+            M('avatar')->add(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         }
         clean_query_user_cache($aUid, array('avatar256', 'avatar128', 'avatar64'));
         $this->success('头像更新成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
@@ -654,22 +735,23 @@ class MemberController extends Controller
      */
     public function changeLoginRole()
     {
-        $aRoleId=I('post.role_id',0,'intval');
-        $uid=is_login();
-        $data['status']=0;
-        if($uid&&$aRoleId!=get_login_role()){
-            $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
-            if($roleUser){
-                $memberModel=D('Common/Member');
+        $aRoleId = I('post.role_id', 0, 'intval');
+        $uid = is_login();
+        $data['status'] = 0;
+        if ($uid && $aRoleId != get_login_role()) {
+            $roleUser = D('UserRole')->where(array('uid' => $uid, 'role_id' => $aRoleId))->find();
+            if ($roleUser) {
+                $memberModel = D('Common/Member');
                 $memberModel->logout();
-                $result=$memberModel->login($uid,false,$aRoleId);
-                if($result){
-                    $data['info']="身份切换成功！";
-                    $data['status']=1;
+                clean_query_user_cache($uid,array('avatar64','avatar128','avatar32','avatar256','avatar512','rank_link'));
+                $result = $memberModel->login($uid, false, $aRoleId);
+                if ($result) {
+                    $data['info'] = "身份切换成功！";
+                    $data['status'] = 1;
                 }
             }
         }
-        $data['info']="非法操作！";
+        $data['info'] = "非法操作！";
         $this->ajaxReturn($data);
     }
 
@@ -679,22 +761,23 @@ class MemberController extends Controller
      */
     public function registerRole()
     {
-        $aRoleId=I('post.role_id',0,'intval');
-        $uid=is_login();
-        $data['status']=0;
-        if($uid>0&&$aRoleId!=get_login_role()){
-            $roleUser=D('UserRole')->where(array('uid'=>$uid,'role_id'=>$aRoleId))->find();
-            if($roleUser){
-                $data['info']="已持有该身份！";
+        $aRoleId = I('post.role_id', 0, 'intval');
+        $uid = is_login();
+        $data['status'] = 0;
+        if ($uid > 0 && $aRoleId != get_login_role()) {
+            $roleUser = D('UserRole')->where(array('uid' => $uid, 'role_id' => $aRoleId))->find();
+            if ($roleUser) {
+                $data['info'] = "已持有该身份！";
                 $this->ajaxReturn($data);
-            }else{
-                $memberModel=D('Common/Member');
+            } else {
+                $memberModel = D('Common/Member');
                 $memberModel->logout();
-                $this->initRoleUser($aRoleId,$uid);
-                $memberModel->login($uid, false,$aRoleId); //登陆
+                $this->initRoleUser($aRoleId, $uid);
+                clean_query_user_cache($uid,array('avatar64','avatar128','avatar32','avatar256','avatar512','rank_link'));
+                $memberModel->login($uid, false, $aRoleId); //登陆
             }
-        }else{
-            $data['info']="非法操作！";
+        } else {
+            $data['info'] = "非法操作！";
             $this->ajaxReturn($data);
         }
     }
@@ -706,21 +789,21 @@ class MemberController extends Controller
      * @return bool
      * @author 郑钟良<zzl@ourstu.com>
      */
-    private function initRoleUser($role_id=0,$uid)
+    private function initRoleUser($role_id = 0, $uid)
     {
-        $memberModel=D('Member');
-        $role=D('Role')->where(array('id'=>$role_id))->find();
-        $user_role=array('uid'=>$uid,'role_id'=>$role_id,'step'=>"start");
-        if($role['audit']){//该角色需要审核
-            $user_role['status']=2;//未审核
-        }else{
-            $user_role['status']=1;
+        $memberModel = D('Member');
+        $role = D('Role')->where(array('id' => $role_id))->find();
+        $user_role = array('uid' => $uid, 'role_id' => $role_id, 'step' => "start");
+        if ($role['audit']) { //该角色需要审核
+            $user_role['status'] = 2; //未审核
+        } else {
+            $user_role['status'] = 1;
         }
-        $result=D('UserRole')->add($user_role);
-        if(!$role['audit']){//该角色不需要审核
-            $memberModel->initUserRoleInfo($role_id,$uid);
+        $result = D('UserRole')->add($user_role);
+        if (!$role['audit']) { //该角色不需要审核
+            $memberModel->initUserRoleInfo($role_id, $uid);
         }
-        $memberModel->initDefaultShowRole($role_id,$uid);
+        $memberModel->initDefaultShowRole($role_id, $uid);
 
         return $result;
     }
@@ -730,13 +813,136 @@ class MemberController extends Controller
      */
     public function edit_expandinfo()
     {
-        $result=A('Ucenter/RegStep','Widget')->edit_expandinfo();
+        $result = A('Ucenter/RegStep', 'Widget')->edit_expandinfo();
         if ($result['status']) {
-            $this->success('保存成功！',session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('expand_info'))) : 'refresh');
+            $this->success('保存成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('expand_info'))) : 'refresh');
         } else {
-            !isset($result['info'])&&$result['info']='没有要保存的信息！';
+            !isset($result['info']) && $result['info'] = '没有要保存的信息！';
             $this->error($result['info']);
         }
+    }
+
+    /**
+     * 判断注册类型
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    private function checkRegisterType()
+    {
+        $aCode = I('get.code', '', 'op_t');
+        $register_type = modC('REGISTER_TYPE', 'normal', 'Invite');
+        $register_type = explode(',', $register_type);
+
+        if (!in_array('invite', $register_type) && !in_array('normal', $register_type)) {
+            $this->error("网站已关闭注册！");
+        }
+
+        if (in_array('invite', $register_type) && $aCode != '') { //邀请注册开启且有邀请码
+            $invite = D('Ucenter/Invite')->getByCode($aCode);
+            if ($invite) {
+                if ($invite['end_time'] <= time()) {
+                    $this->error("该邀请码或邀请链接已过期！");
+                } else { //获取注册角色
+                    $map['id'] = $invite['invite_type'];
+                    $invite_type = D('Ucenter/InviteType')->getSimpleData($map);
+                    if ($invite_type) {
+                        if (count($invite_type['roles'])) {
+                            //角色
+                            $map_role['status'] = 1;
+                            $map_role['id'] = array('in', $invite_type['roles']);
+                            $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
+                            if (!count($roleList)) {
+                                $this->error('邀请码绑定角色错误！');
+                            }
+                            //角色end
+                        } else {
+                            //角色
+                            $map_role['status'] = 1;
+                            $map_role['invite'] = 0;
+                            $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
+                            //角色end
+                        }
+                        $this->assign('code', $aCode);
+                        $this->assign('invite_user', $invite['user']);
+                    } else {
+                        $this->error("该邀请码或邀请链接已被禁用！");
+                    }
+                }
+            } else {
+                $this->error("不存在该邀请码或邀请链接！");
+            }
+        } else { //（开启邀请注册且无邀请码）或（只开启了普通注册）
+            if (in_array('invite', $register_type)) {
+                $this->assign('open_invite_register', 1);
+            }
+
+            if (in_array('normal', $register_type)) {
+                //角色
+                $map_role['status'] = 1;
+                $map_role['invite'] = 0;
+                $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
+                //角色end
+            } else { //（只开启了邀请注册）
+                $this->error("收到邀请的用户才能注册该网站！");
+            }
+        }
+        $this->assign('role_list', $roleList);
+        return true;
+    }
+
+    /**
+     * 判断邀请码是否可用
+     * @param string $code
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    private function checkInviteCode($code = '')
+    {
+        if($code==''){
+            return true;
+        }
+        $invite = D('Ucenter/Invite')->getByCode($code);
+        if ($invite['end_time'] >= time()) {
+            $map['id'] = $invite['invite_type'];
+            $invite_type = D('Ucenter/InviteType')->getSimpleData($map);
+            if ($invite_type) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function initInviteUser($uid = 0, $code = '', $role = 0)
+    {
+        if ($code != '') {
+            $inviteModel = D('Ucenter/Invite');
+            $invite = $inviteModel->getByCode($code);
+            $data['inviter_id'] = abs($invite['uid']);
+            $data['uid'] = $uid;
+            $data['invite_id'] = $invite['id'];
+            $result = D('Ucenter/InviteLog')->addData($data, $role);
+            if ($result) {
+                D('Ucenter/InviteUserInfo')->addSuccessNum($invite['invite_type'], abs($invite['uid']));
+
+                $invite_info['already_num'] = $invite['already_num'] + 1;
+                if ($invite_info['already_num'] == $invite['can_num']) {
+                    $invite_info['status'] = 0;
+                }
+                $inviteModel->where(array('id' => $invite['id']))->save($invite_info);
+
+                $map['id'] = $invite['invite_type'];
+                $invite_type = D('Ucenter/InviteType')->getSimpleData($map);
+                if ($invite_type['is_follow']) {
+                    $followModel = D('Common/Follow');
+                    $followModel->addFollow($uid, abs($invite['uid']));
+                    $followModel->addFollow(abs($invite['uid']), $uid);
+                }
+                if($invite['uid']>0){
+                    D('Ucenter/Score')->setUserScore(array($invite['uid']),$invite_type['income_score'],$invite_type['income_score_type'],'inc');//扣积分
+                }
+            }
+        }
+        return true;
     }
 
 }

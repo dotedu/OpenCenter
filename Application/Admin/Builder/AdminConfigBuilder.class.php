@@ -280,10 +280,11 @@ class AdminConfigBuilder extends AdminBuilder
 
     public function display()
     {
+
         //将数据融入到key中
         foreach ($this->_keyList as &$e) {
             if($e['type'] == 'multiInput'){
-                $e['name'] = explode(',',$e['name']);
+                $e['name'] = explode('|',$e['name']);
             }
 
             //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
