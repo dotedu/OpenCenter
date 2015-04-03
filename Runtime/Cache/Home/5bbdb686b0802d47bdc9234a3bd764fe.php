@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>微博首页
