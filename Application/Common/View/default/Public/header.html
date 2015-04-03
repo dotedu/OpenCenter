@@ -21,7 +21,7 @@
                 <span class="icon-bar"></span>
             </button>
             <php>$logo = get_cover(C('SITE_LOGO'),'path');
-            $logo = $logo?$logo:'__ROOT__/Public/images/logo.png';
+                $logo = $logo?$logo:'__ROOT__/Public/images/logo.png';
             </php>
             <a class="logo" href="{:U('Home/Index/index')}"><img src="{$logo}"/></a>
         </div>
@@ -119,7 +119,8 @@
                             </li>
                             <li class="footer text-right">
                                 <div class="btn-group">
-                                    <button onclick="Notify.setAllReaded()" class="btn btn-sm  "><i class="icon-check"></i> 全部已读
+                                    <button onclick="Notify.setAllReaded()" class="btn btn-sm  "><i
+                                            class="icon-check"></i> 全部已读
                                     </button>
                                     <a class="btn  btn-sm  " href="{:U('ucenter/Message/message')}">
                                         查看消息
@@ -185,7 +186,7 @@
                             $open_quick_login=modC('OPEN_QUICK_LOGIN', 0, 'USERCONFIG');
                         </php>
                         <script>
-                            var OPEN_QUICK_LOGIN="{$open_quick_login}";
+                            var OPEN_QUICK_LOGIN = "{$open_quick_login}";
                         </script>
                         <a data-login="do_login">登录</a>
                     </li>
@@ -201,6 +202,7 @@
                         <php>}</php>
                     </li>
                     <li class="spliter hidden-xs"></li>
+
                 </if>
             </ul>
 
@@ -215,13 +217,19 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
+
                 </button>
             </div>
         </div>
-
+        <!--举报插件钩子-->
+        {:hook('report',array('type'=>'home','data'=>数组,'url'=> 'home/index/index.html'))}
+        <!--举报插件钩子-->
 
     </nav>
+
 </div>
+
+
 <!--换肤插件钩子-->
 {:hook('setSkin')}
 <!--换肤插件钩子 end-->

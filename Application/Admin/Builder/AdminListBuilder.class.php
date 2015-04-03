@@ -548,9 +548,9 @@ class AdminListBuilder extends AdminBuilder
             $url = $getUrl($item);
             //允许字段为空，如果字段名为空将标题名填充到A变现里
             if(!$value){
-                return "<a href=\"$url\">".$key['title']."</a>";
+                return "<a href=\"$url\" target=\"_blank\">".$key['title']."</a>";
             } else {
-                return "<a href=\"$url\">$value</a>";
+                return "<a href=\"$url\" target=\"_blank\">$value</a>";
             }
         });
 
@@ -587,7 +587,7 @@ class AdminListBuilder extends AdminBuilder
                     }
                     $content = implode(' ', $content);
                     if(isset($action['opt']['data-role'])&&$action['opt']['data-role']=="modal_popup"){//模态弹窗
-                        $result[] = "<a modal-url=\"$url\" ".$content.">$linkText</a>";
+                        $result[] = "<a href=\" javascrapt:void(0);\" modal-url=\"$url\" ".$content.">$linkText</a>";
                     }else{
                         $result[] = "<a href=\"$url\" ".$content.">$linkText</a>";
                     }
