@@ -300,6 +300,12 @@ class InviteController extends AdminController
         }
     }
 
+    /**
+     * 用户兑换名额记录
+     * @param int $page
+     * @param int $r
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function buyLog($page=1,$r=20)
     {
         $aInviteType=I('invite_type',0,'intval');
@@ -343,6 +349,12 @@ class InviteController extends AdminController
             ->display();
     }
 
+    /**
+     * 用户邀请信息列表
+     * @param int $page
+     * @param int $r
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function userInfo($page=1,$r=20)
     {
         $aInviteType=I('invite_type',0,'intval');
@@ -374,6 +386,10 @@ class InviteController extends AdminController
             ->display();
     }
 
+    /**
+     * 编辑用户邀请信息
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function editUserInfo()
     {
         $aId=I('id',0,'intval');
@@ -411,6 +427,12 @@ class InviteController extends AdminController
         }
     }
 
+    /**
+     * 邀请日志
+     * @param int $page
+     * @param int $r
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function inviteLog($page=1,$r=20)
     {
         $list=$this->inviteLogModel->getList($totalCount,$page,$r);
@@ -427,6 +449,10 @@ class InviteController extends AdminController
             ->display();
     }
 
+    /**
+     * 导出cvs
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function cvs()
     {
         $aIds=I('ids',array());

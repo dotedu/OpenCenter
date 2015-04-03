@@ -389,6 +389,15 @@ class AdminListBuilder extends AdminBuilder
         return $this->key($name, $title , 'Join' , $map);
     }
 
+    /**
+     * 模态弹窗
+     * @param $getUrl
+     * @param $text
+     * @param $title
+     * @param array $attr
+     * @return $this
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function keyDoActionModalPopup($getUrl,$text,$title,$attr=array())
     {
         //attr中需要设置data-title，用于设置模态弹窗标题

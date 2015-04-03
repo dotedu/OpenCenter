@@ -29,6 +29,12 @@ class InviteTypeModel extends Model
     protected $updateFields = 'id,title,length,time,cycle_num,cycle_time,roles,auth_groups,pay_score,pay_score_type,income_score,income_score_type,is_follow,status,update_time';
 
 
+    /**
+     * 保存邀请码类型信息
+     * @param array $data
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function saveData($data = array())
     {
         $data = $this->_initSaveData($data);
@@ -38,6 +44,12 @@ class InviteTypeModel extends Model
         return $result;
     }
 
+    /**
+     * 添加邀请码类型信息
+     * @param array $data
+     * @return bool|mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function addData($data = array())
     {
         $data = $this->_initSaveData($data);
@@ -47,6 +59,12 @@ class InviteTypeModel extends Model
         return $result;
     }
 
+    /**
+     * 获取邀请码类型
+     * @param array $map
+     * @return array|mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getData($map = array())
     {
         $data = $this->where($map)->find();
@@ -56,6 +74,12 @@ class InviteTypeModel extends Model
         return $data;
     }
 
+    /**
+     * 获取简易结构邀请码类型
+     * @param array $map
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getSimpleData($map=array())
     {
         $data = $this->where($map)->find();
@@ -69,6 +93,12 @@ class InviteTypeModel extends Model
         return $data;
     }
 
+    /**
+     * 获取邀请码类型列表
+     * @param array $map
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getList($map = array())
     {
         if (count($map)) {
@@ -82,6 +112,13 @@ class InviteTypeModel extends Model
         return $data;
     }
 
+    /**
+     * 获取简易结构邀请码类型列表
+     * @param array $map
+     * @param string $field
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getSimpleList($map = array(), $field = 'id,title')
     {
         if (count($map)) {
@@ -92,6 +129,12 @@ class InviteTypeModel extends Model
         return $data;
     }
 
+    /**
+     * 真删除邀请码
+     * @param array $ids id列表
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function deleteIds($ids=array())
     {
         $this->where(array('id'=>array('in',$ids)))->delete();
@@ -115,6 +158,11 @@ class InviteTypeModel extends Model
         return $list;
     }
 
+    /**
+     * 获取用户可兑换邀请码类型
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getUserTypeList()
     {
         $group_ids=D('AuthGroupAccess')->where(array('uid'=>is_login()))->field('group_id')->select();
@@ -165,6 +213,12 @@ class InviteTypeModel extends Model
         return $list;
     }
 
+    /**
+     * 初始化查询邀请码类型
+     * @param array $data
+     * @return array
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     private function _initSelectData($data = array())
     {
         $data['roles']=str_replace('[','',$data['roles']);
@@ -207,6 +261,12 @@ class InviteTypeModel extends Model
         return $data;
     }
 
+    /**
+     * 初始化保存邀请码类型
+     * @param array $data
+     * @return array
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     private function _initSaveData($data = array())
     {
         $data['time'] = $data['time_num'] . ' ' . $data['time_unit'];
