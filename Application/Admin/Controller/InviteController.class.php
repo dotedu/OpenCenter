@@ -221,9 +221,9 @@ class InviteController extends AdminController
             $builder=new AdminListBuilder();
             $builder->title('邀请码列表页面')
                 ->setSelectPostUrl('Invite/invite')
-                ->buttonDelete(U('Invite/delete'))
-                ->modalPopupButton(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
-                ->buttonDelete(U('Invite/deleteTrue'),'删除无用邀请码(真删除)')
+                /*->buttonDelete(U('Invite/delete'))*/
+                ->butttonModalPopup(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
+                ->buttonDelete(U('Invite/deleteTrue'),'清空无用邀请码(真删除)')
                 ->select('邀请码类型：','type','select','','','',$typeOptions)
                 ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'3','value'=>'已过期'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
                 ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>'管理员生成'),array('id'=>'1','value'=>'用户购买')))
@@ -300,6 +300,12 @@ class InviteController extends AdminController
         }
     }
 
+    /**
+     * 用户兑换名额记录
+     * @param int $page
+     * @param int $r
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function buyLog($page=1,$r=20)
     {
         $aInviteType=I('invite_type',0,'intval');
@@ -315,7 +321,6 @@ class InviteController extends AdminController
             $order='uid asc,invite_type asc,create_time desc';
         }
         $list=$this->inviteBuyLogModel->getList($map,$totalCount,$page,$order,$r);
-
         $orderOptions=array(
             array('id'=>0,'value'=>'最新创建'),
             array('id'=>1,'value'=>'最早创建'),
@@ -344,6 +349,12 @@ class InviteController extends AdminController
             ->display();
     }
 
+    /**
+     * 用户邀请信息列表
+     * @param int $page
+     * @param int $r
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function userInfo($page=1,$r=20)
     {
         $aInviteType=I('invite_type',0,'intval');
@@ -375,6 +386,10 @@ class InviteController extends AdminController
             ->display();
     }
 
+    /**
+     * 编辑用户邀请信息
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function editUserInfo()
     {
         $aId=I('id',0,'intval');
@@ -412,6 +427,12 @@ class InviteController extends AdminController
         }
     }
 
+    /**
+     * 邀请日志
+     * @param int $page
+     * @param int $r
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function inviteLog($page=1,$r=20)
     {
         $list=$this->inviteLogModel->getList($totalCount,$page,$r);
@@ -428,6 +449,10 @@ class InviteController extends AdminController
             ->display();
     }
 
+    /**
+     * 导出cvs
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function cvs()
     {
         $aIds=I('ids',array());

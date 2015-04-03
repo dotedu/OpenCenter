@@ -80,6 +80,12 @@ class InviteModel extends Model
         return $result;
     }
 
+    /**
+     * 获取简易结构的邀请码列表
+     * @param array $ids
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getSimpleListByIds($ids = array())
     {
         $map['id'] = array('in', $ids);
@@ -91,6 +97,16 @@ class InviteModel extends Model
         return $dataList;
     }
 
+    /**
+     * 获取分页邀请码列表
+     * @param array $map
+     * @param int $page
+     * @param $totalCount
+     * @param int $r
+     * @param string $order
+     * @return array|null
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getList($map = array(), $page = 1, &$totalCount, $r = 20, $order = 'id desc')
     {
         $totalCount = $this->where($map)->count();
@@ -101,6 +117,12 @@ class InviteModel extends Model
         return null;
     }
 
+    /**
+     * 退还邀请码
+     * @param int $id
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function backCode($id = 0)
     {
         $result = $this->where(array('id' => $id))->setField('status', 2);
@@ -117,6 +139,12 @@ class InviteModel extends Model
         return $result;
     }
 
+    /**
+     * 根据邀请码获取邀请码信息
+     * @param string $code
+     * @return mixed|null
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getByCode($code = '')
     {
         $map['code'] = $code;
@@ -129,6 +157,12 @@ class InviteModel extends Model
         return null;
     }
 
+    /**
+     * 初始化查询信息
+     * @param array $dataList
+     * @return array
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     private function _initSelectData($dataList = array())
     {
         $invite_type_id = array_column($dataList, 'invite_type');
@@ -149,6 +183,13 @@ class InviteModel extends Model
     }
 
 
+    /**
+     * 创建邀请码
+     * @param array $data
+     * @param $length
+     * @return array|mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     private function createOneCode($data = array(), $length)
     {
         $length = $length ? $length : 11;

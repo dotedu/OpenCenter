@@ -253,8 +253,8 @@ str;
      */
     public function adminList($name){
 
-        if(method_exists(A('Addons://'.$name.'/Admin') ,'buildList')){
-            A('Addons://'.$name.'/Admin')->buildList();
+        if(method_exists(A('Addons://Mail/Admin') ,'buildList')){
+            A('Addons://Mail/Admin')->buildList();
             exit;
         }
 
@@ -380,7 +380,7 @@ str;
         $addonsModel    =   D('Addons');
         $data           =   $addonsModel->create($info);
 
-        if((is_array($addons->admin_list) && $addons->admin_list !== array()) || method_exists(A('Addons://'.$addon_name.'/Admin') ,'buildList')){
+        if((is_array($addons->admin_list) && $addons->admin_list !== array()) || method_exists(A('Addons://Mail/Admin') ,'buildList')){
             $data['has_adminlist'] = 1;
         }else{
             $data['has_adminlist'] = 0;

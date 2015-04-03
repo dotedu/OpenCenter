@@ -28,6 +28,10 @@ class InviteController extends BaseController
         $this->mInviteUserInfoModel=D('Ucenter/InviteUserInfo');
     }
 
+    /**
+     * 邀请码类型列表页
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function index()
     {
         //获取邀请码类型列表
@@ -38,6 +42,10 @@ class InviteController extends BaseController
         $this->display();
     }
 
+    /**
+     * 邀请码列表页
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function invite()
     {
         $typeList=$this->mInviteTypeModel->getUserTypeSimpleList();
@@ -54,6 +62,10 @@ class InviteController extends BaseController
         $this->display();
     }
 
+    /**
+     * 兑换邀请名额
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function exchange()
     {
         if(IS_POST){
@@ -80,6 +92,10 @@ class InviteController extends BaseController
         }
     }
 
+    /**
+     * 生成邀请码
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function createCode()
     {
         if(IS_POST){
@@ -120,6 +136,10 @@ class InviteController extends BaseController
         }
     }
 
+    /**
+     * 退还邀请码
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function backCode()
     {
         $aId=I('post.id',0,'intval');
@@ -133,6 +153,12 @@ class InviteController extends BaseController
         $this->ajaxReturn($data);
     }
 
+    /**
+     * 获取用户邀请码
+     * @param int $type_id 邀请码类型
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     private function _getUserCode($type_id=0)
     {
         $map['uid']=is_login();

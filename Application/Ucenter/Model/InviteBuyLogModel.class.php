@@ -14,6 +14,13 @@ use Think\Model;
 
 class InviteBuyLogModel extends Model
 {
+    /**
+     * 添加用户兑换名额记录
+     * @param int $type_id
+     * @param int $num
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function buy($type_id = 0, $num = 0)
     {
         $invite_type=D('Ucenter/InviteType')->where(array('id'=>$type_id))->find();
@@ -29,6 +36,16 @@ class InviteBuyLogModel extends Model
         return $result;
     }
 
+    /**
+     * 获取兑换记录列表
+     * @param array $map
+     * @param $totalCount
+     * @param int $page
+     * @param string $order
+     * @param int $r
+     * @return array
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getList($map=array(),&$totalCount,$page=1,$order='create_time desc',$r=20)
     {
         if(count($map)){
@@ -46,11 +63,17 @@ class InviteBuyLogModel extends Model
         return $list;
     }
 
+    /**
+     * 初始化查询出的数据
+     * @param array $list
+     * @return array
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     private function _initSelectData($list=array())
     {
         $inviteTypeModel=D('Ucenter/InviteType');
         foreach($list as &$val){
-            $inviteType=$inviteTypeModel->getSimpleData();
+            $inviteType=$inviteTypeModel->getSimpleData(array('id'=>$val['invite_type']));
             $val['invite_type_title']=$inviteType['title'];
             $val['user']=query_user('nickname',$val['uid']);
             $val['user']='['.$val['uid'].']'.$val['user'];

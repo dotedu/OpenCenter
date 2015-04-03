@@ -15,6 +15,13 @@ use Think\Model;
 class InviteLogModel extends Model
 {
 
+    /**
+     * 添加邀请注册成功日志
+     * @param array $data
+     * @param int $role
+     * @return mixed
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function addData($data=array(),$role=0)
     {
         $inviter_user=query_user('nickname',$data['inviter_id']);
@@ -27,6 +34,14 @@ class InviteLogModel extends Model
         return $result;
     }
 
+    /**
+     * 分页获取邀请注册日志列表
+     * @param $totalCount
+     * @param int $page
+     * @param int $r
+     * @return array
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     public function getList(&$totalCount,$page=1,$r=20)
     {
         $totalCount=$this->count();
@@ -37,11 +52,17 @@ class InviteLogModel extends Model
         return $list;
     }
 
+    /**
+     * 初始化查询数据
+     * @param array $list
+     * @return array
+     * @author 郑钟良<zzl@ourstu.com>
+     */
     private function _initSelectData($list=array())
     {
         $inviteTypeModel=D('Ucenter/InviteType');
         foreach($list as &$val){
-            $inviteType=$inviteTypeModel->getSimpleData();
+            $inviteType=$inviteTypeModel->getSimpleData(array('id'=>$val['invite_type']));
             $val['invite_type_title']=$inviteType['title'];
             $val['user']=query_user('nickname',$val['uid']);
             $val['user']='['.$val['uid'].']'.$val['user'];
