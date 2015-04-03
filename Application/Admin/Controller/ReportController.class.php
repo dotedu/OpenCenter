@@ -2,10 +2,8 @@
 
 namespace Admin\Controller;
 
-use Admin\Controller\AddonsController;
-use Admin\Builder\AdminListBuilder;
 use Admin\Builder\AdminConfigBuilder;
-use Admin\Builder\AdminTreeListBuilder;
+use Admin\Builder\AdminListBuilder;
 
 require_once(ONETHINK_ADDON_PATH . 'Report/Common/function.php');
 
@@ -25,7 +23,7 @@ class ReportController extends AdminController
         $builder->title("举报处理列表");
 
         $builder->setStatusUrl(U('setStatus'))
-            ->modalPopupButton(U('handleEject'), '', "处理", $attr = array())
+            ->buttonModalPopup(U('handleEject'), '', "处理", $attr = array())
             ->buttonDisable('','忽略处理')
             ->buttonDelete(U('deleteReport'),'删除举报')
             ->keyId()
@@ -37,9 +35,7 @@ class ReportController extends AdminController
             ->keyCreateTime('create_time',"创建时间")
             ->keyUpdateTime('update_time',"更新时间")
             ->keyUpdateTime('handle_time',"处理时间")
-            ->keyDoAction(' ','','操作')
-            ->keyDoActionModalPopup('RoleangeRole?id=###','测试','操作',array('data-title'=>'迁移用户到其他角色'))
-            ->keyDoActionEdit(' ','处理')
+            ->keyDoActionModalPopup('handleEject?id=###','处理','操作',array('data-title'=>'迁移用户到其他角色'))
             ->keyDoActionEdit(' ','忽略处理')
             ->key('status', '状态', 'status',array('0'=>'忽略处理','1'=>'已处理','2'=>'正在处理'));
 
@@ -68,7 +64,7 @@ class ReportController extends AdminController
     }
 
     public function handleEject(){
-        $this->display(T('Application://'));
+        $this->display();
     }
 
 

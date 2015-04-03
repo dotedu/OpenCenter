@@ -1,1 +1,0 @@
-<?php if (!defined('THINK_PATH')) exit();?>OpenCenter轻量化社交框架

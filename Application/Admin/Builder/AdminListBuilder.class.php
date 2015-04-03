@@ -578,7 +578,7 @@ class AdminListBuilder extends AdminBuilder
                     }
                     $content = implode(' ', $content);
                     if(isset($action['opt']['data-role'])&&$action['opt']['data-role']=="modal_popup"){//模态弹窗
-                        $result[] = "<a modal-url=\"$url\" ".$content.">$linkText</a>";
+                        $result[] = "<a href=\" javascrapt:void(0);\" modal-url=\"$url\" ".$content.">$linkText</a>";
                     }else{
                         $result[] = "<a href=\"$url\" ".$content.">$linkText</a>";
                     }
