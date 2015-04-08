@@ -28,7 +28,11 @@
         </div>
         <input type="hidden" value="{$default.value}" name="config[defaultSkin]" id="default"/>
     </div>
-    <div class="button_list"><a class="btn btn-primary" data-role="SelectSkin" <if condition="!is_login()">disabled="disabled"</if>>确定</a><a class="btn btn-primary" data-role="SelectSkinDefault" <if condition="!is_login()">disabled="disabled"</if>>恢复默认</a><a class="btn btn-primary" data-role="USelectSkin">取消</a></div>
+    <div class="button_list">
+        <a class="btn btn-primary" data-role="SelectSkin" <if condition="!is_login()">disabled="disabled"</if>>确定</a>
+        <a class="btn btn-primary" data-role="SelectSkinDefault" <if condition="!is_login()">disabled="disabled"</if>>恢复默认</a>
+        <a class="btn btn-primary" data-role="USelectSkin">取消</a>
+    </div>
     <div class="clearfix"></div>
 </div>
 <!--模态弹窗 end-->
