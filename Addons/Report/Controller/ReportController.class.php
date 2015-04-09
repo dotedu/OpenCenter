@@ -40,8 +40,10 @@ class ReportController extends AddonsController
         $data['type'] = $param['type'];
         $data['data'] = $param['data'];
 
+
         $result = D('Addons://Report/Report')->addData($data);
         if ($result) {
+            D('Message')->sendMessageWithoutCheckSelf('1', '有一封举报，请到后台查看。', '您有新的系统消息','',is_login(), 0);
             $this->success('举报成功', 0);
         } else {
             $this->error('举报失败');

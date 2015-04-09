@@ -13,9 +13,12 @@ class ReportAddon extends Addon
         'description' => '可举报不法数据',
         'status' => 1,
         'author' => '想天科技xuminwei',
-        'version' => '0.1'
+        'version' => '0.1',
+        'has_adminlist'=>'1',
     );
-
+    public $admin_list = array(
+        '' => '',
+    );
 
     public function install()
     {

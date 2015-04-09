@@ -1,35 +1,31 @@
 <?php
 
-namespace Admin\Controller;
+namespace Addons\Report\Controller;
 
-use Admin\Builder\AdminConfigBuilder;
+use Admin\Controller\AddonsController;
 use Admin\Builder\AdminListBuilder;
+use Admin\Builder\AdminConfigBuilder;
+use Admin\Builder\AdminTreeListBuilder;
 
 require_once(ONETHINK_ADDON_PATH . 'Report/Common/function.php');
 
 
-class ReportController extends AdminController
+class AdminController extends AddonsController
 {
-    /**
-     * 后台管理员处理举报页面
-     * @param int $page
-     * @param int $r
-     * @return array|false|void
-     */
-    public function lists($page = 1, $r = 20)
+
+    public function buildList($page = 1, $r = 20)
     {
         $map['status'] = array('egt', 0);
-        $list = M('Report')->where($map)->page($page, $r)->select();
+        $list = M('Report')->where($map)->page($page, $r)->order('id asc')->select();
         $reportCount = M('Report')->where($map)->count();
-
         int_to_string($list);
 
         $builder = new AdminListBuilder();
         $builder->title("举报处理列表");
 
-        $builder->buttonModalPopup(U('Report/handleEject'), '', '批量处理', array('target-form' => 'ids'))
-            ->buttonDisable(U('Report/ignoreReport'), '忽略处理')
-            ->buttonDelete(U('deleteReport'), '删除举报')
+        $builder->buttonModalPopup(addons_url('Report://Admin/handleEject'), '', '批量处理', array('target-form' => 'ids'))
+            ->buttonDisable(addons_url('Report://Admin/ignoreReport'), '忽略处理')
+            ->buttonDelete(addons_url('Report://Admin/deleteReport'), '删除举报')
             ->keyId()
             ->keyLink('url', "举报链接", '{$url}')
             ->keyUid('uid', "举报用户的ID")
@@ -39,14 +35,15 @@ class ReportController extends AdminController
             ->keyCreateTime('create_time', "创建时间")
             ->keyUpdateTime('handle_time', "处理时间")
             ->keyText('handle_result', "处理结果")
-            ->keyDoActionModalPopup('handleEject?ids=###', '处理', '操作')
-            ->keyDoActionEdit('ignoreReport?ids=###', '忽略处理')
+            ->keyDoActionModalPopup('Report://Admin/handleEject?ids=###|addons_url', '处理', '操作')
+            ->keyDoActionEdit('Report://Admin/ignoreReport?ids=###|addons_url', '忽略处理')
             ->key('status', '状态', 'status', array('0' => '未处理', '1' => '处理中', '2' => '已处理'));
 
         $builder->data($list);
         $builder->pagination($reportCount, $r);
         $builder->display();
     }
+
 
     /**
      * 删除举报操作
@@ -69,9 +66,11 @@ class ReportController extends AdminController
     public function handleEject()
     {
         $ids = I('ids');                        //获取点击的ids
-        $ids = implode(',', $ids);              //数组转换成字符串，传到页面
+        if (is_array($ids)) {
+            $ids = implode(',', $ids);              //数组转换成字符串，传到页面
+        }
         $this->assign('ids', $ids);
-        $this->display();
+        $this->display(T('Addons://Report@Report/handleeject'));
     }
 
 
@@ -97,14 +96,15 @@ class ReportController extends AdminController
         $handlestatus = I('post.user_choose', '', 'op_t');      //接收处理状态
         $data['status'] = $handlestatus;
 
-        $uid= D('Common/Report')->where($map)->field('uid')->select();
-        $uid=array_column($uid,'uid');
+        $uid = D('Common/Report')->where($map)->field('uid')->select();
+        $uid = array_column($uid, 'uid');
         $name = query_user(array('uid', 'nickname'));
 
         $result = D('Addons://Report/Report')->where($map)->save($data);
+
         if ($result) {
-            for($i=0;$i<count($uid);$i++){      //根据用户ID，发送系统消息
-                D('Message')->sendMessageWithoutCheckSelf($uid[$i],'处理时间：' . friendlyDate($data['handle_time']).'。' . '处理状态：' .'已处理' .'。' .'处理结果：'.$data['handle_result'].'。'. '处理人：'.$name['nickname'], '您有新的系统消息','',is_login(), 0);
+            for ($i = 0; $i < count($uid); $i++) {      //根据用户ID，发送系统消息
+                D('Message')->sendMessageWithoutCheckSelf($uid[$i], '处理时间：' . friendlyDate($data['handle_time']) . '。' . '处理状态：' . '已处理' . '。' . '处理结果：' . $data['handle_result'] . '。' . '处理人：' . $name['nickname'], '您有新的系统消息', '', is_login(), 0);
             }
             $this->success('处理成功', 0);
         } else {
@@ -129,16 +129,16 @@ class ReportController extends AdminController
         $data['status'] = '2';
         $data['handle_uid'] = $handlepeople;
 
-        $uid= D('Common/Report')->where($map)->field('uid')->select();
-        $uid=array_column($uid,'uid');
+        $uid = D('Common/Report')->where($map)->field('uid')->select();
+        $uid = array_column($uid, 'uid');
         $name = query_user(array('uid', 'nickname'));                       //获取用户名
 
         $result = D('Addons://Report/Report')->where($map)->save($data);
 
         if ($result) {
-                for($i=0;$i<count($uid);$i++){   //根据用户ID，发送系统消息
-                    D('Message')->sendMessageWithoutCheckSelf($uid[$i],'处理时间：' . friendlyDate($data['handle_time']).'。' . '处理状态：' .'已处理' .'。' .'处理结果：'.$data['handle_result'].'。'. '处理人：'.$name['nickname'], '您有新的系统消息','',is_login(), 0);
-                }
+            for ($i = 0; $i < count($uid); $i++) {   //根据用户ID，发送系统消息
+                D('Message')->sendMessageWithoutCheckSelf($uid[$i], '处理时间：' . friendlyDate($data['handle_time']) . '。' . '处理状态：' . '已处理' . '。' . '处理结果：' . $data['handle_result'] . '。' . '处理人：' . $name['nickname'], '您有新的系统消息', '', is_login(), 0);
+            }
 
             $this->success('处理成功', 0);
         } else {
