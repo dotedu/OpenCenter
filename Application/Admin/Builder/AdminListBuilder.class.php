@@ -721,13 +721,16 @@ class AdminListBuilder extends AdminBuilder
      */
     private function createDefaultGetUrlFunction($pattern)
     {
-        return function ($item) use ($pattern) {
+        $explode = explode('|',$pattern);
+        $pattern = $explode[0];
+        $fun = empty($explode[1])?'U':$explode[1];
+        return function ($item) use ($pattern,$fun) {
             $pattern = str_replace('###', $item['id'], $pattern);
             //调用ThinkPHP中的解析引擎解析变量
             $view = new \Think\View();
             $view->assign($item);
             $pattern = $view->fetch('', $pattern);
-            return U($pattern);
+            return $fun($pattern);
         };
     }
 
