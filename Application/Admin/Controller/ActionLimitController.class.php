@@ -23,9 +23,9 @@ class ActionLimitController extends AdminController
         $map['status'] = array('EGT', 0);
         $model = M('action_limit');
         $List = $model->where($map)->order('id asc')->select();
+        $timeUnit = $this->getTimeUnit();
         foreach($List as &$val){
-            $timeUnit = $this->getTimeUnit();
-            $val['time_unit'] = $timeUnit[$val['time_unit']];
+            $val['time'] =$val['time_number']. $timeUnit[$val['time_unit']];
             $val['action_list'] = get_action_name($val['action_list']);
             empty( $val['action_list']) &&  $val['action_list'] = '所有行为';
 
@@ -43,7 +43,7 @@ class ActionLimitController extends AdminController
             ->keyTitle()
             ->keyText('name', '名称')
             ->keyText('frequency', '频率')
-            ->keyText('time_unit', '时间单位')
+            ->keyText('time', '时间单位')
             ->keyText('punish', '处罚')
             ->keyBool('if_message', '是否发送提醒')
             ->keyText('message_content', '消息提示内容')

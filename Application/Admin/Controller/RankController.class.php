@@ -453,9 +453,6 @@ class RankController extends AdminController
                 $content1 = '管理员通过了@' . $user['username'] . ' 的头衔申请：[' . $rank['title'] . ']，申请理由：' . $rank_user['reason'];
                 clean_query_user_cache($rank_user['uid'], array('rank_link'));
                 $this->sendMessage($rank_user, $content,'头衔申请审核通过');
-                //发微博
-                $model_weibo = D('Weibo/Weibo');
-                $result = $model_weibo->addWeibo(is_login(), $content1);
             }
         }else if($status=-1){
             foreach($ids as $val){
