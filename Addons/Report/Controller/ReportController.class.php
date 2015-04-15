@@ -17,12 +17,11 @@ class ReportController extends AddonsController
     public function eject()
     {
         parse_str(I('get.param'), $param);
+        $param['data']=json_encode($param['data']);
         $this->assign('param', $param);
-        if (is_login()) {
-            $config = _getAddonsCinfig();
-            $this->assign("reason", $config);
-            $this->display(T('Addons://Report@Report/eject'));
-        }
+        $config = _getAddonsCinfig();$this->assign("reason", $config);
+        $this->display(T('Addons://Report@Report/eject'));
+
     }
 
     /**
@@ -30,20 +29,21 @@ class ReportController extends AddonsController
      */
     public function addReport()
     {
+        parse_str(I('get.param'), $param);      //含有url,type,data,
         $preason = I('post.reason', '', 'op_t');
         $pcontent = I('post.content', '', 'op_t');
-        $purl = I('post.url', '', 'op_t');
-        $ptype = I('post.type', '', 'op_t');
-        $pdata = I('post.data', '', 'op_t');
 
         $data['uid'] = is_login();
-        $data['url'] = $purl;
+        $data['url'] = $param['url'];
         $data['reason'] = $preason;        //  举报原因
         $data['content'] = $pcontent;      // 举报描述
-        $data['type'] = $ptype;
-        $data['data'] = $pdata;
+        $data['type'] = $param['type'];
+        $data['data'] = $param['data'];
+
+
         $result = D('Addons://Report/Report')->addData($data);
         if ($result) {
+            D('Message')->sendMessageWithoutCheckSelf('1', '有一封举报，请到后台查看。', '您有新的系统消息','',is_login(), 0);
             $this->success('举报成功', 0);
         } else {
             $this->error('举报失败');

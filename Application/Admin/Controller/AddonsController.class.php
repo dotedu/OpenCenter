@@ -253,8 +253,8 @@ str;
      */
     public function adminList($name){
 
-        if(method_exists(A('Addons://Mail/Admin') ,'buildList')){
-            A('Addons://Mail/Admin')->buildList();
+        if(method_exists(A('Addons://'.$name.'/Admin') ,'buildList')){
+            A('Addons://'.$name.'/Admin')->buildList();
             exit;
         }
 
