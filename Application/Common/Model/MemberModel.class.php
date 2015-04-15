@@ -98,15 +98,15 @@ class MemberModel extends Model
      * @param int $role_id 有值代表强制登录这个角色
      * @return boolean      ture-登录成功，false-登录失败
      */
-    public function login($uid, $remember = false,$role_id=0)
+    public function login($uid, $remember = false, $role_id = 0)
     {
         /* 检测是否在当前应用注册 */
         $user = $this->field(true)->find($uid);
-        if($role_id!=0){
-            $user['last_login_role']=$role_id;
-        }else{
-            if(!intval($user['last_login_role'])){
-                $user['last_login_role']=$user['show_role'];
+        if ($role_id != 0) {
+            $user['last_login_role'] = $role_id;
+        } else {
+            if (!intval($user['last_login_role'])) {
+                $user['last_login_role'] = $user['show_role'];
             }
         }
         session('temp_login_uid', $uid);
@@ -124,20 +124,20 @@ class MemberModel extends Model
             return false;
         }
 
-        $step = D('UserRole')->where(array('uid' => $uid,'role_id'=>$user['last_login_role']))->getField('step');
+        $step = D('UserRole')->where(array('uid' => $uid, 'role_id' => $user['last_login_role']))->getField('step');
         if (!empty($step) && $step != 'finish') {
             header('Content-Type:application/json; charset=utf-8');
             $data['status'] = 1;
             //执行步骤在start的时候执行下一步，否则执行此步骤
-            $go = $step=='start'?get_next_step($step):check_step($step);
-            $data['url'] = U('Ucenter/Member/step',array('step'=>$go));
+            $go = $step == 'start' ? get_next_step($step) : check_step($step);
+            $data['url'] = U('Ucenter/Member/step', array('step' => $go));
 
             exit(json_encode($data));
         }
         /* 登录用户 */
         $this->autoLogin($user, $remember);
 
-        session('temp_login_uid',null);
+        session('temp_login_uid', null);
         session('temp_login_role_id', null);
         //记录行为
         action_log('user_login', 'member', $uid, $uid);
@@ -159,7 +159,7 @@ class MemberModel extends Model
      * 自动登录用户
      * @param  integer $user 用户信息数组
      */
-    private function autoLogin($user, $remember = false,$role_id=0)
+    private function autoLogin($user, $remember = false, $role_id = 0)
     {
 
         /* 更新登录信息 */
@@ -168,13 +168,13 @@ class MemberModel extends Model
             'login' => array('exp', '`login`+1'),
             'last_login_time' => NOW_TIME,
             'last_login_ip' => get_client_ip(1),
-            'last_login_role'=>$user['last_login_role'],
+            'last_login_role' => $user['last_login_role'],
         );
         $this->save($data);
         //判断角色用户是否审核
-        $map['uid']=$user['uid'];
-        $map['role_id']=$user['last_login_role'];
-        $audit=D('UserRole')->where($map)->getField('status');
+        $map['uid'] = $user['uid'];
+        $map['role_id'] = $user['last_login_role'];
+        $audit = D('UserRole')->where($map)->getField('status');
         //判断角色用户是否审核 end
 
         /* 记录登录SESSION和COOKIES */
@@ -182,8 +182,8 @@ class MemberModel extends Model
             'uid' => $user['uid'],
             'username' => get_username($user['uid']),
             'last_login_time' => $user['last_login_time'],
-            'role_id'=>$user['last_login_role'],
-            'audit'=>$audit,
+            'role_id' => $user['last_login_role'],
+            'audit' => $audit,
         );
 
         session('user_auth', $auth);
@@ -208,10 +208,11 @@ class MemberModel extends Model
 
     public function need_login()
     {
-
-        if ($uid = $this->getCookieUid()) {
-            $this->login($uid);
-            return true;
+        if (!is_login()) {
+            if ($uid = $this->getCookieUid()) {
+                $this->login($uid);
+                return true;
+            }
         }
     }
 
@@ -350,27 +351,28 @@ class MemberModel extends Model
      * @param $uid
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function initUserRoleInfo($role_id,$uid){
-        $roleModel=D('Role');
-        $roleConfigModel=D('RoleConfig');
-        $authGroupAccessModel=D('AuthGroupAccess');
-        D('UserRole')->where(array('role_id'=>$role_id,'uid'=>$uid))->setField('init',1);
+    public function initUserRoleInfo($role_id, $uid)
+    {
+        $roleModel = D('Role');
+        $roleConfigModel = D('RoleConfig');
+        $authGroupAccessModel = D('AuthGroupAccess');
+        D('UserRole')->where(array('role_id' => $role_id, 'uid' => $uid))->setField('init', 1);
         //默认用户组设置
-        $role=$roleModel->where(array('id'=>$role_id))->find();
-        if($role['user_groups']!=''){
-            $role=explode(',',$role['user_groups']);
+        $role = $roleModel->where(array('id' => $role_id))->find();
+        if ($role['user_groups'] != '') {
+            $role = explode(',', $role['user_groups']);
 
             //查询已拥有用户组
-            $have_user_group_ids=$authGroupAccessModel->where(array('uid'=>$uid))->select();
-            $have_user_group_ids=array_column($have_user_group_ids,'group_id');
+            $have_user_group_ids = $authGroupAccessModel->where(array('uid' => $uid))->select();
+            $have_user_group_ids = array_column($have_user_group_ids, 'group_id');
             //查询已拥有用户组 end
 
-            $authGroupAccess['uid']=$uid;
-            $authGroupAccess_list=array();
-            foreach($role as $val){
-                if($val!=''&&!in_array($val,$have_user_group_ids)){//去除已拥有用户组
-                    $authGroupAccess['group_id']=$val;
-                    $authGroupAccess_list[]=$authGroupAccess;
+            $authGroupAccess['uid'] = $uid;
+            $authGroupAccess_list = array();
+            foreach ($role as $val) {
+                if ($val != '' && !in_array($val, $have_user_group_ids)) { //去除已拥有用户组
+                    $authGroupAccess['group_id'] = $val;
+                    $authGroupAccess_list[] = $authGroupAccess;
                 }
             }
             unset($val);
@@ -378,24 +380,23 @@ class MemberModel extends Model
         }
         //默认用户组设置 end
 
-        $map['role_id']=$role_id;
-        $map['name']=array('in',array('score','rank'));
-        $config=$roleConfigModel->where($map)->select();
-        $config=array_combine(array_column($config,'name'),$config);
-
+        $map['role_id'] = $role_id;
+        $map['name'] = array('in', array('score', 'rank'));
+        $config = $roleConfigModel->where($map)->select();
+        $config = array_combine(array_column($config, 'name'), $config);
 
 
         //默认积分设置
-        if(isset($config['score']['value'])){
-            $value=json_decode($config['score']['value'],true);
-            $data=$this->getUserScore($role_id,$uid,$value);
-            $user=$this->where(array('uid'=>$uid))->find();
-            foreach($data as $key=>$val){
-                if($val>0){
-                    if(isset($user[$key])){
-                        $this->where(array('uid'=>$uid))->setInc($key,$val);
-                    }else{
-                        $this->where(array('uid'=>$uid))->setField($key,$val);
+        if (isset($config['score']['value'])) {
+            $value = json_decode($config['score']['value'], true);
+            $data = $this->getUserScore($role_id, $uid, $value);
+            $user = $this->where(array('uid' => $uid))->find();
+            foreach ($data as $key => $val) {
+                if ($val > 0) {
+                    if (isset($user[$key])) {
+                        $this->where(array('uid' => $uid))->setInc($key, $val);
+                    } else {
+                        $this->where(array('uid' => $uid))->setField($key, $val);
                     }
                 }
             }
@@ -404,28 +405,27 @@ class MemberModel extends Model
         //默认积分设置 end
 
 
-
         //默认头衔设置
-        if(isset($config['rank']['value'])&&$config['rank']['value']!=''){
-            $ranks=explode(',',$config['rank']['value']);
-            if(count($ranks)){
+        if (isset($config['rank']['value']) && $config['rank']['value'] != '') {
+            $ranks = explode(',', $config['rank']['value']);
+            if (count($ranks)) {
                 //查询已拥有头衔
-                $rankUserModel=D('RankUser');
-                $have_rank_ids=$rankUserModel->where(array('uid'=>$uid))->select();
-                $have_rank_ids=array_column($have_rank_ids,'rank_id');
+                $rankUserModel = D('RankUser');
+                $have_rank_ids = $rankUserModel->where(array('uid' => $uid))->select();
+                $have_rank_ids = array_column($have_rank_ids, 'rank_id');
                 //查询已拥有头衔 end
 
-                $reason=json_decode($config['rank']['data'],true);
-                $rank_user['uid']=$uid;
-                $rank_user['create_time']=time();
-                $rank_user['status']=1;
-                $rank_user['is_show']=1;
-                $rank_user['reason']=$reason['reason'];
-                $rank_user_list=array();
-                foreach($ranks as $val){
-                    if($val!=''&&!in_array($val,$have_rank_ids)){//去除已拥有头衔
-                        $rank_user['rank_id']=$val;
-                        $rank_user_list[]=$rank_user;
+                $reason = json_decode($config['rank']['data'], true);
+                $rank_user['uid'] = $uid;
+                $rank_user['create_time'] = time();
+                $rank_user['status'] = 1;
+                $rank_user['is_show'] = 1;
+                $rank_user['reason'] = $reason['reason'];
+                $rank_user_list = array();
+                foreach ($ranks as $val) {
+                    if ($val != '' && !in_array($val, $have_rank_ids)) { //去除已拥有头衔
+                        $rank_user['rank_id'] = $val;
+                        $rank_user_list[] = $rank_user;
                     }
                 }
                 unset($val);
@@ -436,17 +436,18 @@ class MemberModel extends Model
     }
 
     //默认显示哪一个角色的个人主页设置
-    public function initDefaultShowRole($role_id,$uid)
+    public function initDefaultShowRole($role_id, $uid)
     {
-        $userRoleModel=D('UserRole');
+        $userRoleModel = D('UserRole');
 
-        $roles=$userRoleModel->where(array('uid'=>$uid,'status'=>1,'role_id'=>array('neq',$role_id)))->select();
-        if(!count($roles)){
-            $data['show_role']=$role_id;
+        $roles = $userRoleModel->where(array('uid' => $uid, 'status' => 1, 'role_id' => array('neq', $role_id)))->select();
+        if (!count($roles)) {
+            $data['show_role'] = $role_id;
             //执行member表默认值设置
-            $this->where(array('uid'=>$uid))->save($data);
+            $this->where(array('uid' => $uid))->save($data);
         }
     }
+
     //默认显示哪一个角色的个人主页设置 end
 
     /**
@@ -457,31 +458,31 @@ class MemberModel extends Model
      * @return array
      * @author 郑钟良<zzl@ourstu.com>
      */
-    private function getUserScore($role_id,$uid,$value)
+    private function getUserScore($role_id, $uid, $value)
     {
-        $roleConfigModel=D('RoleConfig');
-        $userRoleModel=D('UserRole');
+        $roleConfigModel = D('RoleConfig');
+        $userRoleModel = D('UserRole');
 
-        $map['role_id']=array('neq',$role_id);
-        $map['uid']=$uid;
-        $map['init']=1;
-        $role_list=$userRoleModel->where($map)->select();
-        $role_ids=array_column($role_list,'role_id');
-        $map_config['role_id']=array('in',$role_ids);
-        $map_config['name']='score';
-        $config_list=$roleConfigModel->where($map_config)->field('value')->select();
-        $change=array();
-        foreach($config_list as &$val){
-            $val=json_decode($val['value'],true);
+        $map['role_id'] = array('neq', $role_id);
+        $map['uid'] = $uid;
+        $map['init'] = 1;
+        $role_list = $userRoleModel->where($map)->select();
+        $role_ids = array_column($role_list, 'role_id');
+        $map_config['role_id'] = array('in', $role_ids);
+        $map_config['name'] = 'score';
+        $config_list = $roleConfigModel->where($map_config)->field('value')->select();
+        $change = array();
+        foreach ($config_list as &$val) {
+            $val = json_decode($val['value'], true);
         }
         unset($val);
         unset($config_list[0]['score1']);
-        foreach($value as $key=>$val){
-            $config_list=list_sort_by($config_list,$key,'desc');
-            if($val>$config_list[0][$key]){
-                $change[$key]=$val-$config_list[0][$key];
-            }else{
-                $change[$key]=0;
+        foreach ($value as $key => $val) {
+            $config_list = list_sort_by($config_list, $key, 'desc');
+            if ($val > $config_list[0][$key]) {
+                $change[$key] = $val - $config_list[0][$key];
+            } else {
+                $change[$key] = 0;
             }
         }
         return $change;
