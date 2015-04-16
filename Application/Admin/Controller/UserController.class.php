@@ -340,6 +340,7 @@ class UserController extends AdminController
             $data['visiable'] = $visiable;
             $data['required'] = $required;
             $data['form_type'] = $form_type;
+            $data['form_default_value'] = $form_default_value;
             //当表单类型为以下三种是默认值不能为空判断@MingYang
             $form_types = array('radio','checkbox','select');
             if(in_array($data['form_type'],$form_types)){
@@ -352,7 +353,6 @@ class UserController extends AdminController
             if ($form_type == 'input' && $child_form_type == 'join') {
                 $data['child_form_type'] = $child_form_type;
             }
-            $data['form_default_value'] = $form_default_value;
             $data['validation'] = $validation;
             if ($id != '') {
                 $res = D('field_setting')->where('id=' . $id)->save($data);
