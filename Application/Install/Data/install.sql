@@ -735,7 +735,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
 DROP TABLE  IF EXISTS `ocenter_member`;
 CREATE TABLE IF NOT EXISTS `ocenter_member` (
   `uid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `nickname` char(16) NOT NULL DEFAULT '' COMMENT '昵称',
+  `nickname` char(32) NOT NULL DEFAULT '' COMMENT '昵称',
   `sex` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '性别',
   `birthday` date NOT NULL DEFAULT '0000-00-00' COMMENT '生日',
   `qq` char(10) NOT NULL DEFAULT '' COMMENT 'qq号',
@@ -924,7 +924,13 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (144, '生成邀请码', 136, 0, 'Invite/createCode', 1, '', '', 0, ''),
 (145, '删除无用邀请码', 136, 0, 'Invite/deleteTrue', 1, '', '', 0, ''),
 (146, '导出cvs', 136, 0, 'Invite/cvs', 1, '', '', 0, ''),
-(147, '用户信息编辑', 140, 0, 'Invite/editUserInfo', 1, '', '', 0, '');
+(147, '用户信息编辑', 140, 0, 'Invite/editUserInfo', 1, '', '', 0, ''),
+(148, '删除日志', 31, 0, 'Action/remove', 1, '', '', 0, ''),
+(149, '清空日志', 31, 0, 'Action/clear', 1, '', '', 0, ''),
+(150, '删除积分类型', 51, 0, 'User/delType', 1, '', '', 0, ''),
+(151, '删除菜单', 82, 0, 'Menu/del', 1, '', '', 0, ''),
+(152, '设置开发者模式可见', 82, 0, 'Menu/toogleDev', 1, '', '', 0, ''),
+(153, '设置显示隐藏', 82, 0, 'Menu/toogleHide', 1, '', '', 0, '');
 
 
 
@@ -1152,7 +1158,7 @@ CREATE TABLE IF NOT EXISTS `ocenter_ucenter_admin` (
 DROP TABLE  IF EXISTS `ocenter_ucenter_member`;
 CREATE TABLE IF NOT EXISTS `ocenter_ucenter_member` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `username` char(16) NOT NULL COMMENT '用户名',
+  `username` char(32) NOT NULL COMMENT '用户名',
   `password` char(32) NOT NULL COMMENT '密码',
   `email` char(32) NOT NULL COMMENT '用户邮箱',
   `mobile` char(15) NOT NULL COMMENT '用户手机',

@@ -48,8 +48,9 @@
                     <dt>
                     <div class="row">
                         <div class="col-xs-9"><a href="{$message.url}" onclick="Notify.readMessage(this,{$message.id})">{$message.title}</a>
-                            <span class="badge-primary">未读</span>
-
+                            <eq name="message.is_read" value="0">
+                                <span class="label label-badge label-info">未读</span>
+                            </eq>
                         </div>
                         <div class="col-xs-3 message-ctime">{$message.create_time|friendlyDate}</div>
                     </div>

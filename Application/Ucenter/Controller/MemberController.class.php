@@ -383,7 +383,7 @@ class MemberController extends Controller
     {
         switch ($code) {
             case -1:
-                $error = '用户名长度必须在4-16个字符以内！';
+                $error = '用户名长度必须在4-32个字符以内！';
                 break;
             case -2:
                 $error = '用户名被禁止注册！';
@@ -662,8 +662,8 @@ class MemberController extends Controller
             case 'username':
                 empty($aAccount) && $this->error('用户名格式不正确！');
                 $length = mb_strlen($aAccount, 'utf-8'); // 当前数据长度
-                if ($length < 4 || $length > 30) {
-                    $this->error('用户名长度在4-30之间');
+                if ($length < 4 || $length > 32) {
+                    $this->error('用户名长度在4-32之间');
                 }
 
 
@@ -671,7 +671,7 @@ class MemberController extends Controller
                 if ($id) {
                     $this->error('该用户名已经存在！');
                 }
-                preg_match("/^[a-zA-Z0-9_]{1,30}$/", $aAccount, $result);
+                preg_match("/^[a-zA-Z0-9_]{4,32}$/", $aAccount, $result);
                 if (!$result) {
                     $this->error('只允许字母和数字和下划线！');
                 }
@@ -712,8 +712,8 @@ class MemberController extends Controller
         }
 
         $length = mb_strlen($aNickname, 'utf-8'); // 当前数据长度
-        if ($length < 2 || $length > 30) {
-            $this->error('昵称长度在2-30之间');
+        if ($length < 4 || $length > 32) {
+            $this->error('昵称长度在4-32之间');
         }
 
         $memberModel = D('member');

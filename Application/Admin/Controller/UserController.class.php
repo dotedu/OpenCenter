@@ -640,9 +640,10 @@ class UserController extends AdminController
      * 会员状态修改
      * @author 朱亚杰 <zhuyajie@topthink.net>
      */
-    public function changeStatus($method = null)
+    public function changeStatus()
     {
         $id = array_unique((array)I('id', 0));
+        $status=I('status',1,'intval');
         if (in_array(C('USER_ADMINISTRATOR'), $id)) {
             $this->error("不允许对超级管理员执行该操作!");
         }
@@ -651,19 +652,11 @@ class UserController extends AdminController
             $this->error('请选择要操作的数据!');
         }
         $map['uid'] = array('in', $id);
-        switch (strtolower($method)) {
-            case 'forbiduser':
-                $this->forbid('Member', $map);
-                break;
-            case 'resumeuser':
-                $this->resume('Member', $map);
-                break;
-            case 'deleteuser':
-                $this->delete('Member', $map);
-                break;
-            default:
-                $this->error('参数非法');
-
+        $res=set_users_status($map,$status);
+        if($res){
+            $this->success('设置成功！');
+        }else{
+            $this->error('设置失败！');
         }
     }
 
@@ -677,7 +670,7 @@ class UserController extends AdminController
     {
         switch ($code) {
             case -1:
-                $error = '用户名长度必须在16个字符以内！';
+                $error = '用户名长度必须在32个字符以内！';
                 break;
             case -2:
                 $error = '用户名被禁止注册！';

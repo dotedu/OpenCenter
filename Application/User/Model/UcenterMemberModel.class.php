@@ -34,7 +34,7 @@ class UcenterMemberModel extends Model
     /* 用户模型自动验证 */
     protected $_validate = array(
         /* 验证用户名 */
-        array('username', '4,30', -1, self::EXISTS_VALIDATE, 'length'), //用户名长度不合法
+        array('username', '4,32', -1, self::EXISTS_VALIDATE, 'length'), //用户名长度不合法
         array('username', 'checkDenyMember', -2, self::EXISTS_VALIDATE, 'callback'), //用户名禁止注册
         array('username', 'checkUsername', -20, self::EXISTS_VALIDATE, 'callback'),
         array('username', '', -3, self::EXISTS_VALIDATE, 'unique'), //用户名被占用
@@ -90,7 +90,7 @@ class UcenterMemberModel extends Model
         if (strpos($username, ' ') !== false) {
             return false;
         }
-        preg_match("/^[a-zA-Z0-9_]{1,30}$/", $username, $result);
+        preg_match("/^[a-zA-Z0-9_]{4,32}$/", $username, $result);
 
         if (!$result) {
             return false;
@@ -568,7 +568,7 @@ class UcenterMemberModel extends Model
         $error = $error_code == null ? $this->error : $error_code;
         switch ($error) {
             case -1:
-                $error = '用户名长度必须在16个字符以内！';
+                $error = '用户名长度必须在32个字符以内！';
                 break;
             case -2:
                 $error = '用户名被禁止注册！';

@@ -235,10 +235,10 @@ class ConfigController extends BaseController
         $length = mb_strlen($nickname, 'utf8');
         if ($length == 0) {
             $this->error('请输入昵称。');
-        } else if ($length > 16) {
-            $this->error('昵称不能超过16个字。');
-        } else if ($length <= 1) {
-            $this->error('昵称不能少于1个字。');
+        } else if ($length > 32) {
+            $this->error('昵称不能超过32个字。');
+        } else if ($length <= 4) {
+            $this->error('昵称不能少于4个字。');
         }
         $match = preg_match('/^(?!_|\s\')[A-Za-z0-9_\x80-\xff\s\']+$/', $nickname);
         if (!$match) {
@@ -261,8 +261,8 @@ class ConfigController extends BaseController
     private function checkSignature($signature)
     {
         $length = mb_strlen($signature, 'utf8');
-        if ($length >= 30) {
-            $this->error('签名不能超过30个字');
+        if ($length >= 100) {
+            $this->error('签名不能超过100个字');
         }
     }
 
@@ -690,7 +690,7 @@ class ConfigController extends BaseController
         }
 
         //验证用户名是否是字母和数字
-        preg_match("/^[a-zA-Z0-9_]{1,30}$/", $aUsername, $match);
+        preg_match("/^[a-zA-Z0-9_]{4,32}$/", $aUsername, $match);
         if (!$match) {
             $this->error('用户名只允许英文字母和数字');
         }

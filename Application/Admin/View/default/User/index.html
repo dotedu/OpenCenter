@@ -7,13 +7,13 @@
     </div>
     <div class="clearfix">
         <div class="col-xs-10">
-            <button class="btn ajax-post" url="{:U('User/changeStatus',array('method'=>'resumeUser'))}"
+            <button class="btn ajax-post" url="{:U('User/changeStatus',array('status'=>'1'))}"
                     target-form="ids">启 用
             </button>
-            <button class="btn ajax-post" url="{:U('User/changeStatus',array('method'=>'forbidUser'))}"
+            <button class="btn ajax-post" url="{:U('User/changeStatus',array('status'=>'0'))}"
                     target-form="ids">禁 用
             </button>
-            <button class="btn ajax-post confirm" url="{:U('User/changeStatus',array('method'=>'deleteUser'))}"
+            <button class="btn ajax-post confirm" url="{:U('User/changeStatus',array('status'=>'-1'))}"
                     target-form="ids">删 除
             </button>
 
@@ -71,14 +71,14 @@
 
                         <td>
                             <eq name="vo.status" value="1">
-                                <a href="{:U('User/changeStatus?method=forbidUser&id='.$vo['uid'])}"
+                                <a href="{:U('User/changeStatus?status=0&id='.$vo['uid'])}"
                                    class="ajax-get">禁用</a>
                                 <else/>
-                                <a href="{:U('User/changeStatus?method=resumeUser&id='.$vo['uid'])}"
+                                <a href="{:U('User/changeStatus?status=1&id='.$vo['uid'])}"
                                    class="ajax-get">启用</a>
                             </eq>
                             <a href="{:U('AuthManager/group?uid='.$vo['uid'])}" class="authorize">授权</a>
-                            <a href="{:U('User/changeStatus?method=deleteUser&id='.$vo['uid'])}"
+                            <a href="{:U('User/changeStatus?status=-1&id='.$vo['uid'])}"
                                class="confirm ajax-get">删除</a>
                         </td>
 

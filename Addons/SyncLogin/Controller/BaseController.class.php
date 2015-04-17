@@ -276,7 +276,7 @@ class BaseController extends AddonsController
     {
         switch ($code) {
             case -1:
-                $error = '用户名长度必须在16个字符以内！';
+                $error = '用户名长度必须在32个字符以内！';
                 break;
             case -2:
                 $error = '用户名被禁止注册！';
