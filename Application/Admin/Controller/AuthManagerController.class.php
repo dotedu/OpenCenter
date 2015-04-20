@@ -433,7 +433,8 @@ class AuthManagerController extends AdminController
         $aId = I('get.group_id', 0, 'intval');
 
         if (IS_POST) {
-            $aOldRule = I('post.old_rules', '', 'op_t');
+            $aId = I('id', 0, 'intval');
+            $aOldRule = I('post.old_rules', '', 'text');
             $aRules = I('post.rules', array());
             $rules = $this->getMergedRules($aOldRule, $aRules);
             $authGroupModel = M('AuthGroup');

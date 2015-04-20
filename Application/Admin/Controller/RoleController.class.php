@@ -343,7 +343,7 @@ class RoleController extends AdminController
             ->select('角色：', 'role_id', 'select', '', '', '', $role_list)->select('状态：', 'user_status', 'select', '', '', '', $statusOptions)->select('', 'single_role', 'select', '', '', '', $singleRoleOptions)
             ->keyId()
             ->keyImage('avatar', '头像')
-            ->keyLink('nickname', '昵称', 'ucenter/index/information?uid=###')
+            ->keyLink('nickname', '昵称', 'ucenter/index/information?uid={$uid}')
             ->keyStatus()
             ->pagination($totalCount, $r)
             ->data($user_list)
@@ -449,7 +449,8 @@ class RoleController extends AdminController
                     $map_ids['uid']=array('in',$unHave);
                     $map_ids['role_id']=$role_id;
                     $error_ids=$this->userRoleModel->where($map_ids)->field('id')->select();
-                    $error_ids=array_column($error_ids,'id');
+                    $error_ids=implode(',',array_column($error_ids,'id'));
+
                     $this->error("id为{$error_ids}的角色用户只拥有该角色，不能被禁用！");
                 }
                 foreach($uids as $val){
@@ -549,7 +550,7 @@ class RoleController extends AdminController
         }
         unset($roles, $val);
         $builder = new AdminListBuilder;
-        $builder->title('角色分组（同组角色互斥，即同一分组下的角色不能同时被用户拥有）')
+        $builder->title('角色分组（同组角色互斥，即同一分组下的角色不能同时被用户拥有；同一角色同时只能存在于一个分组中）')
             ->buttonNew(U('Role/editGroup'))
             ->keyId()
             ->keyText('title', '标题')
@@ -608,7 +609,7 @@ class RoleController extends AdminController
             }
             unset($val);
             $builder = new AdminConfigBuilder;
-            $builder->title("{$title}（同组角色互斥，即同一分组下的角色不能同时被用户拥有）");
+            $builder->title("{$title}（同组角色互斥，即同一分组下的角色不能同时被用户拥有；同一角色同时只能存在于一个分组中）");
             $builder->keyId()
                 ->keyText('title', '标题')
                 ->keyChosen('roles', '分组下角色选择', '一个角色同时只能存在于一个分组下', $roles)

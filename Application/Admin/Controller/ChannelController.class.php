@@ -57,7 +57,7 @@ if(IS_POST){
                 'color'=>op_t($two['color'][$j]),
                 'band_text'=>op_t($two['band_text'][$j]),
                 'band_color'=>op_t($two['band_color'][$j]),
-                'icon'=>op_t(str_replace('icon-','',$two['icon'][$i])),
+                'icon'=>op_t(str_replace('icon-','',$two['icon'][$j])),
                 'status'=>1
             );
             $res[$j] = $Channel->add($data_two[$j]);

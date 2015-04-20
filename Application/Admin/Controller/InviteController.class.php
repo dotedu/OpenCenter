@@ -222,7 +222,7 @@ class InviteController extends AdminController
             $builder->title('邀请码列表页面')
                 ->setSelectPostUrl('Invite/invite')
                 /*->buttonDelete(U('Invite/delete'))*/
-                ->butttonModalPopup(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
+                ->buttonModalPopup(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
                 ->buttonDelete(U('Invite/deleteTrue'),'清空无用邀请码(真删除)')
                 ->select('邀请码类型：','type','select','','','',$typeOptions)
                 ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'3','value'=>'已过期'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
