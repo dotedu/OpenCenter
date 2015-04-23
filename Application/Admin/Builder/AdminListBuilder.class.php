@@ -71,7 +71,7 @@ class AdminListBuilder extends AdminBuilder
      */
     public function setSelectPostUrl($url)
     {
-        $this->_selectPostUrl = U($url);
+        $this->_selectPostUrl = $url;
         return $this;
     }
 

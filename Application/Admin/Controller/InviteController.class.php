@@ -220,7 +220,7 @@ class InviteController extends AdminController
         }else{
             $builder=new AdminListBuilder();
             $builder->title('邀请码列表页面')
-                ->setSelectPostUrl('Invite/invite')
+                ->setSelectPostUrl(U('Invite/invite'))
                 /*->buttonDelete(U('Invite/delete'))*/
                 ->buttonModalPopup(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
                 ->buttonDelete(U('Invite/deleteTrue'),'清空无用邀请码(真删除)')
@@ -335,7 +335,7 @@ class InviteController extends AdminController
 
         $builder=new AdminListBuilder();
         $builder->title('用户兑换名额记录')
-            ->setSelectPostUrl('Invite/buyLog')
+            ->setSelectPostUrl(U('Invite/buyLog'))
             ->select('邀请码类型：','invite_type','select','','','',$typeOptions)
             ->select('排序方式：','order','select','','','',$orderOptions)
             ->keyId()
@@ -372,7 +372,7 @@ class InviteController extends AdminController
 
         $builder=new AdminListBuilder();
         $builder->title('用户信息')
-            ->setSelectPostUrl('Invite/userInfo')
+            ->setSelectPostUrl(U('Invite/userInfo'))
             ->select('邀请码类型：','invite_type','select','','','',$typeOptions)
             ->keyId()
             ->keyText('user','用户')

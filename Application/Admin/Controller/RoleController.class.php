@@ -331,7 +331,7 @@ class RoleController extends AdminController
 
         $builder = new AdminListBuilder();
         $builder->title('角色用户列表')
-            ->setSelectPostUrl('Role/userList');
+            ->setSelectPostUrl(U('Role/userList'));
         if ($map_user_list['status'] == 2) {
             $builder->setStatusUrl(U('Role/setUserAudit', array('role_id' => $map_user_list['role_id'])))->buttonEnable('', '审核通过')->buttonDelete('', '审核失败');
         } else {
