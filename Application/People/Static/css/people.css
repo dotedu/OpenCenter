@@ -47,11 +47,6 @@ hr {
 }
 /*应用公共css*/
 .app_head {
-  border: 1px solid #dddddd;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -khtml-border-radius: 3px;
-  border-radius: 3px;
   background: white;
 }
 .app_title {
@@ -116,4 +111,3 @@ hr {
   -moz-box-shadow: 0 0 5px #CCCCCC;
   -khtml-box-shadow: 0 0 5px #CCCCCC;
 }
-/*详情页面END*/

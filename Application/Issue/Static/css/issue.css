@@ -203,12 +203,6 @@ hr {
   background: white;
   padding: 0;
   margin: 0;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -khtml-border-radius: 3px;
-  border-radius: 3px;
-  border: 1px solid #dddddd;
-  border-radius: 0.2em;
   margin-bottom: 1em;
 }
 .app_title {
