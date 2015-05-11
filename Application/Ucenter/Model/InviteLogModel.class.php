@@ -36,20 +36,19 @@ class InviteLogModel extends Model
 
     /**
      * 分页获取邀请注册日志列表
-     * @param $totalCount
      * @param int $page
      * @param int $r
      * @return array
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function getList(&$totalCount,$page=1,$r=20)
+    public function getList($page=1,$r=20)
     {
         $totalCount=$this->count();
         if($totalCount){
             $list=$this->page($page,$r)->order('create_time desc')->select();
         }
         $list=$this->_initSelectData($list);
-        return $list;
+        return array($list,$totalCount);
     }
 
     /**

@@ -71,7 +71,6 @@ class RoleModel extends Model
     /**
      * 分页按照$map获取列表
      * @param array $map 查询条件
-     * @param $totalCount 总条数
      * @param int $page 页码
      * @param $order 排序
      * @param null $fields 查询字段，null表示全部字段
@@ -79,7 +78,7 @@ class RoleModel extends Model
      * @return mixed 一页结果列表
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function selectPageByMap($map=array(),&$totalCount,$page=1,$r=20,$order,$fields=null){
+    public function selectPageByMap($map=array(),$page=1,$r=20,$order,$fields=null){
         $order=$order?$order:"id asc";
         if($fields==null){
             $list=$this->where($map)->order($order)->page($page,$r)->select();
@@ -87,7 +86,7 @@ class RoleModel extends Model
             $list=$this->where($map)->order($order)->field($fields)->page($page,$r)->select();
         }
         $totalCount=$this->where($map)->count();
-        return $list;
+        return array($list,$totalCount);
     }
 
     /**

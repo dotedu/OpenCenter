@@ -96,14 +96,13 @@ class InviteUserInfoModel extends Model
     /**
      * 获取用户邀请信息列表
      * @param array $map
-     * @param $totalCount
      * @param int $page
      * @param int $r
      * @param string $order
      * @return array
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function getList($map=array(),&$totalCount,$page=1,$r=20,$order='uid asc,invite_type asc')
+    public function getList($map=array(),$page=1,$r=20,$order='uid asc,invite_type asc')
     {
         if(count($map)){
             $totalCount=$this->where($map)->count();
@@ -117,7 +116,7 @@ class InviteUserInfoModel extends Model
             }
         }
         $list=$this->_initSelectData($list);
-        return $list;
+        return array($list,$totalCount);
     }
 
     /**

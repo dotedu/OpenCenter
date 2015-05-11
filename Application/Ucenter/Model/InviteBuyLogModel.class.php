@@ -39,14 +39,13 @@ class InviteBuyLogModel extends Model
     /**
      * 获取兑换记录列表
      * @param array $map
-     * @param $totalCount
      * @param int $page
      * @param string $order
      * @param int $r
      * @return array
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function getList($map=array(),&$totalCount,$page=1,$order='create_time desc',$r=20)
+    public function getList($map=array(),$page=1,$order='create_time desc',$r=20)
     {
         if(count($map)){
             $totalCount=$this->where($map)->count();
@@ -60,7 +59,7 @@ class InviteBuyLogModel extends Model
             }
         }
         $list=$this->_initSelectData($list);
-        return $list;
+        return array($list,$totalCount);
     }
 
     /**
