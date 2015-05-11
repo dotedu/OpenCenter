@@ -1,5 +1,5 @@
 #OpenCenter
-安装程序已经初步制作完毕，但未进行严格测试，有兴趣的朋友可以先行测试。
+在线开发手册：[点击阅读](http://www.ocenter.cn/index.php?m=book&f=browse&nodeID=1)
 
 开发者讨论群：390967955
 
