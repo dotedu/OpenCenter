@@ -12,20 +12,23 @@ CREATE TABLE IF NOT EXISTS `ocenter_action` (
   `type` tinyint(2) unsigned NOT NULL DEFAULT '1' COMMENT '类型',
   `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态',
   `update_time` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `module` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统行为表' AUTO_INCREMENT=1 ;
 
 
-INSERT INTO `ocenter_action` ( `name`, `title`, `remark`, `rule`, `log`, `type`, `status`, `update_time`) VALUES
-('reg', '用户注册', '用户注册', '', '', 1, 1, 1426070545),
-('input_password', '输入密码', '记录输入密码的次数。', '', '', 1, 1, 1426122119),
-('user_login', '用户登录', '积分+10，每天一次', 'a:1:{i:0;a:5:{s:5:"table";s:6:"member";s:5:"field";s:1:"1";s:4:"rule";s:2:"10";s:5:"cycle";s:2:"24";s:3:"max";s:1:"1";}}', '[user|get_nickname]在[time|time_format]登录了账号', 1, 1, 1387181220),
-('update_config', '更新配置', '新增或修改或删除配置', '', '', 1, 1, 1383294988),
-('update_model', '更新模型', '新增或修改模型', '', '', 1, 1, 1383295057),
-('update_attribute', '更新属性', '新增或更新或删除属性', '', '', 1, 1, 1383295963),
-('update_channel', '更新导航', '新增或修改或删除导航', '', '', 1, 1, 1383296301),
-( 'update_menu', '更新菜单', '新增或修改或删除菜单', '', '', 1, 1, 1383296392),
-( 'update_category', '更新分类', '新增或修改或删除分类', '', '', 1, 1, 1383296765);
+INSERT INTO `ocenter_action` ( `name`, `title`, `remark`, `rule`, `log`, `type`, `status`, `update_time`, `module`) VALUES
+( 'reg', '用户注册', '用户注册', '', '', 1, 1, 1426070545, ''),
+( 'input_password', '输入密码', '记录输入密码的次数。', '', '', 1, 1, 1426122119, ''),
+( 'user_login', '用户登录', '积分+10，每天一次', 'a:1:{i:0;a:5:{s:5:"table";s:6:"member";s:5:"field";s:1:"1";s:4:"rule";s:2:"10";s:5:"cycle";s:2:"24";s:3:"max";s:1:"1";}}', '[user|get_nickname]在[time|time_format]登录了账号', 1, 1, 1428397656, ''),
+( 'update_config', '更新配置', '新增或修改或删除配置', '', '', 1, 1, 1383294988, ''),
+( 'update_model', '更新模型', '新增或修改模型', '', '', 1, 1, 1383295057, ''),
+( 'update_attribute', '更新属性', '新增或更新或删除属性', '', '', 1, 1, 1383295963, ''),
+( 'update_channel', '更新导航', '新增或修改或删除导航', '', '', 1, 1, 1383296301, ''),
+( 'update_menu', '更新菜单', '新增或修改或删除菜单', '', '', 1, 1, 1383296392, ''),
+( 'update_category', '更新分类', '新增或修改或删除分类', '', '', 1, 1, 1383296765, '');
+
+
 
 DROP TABLE  IF EXISTS `ocenter_action_limit`;
 CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
@@ -41,13 +44,14 @@ CREATE TABLE IF NOT EXISTS `ocenter_action_limit` (
   `action_list` text NOT NULL,
   `status` tinyint(4) NOT NULL,
   `create_time` int(11) NOT NULL,
+  `module` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-INSERT INTO `ocenter_action_limit` (`title`, `name`, `frequency`, `time_number`, `time_unit`, `punish`, `if_message`, `message_content`, `action_list`, `status`, `create_time`) VALUES
-('reg', '注册限制', 1, 1, 'minute', 'warning', 0, '', '[reg]', 1, 0),
-('input_password', '输密码', 3, 1, 'minute', 'warning', 0, '', '[input_password]', 1, 0);
 
+INSERT INTO `ocenter_action_limit` ( `title`, `name`, `frequency`, `time_number`, `time_unit`, `punish`, `if_message`, `message_content`, `action_list`, `status`, `create_time`, `module`) VALUES
+( 'reg', '注册限制', 1, 1, 'minute', 'warning', 0, '', '[reg]', 1, 0, ''),
+( 'input_password', '输密码', 3, 1, 'minute', 'warning', 0, '', '[input_password]', 1, 0, '');
 
 
 DROP TABLE  IF EXISTS `ocenter_action_log`;
@@ -690,7 +694,7 @@ INSERT INTO `ocenter_hooks` (`name`, `description`, `type`, `update_time`, `addo
 ( 'AdminIndex', '首页小格子个性化显示', 1, 1382596073, 'SiteStat,SyncLogin,DevTeam,SystemInfo'),
 ( 'topicComment', '评论提交方式扩展钩子。', 1, 1380163518, ''),
 ( 'app_begin', '应用开始', 2, 1384481614, 'Iswaf'),
-( 'checkin', '签到', 1, 1395371353, ''),
+( 'checkIn', '签到', 1, 1395371353, ''),
 ( 'Rank', '签到排名钩子', 1, 1395387442, 'Rank_checkin'),
 ( 'support', '赞', 1, 1398264759, ''),
 ( 'localComment', '本地评论插件', 1, 1399440321, 'LocalComment'),
@@ -709,7 +713,8 @@ INSERT INTO `ocenter_hooks` (`name`, `description`, `type`, `update_time`, `addo
 ( 'weiboSide', '微博侧边钩子', 1, 1417063425, 'Retopic'),
 ( 'personalMenus', '顶部导航栏个人下拉菜单', 1, 1417146501, ''),
 ( 'dealPicture', '上传图片处理', 2, 1417139975, ''),
-( 'ucenterSideMenu', '用户中心左侧菜单', 1, 1417161205, '');
+( 'ucenterSideMenu', '用户中心左侧菜单', 1, 1417161205, ''),
+( 'afterTop', '顶部导航之后的钩子，调用公告等', 1, 1429671392, '');
 
 DROP TABLE  IF EXISTS `ocenter_local_comment`;
 CREATE TABLE IF NOT EXISTS `ocenter_local_comment` (
@@ -771,9 +776,10 @@ CREATE TABLE IF NOT EXISTS `ocenter_menu` (
   `group` varchar(50) DEFAULT '' COMMENT '分组',
   `is_dev` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否仅开发者模式可见',
   `icon` varchar(20) NOT NULL COMMENT '导航图标',
+  `module` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `pid` (`pid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=116 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=155 ;
 
 INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, `group`, `is_dev`, `icon`) VALUES
 (1, '首页', 0, 1, 'Index/index', 0, '', '', 0, 'home'),
@@ -878,7 +884,7 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (101, '排序', 99, 0, 'SEO/sortRule', 1, '', '', 0, ''),
 (102, 'SEO规则回收站', 74, 0, 'SEO/ruleTrash', 0, '', 'SEO规则', 0, ''),
 (103, '全部补丁', 74, 0, 'Admin/Update/quick', 0, '', '升级补丁', 0, ''),
-(104, '新增补丁', 103, 0, 'Admin/Update/addpack', 1, '', '', 0, ''),
+(104, '新增补丁', 74, 0, 'Admin/Update/addpack', 1, '', '升级补丁', 0, ''),
 (105, '云市场', 0, 5, 'module/lists', 1, '', '', 0, 'cloud'),
 (106, '模块安装', 105, 0, 'module/install', 1, '', '云市场', 0, ''),
 (107, '模块管理', 105, 0, 'module/lists', 0, '', '云市场', 0, ''),
@@ -937,8 +943,21 @@ INSERT INTO `ocenter_menu` (`id`, `title`, `pid`, `sort`, `url`, `hide`, `tip`, 
 (160, '删除钩子', 58, 0, 'Addons/delHook', 0, '', '', 0, ''),
 (161, '使用补丁', 103, 0, 'Update/usePack', 1, '', '', 0, ''),
 (162, '查看补丁', 103, 0, 'Update/view', 1, '', '', 0, ''),
-(163, '删除补丁', 103, 0, 'Update/delPack', 1, '', '', 0, '');
-
+(163, '删除补丁', 103, 0, 'Update/delPack', 1, '', '', 0, ''),
+(164, '标签列表', 2, 0, 'UserTag/userTag', 0, '', '用户标签管理', 0, ''),
+(165, '添加分类、标签', 164, 0, 'UserTag/add', 1, '', '', 0, ''),
+(166, '设置分类、标签状态', 164, 0, 'UserTag/setStatus', 1, '', '', 0, ''),
+(167, '分类、标签回收站', 164, 0, 'UserTag/tagTrash', 1, '', '', 0, ''),
+(168, '测底删除回收站内容', 164, 0, 'UserTag/userTagClear', 1, '', '', 0, ''),
+(169, '可拥有标签配置', 116, 0, 'role/configusertag', 1, '', '', 0, ''),
+(170, '编辑模块', 107, 0, 'Module/edit', 1, '', '模块管理', 0, ''),
+(171, '网站信息', 74, 0, 'Config/website', 0, '', '系统设置', 0, ''),
+(156, '主题管理', 105, 0, 'Theme/tpls', 0, '', '云市场', 0, ''),
+(157, '使用主题', 105, 0, 'Theme/setTheme', 1, '', '云市场', 0, ''),
+(158, '查看主题', 105, 0, 'Theme/lookTheme', 1, '', '云市场', 0, ''),
+(159, '主题打包下载', 105, 0, 'Theme/packageDownload', 1, '', '云市场', 0, ''),
+(160, '卸载删除主题', 105, 0, 'Theme/delete', 1, '', '云市场', 0, ''),
+(161, '上传安装主题', 105, 0, 'Theme/add', 1, '', '云市场', 0, '');
 
 
 DROP TABLE  IF EXISTS `ocenter_message`;
@@ -1247,6 +1266,39 @@ CREATE TABLE IF NOT EXISTS `ocenter_user_config` (
   `value` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户配置信息表' AUTO_INCREMENT=1 ;
+
+DROP TABLE IF EXISTS `ocenter_user_tag`;
+CREATE TABLE IF NOT EXISTS `ocenter_user_tag` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(25) NOT NULL,
+  `status` tinyint(4) NOT NULL,
+  `pid` int(11) NOT NULL,
+  `sort` tinyint(6) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='标签分类表' AUTO_INCREMENT=4 ;
+
+--
+-- 转存表中的数据 `ocenter_user_tag`
+--
+
+INSERT INTO `ocenter_user_tag` (`id`, `title`, `status`, `pid`, `sort`) VALUES
+(1, '默认', 1, 0, 0),
+(2, '开发者', 1, 1, 0),
+(3, '站长', 1, 1, 0);
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ocenter_user_tag_link`
+--
+
+DROP TABLE IF EXISTS `ocenter_user_tag_link`;
+CREATE TABLE IF NOT EXISTS `ocenter_user_tag_link` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `tags` varchar(200) NOT NULL COMMENT '标签ids',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户标签关联表' AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `ocenter_sso_app`;
 CREATE TABLE IF NOT EXISTS `ocenter_sso_app` (

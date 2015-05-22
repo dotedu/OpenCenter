@@ -166,6 +166,37 @@ class ConfigController extends BaseController
 
     }
 
+    public function tag()
+    {
+        $userTagLinkModel=D('Ucenter/UserTagLink');
+        if(IS_POST){
+            $aTagIds=I('post.tag_ids','','op_t');
+            $result=$userTagLinkModel->editData($aTagIds);
+            if($result){
+                $res['status']=1;
+            }else{
+                $res['status']=0;
+                $res['info']="操作失败！";
+            }
+            $this->ajaxReturn($res);
+        }else{
+            $userTagModel=D('Ucenter/UserTag');
+            $map=getRoleConfigMap('user_tag',get_login_role());
+            $ids=M('RoleConfig')->where($map)->getField('value');
+            if($ids){
+                $ids=explode(',',$ids);
+                $tag_list=$userTagModel->getTreeListByIds($ids);
+                $this->assign('tag_list',$tag_list);
+            }
+            $myTags=$userTagLinkModel->getUserTag(is_login());
+            $this->assign('my_tag',$myTags);
+            $my_tag_ids=array_column($myTags,'id');
+            $my_tag_ids=implode(',',$my_tag_ids);
+            $this->assign('my_tag_ids',$my_tag_ids);
+            $this->display();
+        }
+    }
+
     public function index()
     {
         $aUid = I('get.uid', is_login(), 'intval');
@@ -237,7 +268,7 @@ class ConfigController extends BaseController
             $this->error('请输入昵称。');
         } else if ($length > 32) {
             $this->error('昵称不能超过32个字。');
-        } else if ($length <= 4) {
+        } else if ($length < 4) {
             $this->error('昵称不能少于4个字。');
         }
         $match = preg_match('/^(?!_|\s\')[A-Za-z0-9_\x80-\xff\s\']+$/', $nickname);
@@ -746,7 +777,7 @@ class ConfigController extends BaseController
                 $content = modC('REG_EMAIL_VERIFY', '{$verify}', 'USERCONFIG');
                 $content = str_replace('{$verify}', $verify, $content);
                 $content = str_replace('{$account}', $account, $content);
-                $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
+                $res = send_mail($account, modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . '邮箱验证', $content);
 
                 return $res;
                 break;

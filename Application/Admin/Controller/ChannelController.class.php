@@ -24,73 +24,73 @@ class ChannelController extends AdminController
     public function index()
     {
         $Channel = D('Channel');
-if(IS_POST){
-    $one = $_POST['nav'][1];
-    if(count($one)>0){
-        M()->execute('TRUNCATE TABLE '.C('DB_PREFIX').'channel');
+        if (IS_POST) {
+            $one = $_POST['nav'][1];
+            if (count($one) > 0) {
+                M()->execute('TRUNCATE TABLE ' . C('DB_PREFIX') . 'channel');
 
-        for($i=0;$i<count(reset($one));$i++){
-            $data[$i] = array(
-                'pid'=>0,
-                'title'=>op_t($one['title'][$i]),
-                'url'=>op_t($one['url'][$i]),
-                'sort'=>intval($one['sort'][$i]),
-                'target'=>intval($one['target'][$i]),
-                'color'=>op_t($one['color'][$i]),
-                'band_text'=>op_t($one['band_text'][$i]),
-                'band_color'=>op_t($one['band_color'][$i]),
-                'icon'=>op_t(str_replace('icon-','',$one['icon'][$i])),
-                'status'=>1
+                for ($i = 0; $i < count(reset($one)); $i++) {
+                    $data[$i] = array(
+                        'pid' => 0,
+                        'title' => op_t($one['title'][$i]),
+                        'url' => op_t($one['url'][$i]),
+                        'sort' => intval($one['sort'][$i]),
+                        'target' => intval($one['target'][$i]),
+                        'color' => op_t($one['color'][$i]),
+                        'band_text' => op_t($one['band_text'][$i]),
+                        'band_color' => op_t($one['band_color'][$i]),
+                        'icon' => op_t(str_replace('icon-', '', $one['icon'][$i])),
+                        'status' => 1
 
-            );
-            $pid[$i] =$Channel->add($data[$i]);
+                    );
+                    $pid[$i] = $Channel->add($data[$i]);
+                }
+                $two = $_POST['nav'][2];
+
+                for ($j = 0; $j < count(reset($two)); $j++) {
+                    $data_two[$j] = array(
+                        'pid' => $pid[$two['pid'][$j]],
+                        'title' => op_t($two['title'][$j]),
+                        'url' => op_t($two['url'][$j]),
+                        'sort' => intval($two['sort'][$j]),
+                        'target' => intval($two['target'][$j]),
+                        'color' => op_t($two['color'][$j]),
+                        'band_text' => op_t($two['band_text'][$j]),
+                        'band_color' => op_t($two['band_color'][$j]),
+                        'icon' => op_t(str_replace('icon-', '', $two['icon'][$j])),
+                        'status' => 1
+                    );
+                    $res[$j] = $Channel->add($data_two[$j]);
+                }
+                S('common_nav',null);
+                $this->success('修改成功');
+            }
+            $this->error('导航至少存在一个。');
+
+
+        } else {
+            /* 获取频道列表 */
+            $map = array('status' => array('gt', -1), 'pid' => 0);
+            $list = $Channel->where($map)->order('sort asc,id asc')->select();
+            foreach ($list as $k => &$v) {
+                $module = D('Module')->where(array('entry' => $v['url']))->find();
+                $v['module_name'] = $module['name'];
+                $child = $Channel->where(array('status' => array('gt', -1), 'pid' => $v['id']))->order('sort asc,id asc')->select();
+                foreach ($child as $key => &$val) {
+                    $module = D('Module')->where(array('entry' => $val['url']))->find();
+                    $val['module_name'] = $module['name'];
+                }
+                unset($key, $val);
+                $child && $v['child'] = $child;
+            }
+
+            unset($k, $v);
+            $this->assign('module', $this->getModules());
+            $this->assign('list', $list);
+
+            $this->meta_title = '导航管理';
+            $this->display();
         }
-        $two = $_POST['nav'][2];
-
-        for($j=0;$j<count(reset($two));$j++){
-            $data_two[$j] = array(
-                'pid'=> $pid[$two['pid'][$j]],
-                'title'=>op_t($two['title'][$j]),
-                'url'=>op_t($two['url'][$j]),
-                'sort'=>intval($two['sort'][$j]),
-                'target'=>intval($two['target'][$j]),
-                'color'=>op_t($two['color'][$j]),
-                'band_text'=>op_t($two['band_text'][$j]),
-                'band_color'=>op_t($two['band_color'][$j]),
-                'icon'=>op_t(str_replace('icon-','',$two['icon'][$j])),
-                'status'=>1
-            );
-            $res[$j] = $Channel->add($data_two[$j]);
-        }
-        $this->success('修改成功');
-    }
-  $this->error('导航至少存在一个。');
-
-
-
-}else{
-    /* 获取频道列表 */
-    $map = array('status' => array('gt', -1), 'pid' => 0);
-    $list =$Channel->where($map)->order('sort asc,id asc')->select();
-    foreach ($list as $k => &$v) {
-        $module =  D('Module')->where(array('entry'=>$v['url']))->find();
-        $v['module_name'] =$module['name'];
-        $child = $Channel->where(array('status' => array('gt', -1), 'pid' => $v['id']))->order('sort asc,id asc')->select();
-        foreach($child as $key=>&$val){
-            $module =  D('Module')->where(array('entry'=>$val['url']))->find();
-            $val['module_name'] =$module['name'];
-        }
-        unset($key, $val);
-        $child && $v['child'] = $child;
-    }
-
-    unset($k, $v);
-    $this->assign('module',$this->getModules());
-    $this->assign('list', $list);
-
-    $this->meta_title = '导航管理';
-    $this->display();
-}
 
     }
 
@@ -140,7 +140,7 @@ if(IS_POST){
                 $this->error($Channel->getError());
             }
         } else {
-            $pid = i('get.pid', 0);
+            $pid = I('get.pid', 0);
             //获取父导航
             if (!empty($pid)) {
                 $parent = M('Channel')->where(array('id' => $pid))->field('title')->find();

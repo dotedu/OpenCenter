@@ -7,19 +7,21 @@
     </div>
     <div class="clearfix">
         <div class="col-xs-10">
-            <button class="btn ajax-post" url="{:U('User/changeStatus',array('status'=>'1'))}"
+            <button class="btn ajax-post" url="{:U('User/changeStatus',array('method'=>'resumeUser'))}"
                     target-form="ids">启 用
             </button>
-            <button class="btn ajax-post" url="{:U('User/changeStatus',array('status'=>'0'))}"
+            <button class="btn ajax-post" url="{:U('User/changeStatus',array('method'=>'forbidUser'))}"
                     target-form="ids">禁 用
             </button>
-            <button class="btn ajax-post confirm" url="{:U('User/changeStatus',array('status'=>'-1'))}"
+            <button class="btn ajax-post confirm" url="{:U('User/changeStatus',array('method'=>'deleteUser'))}"
                     target-form="ids">删 除
             </button>
-
             <button class="btn " onclick="post_select_form()"
                     target-form="ids">选择用户分组
             </button>
+            <button class="btn ajax-post confirm" data-confirm="密码重置为“123456”" url="{:U('User/initPass')}" target-form="ids">重置密码
+            </button>
+            <span style="font-size: 14px;color: #999898;margin-left: 11px;">重置密码后新密码为“123456”</span>
         </div>
         <script>
             function post_select_form(){
@@ -71,15 +73,17 @@
 
                         <td>
                             <eq name="vo.status" value="1">
-                                <a href="{:U('User/changeStatus?status=0&id='.$vo['uid'])}"
+                                <a href="{:U('User/changeStatus?method=forbidUser&id='.$vo['uid'])}"
                                    class="ajax-get">禁用</a>
                                 <else/>
-                                <a href="{:U('User/changeStatus?status=1&id='.$vo['uid'])}"
+                                <a href="{:U('User/changeStatus?method=resumeUser&id='.$vo['uid'])}"
                                    class="ajax-get">启用</a>
                             </eq>
                             <a href="{:U('AuthManager/group?uid='.$vo['uid'])}" class="authorize">授权</a>
-                            <a href="{:U('User/changeStatus?status=-1&id='.$vo['uid'])}"
+                            <a href="{:U('User/changeStatus?method=deleteUser&id='.$vo['uid'])}"
                                class="confirm ajax-get">删除</a>
+                            <a href="{:U('User/initPass?id='.$vo['uid'])}"
+                               class="confirm ajax-get">重置密码</a>
                         </td>
 
                     </tr>

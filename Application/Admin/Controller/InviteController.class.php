@@ -198,7 +198,7 @@ class InviteController extends AdminController
             $map['invite_type']=$aType;
         }
 
-        list($list,,$totalCount)=$this->inviteModel->getList($map,$page,$r);
+        list($list,$totalCount)=$this->inviteModel->getList($map,$page,$r);
         $typeOptions=$this->_getTypeList();
         foreach($typeOptions as &$val){
             $val['value']=$val['title'];
@@ -435,7 +435,7 @@ class InviteController extends AdminController
      */
     public function inviteLog($page=1,$r=20)
     {
-        list($list,$totalCount)=$this->inviteLogModel->getList($page,$r);
+        list($list,,$totalCount)=$this->inviteLogModel->getList($page,$r);
         $builder=new AdminListBuilder();
         $builder->title('邀请注册记录')
             ->keyId()
