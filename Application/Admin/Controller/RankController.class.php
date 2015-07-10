@@ -316,9 +316,7 @@ class RankController extends AdminController
                     $content1 = '管理员给@' . $user['username'] . ' 颁发了新的头衔：[' . $rank['title'] . ']，颁发理由：' . $reason; //<img src="'.$logoUrl.'" title="'.$rank['title'].'" alt="'.$rank['title'].'">';
                     clean_query_user_cache($uid, array('rank_link'));
                     $this->sendMessage($data, $content);
-                    //写入数据库
-                    $model = D('Weibo/Weibo');
-                    $result = $model->addWeibo(is_login(), $content1);
+
                 }
             }
             $this->success($is_Edit ? '编辑关联成功' : '添加关联成功', U('Rank/userRankList?id=' . $uid));

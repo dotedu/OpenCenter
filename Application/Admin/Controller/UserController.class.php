@@ -42,6 +42,31 @@ class UserController extends AdminController
         $this->display();
     }
 
+    /**
+     * 重置用户密码
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function initPass(){
+        $uids=I('id');
+        !is_array($uids)&&$uids=explode(',',$uids);
+        foreach($uids as $key=>$val){
+            if(!query_user('uid',$val)){
+                unset($uids[$key]);
+            }
+        }
+        if(!count($uids)){
+            $this->error('前选择要重置的用户！');
+        }
+        $ucModel=UCenterMember();
+        $data=$ucModel->create(array('password'=>'123456'));
+        $res=$ucModel->where(array('id'=>array('in',$uids)))->save(array('password'=>$data['password']));
+        if($res){
+            $this->success('密码重置成功！');
+        }else{
+            $this->error('密码重置失败！可能密码重置前就是“123456”。');
+        }
+    }
+
     public function changeGroup()
     {
 
@@ -123,7 +148,7 @@ class UserController extends AdminController
         $builder = new AdminListBuilder();
         $builder->title("用户扩展资料列表");
         $builder->meta_title = '用户扩展资料列表';
-        $builder->setSearchPostUrl(U('Admin/User/expandinfo_select'),'','')->search('搜索', 'nickname', 'text', '请输入用户昵称或者ID');
+        $builder->setSearchPostUrl(U('Admin/User/expandinfo_select'))->search('搜索', 'nickname', 'text', '请输入用户昵称或者ID');
         $builder->keyId()->keyLink('nickname', "昵称", 'User/expandinfo_details?uid=###');
         foreach ($fields_list as $vt) {
             $builder->keyText($vt['field_name'], $vt['field_name']);
@@ -161,6 +186,7 @@ class UserController extends AdminController
             $map['status'] = array('egt', 0);
             $member = M('Member')->where($map)->find();
             $member['id'] = $member['uid'];
+            $member['username']=query_user('username',$uid);
             //扩展信息查询
             $map_profile['status'] = 1;
             $field_group = D('field_group')->where($map_profile)->select();
@@ -182,8 +208,8 @@ class UserController extends AdminController
             $builder = new AdminConfigBuilder();
             $builder->title("用户扩展资料详情");
             $builder->meta_title = '用户扩展资料详情';
-            $builder->keyId()->keyReadOnly('nickname', "用户名称");
-            $field_key = array('id','nickname');
+            $builder->keyId()->keyReadOnly('username', "用户名称")->keyReadOnly('nickname','昵称');
+            $field_key = array('id','username','nickname');
             foreach ($fields_list as $vt) {
                 $field_key[] = $vt['field_name'];
                 $builder->keyReadOnly($vt['field_name'], $vt['field_name']);
@@ -603,6 +629,10 @@ class UserController extends AdminController
     public function addAction()
     {
         $this->meta_title = '新增行为';
+
+
+        $module = D('Module')->getAll();
+        $this->assign('module',$module);
         $this->assign('data', null);
         $this->display('editaction');
     }
@@ -617,6 +647,8 @@ class UserController extends AdminController
         empty($id) && $this->error('参数不能为空！');
         $data = M('Action')->field(true)->find($id);
 
+        $module = D('Module')->getAll();
+        $this->assign('module',$module);
         $this->assign('data', $data);
         $this->meta_title = '编辑行为';
         $this->display();
@@ -640,10 +672,9 @@ class UserController extends AdminController
      * 会员状态修改
      * @author 朱亚杰 <zhuyajie@topthink.net>
      */
-    public function changeStatus()
+    public function changeStatus($method = null)
     {
         $id = array_unique((array)I('id', 0));
-        $status=I('status',1,'intval');
         if (in_array(C('USER_ADMINISTRATOR'), $id)) {
             $this->error("不允许对超级管理员执行该操作!");
         }
@@ -652,11 +683,19 @@ class UserController extends AdminController
             $this->error('请选择要操作的数据!');
         }
         $map['uid'] = array('in', $id);
-        $res=set_users_status($map,$status);
-        if($res){
-            $this->success('设置成功！');
-        }else{
-            $this->error('设置失败！');
+        switch (strtolower($method)) {
+            case 'forbiduser':
+                $this->forbid('Member', $map);
+                break;
+            case 'resumeuser':
+                $this->resume('Member', $map);
+                break;
+            case 'deleteuser':
+                $this->delete('Member', $map);
+                break;
+            default:
+                $this->error('参数非法');
+
         }
     }
 

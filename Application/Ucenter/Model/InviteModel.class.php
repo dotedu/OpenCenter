@@ -101,20 +101,19 @@ class InviteModel extends Model
      * 获取分页邀请码列表
      * @param array $map
      * @param int $page
-     * @param $totalCount
      * @param int $r
      * @param string $order
      * @return array|null
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function getList($map = array(), $page = 1, &$totalCount, $r = 20, $order = 'id desc')
+    public function getList($map = array(), $page = 1, $r = 20, $order = 'id desc')
     {
         $totalCount = $this->where($map)->count();
         if ($totalCount) {
             $dataList = $this->where($map)->page($page, $r)->order($order)->select();
-            return $this->_initSelectData($dataList);
+            return array($this->_initSelectData($dataList),$totalCount);
         }
-        return null;
+        return array(null,0);
     }
 
     /**

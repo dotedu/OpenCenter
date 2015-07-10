@@ -40,7 +40,7 @@ class RoleController extends AdminController
     public function index($page = 1, $r = 20)
     {
         $map['status'] = array('egt', 0);
-        $roleList = $this->roleModel->selectPageByMap($map, $totalCount, $page, $r, 'sort asc');
+        list($roleList,$totalCount) = $this->roleModel->selectPageByMap($map, $page, $r, 'sort asc');
         $map_group['id'] = array('in', array_column($roleList, 'group_id'));
 
         $group = $this->roleGroupModel->where($map_group)->field('id,title')->select();
@@ -228,12 +228,19 @@ class RoleController extends AdminController
     private function checkSingleRoleUser($ids)
     {
         $ids = is_array($ids) ? $ids : explode(',', $ids);
+
+        $user_ids=D('Member')->where(array('status'=>-1))->field('uid')->select();
+        $user_ids=array_column($user_ids,'uid');
+
         $error_role_id = 0; //出错的角色id
         foreach ($ids as $role_id) {
             //获取拥有该角色的用户ids
             $uids = $this->userRoleModel->where(array('role_id' => $role_id))->field('uid')->select();
+            $uids=array_column($uids,'uid');
+            if(count($user_ids)){
+                $uids=array_diff($uids,$user_ids);
+            }
             if (count($uids) > 0) { //拥有该角色
-                $uids=array_column($uids,'uid');
                 $uids = array_unique($uids);
                 //获取拥有其他角色的用户ids
                 $have_uids = $this->userRoleModel->where(array('role_id' => array('not in', $ids), 'uid' => array('in', $uids)))->field('uid')->select();
@@ -298,13 +305,29 @@ class RoleController extends AdminController
         if ($aUserStatus) {//筛选状态
             $map_user_list['status'] = $aUserStatus == 3 ? 0 : $aUserStatus;
         }
+        $user_ids=D('Member')->where(array('status'=>-1))->field('uid')->select();
+        $user_ids=array_column($user_ids,'uid');
         if($aSingleRole){//单角色筛选
             $uids=$this->userRoleModel->group('uid')->field('uid')->having('count(uid)=1')->select();
             $uids=array_column($uids,'uid');//单角色用户id列表
             if($aSingleRole==1){
-                $map_user_list['uid']=array('in',$uids);
+                if(count($user_ids)){
+                    $map_user_list['uid']=array('in',array_diff($uids,$user_ids));
+                }else{
+                    $map_user_list['uid']=array('in',$uids);
+                }
             }else{
-                $map_user_list['uid']=array('not in',$uids);
+                if(count($uids)&&count($user_ids)){
+                    $map_user_list['uid']=array('not in',array_merge($user_ids,$uids));
+                }else if(count($uids)){
+                    $map_user_list['uid']=array('not in',$uids);
+                }else if(count($user_ids)){
+                    $map_user_list['uid']=array('not in',$user_ids);
+                }
+            }
+        }else{
+            if(count($user_ids)){
+                $map_user_list['uid']=array('not in',$user_ids);
             }
         }
         $user_list = $this->userRoleModel->where($map_user_list)->page($page, $r)->order('id desc')->select();

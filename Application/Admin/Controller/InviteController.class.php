@@ -198,7 +198,7 @@ class InviteController extends AdminController
             $map['invite_type']=$aType;
         }
 
-        $list=$this->inviteModel->getList($map,$page,&$totalCount,$r);
+        list($list,$totalCount)=$this->inviteModel->getList($map,$page,$r);
         $typeOptions=$this->_getTypeList();
         foreach($typeOptions as &$val){
             $val['value']=$val['title'];
@@ -320,7 +320,7 @@ class InviteController extends AdminController
         }elseif($aOrder==2){
             $order='uid asc,invite_type asc,create_time desc';
         }
-        $list=$this->inviteBuyLogModel->getList($map,$totalCount,$page,$order,$r);
+        list($list,$totalCount)=$this->inviteBuyLogModel->getList($map,$page,$order,$r);
         $orderOptions=array(
             array('id'=>0,'value'=>'最新创建'),
             array('id'=>1,'value'=>'最早创建'),
@@ -361,7 +361,7 @@ class InviteController extends AdminController
         if($aInviteType){
             $map['invite_type']=$aInviteType;
         }
-        $list=$this->inviteUserInfoModel->getList($map,$totalCount,$page,$r);
+        list($list,,$totalCount)=$this->inviteUserInfoModel->getList($map,$page,$r);
 
         $typeOptions=$this->_getTypeList();
         foreach($typeOptions as &$val){
@@ -435,7 +435,7 @@ class InviteController extends AdminController
      */
     public function inviteLog($page=1,$r=20)
     {
-        $list=$this->inviteLogModel->getList($totalCount,$page,$r);
+        list($list,,$totalCount)=$this->inviteLogModel->getList($page,$r);
         $builder=new AdminListBuilder();
         $builder->title('邀请注册记录')
             ->keyId()
@@ -462,7 +462,7 @@ class InviteController extends AdminController
         }else{
             $map['id']=array('gt',0);
         }
-        $dataList=$this->inviteModel->getList($map);
+        list($dataList,$totalCount)=$this->inviteModel->getList($map);
         if(!count($dataList)){
             $this->error('没有数据！');
         }

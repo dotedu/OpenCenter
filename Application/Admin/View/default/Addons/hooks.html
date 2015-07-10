@@ -6,7 +6,9 @@
 		<h2>钩子列表</h2>
 	</div>
 	<div class="with-padding">
-		<a class="btn" href="{:U('addhook')}">新 增</a>
+		<?php if (IS_ROOT): ?>
+			<a class="btn" href="{:U('addhook')}">新 增</a>
+		<?php endif ?>
 	</div>
 
 	<!-- 数据列表 -->

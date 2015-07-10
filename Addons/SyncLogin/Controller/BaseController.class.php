@@ -312,7 +312,7 @@ class BaseController extends AddonsController
                 $error = '用户名只能由数字、字母和"_"组成！';
                 break;
             case -21:
-                $error = '昵称不能少于两个字！';
+                $error = '昵称不能少于四个字！';
                 break;
             case -30:
                 $error = '昵称被占用！';

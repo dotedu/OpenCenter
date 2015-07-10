@@ -104,7 +104,7 @@ class MemberController extends Controller
             }
         } else { //显示注册表单
             if (is_login()) {
-                redirect(U('Weibo/Index/index'));
+                redirect(U(C('AFTER_LOGIN_JUMP_URL')));
             }
             $this->checkRegisterType();
             $aType = I('get.type', '', 'op_t');
@@ -294,13 +294,13 @@ class MemberController extends Controller
             $verify = $this->getResetPasswordVerifyCode($uid);
 
             //发送验证邮箱
-            $url = 'http://' . $_SERVER['HTTP_HOST'] . U('Home/User/reset?uid=' . $uid . '&verify=' . $verify);
-            $content = C('USER_RESPASS') . "<br/>" . $url . "<br/>" . C('WEB_SITE') . "系统自动发送--请勿直接回复<br/>" . date('Y-m-d H:i:s', TIME()) . "</p>";
-            send_mail($email, C('WEB_SITE') . "密码找回", $content);
-            $this->success('密码找回邮件发送成功', U('User/login'));
+            $url = 'http://' . $_SERVER['HTTP_HOST'] . U('Ucenter/member/reset?uid=' . $uid . '&verify=' . $verify);
+            $content = C('USER_RESPASS') . "<br/>" . $url . "<br/>" . modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . "系统自动发送--请勿直接回复<br/>" . date('Y-m-d H:i:s', TIME()) . "</p>";
+            send_mail($email, modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . "密码找回", $content);
+            $this->success('密码找回邮件发送成功', U('Member/login'));
         } else {
             if (is_login()) {
-                redirect(U('Weibo/Index/index'));
+                redirect(U(C('AFTER_LOGIN_JUMP_URL')));
             }
 
             $this->display();
@@ -363,7 +363,7 @@ class MemberController extends Controller
         }
 
         //显示成功消息
-        $this->success('密码重置成功', U('Home/User/login'));
+        $this->success('密码重置成功', U('Ucenter/Member/login'));
     }
 
     private function getResetPasswordVerifyCode($uid)
@@ -428,7 +428,7 @@ class MemberController extends Controller
                 $error = '昵称只能由数字、字母、汉字和"_"组成！';
                 break;
             case -33:
-                $error = '昵称不能少于两个字！';
+                $error = '昵称不能少于四个字！';
                 break;
             default:
                 $error = '未知错误24';
@@ -495,7 +495,7 @@ class MemberController extends Controller
                 $content = modC('REG_EMAIL_VERIFY', '{$verify}', 'USERCONFIG');
                 $content = str_replace('{$verify}', $verify, $content);
                 $content = str_replace('{$account}', $account, $content);
-                $res = send_mail($account, C('WEB_SITE') . '邮箱验证', $content);
+                $res = send_mail($account, modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . '邮箱验证', $content);
                 return $res;
                 break;
         }
@@ -581,8 +581,8 @@ class MemberController extends Controller
         $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/doActivate?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . $uid);
         $content = modC('REG_EMAIL_ACTIVATE', '{$url}', 'USERCONFIG');
         $content = str_replace('{$url}', $url, $content);
-        $content = str_replace('{$title}', C('WEB_SITE'), $content);
-        $res = send_mail($account, C('WEB_SITE') . '激活信', $content);
+        $content = str_replace('{$title}', modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config'), $content);
+        $res = send_mail($account, modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . '激活信', $content);
 
 
         return $res;
@@ -619,7 +619,7 @@ class MemberController extends Controller
         if (!$res) {
             M('avatar')->add(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
         }
-        clean_query_user_cache($aUid, array('avatar256', 'avatar128', 'avatar64'));
+        clean_query_user_cache($aUid, array('avatar256', 'avatar128', 'avatar64','avatar32','avatar512'));
         $this->success('头像更新成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
 
     }
@@ -820,6 +820,21 @@ class MemberController extends Controller
             !isset($result['info']) && $result['info'] = '没有要保存的信息！';
             $this->error($result['info']);
         }
+    }
+
+    /**
+     * 设置用户标签
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function set_tag()
+    {
+        $result = A('Ucenter/RegStep', 'Widget')->do_set_tag();
+        if ($result['status']) {
+            $result['url']=U('Ucenter/member/step', array('step' => get_next_step('set_tag')));
+        } else {
+            !isset($result['info']) && $result['info'] = '没有要保存的信息！';
+        }
+        $this->ajaxReturn($result);
     }
 
     /**

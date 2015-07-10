@@ -70,6 +70,7 @@ class ActionLimitController extends AdminController
             $data['message_content'] = I('post.message_content', '', 'op_t');
             $data['action_list'] = I('post.action_list', '', 'op_t');
             $data['status'] = I('post.status', 1, 'intval');
+            $data['module'] = I('post.module', '', 'op_t');
 
             $data['punish'] = implode(',', $data['punish']);
 
@@ -91,6 +92,13 @@ class ActionLimitController extends AdminController
             }
         } else {
             $builder = new AdminConfigBuilder();
+
+            $modules = D('Module')->getAll();
+            $module['all'] = '全站';
+            foreach($modules as $k=>$v){
+                $module[$v['name']] = $v['alias'];
+            }
+
             if ($aId != 0) {
                 $limit = $model->getActionLimit(array('id' => $aId));
                 $limit['punish'] = explode(',', $limit['punish']);
@@ -106,6 +114,7 @@ class ActionLimitController extends AdminController
             $builder->title(($aId == 0 ? '新增' : '编辑') . '行为限制')->keyId()
                 ->keyTitle()
                 ->keyText('name', '名称')
+                ->keySelect('module', '所属模块','',$module)
                 ->keyText('frequency', '频率')
                // ->keySelect('time_unit', '时间单位', '', $this->getTimeUnit())
                 ->keyMultiInput('time_number|time_unit','时间单位','时间单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>$this->getTimeUnit(),'style'=>'width:100px')))
