@@ -43,11 +43,11 @@ class InviteController extends AdminController
         !isset($data['REGISTER_TYPE'])&&$data['REGISTER_TYPE']='normal';
 
         $register_options=array(
-            'normal'=>'普通注册',
-            'invite'=>'邀请注册'
+            'normal'=>L('_ORDINARY_REGISTRATION_'),
+            'invite'=>L('_INVITED_TO_REGISTER_')
         );
-        $builder->title('邀请注册信息配置')
-            ->keyCheckBox('REGISTER_TYPE', '注册类型', '勾选为开启',$register_options)
+        $builder->title(L('_INVITE_REGISTERED_INFORMATION_CONFIGURATION_'))
+            ->keyCheckBox('REGISTER_TYPE', L('_REGISTERED_TYPE_'), L('_CHECK_TO_OPEN_'),$register_options)
             ->data($data)
             ->buttonSubmit()
             ->buttonBack()
@@ -62,14 +62,14 @@ class InviteController extends AdminController
     {
         $data_list=$this->inviteTypeModel->getList();
         $builder=new AdminListBuilder();
-        $builder->title('邀请码类型列表')
+        $builder->title(L('_INVITE_CODE_TYPE_LIST_'))
             ->buttonNew(U('Invite/edit'))
-            ->button('删除',array('class' => 'btn ajax-post confirm', 'url' => U('Invite/setStatus', array('status' => -1)), 'target-form' => 'ids', 'confirm-info' => "确认删除角色？删除后不可恢复！"))
-            ->keyId()->keyTitle()->keyText('length','邀请码长度')->keyText('time_show','有效时长')
-            ->keyText('cycle_num','周期内可购买个数')->keyText('cycle_time_show','周期时长')
-            ->keyText('roles_show','绑定角色')->keyText('auth_groups_show','允许购买的用户组')
-            ->keyText('pay','每个额度消费')->keyText('income','每个成功后获得')
-            ->keyBool('is_follow','成功后是否互相关注')->keyCreateTime()->keyUpdateTime()
+            ->button(L('_DELETE_'),array('class' => 'btn ajax-post confirm', 'url' => U('Invite/setStatus', array('status' => -1)), 'target-form' => 'ids', 'confirm-info' => L('_DELETE_CONFIRM_')))
+            ->keyId()->keyTitle()->keyText('length',L('_INVITE_CODE_LENGTH_'))->keyText('time_show',L('_LONG_'))
+            ->keyText('cycle_num',L('_PERIOD_CAN_BUY_A_FEW_'))->keyText('cycle_time_show',L('_PERIOD_IS_LONG_'))
+            ->keyText('roles_show',L('_BINDING_IDENTITY_'))->keyText('auth_groups_show',L('_ALLOWS_USERS_TO_BUY_'))
+            ->keyText('pay',L('_EACH_AMOUNT_'))->keyText('income',L('_AFTER_EVERY_SUCCESS_'))
+            ->keyBool('is_follow',L('_SUCCESS_IS_CONCERNED_WITH_EACH_OTHER_'))->keyCreateTime()->keyUpdateTime()
             ->keyDoActionEdit('Invite/edit?id=###')
             ->data($data_list)
             ->display();
@@ -83,7 +83,7 @@ class InviteController extends AdminController
     {
         $aId=I('id',0,'intval');
         $is_edit=$aId?1:0;
-        $title=$is_edit?"编辑":"新增";
+        $title=$is_edit?L('_EDIT_'):L('_NEW_');
         if(IS_POST){
             $data['title']=I('post.title','','op_t');
             $data['length']=I('post.length',0,'intval');
@@ -106,9 +106,9 @@ class InviteController extends AdminController
                 $result=$this->inviteTypeModel->addData($data);
             }
             if($result){
-                $this->success($title.'邀请码类型成功！',U('Invite/index'));
+                $this->success($title.L('_INVITATION_CODE_TYPE_SUCCESS_'),U('Invite/index'));
             }else{
-                $this->error($title.'邀请码类型失败！'.$this->inviteTypeModel->getError());
+                $this->error($title.L('_INVITATION_CODE_TYPE_FAILED_').$this->inviteTypeModel->getError());
             }
         }else{
             if($is_edit){
@@ -130,22 +130,22 @@ class InviteController extends AdminController
             $role_option=$this->_getRoleOption();
             $auth_group_option=$this->_getAuthGroupOption();
             $is_follow_option=array(
-                0=>'否',
-                1=>'是'
+                0=>L('_NO_'),
+                1=>L('_YES_')
             );
 
             $builder=new AdminConfigBuilder();
 
-            $builder->title($title.'邀请码类型');
-            $builder->keyId()->keyTitle()->keyText('length','邀请码长度')
-                ->keyMultiInput('time_num|time_unit','有效时长','时间+单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
-                ->keyInteger('cycle_num','周期内可购买个数')
-                ->keyMultiInput('cycle_time_num|cycle_time_unit','周期时长','时间+单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
-                ->keyChosen('roles','绑定角色','',$role_option)
-                ->keyChosen('auth_groups','允许购买的用户组','',$auth_group_option)
-                ->keyMultiInput('pay_score_type|pay_score','每个邀请额度消费','积分类型+个数',array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
-                ->keyMultiInput('income_score_type|income_score','每个邀请成功后获得','积分类型+个数',array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
-                ->keyRadio('is_follow','成功后是否互相关注','',$is_follow_option)
+            $builder->title($title.L('_INVITATION_CODE_TYPE_'));
+            $builder->keyId()->keyTitle()->keyText('length',L('_INVITE_CODE_LENGTH_'))
+                ->keyMultiInput('time_num|time_unit',L('_LONG_'),L('_TIME_UNIT_'),array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
+                ->keyInteger('cycle_num',L('_PERIOD_CAN_BUY_A_FEW_'))
+                ->keyMultiInput('cycle_time_num|cycle_time_unit',L('_PERIOD_IS_LONG_'),L('_TIME_UNIT_'),array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>get_time_unit(),'style'=>'width:100px')))
+                ->keyChosen('roles',L('_BINDING_IDENTITY_'),'',$role_option)
+                ->keyChosen('auth_groups',L('_ALLOWS_USERS_TO_BUY_'),'',$auth_group_option)
+                ->keyMultiInput('pay_score_type|pay_score',L('_EVERY_INVITATION_AMOUNT_'),L('_SCORE_NUMBER_'),array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
+                ->keyMultiInput('income_score_type|income_score',L('_EACH_INVITATION_WAS_SUCCESSFUL_'),L('_SCORE_NUMBER_'),array(array('type'=>'select','opt'=>$score_option,'style'=>'width:100px;margin-right:5px'),array('type'=>'text','style'=>'width:295px')))
+                ->keyRadio('is_follow',L('_SUCCESS_IS_CONCERNED_WITH_EACH_OTHER_'),'',$is_follow_option)
                 ->buttonSubmit()->buttonBack()
                 ->data($data)
                 ->display();
@@ -164,9 +164,9 @@ class InviteController extends AdminController
         //删除邀请码类型，真删除
         if($status==-1){
             $this->inviteTypeModel->deleteIds($ids);
-            $this->success('操作成功！');
+            $this->success(L('_OPERATION_SUCCESS_'));
         }else{
-            $this->error('未知操作！');
+            $this->error(L('_UNKNOWN_OPERATION_'));
         }
 
     }
@@ -204,7 +204,7 @@ class InviteController extends AdminController
             $val['value']=$val['title'];
         }
         unset($val);
-        $typeOptions=array_merge(array(array('id'=>0,'value'=>'全部')),$typeOptions);
+        $typeOptions=array_merge(array(array('id'=>0,'value'=>L('_ALL_'))),$typeOptions);
         if($aStatus==1){
             $this->assign('invite_list',$list);
             $this->assign('buyer',$aBuyer);
@@ -212,29 +212,29 @@ class InviteController extends AdminController
             $this->assign('now_type',$aType);
             //生成翻页HTML代码
             C('VAR_PAGE', 'page');
-            $pager = new \Think\Page($this->_pagination['totalCount'], $this->_pagination['listRows'], $_REQUEST);
+            $pager = new \Think\Page($totalCount, $r, $_REQUEST);
             $pager->setConfig('theme', '%FIRST% %UP_PAGE% %LINK_PAGE% %DOWN_PAGE% %END% %HEADER%');
             $paginationHtml = $pager->show();
             $this->assign('pagination', $paginationHtml);
             $this->display();
         }else{
             $builder=new AdminListBuilder();
-            $builder->title('邀请码列表页面')
+            $builder->title(L('_INVITE_CODE_LIST_PAGE_'))
                 ->setSelectPostUrl(U('Invite/invite'))
                 /*->buttonDelete(U('Invite/delete'))*/
-                ->buttonModalPopup(U('Invite/createCode'),array(),'生成邀请码',array('data-title'=>'生成邀请码'))
-                ->buttonDelete(U('Invite/deleteTrue'),'清空无用邀请码(真删除)')
+                ->buttonModalPopup(U('Invite/createCode'),array(),L('_GENERATE_AN_INVITATION_CODE_'),array('data-title'=>L('_GENERATE_AN_INVITATION_CODE_')))
+                ->buttonDelete(U('Invite/deleteTrue'),L('_DELETE_INV_CODE_WEAK_'))
                 ->select('邀请码类型：','type','select','','','',$typeOptions)
-                ->select('','status','select','','','',array(array('id'=>'1','value'=>'可注册'),array('id'=>'3','value'=>'已过期'),array('id'=>'2','value'=>'已退还'),array('id'=>'0','value'=>'用完无效'),array('id'=>'-1','value'=>'管理员删除')))
-                ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>'管理员生成'),array('id'=>'1','value'=>'用户购买')))
+                ->select('','status','select','','','',array(array('id'=>'1','value'=>L('_REGISTERED_')),array('id'=>'3','value'=>L('_EXPIRED_')),array('id'=>'2','value'=>L('_HAS_BEEN_RETURNED_')),array('id'=>'0','value'=>L('_RUN_OUT_')),array('id'=>'-1','value'=>L('_ADMIN_DELETE_'))))
+                ->select('','buyer','select','','','',array(array('id'=>'-1','value'=>L('_ADMINISTRATOR_GENERATION_')),array('id'=>'1','value'=>L('_USER_PURCHASE_'))))
                 ->keyId()
-                ->keyText('code','邀请码')
-                ->keyText('code_url','邀请码链接')
-                ->keyText('invite','邀请码类型')
-                ->keyText('buyer','购买者')
-                ->keyText('can_num','可注册几个')
-                ->keyText('already_num','已注册几个')
-                ->keyTime('end_time','有效期至')
+                ->keyText('code',L('_INVITATION_CODE_'))
+                ->keyText('code_url',L('_INVITE_CODE_LINK_'))
+                ->keyText('invite',L('_INVITATION_CODE_TYPE_'))
+                ->keyText('buyer',L('_BUYERS_'))
+                ->keyText('can_num',L('_CAN_BE_REGISTERED_A_FEW_'))
+                ->keyText('already_num',L('_ALREADY_REGISTERED_A_FEW_'))
+                ->keyTime('end_time',L('_PERIOD_OF_VALIDITY_'))
                 ->keyCreateTime()
                 ->data($list)
                 ->pagination($totalCount,$r)
@@ -255,7 +255,7 @@ class InviteController extends AdminController
             $aCanNum=$data['can_num']=I('post.can_num',0,'intval');
             if($aCanNum<=0||$aCodeNum<=0){
                 $result['status']=0;
-                $result['info']='生成个数和可注册个数都不能小于1！';
+                $result['info']=L('_GENERATE_A_NUMBER_AND_CAN_BE_REGISTERED_A_NUMBER_CAN_NOT_BE_LESS_THAN_1_');
             }else{
                 $result=$this->inviteModel->createCodeAdmin($data,$aCodeNum);
             }
@@ -277,9 +277,9 @@ class InviteController extends AdminController
         $ids=is_array($ids)?$ids:explode(',',$ids);
         $result=$this->inviteModel->where(array('id'=>array('in',$ids)))->setField('status','-1');
         if($result){
-            $this->success('操作成功！');
+            $this->success(L('_OPERATION_SUCCESS_'));
         }else{
-            $this->error('操作失败！'.$this->inviteModel->getError());
+            $this->error(L('_OPERATION_FAILED_').$this->inviteModel->getError());
         }
     }
 
@@ -294,9 +294,9 @@ class InviteController extends AdminController
         $map['_logic']='OR';
         $result=$this->inviteModel->where($map)->delete();
         if($result){
-            $this->success('操作成功！');
+            $this->success(L('_OPERATION_SUCCESS_'));
         }else{
-            $this->error('操作失败！'.$this->inviteModel->getError());
+            $this->error(L('_OPERATION_FAILED_').$this->inviteModel->getError());
         }
     }
 
@@ -322,27 +322,27 @@ class InviteController extends AdminController
         }
         list($list,$totalCount)=$this->inviteBuyLogModel->getList($map,$page,$order,$r);
         $orderOptions=array(
-            array('id'=>0,'value'=>'最新创建'),
-            array('id'=>1,'value'=>'最早创建'),
-            array('id'=>2,'value'=>'用户')
+            array('id'=>0,'value'=>L('_LATEST_CREATION_')),
+            array('id'=>1,'value'=>L('_FIRST_CREATED_')),
+            array('id'=>2,'value'=>L('_USER_'))
         );
         $typeOptions=$this->_getTypeList();
         foreach($typeOptions as &$val){
             $val['value']=$val['title'];
         }
         unset($val);
-        $typeOptions=array_merge(array(array('id'=>0,'value'=>'全部')),$typeOptions);
+        $typeOptions=array_merge(array(array('id'=>0,'value'=>L('_ALL_'))),$typeOptions);
 
         $builder=new AdminListBuilder();
-        $builder->title('用户兑换名额记录')
+        $builder->title(L('_USER_EXCHANGE_QUOTA_RECORD_'))
             ->setSelectPostUrl(U('Invite/buyLog'))
-            ->select('邀请码类型：','invite_type','select','','','',$typeOptions)
-            ->select('排序方式：','order','select','','','',$orderOptions)
+            ->select(L('_INVITATION_CODE_TYPE_').L('_COLON_'),'invite_type','select','','','',$typeOptions)
+            ->select(L('_SORT_TYPE_').L('_COLON_'),'order','select','','','',$orderOptions)
             ->keyId()
-            ->keyText('user','购买者')
-            ->keyText('invite_type_title','邀请码类型')
-            ->keyText('num','兑换数量（名额）')
-            ->keyText('content','信息')
+            ->keyText('user',L('_BUYERS_'))
+            ->keyText('invite_type_title',L('_INVITATION_CODE_TYPE_'))
+            ->keyText('num',L('_EXCHANGE_COUNT_'))
+            ->keyText('content',L('_INFORMATION_'))
             ->keyCreateTime()
             ->pagination($totalCount,$r)
             ->data($list)
@@ -368,18 +368,18 @@ class InviteController extends AdminController
             $val['value']=$val['title'];
         }
         unset($val);
-        $typeOptions=array_merge(array(array('id'=>0,'value'=>'全部')),$typeOptions);
+        $typeOptions=array_merge(array(array('id'=>0,'value'=>L('_ALL_'))),$typeOptions);
 
         $builder=new AdminListBuilder();
-        $builder->title('用户信息')
+        $builder->title(L('_USER_INFORMATION_'))
             ->setSelectPostUrl(U('Invite/userInfo'))
-            ->select('邀请码类型：','invite_type','select','','','',$typeOptions)
+            ->select(L('_INVITATION_CODE_TYPE_').L('_COLON_'),'invite_type','select','','','',$typeOptions)
             ->keyId()
-            ->keyText('user','用户')
-            ->keyText('invite_type_title','邀请码类型')
-            ->keyText('num','可邀请名额')
-            ->keyText('already_num','已经邀请名额')
-            ->keyText('success_num','成功邀请名额')
+            ->keyText('user',L('_USER_'))
+            ->keyText('invite_type_title',L('_INVITATION_CODE_TYPE_'))
+            ->keyText('num',L('_AVAILABLE_'))
+            ->keyText('already_num',L('_ALREADY_INVITED_'))
+            ->keyText('success_num',L('_SUCCESSFUL_INVITATION_'))
             ->keyDoActionEdit('Invite/editUserInfo?id=###')
             ->pagination($totalCount,$r)
             ->data($list)
@@ -394,33 +394,33 @@ class InviteController extends AdminController
     {
         $aId=I('id',0,'intval');
         if($aId<=0){
-            $this->error('参数错误！');
+            $this->error(L('_PARAMETER_ERROR_'));
         }
         if(IS_POST){
             $data['num']=I('num',0,'intval');
             $data['already_num']=I('already_num',0,'intval');
             $data['success_num']=I('success_num',0,'intval');
             if($data['num']<0||$data['already_num']<0||$data['success_num']<0){
-                $this->error('请填入正确数据！');
+                $this->error(L('_PLEASE_FILL_IN_THE_CORRECT_DATA_'));
             }
             $result=$this->inviteUserInfoModel->saveData($data,$aId);
             if($result){
-                $this->success('编辑成功！',U('Admin/Invite/userInfo'));
+                $this->success(L('_EDITOR_SUCCESS_'),U('Admin/Invite/userInfo'));
             }else{
-                $this->error('编辑失败！');
+                $this->error(L('_EDIT_FAILED_'));
             }
         }else{
             $map['id']=$aId;
             $data=$this->inviteUserInfoModel->getInfo($map);
 
             $builder=new AdminConfigBuilder();
-            $builder->title('编辑用户邀请信息')
+            $builder->title(L('_EDIT_USER_INVITATION_INFORMATION_'))
                 ->keyId()
-                ->keyReadOnly('uid','用户id')
-                ->keyReadOnly('invite_type','邀请码类型id')
-                ->keyInteger('num','可邀请名额')
-                ->keyInteger('already_num','已邀请名额')
-                ->keyInteger('success_num','成功邀请名额')
+                ->keyReadOnly('uid',L('_USER_ID_'))
+                ->keyReadOnly('invite_type',L('_INVITATION_CODE_TYPE_ID_'))
+                ->keyInteger('num',L('_AVAILABLE_'))
+                ->keyInteger('already_num',L('_INVITED_PLACES_'))
+                ->keyInteger('success_num',L('_SUCCESSFUL_INVITATION_'))
                 ->data($data)
                 ->buttonSubmit()->buttonBack()
                 ->display();
@@ -437,13 +437,13 @@ class InviteController extends AdminController
     {
         list($list,,$totalCount)=$this->inviteLogModel->getList($page,$r);
         $builder=new AdminListBuilder();
-        $builder->title('邀请注册记录')
+        $builder->title(L('_INVITE_REGISTRATION_RECORDS_'))
             ->keyId()
             ->keyText('user','注册者')
-            ->keyText('inviter','邀请者')
+            ->keyText('inviter',L('_INVITED_'))
             ->keyText('invite_type_title','邀请码类型')
-            ->keyText('content','信息')
-            ->keyCreateTime('create_time','注册时间')
+            ->keyText('content',L('_INFORMATION_'))
+            ->keyCreateTime('create_time',L('_REGISTRATION_TIME_'))
             ->pagination($totalCount,$r)
             ->data($list)
             ->display();
@@ -460,26 +460,34 @@ class InviteController extends AdminController
         if(count($aIds)){
             $map['id']=array('in',$aIds);
         }else{
-            $map['id']=array('gt',0);
+            $map['status']=array('in',array(1,0,-1));
+            $dataListBack=$this->inviteModel->getListAll(array('status'=>2));
         }
-        list($dataList,$totalCount)=$this->inviteModel->getList($map);
-        if(!count($dataList)){
-            $this->error('没有数据！');
+        $dataList=$this->inviteModel->getListAll($map,'status desc,end_time desc');
+        if(!count($dataList)&&!count($dataListBack)){
+            $this->error(L('_NO_DATA_'));
         }
-        $data="id,邀请码类型,邀请码,邀请链接,购买者,可注册数,已经注册数,有效期,状态,生成时间\n";
+        if(count($dataListBack)){
+            if(count($dataList)){
+                $dataList=array_merge($dataList,$dataListBack);
+            }else{
+                $dataList=$dataListBack;
+            }
+        }
+        $data=L('_DATA_MANY_')."\n";
         foreach ($dataList as $val) {
             if($val['status']==-1){
-                $val['status']="管理员删除";
+                $val['status']=L('_ADMIN_DELETE_');
             }elseif($val['status']==0){
-                $val['status']="用完无效";
+                $val['status']=L('_RUN_OUT_');
             }elseif($val['status']==1){
                 if($val['end_time']<=time()){
-                    $val['status']="已过期";
+                    $val['status']=L('_EXPIRED_');
                 }else{
-                    $val['status']="可注册";
+                    $val['status']=L('_REGISTERED_');
                 }
             }elseif($val['status']==2){
-                $val['status']="已退还";
+                $val['status']=L('_HAS_BEEN_RETURNED_');
             }
             $val['end_time']=time_format($val['end_time']);
             $val['create_time']=time_format($val['create_time']);
@@ -503,7 +511,7 @@ class InviteController extends AdminController
     //私有函数 start
 
     /**
-     * 获取角色列表
+     * 获取身份列表
      * @return mixed
      * @author 郑钟良<zzl@ourstu.com>
      */

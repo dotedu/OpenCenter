@@ -46,9 +46,11 @@ class ActionModel extends Model {
         for($i=0;$i<count($action_rule['table']);$i++){
             $_POST['rule'][] = array('table'=>$action_rule['table'][$i],'field'=>$action_rule['field'][$i],'rule'=>$action_rule['rule'][$i],'cycle'=>$action_rule['cycle'][$i],'max'=>$action_rule['max'][$i],);
         }
-
-        $_POST['rule'] = serialize($_POST['rule']);
-
+        if(empty($_POST['rule'])){
+            $_POST['rule'] ='';
+        }else{
+            $_POST['rule'] = serialize($_POST['rule']);
+        }
         /* 获取数据对象 */
         $data = $this->create($_POST);
         if(empty($data)){
@@ -59,13 +61,13 @@ class ActionModel extends Model {
         if(empty($data['id'])){ //新增数据
             $id = $this->add(); //添加行为
             if(!$id){
-                $this->error = '新增行为出错！';
+                $this->error = L('_NEW_BEHAVIOR_WITH_EXCLAMATION_');
                 return false;
             }
         } else { //更新数据
             $status = $this->save(); //更新基础内容
             if(false === $status){
-                $this->error = '更新行为出错！';
+                $this->error = L('_UPDATE_BEHAVIOR_WITH_EXCLAMATION_');
                 return false;
             }
         }

@@ -29,7 +29,7 @@ class QiniuController extends AdminController {
 
     //获取文件列表
     public function index(){
-        $this->meta_title = '七牛云存储测试';
+        $this->meta_title = L('_SEVEN_CATTLE_CLOUD_STORAGE_TEST_');
         $map = array();
         $prefix = trim(I('post.prefix'));
         if($prefix)
@@ -49,10 +49,10 @@ class QiniuController extends AdminController {
             if(false === $result){
                 $this->error($this->qiniu->errorStr);
             }else{
-                $this->success('删除成功');
+                $this->success(L('_DELETE_SUCCESS_'));
             }
         }else{
-            $this->error('错误的文件名');
+            $this->error(L('_WRONG_FILE_NAME_'));
         }
     }
 
@@ -74,7 +74,7 @@ class QiniuController extends AdminController {
             trace($this->qiniu->error);
             $this->error($this->qiniu->errorStr);
         }else{
-            $this->success('改名成功');
+            $this->success(L('_CHANGE_THE_NAME_'));
         }
     }
 
@@ -86,10 +86,10 @@ class QiniuController extends AdminController {
             if(false === $result){
                 $this->error($this->qiniu->errorStr);
             }else{
-                $this->success('删除成功');
+                $this->success(L('_DELETE_SUCCESS_'));
             }
         }else{
-            $this->error('请至少选择一个文件');
+            $this->error(L('_PLEASE_SELECT_AT_LEAST_ONE_FILE_'));
         }
     }
 
@@ -126,7 +126,7 @@ class QiniuController extends AdminController {
 tpl;
             $this->success('as', '', array('tpl'=>$tpl));
         }else{
-            $this->error('获取文件信息失败');
+            $this->error(L('_GET_FILE_INFO_FAILED_'));
         }
 
     }
@@ -142,9 +142,9 @@ tpl;
         $config = array();
         $result = $this->qiniu->upload($config, $file);
         if($result){
-            $this->success('上传成功','', $result);
+            $this->success(L('_UPLOAD_SUCCESS_'),'', $result);
         }else{
-            $this->error('上传失败','', array(
+            $this->error(L('_UPLOAD_FAILED_'),'', array(
                 'error'=>$this->qiniu->error,
                 'errorStr'=>$this->qiniu->errorStr
             ));

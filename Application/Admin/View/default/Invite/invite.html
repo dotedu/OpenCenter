@@ -3,7 +3,7 @@
 <!-- 标题 -->
     <div class="main-title">
         <h2>
-            邀请码列表页面
+           {:L("_INVITATION_CODE_LIST_PAGE_")}
         </h2>
     </div>
     </div>
@@ -11,27 +11,27 @@
     <div class="with-padding">
         <div class="fl">
             <button class="btn ajax-post btn" url="{:U('admin/invite/delete',array('status'=>-1))}" target-form="ids">
-                删除
+               {:L("_DELETE_")}
             </button>
             &nbsp;
-            <button data-title="生成邀请码" modal-url="{:U('admin/invite/createcode')}" data-role="modal_popup" class="btn">
-                生成邀请码
+            <button data-title={:L("_GENERATE_THE_INVITATION_CODE_WITH_DOUBLE_")} modal-url="{:U('admin/invite/createcode')}" data-role="modal_popup" class="btn">
+               {:L("_GENERATE_INVITATION_CODE_")}
             </button>
             &nbsp;
             <button class="btn ajax-post btn" url="{:U('admin/invite/deletetrue',array('status'=>-1))}" target-form="ids">
-                清空无用邀请码(真删除)
+               {:L("_EMPTY_THE_USELESS_INVITATION_CODE_")}
             </button>
             &nbsp;
             <button class="btn" data-role="copy_code_list">
-                批量复制邀请码
+               {:L("_BATCH_COPY_INVITATION_CODE_")}
             </button>
             &nbsp;
             <button class="btn"  data-role="copy_code_url_list">
-                批量复制邀请链接
+               {:L("_BATCH_COPY_INVITATION_LINK_")}
             </button>
             &nbsp;
             <button class="btn" data-role="cvs" data-url="{:U('admin/invite/cvs')}">
-                导出cvs
+               {:L("_EXPORT_CVS_")}
             </button>
             &nbsp;
             <!-- 选择框select -->
@@ -58,7 +58,7 @@
                 </style>
                 <form id="selectForm" method="get" action="{:U('Admin/Invite/invite')}" class="form-dont-clear-url-param">
                     <div class="oneselect">
-                        <div class="title">邀请码类型：</div>
+                        <div class="title">{:L("_INVITATION_CODE_TYPE_")}{:L("_COLON_")}</div>
                         <div class="select_box">
                             <select name="type" data-role="select_text" class="form-control">
                                 <volist name="type_list" id="type">
@@ -74,19 +74,19 @@
                     <div class="oneselect">
                         <div class="select_box">
                             <select name="status" data-role="select_text" class="form-control">
-                                <option value="1" selected>可注册</option>
-                                <option value="3">已过期</option>
-                                <option value="2">已退还</option>
-                                <option value="0">用完无效</option>
-                                <option value="-1">管理员删除</option>
+                                <option value="1" selected>{:L("_CAN_BE_REGISTERED_")}</option>
+                                <option value="3">{:L("_EXPIRED_")}</option>
+                                <option value="2">{:L("_REFUND_")}</option>
+                                <option value="0">{:L("_INVALID_")}</option>
+                                <option value="-1">{:L("_ADMINISTRATOR_DELETE_")}</option>
                             </select>
                         </div>
                     </div>
                     <div class="oneselect">
                         <div class="select_box">
                             <select name="buyer" data-role="select_text" class="form-control">
-                                <option value="-1" <eq name="buyer" value="-1">selected</eq>>管理员生成</option>
-                                <option value="1" <eq name="buyer" value="1">selected</eq>>用户购买</option>
+                                <option value="-1" <eq name="buyer" value="-1">selected</eq>>{:L("_ADMINISTRATOR_GENERATION_")}</option>
+                                <option value="1" <eq name="buyer" value="1">selected</eq>>{:L("_USER_PURCHASE_")}</option>
                             </select>
                         </div>
                     </div>
@@ -106,15 +106,15 @@
                     <input class="check-all" type="checkbox">
                 </th>
                 <th>ID</th>
-                <th>邀请码</th>
-                <th style="width: 250px;">邀请码链接</th>
-                <th>邀请码类型</th>
-                <th>购买者</th>
-                <th>可注册几个</th>
-                <th>已注册几个</th>
-                <th>有效期至</th>
-                <th>创建时间</th>
-                <th>操作</th>
+                <th>{:L("_INVITATION_CODE_")}</th>
+                <th style="width: 250px;">{:L("_INVITATION_CODE_LINK_")}</th>
+                <th>{:L("_INVITATION_CODE_TYPE_")}</th>
+                <th>{:L("_BUYERS_")}</th>
+                <th>{:L("_CAN_BE_REGISTERED_A_FEW_")}</th>
+                <th>{:L("_ALREADY_REGISTERED_SEVERAL_")}</th>
+                <th>{:L("_PERIOD_OF_VALIDITY_")}</th>
+                <th>{:L("_CREATE_TIME_")}</th>
+                <th>{:L("_OPERATION_")}</th>
             </tr>
             </thead>
 
@@ -134,7 +134,7 @@
                     <td>{$invite.create_time|time_format}</td>
                     <td>
                         <div style="position: relative;">
-                            <a data-role="copy_code" data-code="{$invite.code}">复制邀请码</a> <a data-role="copy_code_url" data-code-url="{$invite.code_url}" style="margin-left: 10px;">复制邀请链接</a>
+                            <a data-role="copy_code" data-code="{$invite.code}">{:L("_COPY_INVITATION_CODE_")}</a> <a data-role="copy_code_url" data-code-url="{$invite.code_url}" style="margin-left: 10px;">{:L("_COPY_INVITATION_LINK_")}</a>
                         </div>
                     </td>
                 </tr>
@@ -182,8 +182,8 @@
                     return $(this).attr('data-code');
                 },
                 afterCopy: function () {
-                    $(this).html('已复制');
-                    toast.success('复制成功');
+                    $(this).html({:L('_HAS_BEEN_COPIED_WITH_SINGLE_')});
+                    toast.success({:L('_COPY_SUCCESS_WITH_SINGLE_')});
                 }
             });
             $('[data-role="copy_code_url"]').zclip({
@@ -191,8 +191,8 @@
                     return $(this).attr('data-code-url');
                 },
                 afterCopy: function () {
-                    $(this).html('链接已复制');
-                    toast.success('复制链接成功');
+                    $(this).html({:L('_LINK_HAS_BEEN_COPIED_WITH_SINGLE_')});
+                    toast.success({:L('_REPLICATION_LINK_SUCCESS_WITH_SINGLE_')});
                 }
             });
             $('[data-role="copy_code_list"]').zclip({
@@ -206,11 +206,11 @@
                     if(code_list!=''){
                         return code_list;
                     }else{
-                        toast.error('请选择数据！');
+                        toast.error({:L('_PLEASE_SELECT_THE_DATA_WITH_SINGLE_')});
                     }
                 },
                 afterCopy: function () {
-                    toast.success('批量复制成功');
+                    toast.success({:L('_BATCH_COPY_SUCCESS_WITH_SINGLE_')});
                 }
             });
             $('[data-role="copy_code_url_list"]').zclip({
@@ -224,11 +224,11 @@
                     if(code_list_url!=''){
                         return code_list_url;
                     }else{
-                        toast.error('请选择数据！');
+                        toast.error({:L('_PLEASE_SELECT_THE_DATA_WITH_SINGLE_')});
                     }
                 },
                 afterCopy: function () {
-                    toast.success('批量复制成功');
+                    toast.success({:L('_BATCH_COPY_SUCCESS_WITH_SINGLE_')});
                 }
             });
             $('[data-role="cvs"]').click(function(){
@@ -258,7 +258,7 @@
                     var form=$('.'+target_form);
 
                     if (form.get(0) == undefined) {
-                        updateAlert('没有可操作数据。','danger');
+                        updateAlert({:L('_NO_OPERATIONAL_DATA_WITH_SINGLE_')},'danger');
                         return false;
                     } else if (form.get(0).nodeName == 'FORM') {
                         query = form.serialize();
@@ -268,12 +268,12 @@
                         query = form.find('input,select,textarea').serialize();
                     }
                     if(!query.length){
-                        updateAlert('没有可操作数据。','danger');
+                        updateAlert({:L('_NO_OPERATIONAL_DATA_WITH_SINGLE_')},'danger');
                         return false;
                     }
                     target_url=target_url+'&'+query;
                 }
-                var myModalTrigger = new ModalTrigger({
+                var myModalTrigger = new $.zui.ModalTrigger({
                     'type':'ajax',
                     'url':target_url,
                     'title':data_title

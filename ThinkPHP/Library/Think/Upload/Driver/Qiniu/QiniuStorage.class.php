@@ -41,10 +41,10 @@
 		    return self::sign($this->sk, $this->ak, $access);
 		}
 
-		public function UploadToken($sk ,$ak ,$param){
+		public function UploadToken($sk ,$ak ,$param,$replace_key){
 			$param['deadline'] = $param['Expires'] == 0? 3600: $param['Expires'];
 			$param['deadline'] += time();
-			$data = array('scope'=> $this->bucket, 'deadline'=>$param['deadline']);
+			$data = array('scope'=> $this->bucket.$replace_key, 'deadline'=>$param['deadline']);
 			if (!empty($param['CallbackUrl'])) {
 				$data['callbackUrl'] = $param['CallbackUrl'];
 			}
@@ -67,8 +67,12 @@
 			return self::SignWithData($sk, $ak, $data);
 		}
 
-		public function upload($config, $file){
-			$uploadToken = $this->UploadToken($this->sk, $this->ak, $config);
+		public function upload($config, $file,$replace = false){
+            $replace_key ='';
+            if($replace){
+                $replace_key = ':'.$file['fileName'];
+            }
+			$uploadToken = $this->UploadToken($this->sk, $this->ak, $config,$replace_key);
 
 			$url = "{$this->QINIU_UP_HOST}";
 			$mimeBoundary = md5(microtime());

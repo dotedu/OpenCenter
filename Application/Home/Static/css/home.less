@@ -1,179 +1,157 @@
-.home_container {
-  h2 {
-    line-height: 24px;
-    padding-bottom: 0;
+
+a {
+  color: #333;
+  &:hover {
+    color: #444;
+  }
+}
+
+.top-bar-inner {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  .just-look {
     font-size: 16px;
-    border-left: 4px solid #03ae87;
-    padding-left: 1em;
   }
-  .flink_image, {
-    li {
-      float: left;
-      margin: 10px;
-      img {
-        width: 120px;
-        height: 90px;
-      }
+}
+
+.carousel-bar {
+  height: 260px;
+  .item {
+    height: 260px;
+    text-align: center;
+    img {
+      display: inline-block !important;
     }
   }
-  .flink_text {
-    a {
-      margin: 10px;
-    }
+  .carousel-control {
+    background-image: none;
   }
+
 }
 
-/*广场部分样式*/
-* {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.hot_activity {
-  margin-bottom: 10px;
-}
-
-.hot_activity > img {
-  width: 240px;
-  height: 180px;
-}
-
-.square_ad img {
-  width: 100%;
-  height: 100%;
-  margin-bottom: 20px;
-}
-
-.plaza_ul li {
-  line-height: 24px;
-  overflow: hidden;
-  a {
-    width: 100%;
-  }
-}
-
-.square_weibo {
-  margin-bottom: 10px;
-}
-
-.square_sider_top {
-  background-color: #efefef;
-  margin-bottom: 15px;
-  padding: 20px;
-}
-
-.square_sider_top img {
-  margin-right: 20px;
-}
-
-.square_sider_top a {
-  color: #f1870a;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.square_sider_top hr {
-  margin: 10px;
-  border-top: 1px solid #C5C5C5
-}
-
-.square_sider_notice {
-  padding: 10px;
-  background-color: #efefef;
-}
-
-.square_sider_notice li {
-  width: 200px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.square_sider_notice li a {
-  line-height: 27px;
-}
-
-/*广场部分样式*/
-
-/*幻灯片部分*/
-.picFocus {
-  width: 760px;
+.login-wrapper {
   position: relative;
-  overflow: hidden;
-  zoom: 1;
-  margin-bottom: 30px;
+
 }
 
-.picFocus .hd {
-  width: 760px;
-  padding-top: 5px;
-  overflow: hidden;
-  text-align: center;
+.login-panel {
+  background: #fff;
+  right: 0;
   z-index: 99;
-  margin-top: -84px;
-  position: absolute;
-  padding-left: 167px;
-}
 
-.picFocus .hd ul {
-  overflow: hidden;
-  zoom: 1;
-}
-
-.ds {
-  filter: alpha(opacity=10);
-  -moz-opacity: 0.1;
-  -khtml-opacity: 0.1;
-  opacity: 0.5;
-  background-color: #000000;
-  width: 775px;
-  height: 84px;
-  margin-top: -84px;
-  position: absolute
-}
-
-.picFocus .hd ul li {
-  padding-top: 5px;
-  float: left;
-  text-align: center;
-}
-
-.picFocus .hd ul li img {
-  width: 109px;
-  height: 65px;
-  border: 2px solid #ddd;
-  cursor: pointer;
-  margin-right: 5px;
-}
-
-.picFocus .hd ul li.on {
-  background: url("../images/icoUp.gif") no-repeat center 0;
-}
-
-.picFocus .hd ul li.on img {
-  border-color: #f60;
-}
-
-.picFocus .bd li {
-  vertical-align: middle;
-}
-
-.picFocus .bd img {
-  width: 760px;
-  height: 420px;
-  display: block;
-}
-
-.tempWrap li {
-  float: left;
-  width: 760px;
-}
-
-/*幻灯片部分*/
-
-.hot_activity {
-  .cover {
-    width: 230px;
+  h2 {
+    color: #333;
+    padding: 15px 20px;
+    font-size: 16px;
   }
+  .login-panel-body {
+    padding: 20px;
+    padding-top: 0;
+  }
+}
+
+.block-bar {
+  .container {
+    .block-body {
+      h2 {
+        padding: 15px;
+      }
+      margin-bottom: 15px;
+    }
+  }
+}
+
+.user-list {
+  margin: 0 18px;
+  li {
+    text-align: center;
+    list-style: none;
+    float: left;
+    padding: 18px;
+    padding-top: 0;
+    .user-name {
+      a {
+        text-align: center;
+        display: block;
+        padding-top: 10px;
+        width: 64px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+    }
+  }
+}
+
+.issue_list {
+  .item_type {
+    background: rgba(0, 0, 0, 0.4);
+    color: rgb(255, 255, 255);
+    position: absolute;
+    padding: 3px 5px;
+    left: 0;
+    top: 0;
+  }
+  .item_inner {
+    display: inline-block;
+    width: 255px;
+    margin-right: 20px;
+    padding: 0;
+    background: white;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+  }
+  h3 {
+    font-size: 1em;
+    padding-left: 20px;
+    padding-top: 5px;
+    margin-top: 5px;
+  }
+  .operation {
+    padding-left: 20px;
+  }
+  .operation li {
+    float: left;
+    list-style: none;
+    width: 33%;
+    text-align: left;
+  }
+  .operation li i {
+    margin-right: 5px;
+    color: #999;
+  }
+  .author img {
+    width: 32px;
+    margin-right: 10px;
+  }
+  .ctime {
+    color: #ccc;
+    padding-right: 10px;
+    padding-top: 5px;
+  }
+  .author {
+    margin-left: 20px;
+
+  }
+  .item_core {
+    .cover {
+      width: 280px;
+      height: 210px;
+    }
+
+    position: relative;
+  }
+}
+
+
+.weibo-list{
+  .weibo_content{
+
+    border: none;
+    border-bottom:1px solid #f0f0f0;
+    border-radius: 0;
+  }
+
 }

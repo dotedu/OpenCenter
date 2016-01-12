@@ -145,6 +145,25 @@ class Dispatcher {
             // 加载模块配置文件
             if(is_file(MODULE_PATH.'Conf/config.php'))
                 C(include MODULE_PATH.'Conf/config.php');
+
+            /**加载模板公共配置文件
+             * 2015-5-14 13:43
+             * 增加模板配置文件加载 start
+             * @author 郑钟良<zzl@ourstu.com>
+             */
+            if(is_file(OS_THEME_PATH.'config.php')){
+                $TMPL_PARSE_STRING=C('TMPL_PARSE_STRING');
+                C(include OS_THEME_PATH.'config.php');
+                $NEW_TMPL_PARSE_STRING=C('TMPL_PARSE_STRING');
+                $NEW_TMPL_PARSE_STRING=array_merge($NEW_TMPL_PARSE_STRING,$TMPL_PARSE_STRING);
+                C('TMPL_PARSE_STRING',$NEW_TMPL_PARSE_STRING);
+            }
+            /**
+             * 2015-5-14 13:43
+             * 增加模板配置文件加载 end
+             * @author 郑钟良<zzl@ourstu.com>
+             */
+
             // 加载模块别名定义
             if(is_file(MODULE_PATH.'Conf/alias.php'))
                 Think::addMap(include MODULE_PATH.'Conf/alias.php');
@@ -152,7 +171,7 @@ class Dispatcher {
             if(is_file(MODULE_PATH.'Common/function.php'))
                 include MODULE_PATH.'Common/function.php';
         }else{
-            E(L('_MODULE_NOT_EXIST_').':'.MODULE_NAME);
+            E(L('_MODULE_NOT_EXIST_').':'.MODULE_NAME,815);
         }
 
         if('' != $_SERVER['PATH_INFO'] ){

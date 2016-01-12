@@ -1,3 +1,59 @@
+.plugin-list .card-content {
+  height: 70px;
+}
+.btn {
+  border-radius: 0;
+}
+.module-list {
+  padding-left: 0;
+}
+.module-list li {
+  border: 1px solid #eee;
+  background: #fbfbfb;
+  margin-right: 25px;
+  margin-bottom: 20px;
+  display: inline-block;
+  padding: 10px;
+  width: 480px;
+  list-style: none;
+}
+.module-list li .cover-wrapper {
+  width: 120px;
+  margin-right: 15px;
+  float: left;
+}
+.module-list li .cover-wrapper .cover {
+  width: 120px;
+  height: 120px;
+  border-radius: 6px;
+}
+.module-list li .cover-wrapper .cover-icon {
+  width: 120px;
+  height: 120px;
+  text-align: center;
+  background: #999;
+  border-radius: 6px;
+  display: inline-block;
+}
+.module-list li .cover-wrapper .cover-icon i {
+  font-size: 64px;
+  line-height: 120px;
+  color: white;
+}
+.module-list li .content-wrapper {
+  width: 320px;
+  float: left;
+}
+.module-list li .content-wrapper .title {
+  margin-bottom: 6px;
+}
+.module-list li .content-wrapper .title a {
+  font-size: 16px;
+  color: #333;
+}
+.module-list li .content-wrapper .bottom-btns {
+  margin-top: 10px;
+}
 body {
   font-family: "Microsoft Yahei", "宋体";
 }
@@ -24,6 +80,7 @@ body {
   left: 0;
   width: 100px;
   bottom: 0;
+  overflow: auto;
   background: #e7e8e9;
   z-index: 13;
   border-right: 1px solid #cccccc;
@@ -49,6 +106,16 @@ body {
   border-right: none;
 }
 .panel-menu i {
+  font-size: 28px;
+}
+#cloud-market {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: #e7e8e9;
+  width: 100px;
+}
+#cloud-market i {
   font-size: 28px;
 }
 .panel-main {
@@ -254,7 +321,7 @@ label {
   list-style: none;
 }
 .channel-ul li.dragging {
-  background-color: #fff4e5 ;
+  background-color: #fff4e5;
   opacity: 0.35;
 }
 .channel-ul li select,
@@ -280,4 +347,19 @@ label {
 .channel-ul .color-chose {
   margin-top: 10px;
   margin-left: 20px;
+}
+.oneselect {
+  display: inline-block;
+  margin-left: 10px;
+}
+.oneselect .title {
+  float: left;
+  line-height: 32px;
+}
+.oneselect .select_box {
+  float: left;
+  line-height: 32px;
+}
+.oneselect .select_box select {
+  min-width: 200px;
 }

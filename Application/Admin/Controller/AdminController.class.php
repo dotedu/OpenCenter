@@ -42,30 +42,31 @@ class AdminController extends Controller
         if (!IS_ROOT && C('ADMIN_ALLOW_IP')) {
             // 检查IP地址访问
             if (!in_array(get_client_ip(), explode(',', C('ADMIN_ALLOW_IP')))) {
-                $this->error('403:禁止访问');
+                $this->error(L('_FORBID_403_'));
             }
         }
         // 检测访问权限
         $access = $this->accessControl();
         if ($access === false) {
-            $this->error('403:禁止访问');
+            $this->error(L('_FORBID_403_'));
         } elseif ($access === null) {
             $dynamic = $this->checkDynamic();//检测分类栏目有关的各项动态权限
             if ($dynamic === null) {
                 //检测非动态权限
                 $rule = strtolower(MODULE_NAME . '/' . CONTROLLER_NAME . '/' . ACTION_NAME);
                 if (!$this->checkRule($rule, array('in', '1,2'))) {
-                    $this->error('未授权访问!');
+                    $this->error(L('_VISIT_NOT_AUTH_'));
                 }
             } elseif ($dynamic === false) {
-                $this->error('未授权访问!');
+                $this->error(L('_VISIT_NOT_AUTH_'));
             }
         }
         $this->assign('__MANAGE_COULD__',$this->checkRule('admin/module/lists',array('in','1,2')));
 
         $this->assign('__MENU__', $this->getMenus());
         $this->assign('__MODULE_MENU__', $this->getModules());
-        $this->getReport();
+
+        import_lang(ucfirst(CONTROLLER_NAME));
     }
 
     /**
@@ -151,7 +152,7 @@ class AdminController extends Controller
         $id = array_unique((array)I('id', 0));
         $id = is_array($id) ? implode(',', $id) : $id;
         $where = array_merge(array('id' => array('in', $id)), (array)$where);
-        $msg = array_merge(array('success' => '操作成功！', 'error' => '操作失败！', 'url' => '', 'ajax' => IS_AJAX), (array)$msg);
+        $msg = array_merge(array('success' => L('_OPERATION_SUCCESS_'), 'error' => L('_OPERATION_FAILED_'), 'url' => '', 'ajax' => IS_AJAX), (array)$msg);
         if (M($model)->where($where)->save($data) !== false) {
             $this->success($msg['success'], $msg['url'], $msg['ajax']);
         } else {
@@ -229,22 +230,22 @@ class AdminController extends Controller
         $ids = I('request.ids');
         $status = I('request.status');
         if (empty($ids)) {
-            $this->error('请选择要操作的数据');
+            $this->error(L('_PLEASE_CHOOSE_THE_DATA_TO_BE_OPERATED_'));
         }
 
         $map['id'] = array('in', $ids);
         switch ($status) {
             case -1 :
-                $this->delete($Model, $map, array('success' => '删除成功', 'error' => '删除失败'));
+                $this->delete($Model, $map, array('success' => L('_DELETE_SUCCESS_EXCLAMATION_'), 'error' => L('_DELETE_FAILED_EXCLAMATION_')));
                 break;
             case 0  :
-                $this->forbid($Model, $map, array('success' => '禁用成功', 'error' => '禁用失败'));
+                $this->forbid($Model, $map, array('success' => L('_DISABLE_SUCCESS_'), 'error' => L('_DISABLE_FAIL_')));
                 break;
             case 1  :
-                $this->resume($Model, $map, array('success' => '启用成功', 'error' => '启用失败'));
+                $this->resume($Model, $map, array('success' => L('_ENABLE_SUCCESS_'), 'error' => L('_ENABLE_FAILED_')));
                 break;
             default :
-                $this->error('参数错误');
+                $this->error(L('_PARAMETER_ERROR_'));
                 break;
         }
     }
@@ -257,9 +258,9 @@ class AdminController extends Controller
         $modules=D('Module')->getAll();
         foreach($modules as $key=> &$v){
             $rule = strtolower($v['admin_entry']);
-            if (!$this->checkRule($rule, array('in', '1,2'))) {
+          /*  if (!$this->checkRule($rule, array('in', '1,2'))) {
                 unset($modules[$key]);
-            }
+            }*/
 
         }
         return $modules;
@@ -294,7 +295,7 @@ class AdminController extends Controller
 
                 foreach ($menus['main'] as $key => $item) {
                     if (!is_array($item) || empty($item['title']) || empty($item['url'])) {
-                        $this->error('控制器基类$menus属性元素配置有误');
+                        $this->error(L('_CLASS_CONTROLLER_ERROR_PARAM_',array('menus'=>$menus)));
                     }
                     if (stripos($item['url'], MODULE_NAME) !== 0) {
                         $item['url'] = MODULE_NAME . '/' . $item['url'];
@@ -308,7 +309,7 @@ class AdminController extends Controller
                     if ($item['title'] == $nav_first_title) {
                         $menus['main'][$key]['class'] = 'active';
                         //生成child树
-                        $groups = M('Menu')->where("pid = {$item['id']}")->distinct(true)->field("`group`")->select();
+                        $groups = M('Menu')->where("pid = {$item['id']}")->distinct(true)->field("`group`")->order('sort asc')->select();
 
                         if ($groups) {
                             $groups = array_column($groups, 'group');
@@ -455,7 +456,8 @@ class AdminController extends Controller
 
         $options['where'] = array_filter(array_merge((array)$base, /*$REQUEST,*/
             (array)$where), function ($val) {
-            if ($val === '' || $val === null) {
+            //if ($val === '' || $val === null) {
+            if ( $val === null) {
                 return false;
             } else {
                 return true;
@@ -487,65 +489,6 @@ class AdminController extends Controller
     }
 
     public function  _empty(){
-        $this->error('404，找不到您想要的页面。');
-    }
-
-    public function getReport(){
-
-        $result = S('os_report');
-        if(!$result){
-            $url = '/index.php?s=/report/index/check.html';
-            $result = $this->visitUrl($url);
-            S('os_report',$result,60*60);
-        }
-        $report = json_decode($result[1],true);
-        $ctime = filemtime("version.ini");
-        $check_exists = file_exists('./Application/Admin/Data/'.$report['title'].'.txt');
-        if(!$check_exists ){
-            $this_update = explode("\n",$report['this_update']);
-            $future_update = explode("\n",$report['future_update']);
-            $this->assign('this_update',$this_update);
-            $this->assign('future_update',$future_update);
-            $this->assign('report',$report);
-        }
-
-    }
-    public function submitReport(){
-        $aQ1 =  $data['q1'] =I('post.q1','','op_t');
-        $aQ2 =  $data['q2']=I('post.q2','','op_t');
-        $aQ3 =  $data['q3']=I('post.q3','','op_t');
-        $aQ4 =  $data['q4']=I('post.q4','','op_t');
-
-        if(empty($aQ1)|| empty($aQ2)|| empty($aQ3)||empty($aQ4)){
-            $this->error('请确保已经答完所有题目了~');
-        }
-
-        $data['host'] = 'http://'.$_SERVER['HTTP_HOST'].__ROOT__;
-        $data['ip'] = get_client_ip(1);
-        $url = '/index.php?s=/report/index/addFeedback.html';
-        $result = $this->visitUrl($url,$data);
-        $res = json_decode($result[1],true);
-        if($res['status']){
-            file_put_contents('./Application/Admin/Data/'.$res['data']['report_name'].'.txt',$result[1]);
-            $this->success('报告提交成功，非常感谢您的合作！');
-        }
-        else{
-            $this->error($res['info']);
-        }
-
-    }
-    private function visitUrl($url,$data='')
-    {
-        $host = 'http://demo.ocenter.cn';
-        $url = $host.$url;
-        $requester = new requester($url);
-        $requester->charset = "utf-8";
-        $requester->content_type = 'application/x-www-form-urlencoded';
-        $requester->data = http_build_query($data);
-        $requester->enableCookie = true;
-        $requester->enableHeaderOutput = false;
-        $requester->method = "post";
-        $arr = $requester->request();
-        return $arr;
+        $this->error(L('_ERROR_404_2_'));
     }
 }

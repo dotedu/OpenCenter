@@ -151,13 +151,13 @@ class AdminTreeListBuilder extends AdminBuilder
 
     public function keyStatus($name = 'status', $title = '状态')
     {
-        $map = array(-1 => '删除', 0 => '禁用', 1 => '启用', 2 => '未审核');
+        $map = array(-1 => L('DELETE'), 0 => L('DISABLE'), 1 => L('ENABLE'), 2 => L('_UNAUDITED_'));
         return $this->key($name, $title, 'status', $map);
     }
 
     public function keyYesNo($name, $title)
     {
-        $map = array(0 => '不是', 1 => '是');
+        $map = array(0 => L('_NOT_'), 1 => L('YES'));
         return $this->keymap($name, $title, $map);
     }
 
@@ -333,7 +333,7 @@ class AdminTreeListBuilder extends AdminBuilder
         //如果html为空
         $this->convertKey('html', 'html', function ($value) {
             if ($value === '') {
-                return '<span style="color:#bbb;">（空）</span>';
+                return '<span style="color:#bbb;">'.L('_EMPTY_BRACED_').'</span>';
             }
             return $value;
         });
@@ -386,7 +386,7 @@ class AdminTreeListBuilder extends AdminBuilder
     {
         $ids = is_array($ids) ? $ids : explode(',', $ids);
         M($model)->where(array('id' => array('in', $ids)))->save(array('status' => $status));
-        $this->success('设置成功', $_SERVER['HTTP_REFERER']);
+        $this->success(L('success_setting'), $_SERVER['HTTP_REFERER']);
     }
 
     private function convertKey($from, $to, $convertFunction)

@@ -63,9 +63,9 @@ class ChannelController extends AdminController
                     $res[$j] = $Channel->add($data_two[$j]);
                 }
                 S('common_nav',null);
-                $this->success('修改成功');
+                $this->success(L('_CHANGE_'));
             }
-            $this->error('导航至少存在一个。');
+            $this->error(L('_NAVIGATION_AT_LEAST_ONE_'));
 
 
         } else {
@@ -88,12 +88,59 @@ class ChannelController extends AdminController
             $this->assign('module', $this->getModules());
             $this->assign('list', $list);
 
-            $this->meta_title = '导航管理';
+            $this->meta_title = L('_NAVIGATION_MANAGEMENT_');
             $this->display();
         }
 
     }
 
+
+    public function user(){
+        $Channel = D('UserNav');
+        if (IS_POST) {
+            $one = $_POST['nav'][1];
+            if (count($one) > 0) {
+                M()->execute('TRUNCATE TABLE ' . C('DB_PREFIX') . 'user_nav');
+
+                for ($i = 0; $i < count(reset($one)); $i++) {
+                    $data[$i] = array(
+                        'title' => op_t($one['title'][$i]),
+                        'url' => op_t($one['url'][$i]),
+                        'sort' => intval($one['sort'][$i]),
+                        'target' => intval($one['target'][$i]),
+                        'color' => op_t($one['color'][$i]),
+                        'band_text' => op_t($one['band_text'][$i]),
+                        'band_color' => op_t($one['band_color'][$i]),
+                        'icon' => op_t(str_replace('icon-', '', $one['icon'][$i])),
+                        'status' => 1
+
+                    );
+                    $pid[$i] = $Channel->add($data[$i]);
+                }
+                S('common_user_nav',null);
+                $this->success(L('_CHANGE_'));
+            }
+            $this->error(L('_NAVIGATION_AT_LEAST_ONE_'));
+
+
+        } else {
+            /* 获取频道列表 */
+            $map = array('status' => array('gt', -1));
+            $list = $Channel->where($map)->order('sort asc,id asc')->select();
+            foreach ($list as $k => &$v) {
+                $module = D('Module')->where(array('entry' => $v['url']))->find();
+                $v['module_name'] = $module['name'];
+                unset($key, $val);
+            }
+
+            unset($k, $v);
+            $this->assign('module', $this->getModules());
+            $this->assign('list', $list);
+
+            $this->meta_title = L('_NAVIGATION_MANAGEMENT_');
+            $this->display();
+        }
+    }
     public function getModule()
     {
         $this->success($this->getModules());
@@ -113,7 +160,7 @@ class ChannelController extends AdminController
 
         $this->assign('list', $list);
         $this->assign('pid', $pid);
-        $this->meta_title = '导航管理';
+        $this->meta_title = L('_NAVIGATION_MANAGEMENT_');
         $this->display();
     }
 
@@ -130,11 +177,11 @@ class ChannelController extends AdminController
             if ($data) {
                 $id = $Channel->add();
                 if ($id) {
-                    $this->success('新增成功', U('index'));
+                    $this->success(L('_NEW_SUCCESS_'), U('index'));
                     //记录行为
                     action_log('update_channel', 'channel', $id, UID);
                 } else {
-                    $this->error('新增失败');
+                    $this->error(L('_NEW_FAILURE_'));
                 }
             } else {
                 $this->error($Channel->getError());
@@ -150,7 +197,7 @@ class ChannelController extends AdminController
             $this->assign('pnav', $pnav);
             $this->assign('pid', $pid);
             $this->assign('info', null);
-            $this->meta_title = '新增导航';
+            $this->meta_title = L('_NEW_NAVIGATION_');
             $this->display('edit');
         }
     }
@@ -168,9 +215,9 @@ class ChannelController extends AdminController
                 if ($Channel->save()) {
                     //记录行为
                     action_log('update_channel', 'channel', $data['id'], UID);
-                    $this->success('编辑成功', U('index'));
+                    $this->success(L('_SUCCESS_EDIT_'), U('index'));
                 } else {
-                    $this->error('编辑失败');
+                    $this->error(L('_EDIT_FAILED_'));
                 }
 
             } else {
@@ -182,7 +229,7 @@ class ChannelController extends AdminController
             $info = M('Channel')->find($id);
 
             if (false === $info) {
-                $this->error('获取配置信息错误');
+                $this->error(L('_GET_CONFIGURATION_INFORMATION_ERROR_'));
             }
 
             $pid = i('get.pid', 0);
@@ -196,7 +243,7 @@ class ChannelController extends AdminController
             $this->assign('pnav', $pnav);
             $this->assign('pid', $pid);
             $this->assign('info', $info);
-            $this->meta_title = '编辑导航';
+            $this->meta_title = L('_EDIT_NAVIGATION_');
             $this->display();
         }
     }
@@ -210,16 +257,16 @@ class ChannelController extends AdminController
         $id = array_unique((array)I('id', 0));
 
         if (empty($id)) {
-            $this->error('请选择要操作的数据!');
+            $this->error(L('_PLEASE_CHOOSE_TO_OPERATE_THE_DATA_'));
         }
 
         $map = array('id' => array('in', $id));
         if (M('Channel')->where($map)->delete()) {
             //记录行为
             action_log('update_channel', 'channel', $id, UID);
-            $this->success('删除成功');
+            $this->success(L('_DELETE_SUCCESS_'));
         } else {
-            $this->error('删除失败！');
+            $this->error(L('_DELETE_FAILED_'));
         }
     }
 
@@ -245,7 +292,7 @@ class ChannelController extends AdminController
             $list = M('Channel')->where($map)->field('id,title')->order('sort asc,id asc')->select();
 
             $this->assign('list', $list);
-            $this->meta_title = '导航排序';
+            $this->meta_title = L('_NAVIGATION_SORT_');
             $this->display();
         } elseif (IS_POST) {
             $ids = I('post.ids');
@@ -254,12 +301,12 @@ class ChannelController extends AdminController
                 $res = M('Channel')->where(array('id' => $value))->setField('sort', $key + 1);
             }
             if ($res !== false) {
-                $this->success('排序成功！');
+                $this->success(L('_SORT_OF_SUCCESS_'));
             } else {
-                $this->eorror('排序失败！');
+                $this->eorror(L('_SORT_OF_FAILURE_'));
             }
         } else {
-            $this->error('非法请求！');
+            $this->error(L('_ILLEGAL_REQUEST_'));
         }
     }
 }

@@ -53,13 +53,13 @@ class UrlModel extends Model {
             $id = $this->add();
             $data['id'] = $id;
             if(!$id){
-                $this->error = '新增链接出错！';
+                $this->error = L('_NEW_LINK_ERROR_WITH_EXCLAMATION_');
                 return false;
             }
         } else { //更新数据
             $status = $this->save(); //更新基础内容
             if(false === $status){
-                $this->error = '更新链接出错！';
+                $this->error = L('_UPDATE_LINK_ERROR_WITH_EXCLAMATION_');
                 return false;
             }
         }

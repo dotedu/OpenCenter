@@ -581,8 +581,8 @@ function uc_check_version() {
 
 
 
-//thinkox 相关函数
-function tox_get_ucenter_user_ref($uid='',$uc_uid='',$uc_username=''){
+//opensns 相关函数
+function get_ucenter_user_ref($uid='',$uc_uid='',$uc_username=''){
     $uid && $map['uid'] 				= intval($uid);
     $uc_uid && $map['uc_uid'] 			= intval($uc_uid);
     if($uc_username){
@@ -591,7 +591,7 @@ function tox_get_ucenter_user_ref($uid='',$uc_uid='',$uc_username=''){
     return M('ucenter_user_link')->where($map)->find();
 }
 
-function tox_add_ucenter_user_ref($uid,$uc_uid,$uc_username='',$uc_email=''){
+function add_ucenter_user_ref($uid,$uc_uid,$uc_username='',$uc_email=''){
     $uc_ref_data = array(
         'uid' => $uid,
         'uc_uid' => $uc_uid,
@@ -600,7 +600,7 @@ function tox_add_ucenter_user_ref($uid,$uc_uid,$uc_username='',$uc_email=''){
     );
     return M('ucenter_user_link')->add($uc_ref_data);
 }
-function tox_update_ucenter_user_ref($uid,$uc_uid,$uc_username='',$uc_email=''){
+function update_ucenter_user_ref($uid,$uc_uid,$uc_username='',$uc_email=''){
     $uc_ref_data = array(
         'uc_uid' => $uc_uid,
         'uc_username' => $uc_username,

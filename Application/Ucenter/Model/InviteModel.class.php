@@ -45,7 +45,7 @@ class InviteModel extends Model
             $result['url'] = U('Admin/Invite/invite', array('status' => 1, 'buyer' => -1));
         } else {
             $result['status'] = 0;
-            $result['info'] = "生成邀请码时失败！" . $this->getError();
+            $result['info'] = L('_FAILED_TO_GENERATE_AN_INVITATION_CODE_WITH_EXCLAMATION_') . $this->getError();
         }
         return $result;
     }
@@ -75,7 +75,7 @@ class InviteModel extends Model
             $result['url'] = U('Ucenter/Invite/invite');
         } else {
             $result['status'] = 0;
-            $result['info'] = "生成邀请码时失败！" . $this->getError();
+            $result['info'] = L('_FAILED_TO_GENERATE_AN_INVITATION_CODE_WITH_EXCLAMATION_') . $this->getError();
         }
         return $result;
     }
@@ -111,9 +111,22 @@ class InviteModel extends Model
         $totalCount = $this->where($map)->count();
         if ($totalCount) {
             $dataList = $this->where($map)->page($page, $r)->order($order)->select();
-            return array($this->_initSelectData($dataList),$totalCount);
+            return array($this->_initSelectData($dataList), $totalCount);
         }
-        return array(null,0);
+        return array(null, 0);
+    }
+
+    /**
+     * 获取邀请码列表
+     * @param array $map
+     * @param string $order
+     * @return array|null
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function getListAll($map = array(), $order = 'id desc')
+    {
+        $dataList = $this->where($map)->order($order)->select();
+        return $this->_initSelectData($dataList);
     }
 
     /**
@@ -172,9 +185,9 @@ class InviteModel extends Model
             $val['invite'] = $invite_types[$val['invite_type']]['title'];
             $val['code_url'] = U('Ucenter/Member/register', array('code' => $val['code']), true, true);
             if ($val['uid'] > 0) {
-                $val['buyer'] = query_user('nickname', $val['uid']);
+                $val['buyer'] = get_nickname( $val['uid']);
             } else {
-                $val['buyer'] = query_user('nickname', -$val['uid']) . '后台生成';
+                $val['buyer'] = get_nickname( -$val['uid']) . L('_BACKGROUND_GENERATION_');
             }
         }
         unset($val);

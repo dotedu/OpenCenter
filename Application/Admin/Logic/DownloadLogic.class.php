@@ -33,7 +33,7 @@ class DownloadLogic extends BaseLogic{
 	public function detail($id){
 		$data = $this->field(true)->find($id);
 		if(!$data){
-			$this->error = '获取详细信息出错！';
+			$this->error = L('_TO_GET_MORE_INFORMATION_ABOUT_THE_ERROR_WITH_EXCLAMATION_');
 			return false;
 		}
 		$file = D('File')->field(true)->find($data['file_id']);
@@ -57,7 +57,7 @@ class DownloadLogic extends BaseLogic{
 			$data['file_id'] = $file['id'];
 			$data['size']    = $file['size'];
 		} else {
-			$this->error = '获取上传文件信息失败！';
+			$this->error = L('_ACCESS_TO_UPLOAD_FILE_INFORMATION_FAILED_WITH_EXCLAMATION_');
 			return false;
 		}
 
@@ -66,13 +66,13 @@ class DownloadLogic extends BaseLogic{
 			$data['id'] = $id;
 			$id = $this->add($data);
 			if(!$id){
-				$this->error = '新增详细内容失败！';
+				$this->error = L('_NEW_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		} else { //更新数据
 			$status = $this->save($data);
 			if(false === $status){
-				$this->error = '更新详细内容失败！';
+				$this->error = L('_UPDATE_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		}
@@ -88,7 +88,7 @@ class DownloadLogic extends BaseLogic{
 	public function download($id){
 		$info = $this->find($id);
 		if(empty($info)){
-			$this->error = "不存在的文档ID：{$id}";
+			$this->error = L('_DOCUMENT_NOT_EXIST_WITH_COLON_')."{$id}";
 			return false;
 		}
 
@@ -133,13 +133,13 @@ class DownloadLogic extends BaseLogic{
 			$data['id'] = $id;
 			$id = $this->add($data);
 			if(!$id){
-				$this->error = '新增详细内容失败！';
+				$this->error = L('_NEW_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		} else { //更新数据
 			$status = $this->save($data);
 			if(false === $status){
-				$this->error = '更新详细内容失败！';
+				$this->error = L('_UPDATE_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		}

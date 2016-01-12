@@ -21,13 +21,13 @@ class ThinkController extends AdminController {
      * @author 麦当苗儿 <zuojiazi@vip.qq.com>
      */
     public function lists($model = null, $p = 0){
-        $model || $this->error('模型名标识必须！');
+        $model || $this->error(L('_MODEL_NAME_IDENTIFICATION_MUST_'));
         $page = intval($p);
         $page = $page ? $page : 1; //默认显示第一页数据
 
         //获取模型信息
         $model = M('Model')->getByName($model);
-        $model || $this->error('模型不存在！');
+        $model || $this->error(L('_MODEL_DOES_NOT_EXIST_'));
 
         //解析列表规则
         $fields = array();
@@ -129,40 +129,40 @@ class ThinkController extends AdminController {
         $this->assign('model', $model);
         $this->assign('list_grids', $grids);
         $this->assign('list_data', $data);
-        $this->meta_title = $model['title'].'列表';
+        $this->meta_title = $model['title'].L('_LIST_');
         $this->display($model['template_list']);
     }
 
     public function del($model = null, $ids=null){
         $model = M('Model')->find($model);
-        $model || $this->error('模型不存在！');
+        $model || $this->error(L('_MODEL_DOES_NOT_EXIST_'));
 
         $ids = array_unique((array)I('ids',0));
 
         if ( empty($ids) ) {
-            $this->error('请选择要操作的数据!');
+            $this->error(L('_PLEASE_CHOOSE_TO_OPERATE_THE_DATA_'));
         }
 
         $Model = M(get_table_name($model['id']));
         $map = array('id' => array('in', $ids) );
         if($Model->where($map)->delete()){
-            $this->success('删除成功');
+            $this->success(L('_DELETE_SUCCESS_'));
         } else {
-            $this->error('删除失败！');
+            $this->error(L('_DELETE_FAILED_'));
         }
     }
 
     public function edit($model = null, $id = 0){
         //获取模型信息
         $model = M('Model')->find($model);
-        $model || $this->error('模型不存在！');
+        $model || $this->error(L('_MODEL_DOES_NOT_EXIST_'));
 
         if(IS_POST){
             $Model  =   D(parse_name(get_table_name($model['id']),1));
             // 获取模型的字段信息 
             $Model  =   $this->checkAttr($Model,$model['id']);
             if($Model->create() && $Model->save()){
-                $this->success('保存'.$model['title'].'成功！', U('lists?model='.$model['name']));
+                $this->success(L('_SAVE_').$model['title'].L('_SUCCESS_'), U('lists?model='.$model['name']));
             } else {
                 $this->error($Model->getError());
             }
@@ -171,12 +171,12 @@ class ThinkController extends AdminController {
 
             //获取数据
             $data       = M(get_table_name($model['id']))->find($id);
-            $data || $this->error('数据不存在！');
+            $data || $this->error(L('_DATA_DOES_NOT_EXIST_'));
 
             $this->assign('model', $model);
             $this->assign('fields', $fields);
             $this->assign('data', $data);
-            $this->meta_title = '编辑'.$model['title'];
+            $this->meta_title = L('_EDIT_').$model['title'];
             $this->display($model['template_edit']?$model['template_edit']:'');
         }
     }
@@ -184,13 +184,13 @@ class ThinkController extends AdminController {
     public function add($model = null){
         //获取模型信息
         $model = M('Model')->where(array('status' => 1))->find($model);
-        $model || $this->error('模型不存在！');
+        $model || $this->error(L('_MODEL_DOES_NOT_EXIST_'));
         if(IS_POST){
             $Model  =   D(parse_name(get_table_name($model['id']),1));
             // 获取模型的字段信息 
             $Model  =   $this->checkAttr($Model,$model['id']);
             if($Model->create() && $Model->add()){
-                $this->success('添加'.$model['title'].'成功！', U('lists?model='.$model['name']));
+                $this->success(L('_ADD_').$model['title'].L('_SUCCESS_'), U('lists?model='.$model['name']));
             } else {
                 $this->error($Model->getError());
             }
@@ -200,21 +200,21 @@ class ThinkController extends AdminController {
 
             $this->assign('model', $model);
             $this->assign('fields', $fields);
-            $this->meta_title = '新增'.$model['title'];
+            $this->meta_title = L('_NEW_').$model['title'];
             $this->display($model['template_add']?$model['template_add']:'');
         }
     }
 
     protected function checkAttr($Model,$model_id){
-        $fields     =   get_model_attribute($model_id,false);    
+        $fields     =   get_model_attribute($model_id,false);
         $validate   =   $auto   =   array();
         foreach($fields as $key=>$attr){
             if($attr['is_must']){// 必填字段
-                $validate[]  =  array($attr['name'],'require',$attr['title'].'必须!');
-            }            
+                $validate[]  =  array($attr['name'],'require',$attr['title'].L('_HAVE_TO_'));
+            }
             // 自动验证规则
             if(!empty($attr['validate_rule'])) {
-                $validate[]  =  array($attr['name'],$attr['validate_rule'],$attr['error_info']?$attr['error_info']:$attr['title'].'验证错误',0,$attr['validate_type'],$attr['validate_time']);
+                $validate[]  =  array($attr['name'],$attr['validate_rule'],$attr['error_info']?$attr['error_info']:$attr['title'].L('_VALIDATION_ERROR_'),0,$attr['validate_type'],$attr['validate_time']);
             }
             // 自动完成规则
             if(!empty($attr['auto_rule'])) {

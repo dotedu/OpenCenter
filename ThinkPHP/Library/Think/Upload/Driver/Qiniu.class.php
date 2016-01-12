@@ -79,14 +79,14 @@ class Qiniu{
      */
     public function save(&$file,$replace=true) {
         //$file['name'] = $file['savepath'] . $file['savename'];
-        $key = str_replace('/', '_', $file['name']);
+        $key = str_replace('/', '_', $file['qiniu_key']);
         $upfile = array(
             'name'=>'file',
             'fileName'=>$key,
             'fileBody'=>file_get_contents($file['tmp_name'])
         );
         $config = array();
-        $result = $this->qiniu->upload($config, $upfile);
+        $result = $this->qiniu->upload($config, $upfile,$replace);
         $url = $this->qiniu->downlink($key);
         $file['url'] = $url;
         return false ===$result ? false : true;

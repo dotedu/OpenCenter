@@ -23,7 +23,7 @@ class CollectionController extends BaseController{
         //设置Tab
         $this->defaultTabHash('collection');
         $this->assign('type', $type);
-        $this->setTitle('我的收藏');
+        $this->setTitle(L('_MY_FAVORITES_'));
         $this->display($type);
     }
 
@@ -64,7 +64,7 @@ class CollectionController extends BaseController{
                 }
                 break;
             default:
-                $this->error('非法操作！');
+                $this->error(L('_ERROR_ILLEGAL_OPERATE_').L('_EXCLAMATION_'));
                 break;
         }
         return $list;

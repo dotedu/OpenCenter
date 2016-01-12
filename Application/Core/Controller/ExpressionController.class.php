@@ -21,8 +21,22 @@ class ExpressionController extends Controller
      */
     public function getSmile()
     {
+        $aPkg = I('post.pkg','','op_t');
+        $expressionMode = D('Core/Expression');
+        $config = get_kanban_config('PKGLIST','enable',array('miniblog'),'EXPRESSION');
+        $list = array();
+        foreach($config as $v){
+            $list[] = $expressionMode->getPkgInfo($v);
+        }
+        if(empty($aPkg)){
+            $first = reset($list);
+            $aPkg = $first['name'];
+        }
+        $data['pkg'] = $aPkg;
+        $data['pkgList'] = $list;
+        $data['expression'] = D('Core/Expression')->getExpression($aPkg);
         //这段代码不是测试代码，请勿删除
-        exit(json_encode(D('Core/Expression')->getAllExpression()));
+        exit(json_encode($data));
     }
 
 }

@@ -2155,6 +2155,7 @@
 
         function markOrders(list)
         {
+            console.log(list)
             var order = 0;
             list.each(function()
             {

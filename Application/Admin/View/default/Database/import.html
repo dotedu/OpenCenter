@@ -1,24 +1,24 @@
 <extend name="Public/base"/>
 
 <block name="body">
-    <!-- 标题栏 -->
+    <!-- ������ -->
     <div class="main-title">
-        <h2>数据备份</h2>
+        <h2>{:L("_DATA_BACKUP_")}</h2>
     </div>
-    <!-- /标题栏 -->
+    <!-- /������ -->
 
-    <!-- 应用列表 -->
+    <!-- Ӧ���б� -->
     <div class="with-padding">
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th width="200">备份名称</th>
-                    <th width="80">卷数</th>
-                    <th width="80">压缩</th>
-                    <th width="80">数据大小</th>
-                    <th width="200">备份时间</th>
-                    <th>状态</th>
-                    <th width="120">操作</th>
+                    <th width="200">{:L("_BACKUP_NAME_")}</th>
+                    <th width="80">{:L("_VOLUME_NUMBER_")}</th>
+                    <th width="80">{:L("_COMPRESSION_")}</th>
+                    <th width="80">{:L("_DATA_SIZE_")}</th>
+                    <th width="200">{:L("_BACKUP_TIME_")}</th>
+                    <th>{:L("_STATE_")}</th>
+                    <th width="120">{:L("_OPERATION_")}</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,15 +31,15 @@
                         <td>{$key}</td>
                         <td>-</td>
                         <td class="action">
-                            <a class="db-import" href="{:U('import?time='.$data['time'])}">还原</a>&nbsp;
-                            <a class="ajax-get confirm" href="{:U('del?time='.$data['time'])}">删除</a>
+                            <a class="db-import" href="{:U('import?time='.$data['time'])}">{:L("_REDUCTION_")}</a>&nbsp;
+                            <a class="ajax-get confirm" href="{:U('del?time='.$data['time'])}">{:L("_DELETE_")}</a>
                         </td>
                     </tr>
                 </volist>
             </tbody>
         </table>
     </div>
-    <!-- /应用列表 -->
+    <!-- /{:L("_APPLICATION_LIST_")}-->
 </block>
 
 <block name="script">
@@ -47,7 +47,7 @@
         $(".db-import").click(function(){
             var self = this, status = ".";
             $.get(self.href, success, "json");
-            window.onbeforeunload = function(){ return "正在还原数据库，请不要关闭！" }
+            window.onbeforeunload = function(){ return {:L("_RESTORING_DATABASE_PLEASE_DONT_TURN_OFF_WITH_DOUBLE_")} }
             return false;
         
             function success(data){

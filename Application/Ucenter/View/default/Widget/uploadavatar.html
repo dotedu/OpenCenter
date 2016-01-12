@@ -13,15 +13,15 @@
         .jcrop-holder .avatar_select{margin-top: -10px;margin-left: -10px;}
     </style>
 </block>
-<div style="height: 525px;">
+<div style="height: 600px;">
 <div id="uploader-demo">
     <!--用来存放item-->
     <div id="fileList" class="uploader-list"></div>
-    <div id="upload_avatar_{$uid}" style="padding: 20px 0">选择图片</div>
+    <div id="upload_avatar_{$uid}" style="padding: 20px 0">{:L('_AVATAR_SELECT_')}</div>
 
     <div class="show_avatar">
 
-        <div class="col-md-4 avatar_select" >
+        <div class="col-xs-4 avatar_select" >
             <div id="avatar_{$uid}_original">
                 <img class="avatar-img"  src="{$user.avatar256}" style=""/>
 
@@ -33,7 +33,7 @@
                     <img class="avatar-img"  src="{$user.avatar256}">
 
                 </div>
-                <p>大尺寸头像</p>
+                <p>{:L('_AVATAR_BIG_')}</p>
                 <p> 256*256</p>
             </div>
             <div class="pull-left avatar_128 text-center avatar_select" id="avatar_{$uid}_128" style="">
@@ -41,7 +41,7 @@
                     <img class="avatar-img"  src="{$user.avatar128}">
 
                 </div>
-                <p>中尺寸头像</p>
+                <p>{:L('_AVATAR_MIDDLE_')}</p>
                 <p> 128*128</p>
 
 
@@ -51,14 +51,14 @@
                     <img class="avatar-img" src="{$user.avatar64}">
 
                 </div>
-                <p style="width: 66px;">小尺寸头像</p>
+                <p style="width: 66px;">{:L('_AVATAR_SMALL_')}</p>
                 <p>64*64</p>
 
             </div>
 
 
 
-            <input class="btn btn-default avatar_btn" data-role="avatar_btn"  type="button" value="保存头像"/>
+            <input class="btn btn-default avatar_btn" data-role="avatar_btn"  type="button" value="{:L('_AVATAR_SAVE_')}"/>
         </div>
 
 
@@ -86,7 +86,7 @@
                 $pimg_128 = $('.avatar_128 div img'),
                 $pcnt_64 = $('.avatar_64 div'),
                 $pimg_64 = $('.avatar_64 div img');
-
+        var path;
         var uploader_{$uid}= WebUploader.create({
             // 选完文件后，是否自动上传。
             auto: true,
@@ -116,8 +116,8 @@
             } else {
                // $("#avatar_" + "{$uid}" + "_original img").attr('src', ret.data.file.path );
                 ext = ret.data.file.ext;
-
-                var src = ret.data.file.path+'?time='+ret.data.file.time;
+                path = ret.data.file.path;
+                var src = ret.data.file.src+'?time='+ret.data.file.time;
                 $("#avatar_" + "{$uid}" + "_original").html('');
                 $("#avatar_" + "{$uid}" + "_original").html('<img src="'+src+'">');
                 $pimg.attr('src', src)
@@ -190,7 +190,8 @@
         $('[data-role=avatar_btn]').click(function(){
             //检查是否已经裁剪过
             if (typeof (crop) == 'undefined') {
-                crop2='';
+                toast.error("{:L('_AVATAR_UPLOAD_AND_CROP_')}");
+                return;
             }
             else{
                 var crop2 = crop.x / boundx + ',' + crop.y / boundy + ',' + crop.w / boundx + ',' + crop.h / boundy;
@@ -199,7 +200,7 @@
             //提交到服务器
             var url = "{:U('ucenter/member/saveAvatar')}";
 
-            $.post(url, {uid: uid, crop: crop2,ext:ext}, function (res) {
+            $.post(url, {uid: uid, crop: crop2,path:path}, function (res) {
                      handleAjax(res);
             });
 

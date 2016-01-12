@@ -22,9 +22,9 @@ class LoginWidget extends Action
         }
         $this->assign('login_type', $type);
         $ph = array();
-        check_reg_type('username') && $ph[] = '用户名';
-        check_reg_type('email') && $ph[] = '邮箱';
-        check_reg_type('mobile') && $ph[] = '手机号';
+        check_login_type('username') && $ph[] = L('_USERNAME_');
+        check_login_type('email') && $ph[] = L('_EMAIL_');
+        check_login_type('mobile') && $ph[] = L('_PHONE_');
         $this->assign('ph', implode('/', $ph));
         $this->display('Widget/Login/login');
     }
@@ -40,7 +40,7 @@ class LoginWidget extends Action
         /* 检测验证码 */
         if (check_verify_open('login')) {
             if (!check_verify($aVerify)) {
-                $res['info']="验证码输入错误。";
+                $res['info']=L('_INFO_VERIFY_CODE_INPUT_ERROR_').L('_PERIOD_');
                 return $res;
             }
         }
@@ -49,7 +49,7 @@ class LoginWidget extends Action
         check_username($aUsername, $email, $mobile, $aUnType);
 
         if (!check_reg_type($aUnType)) {
-            $res['info']="该类型未开放登录。";
+            $res['info']=L('_INFO_TYPE_NOT_OPENED_').L('_PERIOD_');
         }
 
         $uid = UCenterMember()->login($username, $aPassword, $aUnType);
@@ -63,21 +63,22 @@ class LoginWidget extends Action
             if ($Member->login($uid, $aRemember == 1)) { //登录用户
                 //TODO:跳转到登录前页面
 
-
+                $html_uc = '';
                 if (UC_SYNC && $uid != 1) {
+                    include_once './api/uc_client/client.php';
                     //同步登录到UC
                     $ref = M('ucenter_user_link')->where(array('uid' => $uid))->find();
-                    $html = '';
-                    $html = uc_user_synlogin($ref['uc_uid']);
+                    $html_uc = uc_user_synlogin($ref['uc_uid']);
                 }
 
                 $oc_config =  include_once './OcApi/oc_config.php';
                 if ($oc_config['SSO_SWITCH']) {
                     include_once  './OcApi/OCenter/OCenter.php';
                     $OCApi = new \OCApi();
-                    $html = $OCApi->ocSynLogin($uid);
+                    $html_oc = $OCApi->ocSynLogin($uid);
                 }
 
+                $html =  empty($html_oc) ? $html_uc : $html_oc;
                 $res['status']=1;
                 $res['info']=$html;
                 //$this->success($html, get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
@@ -88,10 +89,10 @@ class LoginWidget extends Action
         } else { //登录失败
             switch ($uid) {
                 case -1:
-                    $res['info']= '用户不存在或被禁用！';
+                    $res['info']= L('_INFO_USER_FORBIDDEN_');
                     break; //系统级别禁用
                 case -2:
-                    $res['info']= '密码错误！';
+                    $res['info']= L('_INFO_PW_ERROR_').L('_EXCLAMATION_');
                     break;
                 default:
                     $res['info']= $uid;

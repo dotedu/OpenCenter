@@ -258,4 +258,20 @@ class InfoModel extends Model {
         }
     }
 
+    //登录成功，获取微信用户信息
+    public function weixin($token){
+        $weixin   = \ThinkOauth::getInstance('weixin', $token);
+        $data = $weixin->call('sns/userinfo');
+        if($data['ret'] == 0){
+            $userInfo['type'] = 'WEIXIN';
+            $userInfo['name'] = $data['nickname'];
+            $userInfo['nick'] = $data['nickname'];
+            $userInfo['head'] = $data['headimgurl'];
+            $userInfo['sex'] = $data['sex']=='1'? 0:1;
+            return $userInfo;
+        } else {
+            throw_exception("获取微信用户信息失败：{$data['errmsg']}");
+        }
+    }
+
 }

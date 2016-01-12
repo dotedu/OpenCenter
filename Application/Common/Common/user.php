@@ -41,8 +41,8 @@ function check_username(&$username, &$email, &$mobile, &$type = 0)
                 break;
         }
     } else {
-        $check_email = preg_match("/[a-z0-9_\-\.]+@[a-z0-9]+[_\-]?\.+[a-z]{2,3}/i", $username, $match_email);
-        $check_mobile = preg_match("/^(1[3|4|5|8])[0-9]{9}$/", $username, $match_mobile);
+        $check_email = preg_match("/[a-z0-9_\-\.]+@([a-z0-9_\-]+?\.)+[a-z]{2,3}/i", $username, $match_email);
+        $check_mobile = preg_match("/^(1[0-9])[0-9]{9}$/", $username, $match_mobile);
         if ($check_email) {
             $email = $username;
             $username = '';
@@ -84,6 +84,29 @@ function check_reg_type($type){
 
 }
 
+
+/**
+ * check_login_type  验证登录提示信息是否开启
+ * @param $type
+ * @return bool
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
+function check_login_type($type){
+    $t[1] = $t['username'] ='username';
+    $t[2] = $t['email'] ='email';
+    $t[3] = $t['mobile'] ='mobile';
+
+    $switch = modC('LOGIN_SWITCH','username','USERCONFIG');
+    if($switch){
+        $switch = explode(',',$switch);
+        if(in_array($t[$type],$switch)){
+            return true;
+        }
+    }
+    return false;
+
+}
+
 /**
  * get_next_step  获取注册流程下一步
  * @param string $now_step
@@ -104,6 +127,7 @@ function get_next_step($now_step =''){
     }
     return $return;
 }
+
 
 /**
  * check_step

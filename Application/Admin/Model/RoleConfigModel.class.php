@@ -28,4 +28,8 @@ class RoleConfigModel extends Model
         return $result;
     }
 
+    public function deleteData($map){
+        $result=$this->where($map)->delete();
+        return $result;
+    }
 } 

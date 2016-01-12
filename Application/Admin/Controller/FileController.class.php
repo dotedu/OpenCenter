@@ -15,16 +15,16 @@ class FileController extends AdminController {
 
     /* 文件上传 */
     public function upload(){
-		$return  = array('status' => 1, 'info' => '上传成功', 'data' => '');
-		/* 调用文件上传组件上传文件 */
-		$File = D('File');
-		$file_driver = C('DOWNLOAD_UPLOAD_DRIVER');
-		$info = $File->upload(
-			$_FILES,
-			C('DOWNLOAD_UPLOAD'),
-			C('DOWNLOAD_UPLOAD_DRIVER'),
-			C("UPLOAD_{$file_driver}_CONFIG")
-		);
+        $return  = array('status' => 1, 'info' => L('_UPLOAD_SUCCESS_'), 'data' => '');
+        /* 调用文件上传组件上传文件 */
+        $File = D('File');
+        $file_driver = C('DOWNLOAD_UPLOAD_DRIVER');
+        $info = $File->upload(
+            $_FILES,
+            C('DOWNLOAD_UPLOAD'),
+            C('DOWNLOAD_UPLOAD_DRIVER'),
+            C("UPLOAD_{$file_driver}_CONFIG")
+        );
 
         /* 记录附件信息 */
         if($info){
@@ -42,7 +42,7 @@ class FileController extends AdminController {
     /* 下载文件 */
     public function download($id = null){
         if(empty($id) || !is_numeric($id)){
-            $this->error('参数错误！');
+            $this->error(L('_PARAMETER_ERROR_'));
         }
 
         $logic = D('Download', 'Logic');
@@ -60,16 +60,20 @@ class FileController extends AdminController {
         //TODO: 用户登录检测
 
         /* 返回标准数据 */
-        $return  = array('status' => 1, 'info' => '上传成功', 'data' => '');
+        $return  = array('status' => 1, 'info' => L('_UPLOAD_SUCCESS_'), 'data' => '');
 
         /* 调用文件上传组件上传文件 */
         $Picture = D('Picture');
-        $pic_driver = C('PICTURE_UPLOAD_DRIVER');
+
+        $driver = modC('PICTURE_UPLOAD_DRIVER','local','config');
+        $driver = check_driver_is_exist($driver);
+        $uploadConfig = get_upload_config($driver);
+
         $info = $Picture->upload(
             $_FILES,
             C('PICTURE_UPLOAD'),
-            C('PICTURE_UPLOAD_DRIVER'),
-            C("UPLOAD_{$pic_driver}_CONFIG")
+            $driver,
+            $uploadConfig
         ); //TODO:上传到远程服务器
         /* 记录图片信息 */
         if($info){

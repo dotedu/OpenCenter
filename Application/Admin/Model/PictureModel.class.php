@@ -34,7 +34,7 @@ class PictureModel extends Model{
      * @param  array  $config  上传驱动配置
      * @return array           文件上传成功后的信息
      */
-    public function upload($files, $setting, $driver = 'Local', $config = null){
+    public function upload($files, $setting, $driver = 'local', $config = null){
         /* 上传文件 */
         $setting['callback'] = array($this, 'isFile');
 		$setting['removeTrash'] = array($this, 'removeTrash');
@@ -69,7 +69,7 @@ class PictureModel extends Model{
 
                 }
 
-                $value['type'] = strtolower($driver);
+                $value['type'] = $driver;
 
                 if($this->create($value) && ($id = $this->add())){
                     $value['id'] = $id;
@@ -81,7 +81,7 @@ class PictureModel extends Model{
 
             foreach($info as &$t_info){
                 if($t_info['type'] =='local'){
-                    $t_info['path']=fixAttachUrl($t_info['path']);
+                    $t_info['path']=get_pic_src($t_info['path']);
                 }
                 else{
                     $t_info['path']=$t_info['path'];
@@ -111,7 +111,7 @@ class PictureModel extends Model{
         /* 获取下载文件信息 */
         $file = $this->find($id);
         if(!$file){
-            $this->error = '不存在该文件！';
+            $this->error = L('_NO_THIS_FILE_IS_NOT_THERE_WITH_EXCLAMATION_');
             return false;
         }
 
@@ -123,7 +123,7 @@ class PictureModel extends Model{
             case 1: //TODO: 下载远程FTP文件
                 break;
             default:
-                $this->error = '不支持的文件存储类型！';
+                $this->error = L('_UNSUPPORTED_FILE_STORAGE_TYPE_WITH_EXCLAMATION_');
                 return false;
 
         }
@@ -168,7 +168,7 @@ class PictureModel extends Model{
             readfile($file['rootpath'].$file['savepath'].$file['savename']);
             exit;
         } else {
-            $this->error = '文件已被删除！';
+            $this->error = L('_FILE_HAS_BEEN_DELETED_WITH_EXCLAMATION_');
             return false;
         }
     }

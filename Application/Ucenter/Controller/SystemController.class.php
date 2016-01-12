@@ -45,7 +45,7 @@ class SystemController extends BaseController
             $html = $OCApi->ocSynLogout();
         }
 
-        exit(json_encode(array('message' =>'退出登陆成功。','url' => U('Home/Index/index'),'html'=>$html)));
+        exit(json_encode(array('message' =>L('_SUCCESS_LOGOUT_').L('_PERIOD_'),'url' => U('Home/Index/index'),'html'=>$html)));
         //显示页面
         //$this->success($result['message'], U('Home/Index/index'));
     }
@@ -94,7 +94,7 @@ class SystemController extends BaseController
         //确认用户已经绑定手机
         $profile = callApi('User/getProfile');
         if (!$profile['mobile']) {
-            $this->error('您尚未绑定手机', U('Ucenter/Index/index'));
+            $this->error(L('_ERROR_PHONE_NOT_BIND_'), U('Ucenter/Index/index'));
         }
 
         //发送验证码到已经绑定的手机上

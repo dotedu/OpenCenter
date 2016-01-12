@@ -19,25 +19,31 @@ class UploadAvatarWidget extends Controller
 
     public function render($uid = 0)
     {
-        $this->assign('user', query_user(array('avatar256', 'avatar128', 'avatar64'), $uid));
+        $this->assign('user', query_user(array('avatar256', 'avatar128', 'avatar64','avatar32','avatar512'), $uid));
         $this->assign('uid', $uid);
         $this->display(T('Application://Ucenter@Widget/uploadavatar'));
     }
 
+
     public function getAvatar($uid = 0, $size = 256)
     {
-        $avatar = M('avatar')->where(array('uid' => $uid, 'status' => 1, 'is_temp' => 0))->getField('path');
+        $avatar = M('avatar')->where(array('uid' => $uid, 'status' => 1, 'is_temp' => 0))->find();
         if ($avatar) {
-            if (is_sae()) {
-                $avatar_path = $avatar;
-            } else {
-                if (!is_bool(strpos($avatar, 'http://'))) {
-                    return $avatar . '/thumbnail/' . $size . 'x' . $size . '!';
-                } else {
-                    $avatar_path = "/Uploads/Avatar$avatar";
+
+            if($avatar['driver'] == 'local'){
+                $avatar_path = "/Uploads/Avatar".$avatar['path'];
+                return $this->getImageUrlByPath($avatar_path, $size);
+            }else{
+                $new_img = $avatar['path'];
+                $name = get_addon_class($avatar['driver']);
+                if (class_exists($name)) {
+                    $class = new $name();
+                    if (method_exists($class, 'thumb')) {
+                        $new_img =  $class->thumb($avatar['path'],$size,$size);
+                    }
                 }
+                return $new_img;
             }
-            return $this->getImageUrlByPath($avatar_path, $size);
         } else {
             //如果没有头像，返回默认头像
             if($uid==session('temp_login_uid')||$uid==is_login()){
@@ -49,16 +55,13 @@ class UploadAvatarWidget extends Controller
         }
     }
 
-    private function getImageUrlByPath($path, $size)
+
+
+
+    private function getImageUrlByPath($path, $size,$isReplace = true)
     {
-        //TODO 重新开启缩略
-        $thumb = getThumbImage($path, $size, $size, 0, true);
-        // $thumb['src']=$path;
-        $thumb = $thumb['src'];
-        if (!is_sae()) {
-            $thumb = getRootUrl() . $thumb;
-        }
-        return $thumb;
+        $thumb = getThumbImage($path, $size, $size, 0, $isReplace);
+        return get_pic_src($thumb['src']);
     }
 
     /**
@@ -85,38 +88,30 @@ class UploadAvatarWidget extends Controller
         }else{//角色没有默认
             if ($size != 0) {
                 $default_avatar = "Public/images/default_avatar.jpg";
-                $path=$this->getImageUrlByPath($default_avatar, $size);
+                $path=$this->getImageUrlByPath($default_avatar, $size, false);
             } else {
-                $path=getRootUrl() . "Public/images/default_avatar.jpg";
+                $path= get_pic_src("Public/images/default_avatar.jpg");
             }
         }
         return $path;
     }
 
-    public function cropPicture($uid, $crop = null, $ext = 'jpg')
+    public function cropPicture($crop = null,$path)
     {
         //如果不裁剪，则发生错误
         if (!$crop) {
             $this->error('必须裁剪');
         }
-
-        $path = "/Uploads/Avatar/" . $uid . "/original." . $ext;
-        //获取文件路径
-        $fullPath = substr($path, 0, 1) == '/' ? '.' . $path : $path;
-        $savePath = str_replace('original', 'crop', $fullPath);
-        $returnPath = str_replace('original', 'crop', $path);
-        $returnPath = substr($returnPath, 0, 1) == '/' ? '.' . $returnPath : $returnPath;
-
-        //解析crop参数
-        $crop = explode(',', $crop);
-        $x = $crop[0];
-        $y = $crop[1];
-        $width = $crop[2];
-        $height = $crop[3];
-        //是sae则不需要获取全路径
-        if (strtolower(C('PICTURE_UPLOAD_DRIVER')) == 'local') {
+        $driver = modC('PICTURE_UPLOAD_DRIVER','local','config');
+        if (strtolower($driver) == 'local') {
+            //解析crop参数
+            $crop = explode(',', $crop);
+            $x = $crop[0];
+            $y = $crop[1];
+            $width = $crop[2];
+            $height = $crop[3];
             //本地环境
-            $image = ImageWorkshop::initFromPath($fullPath);
+            $image = ImageWorkshop::initFromPath($path);
             //生成将单位换算成为像素
             $x = $x * $image->getWidth();
             $y = $y * $image->getHeight();
@@ -128,51 +123,18 @@ class UploadAvatarWidget extends Controller
                 $width = $height;
             }
             //调用组件裁剪头像
-            $image = ImageWorkshop::initFromPath($fullPath);
+            $image = ImageWorkshop::initFromPath($path);
             $image->crop(ImageWorkshopLayer::UNIT_PIXEL, $width, $height, $x, $y);
-            $image->save(dirname($savePath), basename($savePath));
+            $image->save(dirname($path), basename($path));
             //返回新文件的路径
-            return $returnPath;
-        } elseif (strtolower(C('PICTURE_UPLOAD_DRIVER')) == 'sae') {
-            //sae
-            //载入临时头像
-            $f = new \SaeFetchurl();
-            $img_data = $f->fetch($fullPath);
-            $img = new \SaeImage();
-            $img->setData($img_data);
-            $img_attr = $img->getImageAttr();
-            //生成将单位换算成为像素
-            $x = $x * $img_attr[0];
-            $y = $y * $img_attr[1];
-            $width = $width * $img_attr[0];
-            $height = $height * $img_attr[1];
-            //如果宽度和高度近似相等，则令宽和高一样
-            if (abs($height - $width) < $height * 0.01) {
-                $height = min($height, $width);
-                $width = $height;
-            }
-            $img->crop($x / $img_attr[0], ($x + $width) / $img_attr[0], ($y) / $img_attr[1], ($y + $height) / $img_attr[1]);
-            $new_data = $img->exec();
-            $storage = new \SaeStorage();
-            $thumbFilePath = str_replace(C('UPLOAD_SAE_CONFIG.rootPath'), '', dirname($savePath) . '/' . basename($savePath));
-            $thumbed = $storage->write(C('UPLOAD_SAE_CONFIG.domain'), $thumbFilePath, $new_data);
-            //返回新文件的路径
-            return $thumbed;
-        } elseif (strtolower(C('PICTURE_UPLOAD_DRIVER')) == 'qiniu') {
-
-            $imageInfo = file_get_contents($fullPath . '?imageInfo');
-            $imageInfo = json_decode($imageInfo);
-
-            //生成将单位换算成为像素
-            $x = $x * $imageInfo->width;
-            $y = $y * $imageInfo->height;
-            $width = $width * $imageInfo->width;
-            $height = $height * $imageInfo->height;
-            $new_img = $fullPath . '?imageMogr2/crop/!' . $width . 'x' . $height . 'a' . $x . 'a' . $y;
-
-            //返回新文件的路径
+            return  cut_str('/Uploads/Avatar',$path,'l');
+        }else{
+            $name = get_addon_class($driver);
+            $class = new $name();
+            $new_img = $class->crop($path,$crop);
             return $new_img;
         }
+
 
     }
 

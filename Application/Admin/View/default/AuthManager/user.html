@@ -2,15 +2,15 @@
 <extend name="Public/base" />
 <block name="body">
 <div class="main-title">
-        <h2>用户组成员授权</h2>
+        <h2>{:L("_USER_GROUP_MEMBERSHIP_")}</h2>
 </div>
 <div class="tab-wrap">
     <div class="with-padding clearfix">
         <div class="col-xs-10">
             <ul class="nav nav-secondary">
-                <li><a href="{:U('AuthManager/access',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">管理后台授权</a></li>
-                <li><a href="{:U('AuthManager/accessUser',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">前台访问授权</a></li>
-                <li class="active"><a href="javascript:;">成员授权</a></li>
+                <li><a href="{:U('AuthManager/access',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">{:L("_MANAGEMENT_BACKGROUND_AUTHORIZATION_")}</a></li>
+                <li><a href="{:U('AuthManager/accessUser',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">{:L("_FRONT_DESK_ACCESS_AUTHORIZATION_")}</a></li>
+                <li class="active"><a href="javascript:;">{:L("_MEMBER_DELEGATION_")}</a></li>
 
             </ul>
         </div>
@@ -29,11 +29,11 @@
     <thead>
         <tr>
 		<th class="">UID</th>
-		<th class="">昵称</th>
-		<th class="">最后登录时间</th>
-		<th class="">最后登录IP</th>
-		<th class="">状态</th>
-		<th class="">操作</th>
+		<th class="">{:L("_NICKNAME_")}</th>
+		<th class="">{:L("_LAST_LOGIN_TIME_")}</th>
+		<th class="">{:L("_LAST_LOGIN_IP_")}</th>
+		<th class="">{:L("_STATE_")}</th>
+		<th class="">{:L("_OPERATION_")}</th>
 		</tr>
     </thead>
     <tbody>
@@ -44,7 +44,7 @@
 			<td><span>{$vo.last_login_time|time_format}</span></td>
 			<td><span>{$vo.last_login_ip|long2ip}</span></td>
 			<td>{$vo.status_text}</td>
-			<td><a href="{:U('AuthManager/removeFromGroup?uid='.$vo['uid'].'&group_id='.I('group_id'))}" class="ajax-get">解除授权</a>
+			<td><a href="{:U('AuthManager/removeFromGroup?uid='.$vo['uid'].'&group_id='.I('group_id'))}" class="ajax-get">{:L("_RELEASE_AUTHORITY_")}</a>
 
                 </td>
 		</tr>
@@ -62,10 +62,10 @@
             <div class="col-xs-2 pull-right">
                 <form class="add-user" action="{:U('addToGroup')}" method="post" enctype="application/x-www-form-urlencoded" >
                     <div class="input-group ">
-                        <input class="text input-4x form-control" type="text" name="uid" placeholder="请输入uid,多个用英文逗号分隔">
+                        <input class="text input-4x form-control" type="text" name="uid" placeholder="{:L("_PLEASE_ENTER_UID_")},{:L("_COMMA_SEPARATED_IN_ENGLISH_")}">
                         <input type="hidden" name="group_id" value="{:I('group_id')}">
                     <span class="input-group-btn">
-                         <button type="submit" class="btn ajax-post" target-form="add-user">新 增</button>
+                         <button type="submit" class="btn ajax-post" target-form="add-user">{:L("_NEW_GROWTH_WITH_SPACE_")}</button>
                     </span>
 
                     </div>

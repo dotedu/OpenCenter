@@ -12,13 +12,13 @@ use Think\Model;
 
 class ExpressionModel extends Model
 {
+    protected $ROOT_PATH = '';
     public $pkg = '';
     public  function _initialize()
     {
         parent:: _initialize();
         $this->pkg = modC('EXPRESSION','miniblog','EXPRESSION');
-        define('ROOT_PATH', str_replace('/Application/Core/Model/ExpressionModel.class.php', '', str_replace('\\', '/', __FILE__)));
-
+        $this->ROOT_PATH = str_replace('/Application/Core/Model/ExpressionModel.class.php', '', str_replace('\\', '/', __FILE__));
     }
 
     /**
@@ -28,26 +28,21 @@ class ExpressionModel extends Model
      */
     public function getAllExpression()
     {
-
         $pkg = $this->pkg;
-
         if($pkg =='all'){
             return $this->getAll();
         }else{
             return $this->getExpression($pkg);
         }
-
     }
-
-
 
     public function getExpression($pkg){
         if($pkg == 'miniblog'){
-            $filepath =  "/Application/Core/Static/image/expression/" . $pkg;
+            $filepath =  "/Application/Core/Static/images/expression/" . $pkg;
         }else{
-            $filepath =  "/Uploads/expression/" . $pkg;
+            $filepath =  "/Uploads/Expression/" . $pkg;
         }
-        $list = $this->myreaddir(ROOT_PATH.$filepath);
+        $list = $this->myreaddir($this->ROOT_PATH .$filepath);
         $res = array();
         foreach ($list as $value) {
             $file = explode(".", $value);
@@ -58,7 +53,6 @@ class ExpressionModel extends Model
             $temp['src'] = __ROOT__ . $filepath . '/' . $value;
             $res[$temp['emotion']] = $temp;
         }
-
         return $res;
     }
 
@@ -71,8 +65,7 @@ class ExpressionModel extends Model
     {
 
         $res = $this->getExpression('miniblog');
-
-        $ExpressionPkg = ROOT_PATH . "/Uploads/expression";
+        $ExpressionPkg = $this->ROOT_PATH  . "/Uploads/Expression";
         $pkgList = $this->myreaddir($ExpressionPkg);
         foreach ($pkgList as $v) {
             $res =array_merge($res,$this->getExpression($v));
@@ -85,7 +78,7 @@ class ExpressionModel extends Model
         $file = scandir($dir, 0);
         $i = 0;
         foreach ($file as $v) {
-            if (($v != ".") and ($v != "..")) {
+            if (($v != ".") and ($v != "..") and ($v != "info.txt")) {
                 $list[$i] = $v;
                 $i = $i + 1;
             }
@@ -109,6 +102,56 @@ class ExpressionModel extends Model
     public function getCount($dir){
         $list = $this->myreaddir($dir);
         return count($list);
+    }
+
+
+    public function getPkgList($checkStatus = 1){
+        $ExpressionPkg = $this->ROOT_PATH . "/Uploads/Expression";
+        $pkgList = $this->myreaddir($ExpressionPkg);
+        $config = get_kanban_config('PKGLIST','enable',array('miniblog'),'EXPRESSION');
+        if(!$checkStatus || in_array('miniblog',$config)){
+            $pkg['miniblog']['status'] =in_array('miniblog',$config)?1:0;
+            $pkg['miniblog']['title'] = L('_DEFAULT_');
+            $pkg['miniblog']['name'] = 'miniblog';
+            $pkg['miniblog']['count'] = $this->getCount($this->ROOT_PATH . '/Application/Core/Static/images/Expression/miniblog');
+        }
+        foreach ($pkgList as $v) {
+           $file =  file_get_contents($ExpressionPkg.'/'.$v.'/info.txt');
+            $file = json_decode($file,true);
+            if(!$checkStatus || in_array($v,$config)){
+               $pkg[$v]['title'] = $file['title'];
+               $pkg[$v]['name'] = $v;
+               $pkg[$v]['status'] = in_array($v,$config)?1:0;
+               $pkg[$v]['count'] =$this->getCount($ExpressionPkg.'/'.$v);
+            }
+        }
+        return $pkg;
+    }
+
+
+
+
+
+
+
+
+
+    public function getPkgInfo($pkg ='miniblog'){
+        $ExpressionPkg = $this->ROOT_PATH . "/Uploads/Expression";
+        if($pkg =='miniblog'){
+            $result['title'] = L('_DEFAULT_');
+            $result['name'] = 'miniblog';
+            $result['count'] = $this->getCount($this->ROOT_PATH . '/Application/Core/Static/images/Expression/miniblog');
+        }else{
+            $file =  file_get_contents($ExpressionPkg.'/'.$pkg.'/info.txt');
+            $file = json_decode($file,true);
+            $result['title'] = $file['title'];
+            $result['name'] = $pkg;
+            $result['count'] =$this->getCount($ExpressionPkg.'/'.$pkg);
+        }
+
+        return $result;
+
     }
 }
 

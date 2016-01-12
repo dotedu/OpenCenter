@@ -75,7 +75,7 @@ class PictureModel extends Model{
         /* 获取下载文件信息 */
         $file = $this->find($id);
         if(!$file){
-            $this->error = '不存在该文件！';
+            $this->error = L('_NO_THIS_FILE_IS_NOT_THERE_WITH_EXCLAMATION_');
             return false;
         }
 
@@ -87,7 +87,7 @@ class PictureModel extends Model{
             case 1: //TODO: 下载远程FTP文件
                 break;
             default:
-                $this->error = '不支持的文件存储类型！';
+                $this->error = L('_UNSUPPORTED_FILE_STORAGE_TYPE_WITH_EXCLAMATION_');
                 return false;
 
         }
@@ -132,7 +132,7 @@ class PictureModel extends Model{
             readfile($file['rootpath'].$file['savepath'].$file['savename']);
             exit;
         } else {
-            $this->error = '文件已被删除！';
+            $this->error = L('_FILE_HAS_BEEN_DELETED_WITH_EXCLAMATION_');
             return false;
         }
     }

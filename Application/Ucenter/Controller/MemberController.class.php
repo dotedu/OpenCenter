@@ -30,18 +30,20 @@ class MemberController extends Controller
         $aNickname = I('post.nickname', '', 'op_t');
         $aPassword = I('post.password', '', 'op_t');
         $aVerify = I('post.verify', '', 'op_t');
-        $aRegVerify = I('post.reg_verify', 0, 'intval');
+        $aRegVerify = I('post.reg_verify', '', 'op_t');
         $aRegType = I('post.reg_type', '', 'op_t');
         $aStep = I('get.step', 'start', 'op_t');
         $aRole = I('post.role', 0, 'intval');
 
 
+
         if (!modC('REG_SWITCH', '', 'USERCONFIG')) {
-            $this->error('注册已关闭');
+            $this->error(L('_ERROR_REGISTER_CLOSED_'));
         }
 
 
-        if (IS_POST) { //注册用户
+        if (IS_POST) {
+            //注册用户
             $return = check_action_limit('reg', 'ucenter_member', 1, 1, true);
             if ($return && !$return['state']) {
                 $this->error($return['info'], $return['url']);
@@ -49,45 +51,46 @@ class MemberController extends Controller
             /* 检测验证码 */
             if (check_verify_open('reg')) {
                 if (!check_verify($aVerify)) {
-                    $this->error('验证码输入错误。');
+                    $this->error(L('_ERROR_VERIFY_CODE_').L('_PERIOD_'));
                 }
             }
             if (!$aRole) {
-                $this->error('请选择角色。');
+                $this->error(L('_ERROR_ROLE_SELECT_').L('_PERIOD_'));
             }
 
             if (($aRegType == 'mobile' && modC('MOBILE_VERIFY_TYPE', 0, 'USERCONFIG') == 1) || (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 2 && $aRegType == 'email')) {
                 if (!D('Verify')->checkVerify($aUsername, $aRegType, $aRegVerify, 0)) {
-                    $str = $aRegType == 'mobile' ? '手机' : '邮箱';
-                    $this->error($str . '验证失败');
+                    $str = $aRegType == 'mobile' ? L('_PHONE_') : L('_EMAIL_');
+                    $this->error($str . L('_FAIL_VERIFY_'));
                 }
             }
             $aUnType = 0;
             //获取注册类型
             check_username($aUsername, $email, $mobile, $aUnType);
             if ($aRegType == 'email' && $aUnType != 2) {
-                $this->error('邮箱格式不正确');
+                $this->error(L('_ERROR_EMAIL_FORMAT_'));
             }
             if ($aRegType == 'mobile' && $aUnType != 3) {
-                $this->error('手机格式不正确');
+                $this->error(L('_ERROR_PHONE_FORMAT_'));
             }
             if ($aRegType == 'username' && $aUnType != 1) {
-                $this->error('用户名格式不正确');
+                $this->error(L('_ERROR_USERNAME_FORMAT_'));
             }
             if (!check_reg_type($aUnType)) {
-                $this->error('该类型未开放注册。');
+                $this->error(L('_ERROR_REGISTER_NOT_OPENED_').L('_PERIOD_'));
             }
 
             $aCode = I('post.code', '', 'op_t');
             if (!$this->checkInviteCode($aCode)) {
-                $this->error('非法邀请码！');
+                $this->error(L('_ERROR_INV_ILLEGAL_').L('_EXCLAMATION_'));
             }
 
             /* 注册用户 */
-            $uid = UCenterMember()->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
+            $ucenterMemberModel=UCenterMember();
+            $uid =$ucenterMemberModel ->register($aUsername, $aNickname, $aPassword, $email, $mobile, $aUnType);
             if (0 < $uid) { //注册成功
                 $this->initInviteUser($uid, $aCode, $aRole);
-                $this->initRoleUser($aRole, $uid); //初始化角色用户
+                $ucenterMemberModel->initRoleUser($aRole, $uid); //初始化角色用户
                 if (modC('EMAIL_VERIFY_TYPE', 0, 'USERCONFIG') == 1 && $aUnType == 2) {
                     set_user_status($uid, 3);
                     $verify = D('Verify')->addVerify($email, 'email', $uid);
@@ -95,16 +98,17 @@ class MemberController extends Controller
                     // $this->success('注册成功，请登录邮箱进行激活');
                 }
 
-                $uid = UCenterMember()->login($username, $aPassword, $aUnType); //通过账号密码取到uid
+                $uid = $ucenterMemberModel->login($username, $aPassword, $aUnType); //通过账号密码取到uid
                 D('Member')->login($uid, false, $aRole); //登陆
 
                 $this->success('', U('Ucenter/member/step', array('step' => get_next_step('start'))));
             } else { //注册失败，显示错误信息
                 $this->error($this->showRegError($uid));
             }
-        } else { //显示注册表单
+        } else {
+            //显示注册表单
             if (is_login()) {
-                redirect(U(C('AFTER_LOGIN_JUMP_URL')));
+                redirect(U('Home/Index/index'));
             }
             $this->checkRegisterType();
             $aType = I('get.type', '', 'op_t');
@@ -124,7 +128,7 @@ class MemberController extends Controller
         $aUid = session('temp_login_uid');
         $aRoleId = session('temp_login_role_id');
         if (empty($aUid)) {
-            $this->error('参数错误');
+            $this->error(L('_ERROR_PARAM_'));
         }
         $userRoleModel = D('UserRole');
         $map['uid'] = $aUid;
@@ -150,7 +154,7 @@ class MemberController extends Controller
             $aCode = I('post.code', '', 'op_t');
             $result['status'] = 0;
             if (!mb_strlen($aCode)) {
-                $result['info'] = "请输入邀请码！";
+                $result['info'] = L('_INFO_PLEASE_INPUT_').L('_EXCLAMATION_');
                 $this->ajaxReturn($result);
             }
             $invite = D('Ucenter/Invite')->getByCode($aCode);
@@ -159,10 +163,10 @@ class MemberController extends Controller
                     $result['status'] = 1;
                     $result['url'] = U('Ucenter/Member/register', array('code' => $aCode, 'type' => $aType));
                 } else {
-                    $result['info'] = "该邀请码已过期！请更换其他邀请码！";
+                    $result['info'] = L('_INFO_INV_CODE_EXPIRED_');
                 }
             } else {
-                $result['info'] = "不存在该邀请码！请核对邀请码！";
+                $result['info'] = L('_INFO_NOT_EXIST_');
             }
             $this->ajaxReturn($result);
         } else {
@@ -175,12 +179,11 @@ class MemberController extends Controller
         $aRoleId = I('role_id', 0, 'intval');
         if (IS_POST) {
             $uid = is_login();
-            $data['status'] = 0;
+            $result['status'] = 0;
             if ($uid > 0 && $aRoleId != get_login_role()) {
                 $aCode = I('post.code', '', 'op_t');
-                $result['status'] = 0;
                 if (!mb_strlen($aCode)) {
-                    $result['info'] = "请输入邀请码！";
+                    $result['info'] = L('_INFO_PLEASE_INPUT_').L('_EXCLAMATION_');
                     $this->ajaxReturn($result);
                 }
                 $invite = D('Ucenter/Invite')->getByCode($aCode);
@@ -192,28 +195,29 @@ class MemberController extends Controller
                         if ($invite_type) {
                             $roleUser = D('UserRole')->where(array('uid' => $uid, 'role_id' => $aRoleId))->find();
                             if ($roleUser) {
-                                $data['info'] = "已持有该身份！";
+                                $result['info'] = L('_INFO_INV_ROLE_POSSESS_').L('_EXCLAMATION_');
                             } else {
                                 $memberModel = D('Common/Member');
                                 $memberModel->logout();
                                 $this->initInviteUser($uid, $aCode, $aRoleId);
-                                $this->initRoleUser($aRoleId, $uid);
-                                clean_query_user_cache($uid,array('avatar64','avatar128','avatar32','avatar256','avatar512','rank_link'));
+                                UCenterMember()->initRoleUser($aRoleId, $uid);
+                                clean_query_user_cache($uid,'avatars');
+                                clean_query_user_cache($uid,array('rank_link'));
                                 $memberModel->login($uid, false, $aRoleId); //登陆
                                 $result['status'] = 1;
                                 $result['url'] = U('Ucenter/Member/register', array('code' => $aCode));
                             }
                         } else {
-                            $result['info'] = "该身份需要更高级的邀请码才能升级！";
+                            $result['info'] = L('_INFO_INV_HIGH_LEVEL_NEEDED_').L('_EXCLAMATION_');
                         }
                     } else {
-                        $result['info'] = "该邀请码已过期！请更换其他邀请码！";
+                        $result['info'] = L('_INFO_INV_CODE_EXPIRED_');
                     }
                 } else {
-                    $result['info'] = "不存在该邀请码！请核对邀请码！";
+                    $result['info'] = L('_INFO_NOT_EXIST_');
                 }
             } else {
-                $data['info'] = "非法操作！";
+                $result['info'] = L('_ERROR_ILLEGAL_OPERATE_').L('_EXCLAMATION_');
             }
             $this->ajaxReturn($result);
         } else {
@@ -225,12 +229,13 @@ class MemberController extends Controller
     /* 登录页面 */
     public function login()
     {
-        $this->setTitle('用户登录');
+        //dump(11111);exit;
+        $this->setTitle(L('_MEMBER_TITLE_LOGIN_'));
 
         if (IS_POST) {
             $result = A('Ucenter/Login', 'Widget')->doLogin();
             if ($result['status']) {
-                $this->success($result['info'], get_nav_url(C('AFTER_LOGIN_JUMP_URL')));
+                $this->success($result['info'], I('post.from', U('Home/index/index'), 'text'));
             } else {
                 $this->error($result['info']);
             }
@@ -256,38 +261,38 @@ class MemberController extends Controller
     {
         if (is_login()) {
             D('Member')->logout();
-            $this->success('退出成功！', U('User/login'));
+            $this->success(L('_SUCCESS_LOGOUT_').L('_EXCLAMATION_'), U('User/login'));
         } else {
             $this->redirect('User/login');
         }
     }
 
     /* 验证码，用于登录和注册 */
-    public function verify()
+    public function verify($id = 1)
     {
-        verify();
+        verify($id);
         //  $verify = new \Think\Verify();
         //  $verify->entry(1);
     }
 
     /* 用户密码找回首页 */
-    public function mi($username = '', $email = '', $verify = '')
+    public function mi( $email = '', $verify = '')
     {
-        $username = strval($username);
+
         $email = strval($email);
 
         if (IS_POST) { //登录验证
             //检测验证码
 
             if (!check_verify($verify)) {
-                $this->error('验证码输入错误');
+                $this->error(L('_ERROR_VERIFY_CODE_'));
             }
 
             //根据用户名获取用户UID
-            $user = UCenterMember()->where(array('username' => $username, 'email' => $email, 'status' => 1))->find();
+            $user = UCenterMember()->where(array( 'email' => $email, 'status' => 1))->find();
             $uid = $user['id'];
             if (!$uid) {
-                $this->error("用户名或邮箱错误");
+                $this->error(L('_ERROR_USERNAME_EMAIL_'));
             }
 
             //生成找回密码的验证码
@@ -295,17 +300,61 @@ class MemberController extends Controller
 
             //发送验证邮箱
             $url = 'http://' . $_SERVER['HTTP_HOST'] . U('Ucenter/member/reset?uid=' . $uid . '&verify=' . $verify);
-            $content = C('USER_RESPASS') . "<br/>" . $url . "<br/>" . modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . "系统自动发送--请勿直接回复<br/>" . date('Y-m-d H:i:s', TIME()) . "</p>";
-            send_mail($email, modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . "密码找回", $content);
-            $this->success('密码找回邮件发送成功', U('Member/login'));
+            $content = C('USER_RESPASS') . "<br/>" . $url . "<br/>" . modC('WEB_SITE_NAME', L('_OPENSNS_'), 'Config') . L('_SEND_MAIL_AUTO_')."<br/>" . date('Y-m-d H:i:s', TIME()) . "</p>";
+            send_mail($email, modC('WEB_SITE_NAME', L('_OPENSNS_'), 'Config') . L('_SEND_MAIL_PASSWORD_FOUND_'), $content);
+            $this->success(L('_SUCCESS_SEND_MAIL_'), U('Member/login'));
         } else {
             if (is_login()) {
-                redirect(U(C('AFTER_LOGIN_JUMP_URL')));
+                redirect(U('Home/Index/index'));
+            }
+            if(!check_reg_type('email')){
+                redirect(U('Ucenter/Member/miMobile'));
             }
 
             $this->display();
         }
     }
+
+    public function miMobile( $email = '', $verify = '')
+    {
+        if(!check_reg_type('mobile')){
+         $this->error('请开启手机注册');
+        }
+        $email = strval($email);
+
+        if (IS_POST) { //登录验证
+            //检测验证码
+            $aMobile=$_POST['mobile'];
+            $aMobVerify=$_POST['verify'];
+
+            $isVerify=D('Common/Verify')->checkVerify($aMobile,$type='mobile',$aMobVerify,0);
+
+
+            if($isVerify){
+                $user=UCenterMember()->where(array('mobile'=>$aMobile,'status'=>1))->find();
+                if (empty($user)) {
+                    $this->ajaxReturn(array('status'=>0,'info'=>'该用户不存在！'));
+                }
+                /*重置密码操作*/
+                $ucModel = UCenterMember();
+                $res = $ucModel->where(array('id'=>$user['id'],'status'=>1))->save(array('password' =>think_ucenter_md5('123456', UC_AUTH_KEY)));
+                if ($res) {
+                    $this->success('密码重置成功！新密码是“123456”');
+                } else {
+                    $this->error('密码重置失败！可能密码重置前就是“123456”。');
+                }
+            }else{
+                $this->error('验证码或手机号码错误！');
+            }
+        } else {
+            if (is_login()) {
+                redirect(U('Home/Index/index'));
+            }
+
+            $this->display();
+        }
+    }
+
 
     /**
      * 重置密码
@@ -316,13 +365,13 @@ class MemberController extends Controller
         $uid = intval($uid);
         $verify = strval($verify);
         if (!$uid || !$verify) {
-            $this->error("参数错误");
+            $this->error(L('_ERROR_PARAM_'));
         }
 
         //确认邮箱验证码正确
         $expectVerify = $this->getResetPasswordVerifyCode($uid);
         if ($expectVerify != $verify) {
-            $this->error("参数错误");
+            $this->error(L('_ERROR_PARAM_'));
         }
 
         //将邮箱验证码储存在SESSION
@@ -337,7 +386,7 @@ class MemberController extends Controller
     {
         //确认两次输入的密码正确
         if ($password != $repassword) {
-            $this->error('两次输入的密码不一致');
+            $this->error(L('_PW_NOT_SAME_'));
         }
 
         //读取SESSION中的验证信息
@@ -347,7 +396,7 @@ class MemberController extends Controller
         //确认验证信息正确
         $expectVerify = $this->getResetPasswordVerifyCode($uid);
         if ($expectVerify != $verify) {
-            $this->error("验证信息无效");
+            $this->error(L('_ERROR_VERIFY_INFO_INVALID_'));
         }
 
         //将新的密码写入数据库
@@ -355,15 +404,15 @@ class MemberController extends Controller
         $model = UCenterMember();
         $data = $model->create($data);
         if (!$data) {
-            $this->error('密码格式不正确');
+            $this->error(L('_ERROR_PASSWORD_FORMAT_'));
         }
         $result = $model->where(array('id' => $uid))->save($data);
         if ($result === false) {
-            $this->error('数据库写入错误');
+            $this->error(L('_ERROR_DB_WRITE_'));
         }
 
         //显示成功消息
-        $this->success('密码重置成功', U('Ucenter/Member/login'));
+        $this->success(L('_ERROR_PASSWORD_RESET_'), U('Ucenter/Member/login'));
     }
 
     private function getResetPasswordVerifyCode($uid)
@@ -383,55 +432,55 @@ class MemberController extends Controller
     {
         switch ($code) {
             case -1:
-                $error = '用户名长度必须在4-32个字符以内！';
+                $error = L('').modC('USERNAME_MIN_LENGTH',2,'USERCONFIG').'-'.modC('USERNAME_MAX_LENGTH',32,'USERCONFIG').L('_ERROR_LENGTH_2_').L('_EXCLAMATION_');
                 break;
             case -2:
-                $error = '用户名被禁止注册！';
+                $error = L('_ERROR_USERNAME_FORBIDDEN_').L('_EXCLAMATION_');
                 break;
             case -3:
-                $error = '用户名被占用！';
+                $error = L('_ERROR_USERNAME_USED_').L('_EXCLAMATION_');
                 break;
             case -4:
-                $error = '密码长度必须在6-30个字符之间！';
+                $error = L('_ERROR_LENGTH_PASSWORD_').L('_EXCLAMATION_');
                 break;
             case -5:
-                $error = '邮箱格式不正确！';
+                $error = L('_ERROR_EMAIL_FORMAT_2_').L('_EXCLAMATION_');
                 break;
             case -6:
-                $error = '邮箱长度必须在4-32个字符之间！';
+                $error = L('_ERROR_EMAIL_LENGTH_').L('_EXCLAMATION_');
                 break;
             case -7:
-                $error = '邮箱被禁止注册！';
+                $error = L('_ERROR_EMAIL_FORBIDDEN_').L('_EXCLAMATION_');
                 break;
             case -8:
-                $error = '邮箱被占用！';
+                $error = L('_ERROR_EMAIL_USED_2_').L('_EXCLAMATION_');
                 break;
             case -9:
-                $error = '手机格式不正确！';
+                $error = L('_ERROR_PHONE_FORMAT_2_').L('_EXCLAMATION_');
                 break;
             case -10:
-                $error = '手机被禁止注册！';
+                $error = L('_ERROR_FORBIDDEN_').L('_EXCLAMATION_');
                 break;
             case -11:
-                $error = '手机号被占用！';
+                $error = L('_ERROR_PHONE_USED_').L('_EXCLAMATION_');
                 break;
             case -20:
-                $error = '用户名只能由数字、字母和"_"组成！';
+                $error = L('_ERROR_USERNAME_FORM_').L('_EXCLAMATION_');
                 break;
             case -30:
-                $error = '昵称被占用！';
+                $error = L('_ERROR_NICKNAME_USED_').L('_EXCLAMATION_');
                 break;
             case -31:
-                $error = '昵称被禁止注册！';
+                $error = L('_ERROR_NICKNAME_FORBIDDEN_2_').L('_EXCLAMATION_');
                 break;
             case -32:
-                $error = '昵称只能由数字、字母、汉字和"_"组成！';
+                $error =L('_ERROR_NICKNAME_FORM_').L('_EXCLAMATION_');
                 break;
             case -33:
-                $error = '昵称不能少于四个字！';
+                $error = L('_ERROR_LENGTH_NICKNAME_1_').modC('NICKNAME_MIN_LENGTH',2,'USERCONFIG').'-'.modC('NICKNAME_MAX_LENGTH',32,'USERCONFIG').L('_ERROR_LENGTH_2_').L('_EXCLAMATION_');;
                 break;
             default:
-                $error = '未知错误24';
+                $error = L('_ERROR_UNKNOWN_');
         }
         return $error;
     }
@@ -444,7 +493,7 @@ class MemberController extends Controller
     public function profile()
     {
         if (!is_login()) {
-            $this->error('您还没有登陆', U('User/login'));
+            $this->error(L('_ERROR_NOT_LOGIN_'), U('User/login'));
         }
         if (IS_POST) {
             //获取参数
@@ -452,18 +501,18 @@ class MemberController extends Controller
             $password = I('post.old');
             $repassword = I('post.repassword');
             $data['password'] = I('post.password');
-            empty($password) && $this->error('请输入原密码');
-            empty($data['password']) && $this->error('请输入新密码');
-            empty($repassword) && $this->error('请输入确认密码');
+            empty($password) && $this->error(L('_ERROR_INPUT_ORIGIN_PASSWORD_'));
+            empty($data['password']) && $this->error(L('_ERROR_INPUT_NEW_PASSWORD_'));
+            empty($repassword) && $this->error(L('_ERROR_CONFIRM_PASSWORD_'));
 
             if ($data['password'] !== $repassword) {
-                $this->error('您输入的新密码与确认密码不一致');
+                $this->error(L('_ERROR_NOT_SAME_PASSWORD_'));
             }
 
             $Api = new UserApi();
             $res = $Api->updateInfo($uid, $password, $data);
             if ($res['status']) {
-                $this->success('修改密码成功！');
+                $this->success(L('_SUCCESS_CHANGE_PASSWORD_').L('_EXCLAMAITON_'));
             } else {
                 $this->error($res['info']);
             }
@@ -495,7 +544,7 @@ class MemberController extends Controller
                 $content = modC('REG_EMAIL_VERIFY', '{$verify}', 'USERCONFIG');
                 $content = str_replace('{$verify}', $verify, $content);
                 $content = str_replace('{$account}', $account, $content);
-                $res = send_mail($account, modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . '邮箱验证', $content);
+                $res = send_mail($account, modC('WEB_SITE_NAME', L('_OPENSNS_'), 'Config') . L('_EMAIL_VERIFY_2_'), $content);
                 return $res;
                 break;
         }
@@ -528,9 +577,9 @@ class MemberController extends Controller
     {
         $res = $this->activateVerify();
         if ($res === true) {
-            $this->success('发送成功', 'refresh');
+            $this->success(L('_SUCCESS_SEND_'), 'refresh');
         } else {
-            $this->error('发送失败，请稍候再试！' . $res, 'refresh');
+            $this->error(L('_ERROR_SEND_') . $res, 'refresh');
         }
 
     }
@@ -544,14 +593,14 @@ class MemberController extends Controller
         $aEmail = I('post.email', '', 'op_t');
         $aUid = session('temp_login_uid');
         $ucenterMemberModel = UCenterMember();
-        $ucenterMemberModel->where(array('id' => $aUid))->getField('status');
+        //$ucenterMemberModel->where(array('id' => $aUid))->getField('status');
         if ($ucenterMemberModel->where(array('id' => $aUid))->getField('status') != 3) {
-            $this->error('权限不足！');
+            $this->error(L('_ERROR_AUTHORITY_LACK_').L('_EXCLAMATION_'));
         }
         $ucenterMemberModel->where(array('id' => $aUid))->setField('email', $aEmail);
         clean_query_user_cache($aUid, 'email');
         $res = $this->activateVerify();
-        $this->success('更换成功，请登录邮箱进行激活！如没收到激活信请稍候再试！', 'refresh');
+        $this->success(L('_SUCCESS_CHANGE_'), 'refresh');
     }
 
     /**
@@ -581,8 +630,8 @@ class MemberController extends Controller
         $url = 'http://' . $_SERVER['HTTP_HOST'] . U('ucenter/member/doActivate?account=' . $account . '&verify=' . $verify . '&type=email&uid=' . $uid);
         $content = modC('REG_EMAIL_ACTIVATE', '{$url}', 'USERCONFIG');
         $content = str_replace('{$url}', $url, $content);
-        $content = str_replace('{$title}', modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config'), $content);
-        $res = send_mail($account, modC('WEB_SITE_NAME', 'OpenSNS开源社交系统', 'Config') . '激活信', $content);
+        $content = str_replace('{$title}', modC('WEB_SITE_NAME', L('_OPENSNS_'), 'Config'), $content);
+        $res = send_mail($account, modC('WEB_SITE_NAME', L('_OPENSNS_'), 'Config') . L('_VERIFY_LETTER_'), $content);
 
 
         return $res;
@@ -595,32 +644,24 @@ class MemberController extends Controller
     public function saveAvatar()
     {
 
+        $redirect_url = session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh';
         $aCrop = I('post.crop', '', 'op_t');
         $aUid = session('temp_login_uid') ? session('temp_login_uid') : is_login();
-        $aExt = I('post.ext', '', 'op_t');
+        $aPath = I('post.path', '', 'op_t');
+
         if (empty($aCrop)) {
-            $this->success('保存成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
+            $this->success(L('_SUCCESS_SAVE_').L('_EXCLAMATION_'),$redirect_url );
         }
-        $dir = './Uploads/Avatar/' . $aUid;
-        $dh = opendir($dir);
-        while ($file = readdir($dh)) {
-            if ($file != "." && $file != ".." && $file != 'original.' . $aExt) {
-                $fullpath = $dir . "/" . $file;
-                if (!is_dir($fullpath)) {
-                    unlink($fullpath);
-                } else {
-                    deldir($fullpath);
-                }
-            }
-        }
-        closedir($dh);
-        A('Ucenter/UploadAvatar', 'Widget')->cropPicture($aUid, $aCrop, $aExt);
-        $res = M('avatar')->where(array('uid' => $aUid))->save(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
+
+        $returnPath = A('Ucenter/UploadAvatar', 'Widget')->cropPicture($aCrop,$aPath);
+        $driver = modC('PICTURE_UPLOAD_DRIVER','local','config');
+        $data = array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => $returnPath,'driver'=> $driver, 'create_time' => time());
+        $res = M('avatar')->where(array('uid' => $aUid))->save($data);
         if (!$res) {
-            M('avatar')->add(array('uid' => $aUid, 'status' => 1, 'is_temp' => 0, 'path' => "/" . $aUid . "/crop." . $aExt, 'create_time' => time()));
+            M('avatar')->add($data);
         }
-        clean_query_user_cache($aUid, array('avatar256', 'avatar128', 'avatar64','avatar32','avatar512'));
-        $this->success('头像更新成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('change_avatar'))) : 'refresh');
+        clean_query_user_cache($aUid, 'avatars');
+        $this->success(L('_SUCCESS_AVATAR_CHANGE_').L('_EXCLAMATION_'), $redirect_url);
 
     }
 
@@ -630,20 +671,22 @@ class MemberController extends Controller
      */
     public function doActivate()
     {
+
         $aAccount = I('get.account', '', 'op_t');
         $aVerify = I('get.verify', '', 'op_t');
         $aType = I('get.type', '', 'op_t');
         $aUid = I('get.uid', 0, 'intval');
-        $check = D('Verify')->checkVerify($aAccount, $aType, $aVerify, $aUid);
+        $check = D('Common/Verify')->checkVerify($aAccount, $aType, $aVerify, $aUid);
         if ($check) {
             set_user_status($aUid, 1);
-            $this->success('激活成功', U('Ucenter/member/step', array('step' => get_next_step('start'))));
+            $this->success(L('_SUCCESS_ACTIVE_'), U('Ucenter/member/step', array('step' => get_next_step('start'))));
         } else {
-            $this->error('激活失败！');
+            $this->error(L('_FAIL_ACTIVE_').L('_EXCLAMATION_'));
         }
 
-
     }
+
+
 
     /**
      * checkAccount  ajax验证用户帐号是否符合要求
@@ -654,49 +697,50 @@ class MemberController extends Controller
         $aAccount = I('post.account', '', 'op_t');
         $aType = I('post.type', '', 'op_t');
         if (empty($aAccount)) {
-            $this->error('不能为空！');
+            $this->error(L('_EMPTY_CANNOT_').L('_EXCLAMATION_'));
         }
         check_username($aAccount, $email, $mobile, $aUnType);
         $mUcenter = UCenterMember();
         switch ($aType) {
             case 'username':
-                empty($aAccount) && $this->error('用户名格式不正确！');
+                empty($aAccount) && $this->error(L('_ERROR_USERNAME_FORMAT_').L('_EXCLAMATION_'));
                 $length = mb_strlen($aAccount, 'utf-8'); // 当前数据长度
-                if ($length < 4 || $length > 32) {
-                    $this->error('用户名长度在4-32之间');
+                if ($length < modC('USERNAME_MIN_LENGTH',2,'USERCONFIG') || $length > modC('USERNAME_MAX_LENGTH',32,'USERCONFIG')) {
+                    $this->error(L('_ERROR_USERNAME_LENGTH_1_').modC('USERNAME_MIN_LENGTH',2,'USERCONFIG').'-'.modC('USERNAME_MAX_LENGTH',32,'USERCONFIG').L('_ERROR_USERNAME_LENGTH_2_'));
                 }
 
 
                 $id = $mUcenter->where(array('username' => $aAccount))->getField('id');
                 if ($id) {
-                    $this->error('该用户名已经存在！');
+                    $this->error(L('_ERROR_USERNAME_EXIST_2_'));
                 }
-                preg_match("/^[a-zA-Z0-9_]{4,32}$/", $aAccount, $result);
+                preg_match("/^[a-zA-Z0-9_]{".modC('USERNAME_MIN_LENGTH',2,'USERCONFIG').",".modC('USERNAME_MAX_LENGTH',32,'USERCONFIG')."}$/", $aAccount, $result);
                 if (!$result) {
-                    $this->error('只允许字母和数字和下划线！');
+                    $this->error(L('_ERROR_USERNAME_ONLY_PERMISSION_'));
                 }
                 break;
             case 'email':
-                empty($email) && $this->error('邮箱格式不正确！');
+                empty($email) && $this->error(L('_ERROR_EMAIL_FORMAT_').L('_EXCLAMATION_'));
                 $length = mb_strlen($email, 'utf-8'); // 当前数据长度
                 if ($length < 4 || $length > 32) {
-                    $this->error('邮箱长度在4-32之间');
+                    $this->error(L('_ERROR_EMAIL_EXIST_'));
                 }
 
                 $id = $mUcenter->where(array('email' => $email))->getField('id');
                 if ($id) {
-                    $this->error('该邮箱已经存在！');
+//                    $this->error(L('_ERROR_EMAIL_LENGTH_LIMIT_'));
+                    $this->error(L('_ERROR_EMAIL_EXIST_'));
                 }
                 break;
             case 'mobile':
-                empty($mobile) && $this->error('手机格式不正确！');
+                empty($mobile) && $this->error(L('_ERROR_PHONE_FORMAT_'));
                 $id = $mUcenter->where(array('mobile' => $mobile))->getField('id');
                 if ($id) {
-                    $this->error('该手机号已经存在！');
+                    $this->error(L('_ERROR_PHONE_EXIST_'));
                 }
                 break;
         }
-        $this->success('验证成功');
+        $this->success(L('_SUCCESS_VERIFY_'));
     }
 
     /**
@@ -708,25 +752,25 @@ class MemberController extends Controller
         $aNickname = I('post.nickname', '', 'op_t');
 
         if (empty($aNickname)) {
-            $this->error('不能为空！');
+            $this->error(L('_EMPTY_CANNOT_').L('_EXCLAMATION_'));
         }
 
         $length = mb_strlen($aNickname, 'utf-8'); // 当前数据长度
-        if ($length < 4 || $length > 32) {
-            $this->error('昵称长度在4-32之间');
+        if ($length < modC('NICKNAME_MIN_LENGTH',2,'USERCONFIG') || $length > modC('NICKNAME_MAX_LENGTH',32,'USERCONFIG')) {
+            $this->error(L('_ERROR_NICKNAME_LENGTH_11_').modC('NICKNAME_MIN_LENGTH',2,'USERCONFIG').'-'.modC('NICKNAME_MAX_LENGTH',32,'USERCONFIG').L('_ERROR_USERNAME_LENGTH_2_'));
         }
 
         $memberModel = D('member');
         $uid = $memberModel->where(array('nickname' => $aNickname))->getField('uid');
         if ($uid) {
-            $this->error('该昵称已经存在！');
+            $this->error(L('_ERROR_NICKNAME_EXIST_'));
         }
         preg_match('/^(?!_|\s\')[A-Za-z0-9_\x80-\xff\s\']+$/', $aNickname, $result);
         if (!$result) {
-            $this->error('只允许中文、字母和数字和下划线！');
+            $this->error(L('_ERROR_NICKNAME_ONLY_PERMISSION_'));
         }
 
-        $this->success('验证成功');
+        $this->success(L('_SUCCESS_VERIFY_'));
     }
 
     /**
@@ -743,15 +787,15 @@ class MemberController extends Controller
             if ($roleUser) {
                 $memberModel = D('Common/Member');
                 $memberModel->logout();
-                clean_query_user_cache($uid,array('avatar64','avatar128','avatar32','avatar256','avatar512','rank_link'));
+                clean_query_user_cache($uid, array('avatars', 'rank_link'));
                 $result = $memberModel->login($uid, false, $aRoleId);
                 if ($result) {
-                    $data['info'] = "身份切换成功！";
+                    $data['info'] = L('_INFO_ROLE_CHANGE_');
                     $data['status'] = 1;
                 }
             }
         }
-        $data['info'] = "非法操作！";
+        $data['info'] = L('_ERROR_ILLEGAL_OPERATE_');
         $this->ajaxReturn($data);
     }
 
@@ -767,46 +811,21 @@ class MemberController extends Controller
         if ($uid > 0 && $aRoleId != get_login_role()) {
             $roleUser = D('UserRole')->where(array('uid' => $uid, 'role_id' => $aRoleId))->find();
             if ($roleUser) {
-                $data['info'] = "已持有该身份！";
+                $data['info'] = L('_INFO_INV_ROLE_POSSESS_');
                 $this->ajaxReturn($data);
             } else {
                 $memberModel = D('Common/Member');
                 $memberModel->logout();
-                $this->initRoleUser($aRoleId, $uid);
-                clean_query_user_cache($uid,array('avatar64','avatar128','avatar32','avatar256','avatar512','rank_link'));
+                UCenterMember()->initRoleUser($aRoleId, $uid);
+                clean_query_user_cache($uid, array('avatars', 'rank_link'));
                 $memberModel->login($uid, false, $aRoleId); //登陆
             }
         } else {
-            $data['info'] = "非法操作！";
+            $data['info'] = L('_ERROR_ILLEGAL_OPERATE_');
             $this->ajaxReturn($data);
         }
     }
 
-    /**
-     * 初始化角色用户信息
-     * @param $role_id
-     * @param $uid
-     * @return bool
-     * @author 郑钟良<zzl@ourstu.com>
-     */
-    private function initRoleUser($role_id = 0, $uid)
-    {
-        $memberModel = D('Member');
-        $role = D('Role')->where(array('id' => $role_id))->find();
-        $user_role = array('uid' => $uid, 'role_id' => $role_id, 'step' => "start");
-        if ($role['audit']) { //该角色需要审核
-            $user_role['status'] = 2; //未审核
-        } else {
-            $user_role['status'] = 1;
-        }
-        $result = D('UserRole')->add($user_role);
-        if (!$role['audit']) { //该角色不需要审核
-            $memberModel->initUserRoleInfo($role_id, $uid);
-        }
-        $memberModel->initDefaultShowRole($role_id, $uid);
-
-        return $result;
-    }
 
     /**修改用户扩展信息
      * @author 郑钟良<zzl@ourstu.com>
@@ -815,9 +834,9 @@ class MemberController extends Controller
     {
         $result = A('Ucenter/RegStep', 'Widget')->edit_expandinfo();
         if ($result['status']) {
-            $this->success('保存成功！', session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('expand_info'))) : 'refresh');
+            $this->success(L('_SUCCESS_SAVE_'), session('temp_login_uid') ? U('Ucenter/member/step', array('step' => get_next_step('expand_info'))) : 'refresh');
         } else {
-            !isset($result['info']) && $result['info'] = '没有要保存的信息！';
+            !isset($result['info']) && $result['info'] = L('_ERROR_INFO_SAVE_NONE_');
             $this->error($result['info']);
         }
     }
@@ -830,9 +849,9 @@ class MemberController extends Controller
     {
         $result = A('Ucenter/RegStep', 'Widget')->do_set_tag();
         if ($result['status']) {
-            $result['url']=U('Ucenter/member/step', array('step' => get_next_step('set_tag')));
+            $result['url'] = U('Ucenter/member/step', array('step' => get_next_step('set_tag')));
         } else {
-            !isset($result['info']) && $result['info'] = '没有要保存的信息！';
+            !isset($result['info']) && $result['info'] = L('_ERROR_INFO_SAVE_NONE_');
         }
         $this->ajaxReturn($result);
     }
@@ -849,14 +868,14 @@ class MemberController extends Controller
         $register_type = explode(',', $register_type);
 
         if (!in_array('invite', $register_type) && !in_array('normal', $register_type)) {
-            $this->error("网站已关闭注册！");
+            $this->error(L('_ERROR_WEBSITE_REG_CLOSED_'));
         }
 
         if (in_array('invite', $register_type) && $aCode != '') { //邀请注册开启且有邀请码
             $invite = D('Ucenter/Invite')->getByCode($aCode);
             if ($invite) {
                 if ($invite['end_time'] <= time()) {
-                    $this->error("该邀请码或邀请链接已过期！");
+                    $this->error(L('_ERROR_EXPIRED_').L('_EXCLAMATION_'));
                 } else { //获取注册角色
                     $map['id'] = $invite['invite_type'];
                     $invite_type = D('Ucenter/InviteType')->getSimpleData($map);
@@ -867,7 +886,7 @@ class MemberController extends Controller
                             $map_role['id'] = array('in', $invite_type['roles']);
                             $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
                             if (!count($roleList)) {
-                                $this->error('邀请码绑定角色错误！');
+                                $this->error(L('_ERROR_ROLE_').L('_EXCLAMATION_'));
                             }
                             //角色end
                         } else {
@@ -880,13 +899,14 @@ class MemberController extends Controller
                         $this->assign('code', $aCode);
                         $this->assign('invite_user', $invite['user']);
                     } else {
-                        $this->error("该邀请码或邀请链接已被禁用！");
+                        $this->error(L('_ERROR_FORBIDDEN_2_').L('_EXCLAMATION_'));
                     }
                 }
             } else {
-                $this->error("不存在该邀请码或邀请链接！");
+                $this->error(L('_ERROR_NOT_EXIST_').L('_EXCLAMATION_'));
             }
-        } else { //（开启邀请注册且无邀请码）或（只开启了普通注册）
+        } else {
+            //（开启邀请注册且无邀请码）或（只开启了普通注册）
             if (in_array('invite', $register_type)) {
                 $this->assign('open_invite_register', 1);
             }
@@ -897,8 +917,9 @@ class MemberController extends Controller
                 $map_role['invite'] = 0;
                 $roleList = D('Admin/Role')->selectByMap($map_role, 'sort asc', 'id,title');
                 //角色end
-            } else { //（只开启了邀请注册）
-                $this->error("收到邀请的用户才能注册该网站！");
+            } else {
+                //（只开启了邀请注册）
+                $this->error(L('_ERROR_NOT_INVITED_').L('_EXCLAMATION_'));
             }
         }
         $this->assign('role_list', $roleList);
@@ -913,7 +934,7 @@ class MemberController extends Controller
      */
     private function checkInviteCode($code = '')
     {
-        if($code==''){
+        if ($code == '') {
             return true;
         }
         $invite = D('Ucenter/Invite')->getByCode($code);
@@ -949,11 +970,11 @@ class MemberController extends Controller
                 $invite_type = D('Ucenter/InviteType')->getSimpleData($map);
                 if ($invite_type['is_follow']) {
                     $followModel = D('Common/Follow');
-                    $followModel->addFollow($uid, abs($invite['uid']));
-                    $followModel->addFollow(abs($invite['uid']), $uid);
+                    $followModel->addFollow($uid, abs($invite['uid']),1);
+                    $followModel->addFollow(abs($invite['uid']), $uid,1);
                 }
-                if($invite['uid']>0){
-                    D('Ucenter/Score')->setUserScore(array($invite['uid']),$invite_type['income_score'],$invite_type['income_score_type'],'inc');//扣积分
+                if ($invite['uid'] > 0) {
+                    D('Ucenter/Score')->setUserScore(array($invite['uid']), $invite_type['income_score'], $invite_type['income_score_type'], 'inc', '', 0, L('_ERROR_BONUS_'));
                 }
             }
         }

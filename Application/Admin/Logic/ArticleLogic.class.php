@@ -39,13 +39,13 @@ class ArticleLogic extends BaseLogic{
 			$data['id'] = $id;
 			$id = $this->add($data);
 			if(!$id){
-				$this->error = '新增详细内容失败！';
+				$this->error = L('_NEW_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		} else { //更新数据
 			$status = $this->save($data);
 			if(false === $status){
-				$this->error = '更新详细内容失败！';
+				$this->error = L('_UPDATE_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		}
@@ -92,13 +92,13 @@ class ArticleLogic extends BaseLogic{
 			$data['id'] = $id;
 			$id = $this->add($data);
 			if(!$id){
-				$this->error = '新增详细内容失败！';
+				$this->error = L('_NEW_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		} else { //更新数据
 			$status = $this->save($data);
 			if(false === $status){
-				$this->error = '更新详细内容失败！';
+				$this->error = L('_UPDATE_DETAILS_FAILED_WITH_EXCLAMATION_');
 				return false;
 			}
 		}

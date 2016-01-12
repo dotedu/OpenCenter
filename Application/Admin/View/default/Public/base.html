@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{$meta_title}|OpenCenter管理后台</title>
+    <title>{$meta_title}|{:L('_SNS_BACKSTAGE_MANAGE_')}</title>
     <link href="__ROOT__/Public/favicon.ico" type="image/x-icon" rel="shortcut icon">
 
 
@@ -30,11 +30,12 @@
             "ROOT": "__ROOT__", //当前网站地址
             "APP": "__APP__", //当前项目地址
             "PUBLIC": "__PUBLIC__", //项目公共目录地址
-            "DEEP": "{:C('URL_PATHINFO_DEPR')}", //PATHINFO分割符
+            "DEEP": "{:C('URL_PATHINFO_DEPR')}", //PATHINF{:L("_O_SEGMENTATION_")}
             "MODEL": ["{:C('URL_MODEL')}", "{:C('URL_CASE_INSENSITIVE')}", "{:C('URL_HTML_SUFFIX')}"],
             "VAR": ["{:C('VAR_MODULE')}", "{:C('VAR_CONTROLLER')}", "{:C('VAR_ACTION')}"],
             'URL_MODEL': "{:C('URL_MODEL')}"
         }
+        var _ROOT_="__ROOT__";
     </script>
 </head>
 <body>
@@ -45,9 +46,7 @@
     <nav class="navbar navbar-inverse admin-bar" role="navigation">
         <div class="navbar-header">
             <a href="{:U('Index/index')}" class="navbar-brand">
-                <img class="logo" src="__IMG__/logo.png">
-                Open Center</a>
-            <!--<a class="navbar-brand" href="{:U('Index/index')}">OpenCenter 管理后台</a>-->
+                OpenCenter</a>
         </div>
         <div class="collapse navbar-collapse navbar-collapse-example">
             <ul id="nav_bar" class="nav navbar-nav">
@@ -61,23 +60,23 @@
                 </volist>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="javascript:;"  onclick="clear_cache()"><i class="icon-trash"></i> 清空缓存</a></li>
-                <li><a target="_blank" href="{:U('Home/Index/index')}"><i class="icon-copy"></i> 打开前台</a></li>
+                <li><a href="javascript:;"  onclick="clear_cache()"><i class="icon-trash"></i> {:L('_CACHE_CLEAR_')}</a></li>
+                <li><a target="_blank" href="{:U('Home/Index/index')}"><i class="icon-copy"></i> {:L('_FORESTAGE_OPEN_')}</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-user"></i>
                         {:session('user_auth.username')} <b
                                 class="caret"></b></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="{:U('User/updatePassword')}">修改密码</a></li>
-                        <li><a href="{:U('User/updateNickname')}">修改昵称</a></li>
+                        <li><a href="{:U('User/updatePassword')}">{:L('_PASSWORD_CHANGE_')}</a></li>
+                        <li><a href="{:U('User/updateNickname')}">{:L('_NICKNAME_CHANGE_')}</a></li>
                         <li class="divider"></li>
-                        <li><a href="{:U('Public/logout')}">退出</a></li>
+                        <li><a href="{:U('Public/logout')}">{:L('_EXIT_')}</a></li>
                     </ul>
                 </li>
                 <script>
                     function clear_cache() {
-                        var msg = new $.Messager('清理缓存成功。', {placement: 'bottom'});
-                        $.get('/cc.php');
+                        var msg = new $.zui.Messager("{:L('_CACHE_CLEAR_SUCCESS_')}{:L('_PERIOD_')}", {placement: 'bottom'});
+                        $.get('__ROOT__/cc.php');
                         msg.show()
                     }
                 </script>
@@ -94,30 +93,20 @@
     <ul class="nav nav-primary nav-stacked">
 
         <volist name="__MODULE_MENU__" id="v">
-            <eq name="v.is_setup" value="1">
+            <if condition="$v['is_setup'] AND $v['admin_entry']">
                 <li>
                     <a  href="{:U($v['admin_entry'])}" title="{$v.alias|text}" class="text-ellipsis text-center">
                         <i class="icon-{$v['icon']}"></i><br/>{$v.alias}
                     </a>
                 </li>
-            </eq>
+            </if>
 
 
         </volist>
 
     </ul>
-    <ul class="nav nav-primary nav-stacked" style="position: absolute;bottom: 0;width: 100%">
-        <li>
-            <eq name="__MANAGE_COULD__" value="1">
-                <a href="{:U('module/lists')}" class="text-center">
-                    <i class="icon-cloud"></i><br/>云市场
-                </a>
-            </eq>
 
-        </li>
-    </ul>
 </div>
-
 
 <div class="panel-main" style="float:left;">
 
@@ -136,7 +125,7 @@
                                          {:extra_menu($_extra_menu,$__MENU__)}
                                      </notempty>-->
                                 <volist name="__MENU__.child" id="sub_menu">
-                                    <!-- 子导航 -->
+                                    <!-- {:L("_SUB_NAVIGATION_")}-->
                                     <notempty name="sub_menu">
                                         <li class="show">
                                             <a href="#">
@@ -151,7 +140,7 @@
                                             </ul>
                                         </li>
                                     </notempty>
-                                    <!-- /子导航 -->
+                                    <!-- /{:L("_SUB_NAVIGATION_")}-->
                                 </volist>
 
                             </block>
@@ -169,16 +158,19 @@
             <php>$col=12;</php>
         </notempty>
         <div id="main-content" class="" style="padding:10px;padding-left:0;padding-bottom:10px;left: 180px;position:absolute;right: 0;bottom: 0;top: 0;overflow: auto">
-            <div id="top-alert" class="fixed alert alert-error" style="display: none;">
-                <button class="close fixed" style="margin-top: 4px;">&times;</button>
-                <div class="alert-content">这是内容</div>
-            </div>
+           <eq name="update" value="1">
+               <div id="top-alert" class="alert alert-success alert-dismissable" style="position: absolute;left: 50%;margin-left: -150px;width: 300px;box-shadow: rgba(95, 95, 95, 0.4) 3px 3px 3px;z-index:999">
+                   <i class="icon-ok-sign" style="font-size: 28px"></i>  &nbsp;&nbsp; {:L('_VERSION_UPDATE_',array('href'=> '<a class="alert-link" href="'.U('Cloud/update').'">' ))}</a>
+                   <button class="close fixed" style="margin-top: 4px;">&times;</button>
+               </div>
+           </eq>
+
             <div id="main" style="overflow-y:auto;overflow-x:hidden;">
                 <block name="nav">
                     <!-- nav -->
                     <notempty name="_show_nav">
                         <div class="breadcrumb">
-                            <span>您的位置:</span>
+                            <span>{:L('_YOUR_POSITION_')}{:L('_COLON_')}</span>
                             <assign name="i" value="1"/>
                             <foreach name="_nav" item="v" key="k">
                                 <if condition="$i eq count($_nav)">
@@ -206,7 +198,7 @@
 
 
 <php>if($report){</php>
-<div  class="report_feedback" title="填写四格体验报告" data-toggle="modal" data-target="#myModal">
+<div  class="report_feedback" title="{:L('_REPORT_EXPERIENCE_PLEASE_FILL_')}" data-toggle="modal" data-target="#myModal">
     <div class="report_icon" ></div>
     <span class="label label-badge label-danger report_point">1</span>
 </div>
@@ -221,8 +213,8 @@
 
 
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
-                <h4 class="modal-title">四格体验报告</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">{:L('_CLOSE_')}</span></button>
+                <h4 class="modal-title">{:L('_REPORT_EXPERIENCE_')}</h4>
             </div>
 
             <div class="modal-body">
@@ -230,34 +222,34 @@
                     <div class="row">
                         <!-- 帖子分类 -->
                         <div class="col-sm-12">
-<div>感谢您使用我们的产品，希望您的认真反馈有助于我们改善产品。</div>
+<div>{:L('_THANKS_HOPE_')}</div>
 
-                                <label class="item-label">我的更新心情</label>
+                                <label class="item-label">{:L('_MOOD_MY_')}</label>
                             <div>
                                 <select name="q1" class="report-select" style="width:400px;">
-                                    <option value="0">请选择</option>
-                                    <option>开心</option>
-                                    <option>悲伤</option>
-                                    <option>超有爱</option>
-                                    <option>期待</option>
+                                    <option value="0">{:L('_ELECT_PLEASE_')}</option>
+                                    <option>{:L('_HAPPY_')}</option>
+                                    <option>{:L('_AGONY_')}</option>
+                                    <option>{:L('_LOVE_')}</option>
+                                    <option>{:L('_EXPECT_')}</option>
                                 </select>
                         </div>
 
-                                <label class="item-label">我选择的最有爱更新</label>
+                                <label class="item-label">{:L('_LOVE_MY_OPTION_')}</label>
                             <div>
                                 <select name="q2" class="report-select" style="width:400px;">
-                                    <option value="0">请选择</option>
+                                    <option value="0">{:L('_ELECT_PLEASE_')}</option>
                                     <volist name="this_update" id="option">
                                         <option value="{$option|htmlspecialchars}">{$option|htmlspecialchars}</option>
                                     </volist>
                                 </select>
                             </div>
 
-                                <label class="item-label">我选择的最不给力更新
+                                <label class="item-label">{:L('_HATE_MY_OPTION_')}
                                 </label>
                             <div>
                                 <select name="q3" class="report-select" style="width:400px;">
-                                    <option value="0">请选择</option>
+                                    <option value="0">{:L('_ELECT_PLEASE_')}</option>
                                     <volist name="this_update" id="option">
                                         <option value="{$option|htmlspecialchars}">{$option|htmlspecialchars}</option>
                                     </volist>
@@ -265,11 +257,11 @@
                             </div>
 
 
-                                <label class="item-label">我选择的期待功能
+                                <label class="item-label">{:L('_EXPECTATION__MY_OPTION_')}
                                 </label>
                             <div>
                                 <select name="q4" class="report-select" style="width:400px;">
-                                    <option value="0">请选择</option>
+                                    <option value="0">{:L('_ELECT_PLEASE_')}</option>
                                     <volist name="future_update" id="option">
                                         <option value="{$option|htmlspecialchars}">{$option|htmlspecialchars}</option>
                                     </volist>
@@ -280,9 +272,9 @@
             </div>
             <div class="modal-footer">
                 <php>if(strval($report['url'])!=''){</php>
-                <a class="pull-left" href="{$report['url']}" target="_blank" >查看更新详情</a>
+                <a class="pull-left" href="{$report['url']}" target="_blank" >{:L('_UPDATE_LOOK_')}</a>
                 <php>}</php>
-                <button type="submit" class="btn ajax-post" target-form="report_form">确定</button>
+                <button type="submit" class="btn ajax-post" target-form="report_form">{:L('_CONFIRM_')}</button>
             </div>
 
             </form>
@@ -298,8 +290,8 @@
 <script>
     $(function () {
         var config = {
-            '.chosen-select'           : {search_contains: true, drop_width: 400,no_results_text:'找不到匹配的选项'},
-            '.report-select'           : {search_contains: true, width: '400px',no_results_text:'找不到匹配的选项'}
+            '.chosen-select'           : {search_contains: true, drop_width: 400,no_results_text:"{:L('_OPTION_MATCHED_NONE_')}"},
+            '.report-select'           : {search_contains: true, width: '400px',no_results_text:"{:L('_OPTION_MATCHED_NONE_')}"}
         };
         for (var selector in config) {
             $(selector).chosen(config[selector]);
@@ -315,9 +307,9 @@
 
 
 
-<!-- 内容区 -->
+<!-- {:L("_CONTENT_AREA_")}-->
 
-<!-- /内容区 -->
+<!-- /{:L("_CONTENT_AREA_")}-->
 <script type="text/javascript">
     (function () {
         var ThinkPHP = window.Think = {
@@ -337,7 +329,7 @@
 <script type="text/javascript" src="__JS__/common.js"></script>
 <script type="text/javascript" src="__JS__/com/com.toast.class.js"></script>
 <script type="text/javascript" src="__ZUI__/js/zui.js"></script>
-<script type="text/javascript" src="__ZUI__/lib/autotrigger/autotrigger.min.js"></script>
+<script type="text/javascript" src="__ZUI__/lib/migrate/migrate1.2.js"></script>
 <!--zui end-->
 <link rel="stylesheet" type="text/css" href="__JS__/kanban/kanban.css" media="all">
 <script type="text/javascript" src="__JS__/kanban/kanban.js"></script>
@@ -347,7 +339,6 @@
         $window.resize(function () {
             $("#main").css("min-height", $window.height() - 130);
         }).resize();
-
 
         // 导航栏超出窗口高度后的模拟滚动条
         var sHeight = $(".sidebar").height();
@@ -373,17 +364,6 @@
         }
     }();
     highlight_subnav("{:U('Admin'.'/'.CONTROLLER_NAME.'/'.ACTION_NAME,$_GET)}")
-</script>
-<!--优化系统DUMP显示方式@mingyangliu-->
-<script type="text/javascript">
-if ( $("pre").length > 0 ) { 
-document.writeln("<div id=\"mydump\"  style=\"position: fixed;z-index: 999;top:0;height:400px;width: 500px;OVERFLOW:auto;\" ></div>");
-$("pre").appendTo('#mydump'); 
-document.writeln("<div style=\"z-index:9999;height:30px;float:right;text-align: right;overflow:hidden;position:fixed;bottom:0;right:150px;color:#000;line-height:30px;cursor:pointer;\">");
-document.writeln("<a style=\"background-color: rgb(255, 255, 255);float: right;\"href=JavaScript:; class=\"STYLE1\" onclick=\"document.all.mydump.style.display=`none`;\">[隐藏DUMP数据]</a>");
-document.writeln("<a style=\"background-color: rgb(255, 255, 255);float: right;\"href=JavaScript:; class=\"STYLE1\" onclick=\"document.all.mydump.style.display=`block`;\">[显示DUMP数据]</a>");
-document.writeln("</div>");
-}
 </script>
 <block name="script"></block>
 <block name="modal">

@@ -154,7 +154,7 @@ class ModelController extends AdminController {
         Cookie('__forward__',$_SERVER['REQUEST_URI']);
 
         $this->assign('_list', $list);
-        $this->meta_title = '模型管理';
+        $this->meta_title = L('_MODEL_MANAGEMENT_');
         $this->getMenu();
         $this->display();
     }
@@ -168,7 +168,7 @@ class ModelController extends AdminController {
         $models = M('Model')->where(array('extend'=>0))->field('id,title')->select();
 
         $this->assign('models', $models);
-        $this->meta_title = '新增模型';
+        $this->meta_title = L('_NEW_MODEL_');
         $this->display();
     }
 
@@ -179,7 +179,7 @@ class ModelController extends AdminController {
     public function edit(){
         $id = I('get.id','');
         if(empty($id)){
-            $this->error('参数不能为空！');
+            $this->error(L('_PARAMETERS_CANT_BE_EMPTY_'));
         }
 
         /*获取一条记录的详细数据*/
@@ -199,35 +199,35 @@ class ModelController extends AdminController {
         /* 获取模型排序字段 */
         $field_sort = json_decode($data['field_sort'], true);
         if(!empty($field_sort)){
-        	/* 对字段数组重新整理 */
-        	$fields_f = array();
-        	foreach($fields as $v){
-        		$fields_f[$v['id']] = $v;
-        	}
-        	$fields = array();
-        	foreach($field_sort as $key => $groups){
-        		foreach($groups as $group){
-        			$fields[$fields_f[$group]['id']] = array(
-        					'id' => $fields_f[$group]['id'],
-        					'name' => $fields_f[$group]['name'],
-        					'title' => $fields_f[$group]['title'],
-        					'is_show' => $fields_f[$group]['is_show'],
-        					'group' => $key
-        			);
-        		}
-        	}
-        	/* 对新增字段进行处理 */
-        	$new_fields = array_diff_key($fields_f,$fields);
-        	foreach ($new_fields as $value){
-        		if($value['is_show'] == 1){
-        			array_unshift($fields, $value);
-        		}
-        	}
+            /* 对字段数组重新整理 */
+            $fields_f = array();
+            foreach($fields as $v){
+                $fields_f[$v['id']] = $v;
+            }
+            $fields = array();
+            foreach($field_sort as $key => $groups){
+                foreach($groups as $group){
+                    $fields[$fields_f[$group]['id']] = array(
+                        'id' => $fields_f[$group]['id'],
+                        'name' => $fields_f[$group]['name'],
+                        'title' => $fields_f[$group]['title'],
+                        'is_show' => $fields_f[$group]['is_show'],
+                        'group' => $key
+                    );
+                }
+            }
+            /* 对新增字段进行处理 */
+            $new_fields = array_diff_key($fields_f,$fields);
+            foreach ($new_fields as $value){
+                if($value['is_show'] == 1){
+                    array_unshift($fields, $value);
+                }
+            }
         }
 
         $this->assign('fields', $fields);
         $this->assign('info', $data);
-        $this->meta_title = '编辑模型';
+        $this->meta_title = L('_EDIT_MODEL_');
         $this->display();
     }
 
@@ -237,7 +237,7 @@ class ModelController extends AdminController {
      */
     public function del(){
         $ids = I('get.ids');
-        empty($ids) && $this->error('参数不能为空！');
+        empty($ids) && $this->error(L('_PARAMETERS_CANT_BE_EMPTY_'));
         $ids = explode(',', $ids);
         foreach ($ids as $value){
             $res = D('Model')->del($value);
@@ -248,7 +248,7 @@ class ModelController extends AdminController {
         if(!$res){
             $this->error(D('Model')->getError());
         }else{
-            $this->success('删除模型成功！');
+            $this->success(L('_DELETE_MODEL_SUCCESS_'));
         }
     }
 
@@ -262,7 +262,7 @@ class ModelController extends AdminController {
         if(!$res){
             $this->error(D('Model')->getError());
         }else{
-            $this->success($res['id']?'更新成功':'新增成功', Cookie('__forward__'));
+            $this->success($res['id']?L('_UPDATE_'):L('_NEW_SUCCESS_'), Cookie('__forward__'));
         }
     }
 
@@ -276,14 +276,14 @@ class ModelController extends AdminController {
             $tables = D('Model')->getTables();
 
             $this->assign('tables', $tables);
-            $this->meta_title = '生成模型';
+            $this->meta_title = L('_GENERATIVE_MODEL_');
             $this->display();
         }else{
             $table = I('post.table');
-            empty($table) && $this->error('请选择要生成的数据表！');
+            empty($table) && $this->error(L('_CHOOSE_THE_DATA_TABLE_TO_GENERATE_'));
             $res = D('Model')->generate($table);
             if($res){
-                $this->success('生成模型成功！', U('index'));
+                $this->success(L('_GENERATIVE_MODEL_SUCCESS_'), U('index'));
             }else{
                 $this->error(D('Model')->getError());
             }

@@ -2,16 +2,16 @@
 <extend name="Public/base" />
 <block name="body">
     <div class="main-title">
-        <h2>前台访问授权</h2>
+        <h2>{:L("_FRONT_DESK_ACCESS_AUTHORIZATION_")}</h2>
     </div>
 	<div class="tab-wrap with-padding">
 
         <div class="clearfix">
             <div class="col-xs-10">
                 <ul class="nav nav-secondary">
-                    <li><a href="{:U('AuthManager/access',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">管理后台授权</a></li>
-                    <li class="active"><a href="javascript:;">前台访问授权</a></li>
-                    <li><a href="{:U('AuthManager/user',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">成员授权</a></li>
+                    <li><a href="{:U('AuthManager/access',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">{:L("_MANAGEMENT_BACKGROUND_AUTHORIZATION_")}</a></li>
+                    <li class="active"><a href="javascript:;">{:L("_FRONT_DESK_ACCESS_AUTHORIZATION_")}</a></li>
+                    <li><a href="{:U('AuthManager/user',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">{:L("_MEMBER_DELEGATION_")}</a></li>
 
                 </ul>
             </div>
@@ -32,7 +32,7 @@
 					<volist name="node_list" id="node" >
 						<dl class="checkmod">
 							<dt class="hd">
-								<label class="checkbox"><input class="auth_rules rules_all" type="checkbox" name="rules[]" value="<?php echo $main_rules[$node['url']] ?>">{$node.alias}模块</label>
+								<label class="checkbox"><input class="auth_rules rules_all" type="checkbox" name="rules[]" value="<?php echo $main_rules[$node['url']] ?>">{$node.alias}{:L("_MODULAR_")}</label>
 							</dt>
 							<dd class="bd">
 								<present name="node['child']">
@@ -41,8 +41,8 @@
                                         <div>
                                             <label class="checkbox" <notempty name="child['tip']">title='{$child.tip}'</notempty>>
                                            <input class="auth_rules rules_row" type="checkbox" name="rules[]" value="{$child.id}"/>{$child.title}
-                                            </label><a target="_blank" href="{:U('addnode',array('id'=>$child['id']))}">[编辑]</a>
-                                            <a target="_blank" href="{:U('deletenode',array('id'=>$child['id']))}">[删除]</a>
+                                            </label><a target="_blank" href="{:U('addnode',array('id'=>$child['id']))}">[{:L("_EDIT_")}]</a>
+                                            <a target="_blank" href="{:U('deletenode',array('id'=>$child['id']))}">[{:L("_DELETE_")}]</a>
                                         </div>
                                        <notempty name="child['operator']">
                                            <span class="divsion">&nbsp;</span>
@@ -58,14 +58,14 @@
 				                    </div>
 								</volist>
 
-								</present><a target="_blank" href="{:U('addnode',array('module'=>$node['name']))}">[新增节点]</a>
+								</present><a target="_blank" href="{:U('addnode',array('module'=>$node['name']))}">[{:L("_NEW_NODE_")}]</a>
 							</dd>
 						</dl>
 					</volist>
 
 			        <input type="hidden" name="id" value="{$this_group.id}" />
-                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
-                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">{:L("_SURE_WITH_SPACE_")}</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
 			    </form>
 			</div>
 

@@ -73,14 +73,15 @@ class InviteController extends BaseController
             $aNum=I('post.exchange_num',0,'intval');
             $this->_checkCanBuy($aTypeId,$aNum);
             $inviteType=$this->mInviteTypeModel->where(array('id'=>$aTypeId))->find();
-            D('Ucenter/Score')->setUserScore(array(is_login()),$aNum*$inviteType['pay_score'],$inviteType['pay_score_type'],'dec');//扣积分
+            D('Ucenter/Score')->setUserScore(array(is_login()),$aNum*$inviteType['pay_score'],$inviteType['pay_score_type'],'dec','',0,L('_INV_QUOTA_2_'));//扣积分
+
             $result=$this->mInviteBuyLogModel->buy($aTypeId,$aNum);
             if($result){
                 $this->mInviteUserInfoModel->addNum($aTypeId,$aNum);
                 $data['status']=1;
             }else{
                 $data['status']=0;
-                $data['info']="兑换失败！如有疑问请联系管理员！";
+                $data['info']=L('_INFO_EXCHANGE_FAIL_');
             }
             $this->ajaxReturn($data);
         }else{
@@ -106,12 +107,12 @@ class InviteController extends BaseController
             //判断合法性
             $result['status']=0;
             if($aTypeId<=0){
-                $result['info']="参数错误！";
+                $result['info']=L('_ERROR_PARAM_').L('_EXCLAMATION_');
                 $this->ajaxReturn($result);
             }
             $userInfo=$this->mInviteUserInfoModel->getInfo(array('uid'=>is_login(),'invite_type'=>$aTypeId));
             if($aCodeNum<=0||$aCanNum<=0||$aCodeNum*$aCanNum>$userInfo['num']){
-                $result['info']="请填写正确数据！";
+                $result['info']=L('_INFO_RIGHT_INFO_INOUT_').L('_EXCLAMATION_');
                 $this->ajaxReturn($result);
             }
             //判断合法性 end
@@ -147,7 +148,7 @@ class InviteController extends BaseController
         if($result){
             $data['status']=1;
         }else{
-            $data['info']="退还失败！";
+            $data['info']=L('_FAIL_RETURN_').L('_EXCLAMATION_');
             $data['status']=0;
         }
         $this->ajaxReturn($data);
@@ -185,15 +186,15 @@ class InviteController extends BaseController
     {
         $result['status']=0;
         if($num<=0){
-            $result['info']="请填写正确的兑换个数！";
+            $result['info']=L('_INFO_RIGHT_NUMBER_').L('_EXCLAMATION_');
             $this->ajaxReturn($result);
         }
         if($inviteType==0){
-            $result['info']="参数错误！";
+            $result['info']=L('_ERROR_PARAM_').L('_EXCLAMATION_');
             $this->ajaxReturn($result);
         }
         if($num>($this->_getCanBuyNum($inviteType))){
-            $result['info']="您要兑换的名额超过了你当前可兑换的最大值！";
+            $result['info']=L('_INFO_EXCEED_COUNT_').L('_EXCLAMATION_');
             $this->ajaxReturn($result);
         }
         //验证是否有权限兑换
@@ -205,7 +206,7 @@ class InviteController extends BaseController
             $map['group_id']=array('in',$inviteType['auth_groups']);
             $map['uid']=is_login();
             if(!D('AuthGroupAccess')->where($map)->count()){
-                $result['info']="你没有权限兑换该类型邀请码名额！";
+                $result['info']=L('_INFO_AUTHORITY_LACK_').L('_EXCLAMATION_');
                 $this->ajaxReturn($result);
             }
         }

@@ -1,48 +1,43 @@
-$.getScript('Public/js/com/com.talker.class.js');
-$.getScript('Public/js/com/com.toast.class.js', function () {
-    $.getScript('Public/js/com/com.ucard.js', function () {
-        var atwho_config;
-        $(function () {
-            $('.open-popup-link').magnificPopup({
-                type: 'inline',
-                midClick: true,
-                closeOnBgClick: false
-            });//绑定发微博弹窗
-            ucard();//绑定用户小名片
-            bindGoTop();//回到顶部
-            talker.bind_ctrl_enter();//绑定
+var atwho_config;
+$(function () {
+    $('.open-popup-link').magnificPopup({
+        type: 'inline',
+        midClick: true,
+        closeOnBgClick: false
+    });//绑定发微博弹窗
+    ucard();//绑定用户小名片
+    bindTool();//回到顶部
 
-            $('input,area').placeholder();//修复ieplace holder
-            if (is_login()) {
-                bindMessageChecker();//绑定用户消息
-            } else {
-                bindLogin();//快捷登录
-                bindRegister();
-            }
-            checkMessage();//检查一次消息
-
-            bindLogout();
-            $('.scroller').slimScroll({
-                height: '200px'
-            });
-
-            $('#scrollArea_chat').slimScroll({
-                height: '320px',
-                alwaysVisible: true,
-                start: 'bottom'
-            });
-            atwho_config = {
-                at: "@",
-                data: U('Weibo/Index/atWhoJson'),
-                tpl: "<li data-value='@${nickname}'><img class='avatar-img' style='width:2em;margin-right: 0.6em' src='${avatar32}'/>${nickname}</li>",
-                show_the_at: true,
-                search_key: 'search_key',
-                start_with_space: false
-            };
-            var $inputor = $('#weibo_content').atwho(atwho_config);
-        });
-
+    $('input,area').placeholder();//修复ieplace holder
+    if (is_login()) {
+        bindMessageChecker();//绑定用户消息
+    } else {
+        bindLogin();//快捷登录
+        bindRegister();
+    }
+    checkMessage();//检查一次消息
+    bindLogout();
+    $('.scroller').slimScroll({
+        height: '350px'
     });
+
+    $('#scrollArea_chat').slimScroll({
+        height: '320px',
+        alwaysVisible: true,
+        start: 'bottom'
+    });
+    $(document).scroll(function () {
+        var left = '-' + $(window).scrollLeft() + 'px';
+        $('#nav_bar').css('left', left);
+        $('#sub_nav').css('left', left);
+    });
+
+    $('.adv-wrap').mouseenter(function () {
+        $(this).find('.adv-tool,.adv-size').show();
+    });
+    $('.adv-wrap').mouseleave(function () {
+        $(this).find('.adv-tool,.adv-size').hide();
+    })
 });
 
 $(function () {
@@ -120,56 +115,71 @@ $(function () {
         //返回
         return false;
     });
-
+    follower.bind_follow();
 });
 
+var follower = {
+    'bind_follow': function () {
+        $('[data-role="follow"]').unbind('click')
+        $('[data-role="follow"]').click(function () {
+            var $this = $(this);
+            var uid = $this.attr('data-follow-who');
+            $.post(U('Core/Public/follow'), {uid: uid}, function (msg) {
+                if (msg.status) {
 
-function ufollow(obj, uid) {
-    objt = obj;
-    obj = $(obj);
-    if ($(obj).text().trim() == '已关注') {
-        $.post(U('Ucenter/Public/unfollow'), {uid: uid}, function (msg) {
-            if (msg.status) {
-                obj.removeClass('btn-default');
-                obj.addClass('btn-primary');
-                toast.success('取消关注成功。', '温馨提示');
-                obj.text('关注');
-            } else {
-                toast.error('取消关注失败。', '温馨提示');
-            }
-        }, 'json');
-    } else {
-        $.post(U('Ucenter/Public/follow'), {uid: uid}, function (msg) {
-            if (msg.status) {
-                obj.removeClass('btn-primary');
-                obj.addClass('btn-default');
-                toast.success('关注成功。', '温馨提示');
-                objt.innerHTML = "<font title='取消关注'>已关注</font>";
-            } else {
-                toast.error('关注失败。', '温馨提示');
-            }
-        }, 'json');
+                    $this.attr('class', $this.attr('data-before'));
+                    $this.attr('data-role', 'unfollow');
+                    $this.html('已关注');
+                    follower.bind_follow();
+                    toast.success(msg.info, L('_KINDLY_REMINDER_'));
+                } else {
+                    toast.error(msg.info, L('_KINDLY_REMINDER_'));
+                }
+            }, 'json');
+        })
+
+        $('[data-role="unfollow"]').unbind('click')
+        $('[data-role="unfollow"]').click(function () {
+            var $this = $(this);
+            var uid = $this.attr('data-follow-who');
+            $.post(U('Core/Public/unfollow'), {uid: uid}, function (msg) {
+                if (msg.status) {
+                    $this.attr('class', $this.attr('data-after'));
+                    $this.attr('data-role', 'follow');
+                    $this.html('关注');
+                    follower.bind_follow();
+                    toast.success(msg.info, L('_KINDLY_REMINDER_'));
+                } else {
+                    toast.error(msg.info, L('_KINDLY_REMINDER_'));
+                }
+            }, 'json');
+        })
     }
-
 }
+
+
 /**
  * 绑定回到顶部
  */
-function bindGoTop() {
-    $(window).scroll(function () {
-        var sc = $(window).scrollTop();
-        //var rwidth=$(window).width()
-        if (sc > 0) {
-            $("#goTopBtn").css("display", "block");
-            $("#goTopBtn").css("right", "50px")
-        } else {
-            $("#goTopBtn").css("display", "none");
-        }
-    })
+function bindTool() {
+    $(function () {
+        $(window).on('scroll', function () {
+            var st = $(document).scrollTop();
+            if (st > 0) {
+                $('#go-top').css('display','block');
+            } else {
+                $('#go-top').hide();
+            }
+        });
+        $('#tool .go-top').on('click', function () {
+            $('html,body').animate({'scrollTop': 0}, 500);
+        });
 
-    $("#goTopBtn").click(function () {
-        var sc = $(window).scrollTop();
-        $('body,html').animate({scrollTop: 0}, 500);
+        $('#go-top .uc-2vm').hover(function () {
+            $('#go-top .uc-2vm-pop').removeClass('dn');
+        }, function () {
+            $('#go-top .uc-2vm-pop').addClass('dn');
+        });
     });
 }
 
@@ -180,10 +190,12 @@ function bindGoTop() {
 function bindMessageChecker() {
     $hint_count = $('#nav_hint_count');
     $nav_bandage_count = $('#nav_bandage_count');
+    if (Config.GET_INFORMATION) {
+        setInterval(function () {
+            checkMessage();
+        }, Config.GET_INFORMATION_INTERNAL);
+    }
 
-    setInterval(function () {
-        checkMessage();
-    }, 10000);
 }
 
 function play_bubble_sound() {
@@ -202,19 +214,17 @@ function checkMessage() {
             if (count == 0) {
                 $('#nav_message').html('');
             }
+
             paly_ios_sound();
+
             for (var index in msg.messages) {
-
-                tip_message(msg['messages'][index]['content'] + '<div style="text-align: right"> ' + msg['messages'][index]['ctime'] + '</div>', msg['messages'][index]['title']);
-                //  var url=msg[index]['url']===''?U('') //设置默认跳转到消息中心
-
-
-                var new_html = $('<span><li><a data-url="' + msg['messages'][index]['url'] + '"' + 'onclick="Notify.readMessage(this,' + msg['messages'][index]['id'] + ')"><i class="icon-bell"></i> ' +
-                    msg['messages'][index]['title'] + '<br/><span class="time">' + msg['messages'][index]['ctime'] +
-                    '</span> </a></li></span>');
-                $('#nav_message').prepend(new_html.html());
-
-
+                var message = msg['messages'];
+                tip_message(message[index]['content']['content'] + '<div style="text-align: right"> ' + message[index]['ctime'] + '</div>', message[index]['content']['title']);
+                var html = '<li><a data-url="' + message[index]['content']['web_url'] + '" onclick="Notify.readMessage(this,' + message[index]['id'] + ')">' +
+                    '<h3 class="margin-top-0"><i class="icon-bell"></i>' + message[index]['content']['title'] + '</h3>' +
+                    '<p>' + message[index]['content']['content'] + '</p> ' +
+                    '<span class="time">' + message[index]['ctime'] + '</span></a></li>';
+                $('#nav_message').prepend(html);
             }
 
             $hint_count.text(count + msg.messages.length);
@@ -337,7 +347,7 @@ function bindLogout() {
     $('[event-node=logout]').click(function () {
         $.get(U('Ucenter/System/logout'), function (msg) {
             $('body').append(msg.html);
-            toast.success(msg.message + '。', '温馨提示');
+            toast.success(msg.message);
             setTimeout(function () {
                 location.href = msg.url;
             }, 1500);
@@ -347,16 +357,13 @@ function bindLogout() {
 /**
  * 绑定点赞事件
  */
-function bindSupport() {
+function bind_support() {
     $('.support_btn').unbind('click');
     $('.support_btn').click(function () {
         // event.stopPropagation();
         var me = $(this);
         if (MID == 0) {
-            toast.error('请在登陆后再点赞。即将跳转到登陆页。', '温馨提示');
-            setTimeout(function () {
-                location.href = U('Home/User/Login');
-            }, 1500);
+            toast.error('请在登陆后再点赞。', L('_KINDLY_REMINDER_'));
             return;
         } else {
             var row = $(this).attr('row');
@@ -381,11 +388,11 @@ function bindSupport() {
                     }
                     var ico = me.find('#ico_like');
                     ico.removeClass();
-                    ico.addClass('support_like');
-                    toast.success(msg.info, '温馨提示');
+                    ico.addClass('icon-heart');
+                    toast.success(msg.info, L('_KINDLY_REMINDER_'));
 
                 } else {
-                    toast.error(msg.info, '温馨提示');
+                    toast.error(msg.info, L('_KINDLY_REMINDER_'));
                 }
 
             }, 'json');
@@ -395,13 +402,7 @@ function bindSupport() {
 }
 
 
-function clearWeibo() {
-    $('.weibo_post_box #weibo_content').val('');
-}
-
-
 /*微博表情*/
-
 var insertFace = function (obj) {
     $('.XT_insert').css('z-index', '1000');
     $('.XT_face').remove();
@@ -409,7 +410,7 @@ var insertFace = function (obj) {
         '<div class="XT_face_main"><div class="XT_face_title"><span class="XT_face_bt" style="float: left">常用表情</span>' +
         '<a onclick="close_face()" class="XT_face_close">X</a></div><div id="face" style="padding: 10px;"></div></div></div>';
     obj.parents('.weibo_post_box').find('#emot_content').html(html);
-    getFace(obj);
+    getFace(obj.parents('.weibo_post_box').find('#emot_content'), '');
 };
 
 var face_chose = function (obj) {
@@ -417,10 +418,8 @@ var face_chose = function (obj) {
     textarea.focus();
     //textarea.val(textarea.val()+'['+obj.attr('title')+']');
 
-    pos = getCursortPosition(textarea[0]);
-    s = textarea.val();
-
-
+    var pos = getCursortPosition(textarea[0]);
+    var s = textarea.val();
     if (obj.attr('data-type') == 'miniblog') {
         textarea.val(s.substring(0, pos) + '[' + obj.attr('title') + ']' + s.substring(pos));
         setCaretPosition(textarea[0], pos + 2 + obj.attr('title').length);
@@ -432,15 +431,45 @@ var face_chose = function (obj) {
 
 }
 
-var getFace = function (obj) {
-    $.post(U('Core/Expression/getSmile'), {}, function (data) {
-        var _imgHtml = '';
-        for (var k in data) {
-            _imgHtml += '<a href="javascript:void(0)" data-type="' + data[k].type + '" title="' + data[k].title + '" onclick="face_chose($(this))";><img src="' + data[k].src + '" width="24" height="24" /></a>';
-        }
-        _imgHtml += '<div class="c"></div>';
-        obj.parents('.weibo_post_box').find('#emot_content').find('#face').html(_imgHtml);
+var bind_face_pkg = function () {
+    $('[data-role="change_pkg"]').unbind('click');
+    $('[data-role="change_pkg"]').click(function () {
+        var $this = $(this)
+        var pkg = $this.attr('data-name');
+        getFace($this.closest('#emot_content'), pkg);
+    })
+}
 
+var getFace = function (obj, pkg) {
+    if (typeof pkg == 'undefined') {
+        pkg = '';
+    }
+    $.post(U('Core/Expression/getSmile'), {pkg: pkg}, function (res) {
+        var expression = res.expression;
+        var pkgList = res.pkgList;
+        var _imgHtml = '';
+        if (pkgList.length > 0) {
+            if (pkgList.length > 1) {
+                _imgHtml = "<div class='face-tab'><ul>";
+                for (var e in pkgList) {
+                    if (pkgList[e].name == res.pkg) {
+                        _imgHtml += "<li class='active' ><a data-role='change_pkg'  data-name='" + pkgList[e].name + "'>" + pkgList[e].title + "</a></li>";
+                    } else {
+                        _imgHtml += "<li><a data-role='change_pkg' data-name='" + pkgList[e].name + "'>" + pkgList[e].title + "</a></li>";
+                    }
+                }
+                _imgHtml += "</ul></div>";
+            }
+            for (var k in expression) {
+                _imgHtml += '<a href="javascript:void(0)" data-type="' + expression[k].type + '" title="' + expression[k].title + '" onclick="face_chose($(this))";><img src="' + expression[k].src + '" width="24" height="24" /></a>';
+            }
+            _imgHtml += '<div class="c"></div>';
+        } else {
+            _imgHtml = '获取表情失败';
+        }
+
+        obj.find('#face').html(_imgHtml);
+        bind_face_pkg()
     }, 'json');
 }
 
@@ -525,19 +554,99 @@ var doLogin = function () {//登录界面
         }
     }
 }
-function bindRegister(){
-         $('[data-role="do_register"]').click(doRegister);
+function bindRegister() {
+    if (!is_login()) {
+        $('[data-role="do_register"]').click(doRegister);
+    }
 }
-var doRegister=function(){
-    if(ONLY_OPEN_REGISTER==1){
-        var myModalTrigger = new ModalTrigger({
-            remote: U('Ucenter/Member/inCode'),
-            title: "邀请用户才能注册！"
-        });
-        myModalTrigger.show();
-    }else{
-        var url=$(this).attr('data-url');
-        location.href=url;
+var doRegister = function () {
+    if (!is_login()) {
+        if (ONLY_OPEN_REGISTER == "1") {
+            var myModalTrigger = new ModalTrigger({
+                remote: U('Ucenter/Member/inCode'),
+                title: "邀请用户才能注册！"
+            });
+            myModalTrigger.show();
+        } else {
+            var url = $(this).attr('data-url');
+            location.href = url;
+        }
     }
 }
 /*登录end*/
+
+
+/**
+ * 更新附件表单值
+ * @return void
+ */
+var upAttachVal = function (type, attachId, obj) {
+    var $attach_ids = obj;
+    var attachVal = $attach_ids.val();
+    var attachArr = attachVal.split(',');
+    var newArr = [];
+    for (var i in attachArr) {
+        if (attachArr[i] !== '' && attachArr[i] !== attachId.toString()) {
+            newArr.push(attachArr[i]);
+        }
+    }
+    type === 'add' && newArr.push(attachId);
+    $attach_ids.val(newArr.join(','));
+    return newArr;
+}
+jQuery.cookie = function (name, value, options) {
+    name = cookie_config.prefix + name;
+    if (typeof value != 'undefined') {
+        options = options || {};
+        if (value === null) {
+            value = '';
+            options = $.extend({}, options);
+            options.expires = -1;
+        }
+        var expires = '';
+        if (options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
+            var date;
+            if (typeof options.expires == 'number') {
+                date = new Date();
+                date.setTime(date.getTime() + (options.expires * 24 * 60 * 60 * 1000));
+            } else {
+                date = options.expires;
+            }
+            expires = '; expires=' + date.toUTCString();
+        }
+        var path = options.path ? '; path=' + (options.path) : '';
+        var domain = options.domain ? '; domain=' + (options.domain) : '';
+        var secure = options.secure ? '; secure' : '';
+        document.cookie = [name, '=', encodeURIComponent(value), expires, path, domain, secure].join('');
+    } else {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+};
+
+
+
+function L(key, obj) {
+    if('undefined' == typeof(LANG[key])) {
+        return key;
+    }
+    if('object' != typeof(obj)) {
+        return LANG[key];
+    } else {
+        var r = LANG[key];
+        for(var i in obj) {
+            r = r.replace("{"+i+"}", obj[i]);
+        }
+        return r;
+    }
+};

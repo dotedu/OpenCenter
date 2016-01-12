@@ -27,7 +27,7 @@ class ActionLimitController extends AdminController
         foreach($List as &$val){
             $val['time'] =$val['time_number']. $timeUnit[$val['time_unit']];
             $val['action_list'] = get_action_name($val['action_list']);
-            empty( $val['action_list']) &&  $val['action_list'] = '所有行为';
+            empty( $val['action_list']) &&  $val['action_list'] = L('_ALL_ACTS_');
 
             $val['punish'] = get_punish_name($val['punish']);
 
@@ -36,18 +36,18 @@ class ActionLimitController extends AdminController
         unset($val);
         //显示页面
         $builder = new AdminListBuilder();
-        $builder->title('行为限制列表')
+        $builder->title(L('_ACTION_LIST_'))
             ->buttonNew(U('editLimit'))
             ->setStatusUrl(U('setLimitStatus'))->buttonEnable()->buttonDisable()->buttonDelete()
             ->keyId()
             ->keyTitle()
-            ->keyText('name', '名称')
-            ->keyText('frequency', '频率')
-            ->keyText('time', '时间单位')
-            ->keyText('punish', '处罚')
-            ->keyBool('if_message', '是否发送提醒')
-            ->keyText('message_content', '消息提示内容')
-            ->keyText('action_list', '行为')
+            ->keyText('name', L('_NAME_'))
+            ->keyText('frequency', L('_FREQUENCY_'))
+            ->keyText('time', L('_TIME_UNIT_'))
+            ->keyText('punish', L('_PUNISHMENT_'))
+            ->keyBool('if_message', L('_SEND_REMINDER_'))
+            ->keyText('message_content', L('_MESSAGE_PROMPT_CONTENT_'))
+            ->keyText('action_list', L('_ACT_'))
             ->keyStatus()
             ->keyDoActionEdit('editLimit?id=###')
             ->data($List)
@@ -86,15 +86,15 @@ class ActionLimitController extends AdminController
                 $res = $model->addActionLimit($data);
             }
             if($res){
-                $this->success(($aId == 0 ? '添加' : '编辑') . '成功', $aId == 0 ? U('', array('id' => $res)) : '');
+                $this->success(($aId == 0 ? L('_ADD_') : L('_EDIT_')) . L('_SUCCESS_'), $aId == 0 ? U('', array('id' => $res)) : '');
             }else{
-                $this->error($aId == 0 ? '操作失败，请添加正确信息！' : '操作失败，请确保修改了信息并且信息正确！');
+                $this->error($aId == 0 ? L('_THE_OPERATION_FAILED_') : L('_THE_OPERATION_FAILED_VICE_'));
             }
         } else {
             $builder = new AdminConfigBuilder();
 
             $modules = D('Module')->getAll();
-            $module['all'] = '全站';
+            $module['all'] = L('_TOTAL_STATION_');
             foreach($modules as $k=>$v){
                 $module[$v['name']] = $v['alias'];
             }
@@ -111,18 +111,18 @@ class ActionLimitController extends AdminController
             }
             $opt_punish = $this->getPunish();
             $opt = D('Action')->getActionOpt();
-            $builder->title(($aId == 0 ? '新增' : '编辑') . '行为限制')->keyId()
+            $builder->title(($aId == 0 ? L('_NEW_') : L('_EDIT_')) . L('_ACT_RESTRICTION_'))->keyId()
                 ->keyTitle()
-                ->keyText('name', '名称')
-                ->keySelect('module', '所属模块','',$module)
-                ->keyText('frequency', '频率')
-               // ->keySelect('time_unit', '时间单位', '', $this->getTimeUnit())
-                ->keyMultiInput('time_number|time_unit','时间单位','时间单位',array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>$this->getTimeUnit(),'style'=>'width:100px')))
+                ->keyText('name', L('_NAME_'))
+                ->keySelect('module', L('_MODULE_'),'',$module)
+                ->keyText('frequency', L('_FREQUENCY_'))
+                // ->keySelect('time_unit', L('_TIME_UNIT_'), '', $this->getTimeUnit())
+                ->keyMultiInput('time_number|time_unit',L('_TIME_UNIT_'),L('_TIME_UNIT_'),array(array('type'=>'text','style'=>'width:295px;margin-right:5px'),array('type'=>'select','opt'=>$this->getTimeUnit(),'style'=>'width:100px')))
 
-                ->keyChosen('punish', '处罚', '可多选', $opt_punish)
-                ->keyBool('if_message', '是否发送提醒')
-                ->keyTextArea('message_content', '消息提示内容')
-                ->keyChosen('action_list', '行为', '可多选,不选为全部行为', $opt)
+                ->keyChosen('punish', L('_PUNISHMENT_'), L('_MULTI_SELECT_'), $opt_punish)
+                ->keyBool('if_message', L('_SEND_REMINDER_'))
+                ->keyTextArea('message_content', L('_MESSAGE_PROMPT_CONTENT_'))
+                ->keyChosen('action_list', L('_ACT_'), L('_MULTI_SELECT_DEFAULT_'), $opt)
                 ->keyStatus()
                 ->data($limit)
                 ->buttonSubmit(U('editLimit'))->buttonBack()->display();

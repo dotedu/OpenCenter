@@ -3,13 +3,13 @@
 <block name="body">
 	<div class="main-title cf">
 		<h2>
-			配置排序 [ <a href="{$Think.cookie.__forward__}">返回列表</a> ]
+			{:L("_CONFIGURATION_SORTING_")}[ <a href="{$Think.cookie.__forward__}">{:L("_RETURN_LIST_")}</a> ]
 		</h2>
 	</div>
 	<div class="sort">
 		<form action="{:U('sort')}" method="post">
 			<!-- <div class="sort_top">
-				查找：<input type="text"><button class="btn search" type="button">查 找</button>
+				{:L("_SEARCH_")}{:L("_COLON_")}<input type="text"><button class="btn search" type="button">{:L("_CHECK_WITH_SPACE_")}</button>
 			</div> -->
             
 			<div class="clearfix">
@@ -22,16 +22,16 @@
 					</select>
 				</div>
 				<div class="col-xs-1">
-					<button class="top btn btn-block" type="button">第 一</button>
-					<button class="up btn btn-block" type="button">上 移</button>
-					<button class="down btn btn-block" type="button">下 移</button>
-					<button class="bottom btn btn-block" type="button">最 后</button>
+					<button class="top btn btn-block" type="button">{:L("_FIRST_WITH_SPACE_")}</button>
+					<button class="up btn btn-block" type="button">{:L("_UPPER_SHIFT_WITH_SPACE_")}</button>
+					<button class="down btn btn-block" type="button">{:L("_NEXT_MOVE_WITH_SPACE_")}</button>
+					<button class="bottom btn btn-block" type="button">{:L("_AFTER_THE_MOST_WITH_SPACE_")}</button>
 				</div>
 			</div>
 			<div class="sort_bottom with-padding">
 				<input type="hidden" name="ids">
-				<button class="sort_confirm btn submit-btn" type="button">确 定</button>&nbsp;
-				<button class="sort_cancel btn btn-return" type="button" url="{$Think.cookie.__forward__}">返 回</button>
+				<button class="sort_confirm btn submit-btn" type="button">{:L("_SURE_WITH_SPACE_")}</button>&nbsp;
+				<button class="sort_cancel btn btn-return" type="button" url="{$Think.cookie.__forward__}">{:L("_RETURN_WITH_SPACE_")}</button>
 			</div>
 		</form>
 	</div>
@@ -90,7 +90,7 @@
 					},
 					function(data){
 						if (data.status) {
-	                        updateAlert(data.info + ' 页面即将自动跳转~','alert-success');
+	                        updateAlert(data.info + {:L('_THE_PAGE_WILL_AUTOMATICALLY_JUMP_TO_WALK_THE_WALK_TODAY_WITH_SINGLE_')},'alert-success');
 	                    }else{
 	                        updateAlert(data.info,'alert-success');
 	                    }

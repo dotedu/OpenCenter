@@ -4,17 +4,17 @@
 <if condition="IS_GET">
     <form method="post" action="{:U()}" class="form-horizontal" style="text-align:center;margin:50px;">
         <div class="form-item">
-            <label class="item-label">是否需要备份重要文件<span class="check-tips"></span></label>
+            <label class="item-label">{:L("_DO_YOU_NEED_TO_BACK_UP_IMPORTANT_FILES_")}<span class="check-tips"></span></label>
             <div class="controls">
                 <label class="radio"><input type="radio" name="backupfile" value="1">是</label>
                 <label class="radio"><input type="radio" name="backupfile" value="0" checked="checked">否</label>
             </div>
         </div>
         <div class="form-item">
-            <label class="item-label">如需备份数据库，请<a href="{:U('/Database/index/type/export')}" target="_blank">点击备份</a></label>
+            <label class="item-label">{:L("_FOR_A_BACKUP_DATABASE_PLEASE_")}<a href="{:U('/Database/index/type/export')}" target="_blank">{:L("_CLICK_BACKUP_")}</a></label>
         </div>
 	    <div class="form-item" style="margin-top:100px;">
-	        <button class="btn submit-btn" type="submit">开始更新</button>
+	        <button class="btn submit-btn" type="submit">{:L("_START_UPDATING_")}</button>
 	    </div>
     </form>
 </if>

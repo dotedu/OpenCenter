@@ -24,8 +24,8 @@ class InviteLogModel extends Model
      */
     public function addData($data=array(),$role=0)
     {
-        $inviter_user=query_user('nickname',$data['inviter_id']);
-        $user=query_user('nickname',$data['uid']);
+        $inviter_user=get_nickname($data['inviter_id']);
+        $user=get_nickname($data['uid']);
         $role=D('Role')->where(array('id'=>$role))->find();
         $data['content']="{$user} 接受了 {$inviter_user} 的邀请，注册了 {$role['title']} 身份。";
         $data['create_time']=time();
@@ -63,9 +63,9 @@ class InviteLogModel extends Model
         foreach($list as &$val){
             $inviteType=$inviteTypeModel->getSimpleData(array('id'=>$val['invite_type']));
             $val['invite_type_title']=$inviteType['title'];
-            $val['user']=query_user('nickname',$val['uid']);
+            $val['user']=get_nickname($val['uid']);
             $val['user']='['.$val['uid'].']'.$val['user'];
-            $val['inviter']=query_user('nickname',$val['inviter_id']);
+            $val['inviter']=get_nickname($val['inviter_id']);
             $val['inviter']='['.$val['inviter_id'].']'.$val['inviter'];
         }
         unset($val);

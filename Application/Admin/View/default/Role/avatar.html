@@ -2,7 +2,7 @@
 
 <block name="body">
     <div class="main-title">
-        <h2>默认头像配置</h2>
+        <h2>{:L("_DEFAULT_AVATAR_CONFIGURATION_")}</h2>
     </div>
     <div class="clearfix">
         <div class="col-xs-10">
@@ -21,32 +21,32 @@
             <input type="hidden" name="id" value="{$this_role.id}"/>
             <input class="attach" type="hidden" name="avatar_id" value="{$this_role.avatar}"/>
             <input class="attach" type="hidden" name="set_null" value="0"/>
-            <label class="item-label" style="font-size: 15px;font-weight: 400;">上传默认头像<span style="font-size: 12px;margin-left: 20px;color: rgb(253, 67, 67);">请上传256px*256px的png头像</span></label>
+            <label class="item-label" style="font-size: 15px;font-weight: 400;">{:L("_UPLOAD_DEFAULT_AVATAR_")}<span style="font-size: 12px;margin-left: 20px;color: rgb(253, 67, 67);">{:L("_PLEASE_UPLOAD_256PX_")}*256px的pn{:L("_G_AVATAR_")}</span></label>
             <div class="controls">
-                <div id="upload_single_image" style="padding-bottom: 5px;">选择图片</div>
+                <div id="upload_single_image" style="padding-bottom: 5px;">{:L("_SELECT_PICTURES_")}</div>
                 <if condition="!isset($this_role['avatar'])">
                     <div data-role="avatar-block" style="display:none;">
 
                         <div class="avatar">
-                            <a href="{$this_role.avatar|getThumbImageById='256','256'}" data-role="avatar256" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='256','256'}" data-role="avatar256" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='256','256'}">
                             </a>
                             <div class="img_tips">256px*256px</div>
                         </div>
                         <div class="avatar">
-                            <a href="{$this_role.avatar|getThumbImageById='128','128'}" data-role="avatar128" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='128','128'}" data-role="avatar128" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='128','128'}">
                             </a>
                             <div class="img_tips">128px*128px</div>
                         </div>
                         <div class="avatar">
-                            <a href="{$this_role.avatar|getThumbImageById='64','64'}" data-role="avatar64" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='64','64'}" data-role="avatar64" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='64','64'}">
                             </a>
                             <div class="img_tips">64px*64px</div>
                         </div>
                         <div class="avatar">
-                            <a href="{$this_role.avatar|getThumbImageById='32','32'}" data-role="avatar32" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='32','32'}" data-role="avatar32" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='32','32'}">
                             </a>
                             <div class="img_tips">32px*32px</div>
@@ -56,25 +56,25 @@
                     <else/>
                     <div data-role="avatar-block">
                         <div class="avatar">
-                            <a href="{$this_role.avatar|getThumbImageById='256','256'}" data-role="avatar256" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='256','256'}" data-role="avatar256" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='256','256'}">
                             </a>
                             <div class="img_tips">256px*256px</div>
                         </div>
                         <div class="avatar" style="margin-top: 20px;">
-                            <a href="{$this_role.avatar|getThumbImageById='128','128'}" data-role="avatar128" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='128','128'}" data-role="avatar128" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='128','128'}">
                             </a>
                             <div class="img_tips">128px*128px</div>
                         </div>
                         <div class="avatar" style="margin-top: 40px;">
-                            <a href="{$this_role.avatar|getThumbImageById='64','64'}" data-role="avatar64" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='64','64'}" data-role="avatar64" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='64','64'}">
                             </a>
                             <div class="img_tips">64px*64px</div>
                         </div>
                         <div class="avatar" style="margin-top: 52px;">
-                            <a href="{$this_role.avatar|getThumbImageById='32','32'}" data-role="avatar32" title="点击查看大图">
+                            <a href="{$this_role.avatar|getThumbImageById='32','32'}" data-role="avatar32" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                 <img src="{$this_role.avatar|getThumbImageById='32','32'}">
                             </a>
                             <div class="img_tips">32px*32px</div>
@@ -102,12 +102,12 @@
             <div class="form-item">
                 <div style="margin-top: 20px;"></div>
 
-                <button type="submit" class="btn submit-btn ajax-post" target-form="avatar-form" data-role="submit_button" style="display: none;">确 定</button>
+                <button type="submit" class="btn submit-btn ajax-post" target-form="avatar-form" data-role="submit_button" style="display: none;">{:L("_SURE_WITH_SPACE_")}</button>
 
-                <button class="btn submit-btn" data-role="do_submit">确 定</button>
-                <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
-                <button class="btn submit-btn" data-role="set_null">使用系统默认头像</button>
-                <span style="color: #BABABA;margin: 11px;">请先保存以上配置后再切换到其它界面</span>
+                <button class="btn submit-btn" data-role="do_submit">{:L("_SURE_WITH_SPACE_")}</button>
+                <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
+                <button class="btn submit-btn" data-role="set_null">{:L("_USE_SYSTEM_DEFAULT_AVATAR_")}</button>
+                <span style="color: #BABABA;margin: 11px;">{:L("_PLEASE_SAVE_THE_ABOVE_CONFIGURATION_AND_THEN_SWITCH_TO_ANOTHER_INTERFACE_")}</span>
             </div>
         </form>
 
@@ -192,7 +192,7 @@
                 $(this).magnificPopup({
                     delegate: 'a',
                     type: 'image',
-                    tLoading: '正在载入 #%curr%...',
+                    tLoading: '{:L("_LOADING_")}#%curr%...',
                     mainClass: 'mfp-img-mobile',
                     gallery: {
                         enabled: true,
@@ -201,7 +201,7 @@
 
                     },
                     image: {
-                        tError: '<a href="%url%">图片 #%curr%</a> 无法被载入.',
+                        tError: '<a href="%url%">{:L("_PICTURE_")}#%curr%</a>{:L("_COULD_NOT_BE_LOADED_")}',
                         titleSrc: function (item) {
                             /*           return item.el.attr('title') + '<small>by Marsel Van Oosten</small>';*/
                             return '';

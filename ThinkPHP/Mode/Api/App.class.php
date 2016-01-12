@@ -57,7 +57,7 @@ class App {
             // 是否定义Empty控制器
             $module = A('Empty');
             if(!$module){
-                E(L('_CONTROLLER_NOT_EXIST_').':'.CONTROLLER_NAME);
+                E(L('_CONTROLLER_NOT_EXIST_').':'.CONTROLLER_NAME,815);
             }
         }
 

@@ -29,8 +29,8 @@ abstract class Controller
      */
     protected $config = array();
 
-    /*ThinkOX新增部分*/
-    /**seo参数  陈一枭  ThinkOX
+    /*OpenSNS新增部分*/
+    /**seo参数  陈一枭  OpenSNS
      * @var array
      */
     public $_seo = array();
@@ -56,7 +56,7 @@ abstract class Controller
 
 
 
-    /*ThinkOX新增部分end*/
+    /*OpenSNS新增部分end*/
 
 
     /**
@@ -65,11 +65,15 @@ abstract class Controller
      */
     public function __construct()
     {
-
         if (is_file('./Conf/user.php')) {//已经安装了
+
+            $moduleModel = D('Common/Module');
             /*读取站点配置*/
             $config = api('Config/lists');
             C($config); //添加配置
+            $module =$moduleModel->getModule(MODULE_NAME);
+
+
             if (strtolower(MODULE_NAME) != 'install' && strtolower(MODULE_NAME) != 'admin') {
                 if (!C('WEB_SITE_CLOSE')) {
                     header("Content-Type: text/html; charset=utf-8");
@@ -77,15 +81,20 @@ abstract class Controller
                 }
 
                 if (strtolower(MODULE_NAME) != 'install' && strtolower(MODULE_NAME) != 'admin') {
-                    $moduleModel = D('Common/Module');
                     $moduleModel->checkCanVisit(MODULE_NAME);
                 }
             }
         }
 
+
         Hook::listen('action_begin', $this->config);
         //实例化视图类
         $this->view = Think::instance('Think\View');
+        if(!empty($module)){
+            $this->view->assign('MODULE_INFO', $module);
+            $this->view->assign('MODULE_ALIAS', $module['alias']);
+        }
+
         //控制器初始化
         if (method_exists($this, '_initialize'))
             $this->_initialize();
@@ -229,7 +238,7 @@ abstract class Controller
                 // 检查是否存在默认模版 如果有直接输出模版
                 $this->display();
             } else {
-                E(L('_ERROR_ACTION_') . ':' . ACTION_NAME);
+                E(L('_ERROR_ACTION_') . ':' . ACTION_NAME,815);
             }
         } else {
             E(__CLASS__ . ':' . $method . L('_METHOD_NOT_EXIST_'));
@@ -342,16 +351,17 @@ abstract class Controller
         //保证输出不受静态缓存影响
         C('HTML_CACHE_ON', false);
         if ($status) { //发送成功信息
-            $this->assign('message', $message);// 提示信息
+            $this->assign('success_message', $message);// 提示信息
             // 成功操作后默认停留1秒
-            if (!isset($this->waitSecond)) $this->assign('waitSecond', '1');
+            if (!isset($this->waitSecond)) $this->assign('waitSecond', modC('SUCCESS_WAIT_TIME','2','config'));
             // 默认操作成功自动返回操作前页面
             if (!isset($this->jumpUrl)) $this->assign("jumpUrl", $_SERVER["HTTP_REFERER"]);
             $this->display(C('TMPL_ACTION_SUCCESS'));
+            exit;
         } else {
-            $this->assign('error', $message);// 提示信息
+            $this->assign('error_message', $message);// 提示信息
             //发生错误时候默认停留3秒
-            if (!isset($this->waitSecond)) $this->assign('waitSecond', '15');
+            if (!isset($this->waitSecond)) $this->assign('waitSecond', modC('ERROR_WAIT_TIME','10','config'));
             // 默认发生错误的话自动返回上页
             if (!isset($this->jumpUrl)) $this->assign('jumpUrl', "javascript:history.back(-1);");
             $this->display(C('TMPL_ACTION_ERROR'));
@@ -369,6 +379,38 @@ abstract class Controller
         // 执行后续操作
         Hook::listen('action_end');
     }
+
+    /**
+     * checkRule  检查权限
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function checkAuth($rule ='',$except_uid =-1,$msg = ''){
+        if (!check_auth($rule,$except_uid)) {
+            $this->error(empty($msg)?'您无操作权限。':$msg);
+        }
+    }
+
+    /**
+     * check_action_limit 行为限制
+     * @param null $action
+     * @param null $model
+     * @param null $record_id
+     * @param null $user_id
+     * @param bool $ip
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function checkActionLimit($action = null, $model = null, $record_id = null, $user_id = null, $ip = false,$url = false){
+        $return = check_action_limit($action, $model, $record_id, $user_id, $ip);
+        if ($return && !$return['state']) {
+            if($url === true){
+                $url = $return['url'];
+            }elseif($url === false){
+                $url = '';
+            }
+            $this->error($return['info'],$url);
+        }
+    }
+
 }
 
 // 设置控制器别名 便于升级

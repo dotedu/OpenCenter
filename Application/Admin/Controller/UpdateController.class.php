@@ -47,7 +47,7 @@ class UpdateController extends AdminController
         }
         unset($pack);
         $this->assign('db', $db);
-        $title = '快捷操作'; //渲染模板
+        $title = L('_FAST_OPERATION_'); //渲染模板
         $this->assign('meta_title', $title);
         $this->display();
     }
@@ -79,8 +79,8 @@ class UpdateController extends AdminController
 
         }
         /*        $listBuilder = new AdminListBuilder();*/
-        /*      $listBuilder->keyText('title', '标题')->keyText('des', '用途介绍')->keyText('author', '作者')->keyText('file', 'sql文件名')->keyText('size', 'sql大小')->keyText('ctime', '创建时间')->keyText('mtime', '修改时间')
-                  ->keyDoActionEdit('update/addpack?id=###', '编辑');*/
+        /*      $listBuilder->keyText('title', L('_TITLE_'))->keyText('des', L('_INTRODUCTION_'))->keyText('author', L('_AUTHOR_'))->keyText('file', L('_SQL_FILE_NAME_'))->keyText('size', L('_SQL_SIZE_'))->keyText('ctime', L('_CREATE_TIME_'))->keyText('mtime', L('_CHANGE_TIME_'))
+                  ->keyDoActionEdit('update/addpack?id=###', L('_EDIT_'));*/
         /*  $listBuilder->data($list);
           $listBuilder->display();
           dump($list);
@@ -100,7 +100,7 @@ class UpdateController extends AdminController
                 }
                 unset($pack);*/
         $this->assign('list', $list);
-        $title = '快捷操作'; //渲染模板
+        $title = L('_FAST_OPERATION_'); //渲染模板
         $this->assign('meta_title', $title);
         $this->display();
     }
@@ -124,13 +124,13 @@ class UpdateController extends AdminController
             $result = unlink($myfile) || unlink($jsonFile);
 
             if ($result) {
-                $this->success('删除文件成功。');
+                $this->success(L('_DELETE_FILE_SUCCESSFULLY_'));
                 exit;
             } else {
-                $this->error('删除文件失败。');
+                $this->error(L('_DELETE_FILE_FAILED_'));
             }
         } else {
-            $this->error('未选择补丁。');
+            $this->error(L('_NO_CHOICE_PATCH_'));
         }
 
 
@@ -156,7 +156,7 @@ class UpdateController extends AdminController
             $aAuthor = I('post.author');
             $aSql = I('post.sql');
             if ($aSql == '') {
-                $this->error('必须填写Sql语句。');
+                $this->error(L('_SQL_STATEMENTS_MUST_BE_FILLED_OUT_'));
             }
             $info['title'] = $aTitle;
             $info['des'] = $aDes;
@@ -172,7 +172,7 @@ class UpdateController extends AdminController
                 $info['ctime'] = time();
                 $info['mtime'] = '0';
                 $fh = $this->writeJsonFile($time, $info);
-                $this->success("新增补丁成功。");
+                $this->success(L('_NEW_PATCH_SUCCESS_'));
 
             } else {
                 $info['mtime'] = time();
@@ -180,7 +180,7 @@ class UpdateController extends AdminController
                 $this->writeJsonFile($aId, $info);
                 fclose($fh);
                 $this->writeSql($aSql, $aId);
-                $this->success("编辑补丁成功。");
+                $this->success(L('_EDIT_PATCH_SUCCESS_'));
                 exit;
             }
         } else {
@@ -191,7 +191,7 @@ class UpdateController extends AdminController
             }
 
             $formBuilder = new AdminConfigBuilder();
-            $formBuilder->title('新增补丁')->keyText('title', '补丁名称')->keyTextArea('des', '用途介绍')->keyTextArea('sql', 'sql语句')->keyText('author', '作者')
+            $formBuilder->title(L('_NEW_PATCH_'))->keyText('title', L('_PATCH_NAME_'))->keyTextArea('des', L('_INTRODUCTION_'))->keyTextArea('sql', L('_SQL_STATEMENT_'))->keyText('author', L('_AUTHOR_'))
                 ->buttonSubmit();
             if ($aId != 0) {
                 $info['id'] = $aId;
@@ -215,10 +215,10 @@ class UpdateController extends AdminController
                 exit;
             } else {
                 clean_all_cache();
-                $this->success('使用补丁成功。');
+                $this->success(L('_USING_THE_PATCH_TO_SUCCEED_'));
             }
         } else {
-            $this->error('请选择补丁。');
+            $this->error(L('_PLEASE_SELECT_THE_PATCH_'));
         }
     }
 
@@ -265,12 +265,12 @@ class UpdateController extends AdminController
     {
 //打开文件
         if (!$fh = fopen($this->pack_sql_dir . '/' . $time . '.sql', 'w')) {
-            $this->error("不能创建文件 " . $this->pack_sql_dir . '/' . $time);
+            $this->error(L('_CANNOT_TO_CREATE_')." " . $this->pack_sql_dir . '/' . $time);
             exit;
         }
         // 写入内容
         if (fwrite($fh, $sql) === FALSE) {
-            $this->error("不能写入到文件" . $this->pack_sql_dir . '/' . $time);
+            $this->error(L('_CANNOT_WRITE_TO_FILE_') . $this->pack_sql_dir . '/' . $time);
             exit;
         }
         return $fh;
@@ -314,12 +314,12 @@ class UpdateController extends AdminController
     {
 //打开文件
         if (!$fh = fopen($this->mPackPath . '/' . $time . '.json', 'w')) {
-            $this->error("不能打开文件 $this->mPackPath" . '/' . $time . '.json');
+            $this->error(L('_CANNOT_TO_OPEN_')." $this->mPackPath" . '/' . $time . '.json');
             exit;
         }
         // 写入内容
         if (fwrite($fh, json_encode($info)) === FALSE) {
-            $this->error("不能写入到 $this->mPackPath" . '/' . $time . '.json');
+            $this->error(L('_CANNOT_TO_WRITE_')." $this->mPackPath" . '/' . $time . '.json');
             exit;
         }
         fclose($fh);

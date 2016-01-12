@@ -33,7 +33,7 @@ class Crypt {
         if(empty(self::$handler)){
             self::init();
         }
-        $class  =   self::$handler; 
+        $class  =   self::$handler;
         return $class::encrypt($data,$key,$expire);
     }
 

@@ -37,7 +37,7 @@ abstract class Controller {
                 // 如果定义了_empty操作 则调用
                 $this->_empty($method,$args);
             }else{
-                E(L('_ERROR_ACTION_').':'.ACTION_NAME);
+                E(L('_ERROR_ACTION_').':'.ACTION_NAME,815);
             }
         }else{
             E(__CLASS__.':'.$method.L('_METHOD_NOT_EXIST_'));

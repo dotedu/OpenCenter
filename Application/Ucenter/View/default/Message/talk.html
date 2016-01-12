@@ -8,13 +8,13 @@
     <div class="row">
         <div class="col-xs-12">
             <p>&nbsp;</p>
-            <h4>消息中心</h4>
+            <h4>{:L('_MESSAGE_CENTER_')}</h4>
             <hr class="oneuser-title-hr"/>
 
             <ul class="nav nav-pills ucenter-tab">
                 <li
                 <eq name="tab" value="unread"> class="active"</eq>
-                ><a href="{:U('Ucenter/Message/session',array('tab'=>'session'))}">所有聊天</a></li>
+                ><a href="{:U('Ucenter/Message/session',array('tab'=>'session'))}">{:L('_CHAT_ALL_')}</a></li>
 
             </ul>
 
@@ -28,14 +28,14 @@
 
                 <div class="talk_source_content">
                     <p class="thinkox-break-word">
-                        【标题】{$talk.source_title|op_t}&nbsp;
-                        <a title="返回来源" href="{$talk.source_url}">
+                        {:L('_BRACKETS_LEFT_')}{:L('_TITLE_')}{:L('_BRACKETS_RIGHT_')}{$talk.source_title|op_t}&nbsp;
+                        <a title="{:L('_RETURN_TO_SOURCE_')}" href="{$talk.source_url}">
                             <i class="glyphicon glyphicon-share-alt"></i>
                         </a>
                     </p>
 
                     <p class="thinkox-break-word">
-                        【内容】{$talk.source_content|op_t}
+                        {:L('_BRACKETS_LEFT_')}{:L('_CONTENT_')}{:L('_BRACKETS_RIGHT_')}{$talk.source_content|op_t}
                     </p>
 
                 </div>
@@ -50,7 +50,7 @@
                                     class="timespan">{$message.create_time|date='m-d h:m:s',###}</span></div>
                             <div class="row">
                                 <div class="col-xs-9 bubble_outter">
-                                    <h3>我</h3>
+                                    <h3>{:L('_I_')}</h3>
                                     <i class="bubble_sharp"></i>
 
                                     <div class="talk_bubble">
@@ -87,21 +87,21 @@
 
                 </volist>
                 <hr/>
-                <div style="text-align: center;color: #666">以上为历史聊天记录</div>
+                <div style="text-align: center;color: #666">{:L('_HISTORY_CHAT_LOG_')}</div>
             </div>
 
 
         </div>
         <div class="row weibo_post_box" style="margin-top: 20px">
             <div class="col-xs-10">
-                <textarea class="form-control" style="width: 100%" id="tt_content" placeholder="说点什么吧~"></textarea>
+                <textarea class="form-control" style="width: 100%" id="tt_content" placeholder="{:L('_PLACEHOLDER_SAY_SOMETHING_')}"></textarea>
                 <a href="javascript:" onclick="insertFace($(this))"><img class="weibo_type_icon" src="__STATIC__/image/bq.png"/></a>
             </div>
 
             <div class="col-xs-2" style="text-align: right">
                 <button type="submit" class="btn btn-large btn-primary" id="submit-button" onclick="appendMessage()">
                     <span class="glyphicon glyphicon-edit"></span>
-                    回复<br/>Ctrl+Enter
+                    {:L('_REPLY_')}
                 </button>
             </div>
             <div id="emot_content" class="emot_content" style="margin-top: 90px;margin-left: 13px;"></div>

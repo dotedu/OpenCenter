@@ -86,7 +86,7 @@ abstract class Addon{
         if(!is_file($templateFile)){
             $templateFile = $this->addon_path.$templateFile.C('TMPL_TEMPLATE_SUFFIX');
             if(!is_file($templateFile)){
-                throw new \Exception("模板不存在:$templateFile");
+                throw new \Exception(L('_TEMPLATE_NOT_EXIST_')."$templateFile");
             }
         }
         return $this->view->fetch($templateFile);
@@ -110,35 +110,66 @@ abstract class Addon{
      * 获取插件的配置数组
      */
     final public function getConfig($name=''){
-        static $_config = array();
         if(empty($name)){
             $name = $this->getName();
         }
-        if(isset($_config[$name])){
-            return $_config[$name];
-        }
-        $config =   array();
-        $map['name']    =   $name;
-        $map['status']  =   1;
-        $config  =   M('Addons')->where($map)->getField('config');
-        if($config){
-            $config   =   json_decode($config, true);
-        }else{
-            $temp_arr = include $this->config_file;
-            foreach ($temp_arr as $key => $value) {
-                if($value['type'] == 'group'){
-                    foreach ($value['options'] as $gkey => $gvalue) {
-                        foreach ($gvalue['options'] as $ikey => $ivalue) {
-                            $config[$ikey] = $ivalue['value'];
+
+        $tag='addons_config_'.$name;
+        $config=S($tag);
+        if($config===false){
+            static $_config = array();
+            if(isset($_config[$name])){
+                return $_config[$name];
+            }
+            $config =   array();
+            $map['name']    =   $name;
+            $map['status']  =   1;
+            $config  =   M('Addons')->where($map)->getField('config');
+            if($config){
+                $config   =   json_decode($config, true);
+            }else{
+                $temp_arr = include $this->config_file;
+                foreach ($temp_arr as $key => $value) {
+                    if($value['type'] == 'group'){
+                        foreach ($value['options'] as $gkey => $gvalue) {
+                            foreach ($gvalue['options'] as $ikey => $ivalue) {
+                                $config[$ikey] = $ivalue['value'];
+                            }
                         }
+                    }else{
+                        $config[$key] = $temp_arr[$key]['value'];
                     }
-                }else{
-                    $config[$key] = $temp_arr[$key]['value'];
                 }
             }
+            $_config[$name]     =   $config;
+            S($tag,$config);
         }
-        $_config[$name]     =   $config;
+
         return $config;
+    }
+
+    /**初始化钩子的方法，防止钩子不存在的情况发生
+     * @param $name
+     * @param $description
+     * @param int $type
+     * @return bool
+     */
+    public function initHook($name,$description,$type=1){
+        $hook=M('hooks')->where(array('name'=>$name))->find();
+        if(!$hook){
+            $hook['name']=$name;
+            $hook['description']=$description;
+            $hook['type']=$type;
+            $hook['update_time']=time();
+            $hook['addons']=$this->getName();
+            $result=M('hooks')->add($hook);
+            if($result===false){
+                return false;
+            }else{
+                return true;
+            }
+        }
+        return true;
     }
 
     //必须实现安装

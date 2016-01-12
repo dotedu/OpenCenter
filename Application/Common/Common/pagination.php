@@ -6,13 +6,8 @@
  * Time: PM7:40
  */
 
-function getPagination($totalCount, $countPerPage = 10)
+function getPagination($totalCount, $countPerPage = 10,$rollPage=0)
 {
-    $pageKey = 'page';
-
-    //获取当前页码
-    $currentPage = intval($_REQUEST[$pageKey]) ? intval($_REQUEST[$pageKey]) : 1;
-
     //计算总页数
     $pageCount = ceil($totalCount / $countPerPage);
 
@@ -21,45 +16,10 @@ function getPagination($totalCount, $countPerPage = 10)
         return '';
     }
     $Page       = new \Think\Page($totalCount,$countPerPage);// 实例化分页类 传入总记录数和每页显示的记录数
+    if($rollPage){
+        $Page->setRollPage($rollPage);
+    }
     return   $Page->show();
-
-
-
-    //定义返回结果
-    $html = '';
-
-    //添加头部
-    $html .= '<div class="pagination">';
-
-    //添加上一页的按钮
-    if ($currentPage > 1) {
-        $prevUrl = addUrlParam(getCurrentUrl(), array($pageKey => $currentPage - 1));
-        $html .= "<li><a class=\"\" href=\"{$prevUrl}\">&laquo;</a></li>";
-    } else {
-        $html .= "<li class=\"disabled\"><a>&laquo;</a></li>";
-    }
-
-    //添加各页面按钮
-    for ($i = 1; $i <= $pageCount; $i++) {
-        $pageUrl = addUrlParam(getCurrentUrl(), array($pageKey => $i));
-        if ($i == $currentPage) {
-            $html .= "<li class=\"active\"><a class=\"active\" href=\"{$pageUrl}\">{$i}</a></li>";
-        } else {
-            $html .= "<li><a class=\"\" href=\"{$pageUrl}\">{$i}</a></li>";
-        }
-    }
-
-    //添加下一页按钮
-    if ($currentPage < $pageCount) {
-        $nextUrl = addUrlParam(getCurrentUrl(), array($pageKey => $currentPage + 1));
-        $html .= "<li><a class=\"\" href=\"{$nextUrl}\">&raquo;</a></li>";
-    } else {
-        $html .= "<li class=\"disabled\"><a>&raquo;</a></li>";
-    }
-
-    //收尾
-    $html .= '</div>';
-    return $html;
 }
 
 
@@ -72,10 +32,10 @@ function getPageHtml($f_name, $totalpage, $data, $nowpage)
         }
         $pages = '';
         for ($i = 1; $i <= $totalpage; $i++) {
-            if ($i == $nowpage) {
-                $pages = $pages . "<li class=\"active\"><a href=\"javascript:\" id='page_" . $i . "' class='page active' onclick='" . $f_name . "(" . $str . $i . ")'>" . $i . "</a></li>";
+           if ($i == $nowpage) {
+                $pages = $pages . "<li class=\"active\"><a href=\"javascript:\"  class='page active' onclick='" . $f_name . "(" . $str . $i . ")'>" . $i . "</a></li>";
             } else {
-                $pages = $pages . "<li><a href=\"javascript:\" id='page_" . $i . "' class='page' onclick='" . $f_name . "(" . $str . $i . ")'>" . $i . "</a></li>";
+                $pages = $pages . "<li><a href=\"javascript:\"  class='page' onclick='" . $f_name . "(" . $str . $i . ")'>" . $i . "</a></li>";
             }
         }
         if ($nowpage == 1) {
@@ -85,7 +45,7 @@ function getPageHtml($f_name, $totalpage, $data, $nowpage)
             $a = $nowpage - 1;
             $pre = "<li><a href=\"javascript:\" class='page_pre'  onclick = '" . $f_name . "( " . $str . $a . ")'>" . "&laquo;" . "</a></li>";
         }
-        /*    $pre = "<li class=\"disabled\"><a class='a page_pre'  onclick = '" . $f_name . "( " . $str . $a . ")'>" . "上一页" . "</a></li>";*/
+        /*    $pre = "<li class=\"disabled\"><a class='a page_pre'  onclick = '" . $f_name . "( " . $str . $a . ")'>" . L('_LAST_PAGE_') . "</a></li>";*/
 
         if ($nowpage == $totalpage) {
             $b = $totalpage;

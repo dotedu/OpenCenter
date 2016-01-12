@@ -30,7 +30,7 @@
                                 </label>
                             </case>
                             <case value="datetime">
-                                <input type="text" name="{$field.name}" class="text input-large time" value="{$data[$field['name']]|date='Y-m-d H:i',###}" placeholder="请选择时间" />
+                                <input type="text" name="{$field.name}" class="text input-large time" value="{$data[$field['name']]|date='Y-m-d H:i',###}" placeholder={:L("_PLEASE_CHOOSE_TIME_WITH_DOUBLE_")} />
                             </case>
                             <case value="bool">
                                 <select name="{$field.name}">
@@ -80,13 +80,13 @@
 							        "height"          : 30,
 							        "swf"             : "__STATIC__/uploadify/uploadify.swf",
 							        "fileObjName"     : "download",
-							        "buttonText"      : "上传图片",
+							        "buttonText"      : {:L("_UPLOAD_PICTURES_WITH_DOUBLE_")},
 							        "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
 							        "width"           : 120,
 							        'removeTimeout'	  : 1,
 							        'fileTypeExts'	  : '*.jpg; *.png; *.gif;',
                                     'onFallback' : function() {
-                                        alert('未检测到兼容版本的Flash.');
+                                        alert('{:L("_AN_INCOMPATIBLE_VERSION_OF_THE_FLASH_IS_NOT_DETECTED_")}.');
                                     },
 							        "onUploadSuccess" : uploadPicture{$field.name}
 							    });
@@ -126,12 +126,12 @@
 							        "height"          : 30,
 							        "swf"             : "__STATIC__/uploadify/uploadify.swf",
 							        "fileObjName"     : "download",
-							        "buttonText"      : "上传附件",
+							        "buttonText"      : {:L("_UPLOAD_ATTACHMENTS_WITH_DOUBLE_")},
 							        "uploader"        : "{:U('File/upload',array('session_id'=>session_id()))}",
 							        "width"           : 120,
 							        'removeTimeout'	  : 1,
                                     'onFallback' : function() {
-                                        alert('未检测到兼容版本的Flash.');
+                                        alert('{:L("_AN_INCOMPATIBLE_VERSION_OF_THE_FLASH_IS_NOT_DETECTED_")}.');
                                     },
 							        "onUploadSuccess" : uploadFile{$field.name}
 							    });
@@ -163,8 +163,8 @@
             <input type="hidden" name="id" value="{$data.id|default=0}">
         </div>
         <div class="form-item cf">
-            <button class="btn submit-btn ajax-post hidden" id="submit" type="submit" target-form="form-horizontal">确 定</button>
-            <a class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</a>
+            <button class="btn submit-btn ajax-post hidden" id="submit" type="submit" target-form="form-horizontal">{:L("_SURE_WITH_SPACE_")}</button>
+            <a class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</a>
         </div>
     </form>
     </div>
@@ -172,11 +172,8 @@
 </block>
 
 <block name="script">
-<link href="__STATIC__/datetimepicker/css/datetimepicker.css" rel="stylesheet" type="text/css">
-<php>if(C('COLOR_STYLE')=='blue_color') echo '<link href="__STATIC__/datetimepicker/css/datetimepicker_blue.css" rel="stylesheet" type="text/css">';</php>
-<link href="__STATIC__/datetimepicker/css/dropdown.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="__STATIC__/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-<script type="text/javascript" src="__STATIC__/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<link href="__ZUI__/lib/datetimepicker/datetimepicker.min.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="__ZUI__/lib/datetimepicker/datetimepicker.min.js"></script>
 <script type="text/javascript">
 $('#submit').click(function(){
     $('#form').submit();

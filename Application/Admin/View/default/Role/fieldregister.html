@@ -2,7 +2,7 @@
 <extend name="Public/base" />
 <block name="body">
     <div class="main-title">
-        <h2>角色用户注册时要填写的扩展资料字段配置</h2>
+        <h2>{:L("_EXTENDED_DATA_FIELD_CONFIGURATION_FOR_USER_REGISTRATION_")}</h2>
     </div>
     <div class="tab-wrap with-padding">
 
@@ -34,7 +34,7 @@
                                         <volist name="group['field_list']" id="field" >
                                             <div class="filed_check">
                                                 <div>
-                                                    <label class="checkbox" title="id：{$field['id']}  字段类型：{$field['form_type']}">
+                                                    <label class="checkbox" title="id：{$field['id']} {:L("_FIELD_TYPE_")}{$field['form_type']}">
                                                         <input class="auth_fields fields_row" type="checkbox" name="fields[]" value="{$field.id}"/>{$field.field_name}
                                                     </label>
                                                 </div>
@@ -46,13 +46,13 @@
                             </dl>
                         </volist>
                         <else/>
-                        <div style="margin: 10px;color: rgb(255, 81, 81);">请先设置角色用户拥有的扩展资料字段</div>
+                        <div style="margin: 10px;color: rgb(255, 81, 81);">{:L("_PLEASE_SET_UP_THE_EXTENDED_DATA_FIELD_FOR_THE_USER_")}</div>
                     </notempty>
 
                     <input type="hidden" name="id" value="{$this_role.id}" />
-                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
-                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
-                    <span style="color: #BABABA;margin: 11px;">请先保存以上配置后再切换到其它界面</span>
+                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">{:L("_SURE_WITH_SPACE_")}</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
+                    <span style="color: #BABABA;margin: 11px;">{:L("_PLEASE_SAVE_THE_ABOVE_CONFIGURATION_AND_THEN_SWITCH_TO_ANOTHER_INTERFACE_")}</span>
                 </form>
             </div>
 

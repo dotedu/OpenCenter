@@ -3,9 +3,11 @@
 <block name="style">
     <link href="__CSS__/issue.css" rel="stylesheet" type="text/css"/>
 </block>
-
+<block name="header">
+    <include file="Public/nav" />
+</block>
 <block name="body">
-<include file="Public/nav" />
+
 
 <div class="content-body col-md-12">
         <h2 class="content-title">
@@ -23,21 +25,15 @@
 
                     <div class="col-md-8">
                         <ul class="operation clearfix">
-                            <li><i class="glyphicon glyphicon-stats"></i>{$content.view_count}</li>
-                            <li>{:Hook('support',array('table'=>'issue_content','row'=>$content['id'],'app'=>'Issue','uid'=>$content['uid'],'jump'=>'no'))}</li>
-                            <li><i class="glyphicon glyphicon-comment"></i>{$content.reply_count}</li>
+                            <li><i class="icon-eye-open"></i>{$content.view_count}</li>
+                            <li>{:Hook('support',array('table'=>'issue_content','row'=>$content['id'],'app'=>'Issue','uid'=>$content['uid'],'jump'=>'issue/index/issuecontentdetail'))}</li>
+                            <li><i class="icon-comments-alt"></i>{$content.reply_count}</li>
                         </ul>
 
                     </div>
                     <div class="col-md-4">
                         <div class="pull-right">
-                            <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a><a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"></a><a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a><a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a></div>
-                            <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script></p>
-                            <style>
-                                #bdshare_weixin_qrcode_dialog{
-                                    min-height:326px;
-                                }
-                            </style>
+                            {:W('Common/Share/detailShare')}
                         </div>
 
                     </div>
@@ -56,7 +52,7 @@
                         <div class="signature word-wrap">
                             <div class="triangle"></div>
                             <div class="triangle_left"></div>
-                            <eq name="content.user.signature" value="">还没想好O(∩_∩)O</eq>
+                            <eq name="content.user.signature" value="">{:L('_NO_MIND_')}</eq>
                             {$content.user.signature}
                         </div>
                     </div>
@@ -64,19 +60,21 @@
                 <div class="row" style="margin-top: 40px">
                     <div class="col-md-4">
                         <neq name="content.url" value="">
-                        <a class="btn btn-primary " target="_blank" href="{$content.url}" ><i class="glyphicon glyphicon-cloud"></i>&nbsp;访问</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</neq>
+                        <a class="btn btn-primary " target="_blank" href="{$content.url}" ><i class="glyphicon glyphicon-cloud"></i>&nbsp;{:L('_VISIT_')}</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</neq>
                         <if condition="($content['uid'] eq is_login()) OR check_auth('editIssueContent')">
 
-                            <a class="btn btn-primary " href="{:U('edit',array('id'=>$content['id']))}" ><i class="glyphicon glyphicon-pencil"></i>&nbsp;编辑</a>
+                            <a class="btn btn-primary " href="{:U('edit',array('id'=>$content['id']))}" style="margin-right: 25px;" ><i class="glyphicon glyphicon-pencil"></i>&nbsp;{:L('_EDIT_')}</a>
                         </if>
+
+                       {:W('Weibo/Share/shareBtn',array('param'=>array('app'=>'Issue','model'=>'IssueContent','method'=>'find','id'=>$content['id'],'img'=>get_cover($content['cover_id'],'path'),'from'=>L('_MODULE_'),'site_link'=>U('issue/index/issuecontentdetail',array('id'=>$content['id']))),'text'=>L('_SHARE_'),'css'=>array('class'=>'btn btn-primary')))}
 
 
 
                     </div>
                     <div class="col-md-8">
                         <div class="pull-right" style="color: #999">
-                            发布时间：  {$content.create_time|friendlyDate} &nbsp;&nbsp;
-                            更新时间： {$content.update_time|friendlyDate}
+                            {:L('_PUBLISH_TIME_')}：  {$content.create_time|friendlyDate} &nbsp;&nbsp;
+                            {:L('_UPDATE_TIME_')}： {$content.update_time|friendlyDate}
                         </div>
                     </div>
 
@@ -90,16 +88,20 @@
 
     <hr/>
         <div>
-            <h3>介绍</h3>
-            {$content.content}
+            <h3>{:L('_INTRO_')}</h3>
+            {$content.content|render}
         </div>
     <div>
-    {:hook('localComment', array('path'=>"Issue/issueContent/$content[id]", 'uid'=>$content['uid']))}
+    {:hook('localComment', array('path'=>"Issue/issueContent/$content[id]", 'uid'=>$content['uid'],'count_model'=>'issue_content','count_field'=>'reply_count','this_url'=>'Issue/Index/issueContentDetail'))}
     </div>
 </div>
 
 
-
+    <script type="text/javascript" charset="utf-8" src="__STATIC__/ueditor/third-party/SyntaxHighlighter/shCore.js"></script>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css"/>
+    <script type="text/javascript">
+        SyntaxHighlighter.all();
+    </script>
 
     <include file="_box"/>
 </block>

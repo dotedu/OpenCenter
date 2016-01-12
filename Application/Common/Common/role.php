@@ -11,7 +11,7 @@
 
 
 /**
- * 获取当前用户登录的角色的标识(角色功能完成后修改)
+ * 获取当前用户登录的角色的标识
  * @return int 角色id
  * @author 郑钟良<zzl@ourstu.com>
  */
@@ -26,8 +26,8 @@ function get_login_role()
 }
 
 /**
- * 获取当前用户登录的角色的标识(角色功能完成后修改)
- * @return int 角色id
+ * 获取当前用户登录的角色是否审核通过
+ * @return status 用户角色审核状态  1：通过，2：待审核，0：审核失败
  * @author 郑钟良<zzl@ourstu.com>
  */
 function get_login_role_audit()
@@ -73,9 +73,9 @@ function getRoleConfigMap($type,$role_id=0){
         case 'score'://积分
         case 'avatar'://默认头像
         case 'rank'://默认头衔
+        case 'user_tag'://用户可拥有标签
             break;
         case 'expend_field'://角色拥有的扩展字段
-            $map['category']='expend_field';
         case 'register_expend_field'://注册时角色要填写的扩展字段
             $map['category']='expend_field';
             break;

@@ -57,7 +57,7 @@ class ActionLimit
         $map['action_list'] = array(array('like', '%[' . $item['action'] . ']%'), '', 'or');
         $map['status'] = 1;
         $limitList = D('ActionLimit')->getList($map);
-        !empty($item['action']) && $item['action_id'] = M('action')->where(array('name' => $item['action']))->getField('id');
+        !empty($item['action']) && $item['action_id'] = M('action')->where(array('name' => $item['action']))->cache(true,60)->getField('id');
         foreach ($limitList as &$val) {
             $ago = get_time_ago($val['time_unit'], $val['time_number'], $time);
             $item['create_time'] = array('egt', $ago);
@@ -72,7 +72,7 @@ class ActionLimit
                 }
                 unset($punish);
                 if ($val['if_message']) {
-                    D('Message')->sendMessageWithoutCheckSelf($item['user_id'], $val['message_content']);
+                    D('Message')->sendMessageWithoutCheckSelf($item['user_id'], L('_SYSTEM_MESSAGE_'),$val['message_content'],$_SERVER['HTTP_REFERER']);
                 }
             }
         }
@@ -106,7 +106,7 @@ class ActionLimit
 
     function warning($item,$val){
         $this->state = false;
-        $this->info = '操作频繁，请'.$val['time_number'].get_time_unit($val['time_unit']).'后再试';
+        $this->info = L('_OPERATION_IS_FREQUENT_PLEASE_').$val['time_number'].get_time_unit($val['time_unit']).L('_AND_THEN_');
         $this->url = U('home/index/index');
     }
 }
@@ -115,12 +115,19 @@ class ActionLimit
 function check_action_limit($action = null, $model = null, $record_id = null, $user_id = null, $ip = false)
 {
     $obj = new ActionLimit();
-    $obj->checkOne(array('action' => $action, 'model' => $model, 'record_id' => $record_id, 'user_id' => $user_id, 'action_ip' => $ip));
 
+    $item = array('action' => $action, 'model' => $model, 'record_id' => $record_id, 'user_id' => $user_id, 'action_ip' => $ip);
+    if(empty($record_id)){
+        unset($item['record_id']);
+    }
+    $obj->checkOne($item);
+    $return = array();
     if (!$obj->state) {
         $return['state'] = $obj->state;
         $return['info'] = $obj->info;
         $return['url'] = $obj->url;
+    }else{
+        $return['state'] = true;
     }
     return $return;
 }
@@ -157,7 +164,7 @@ function get_time_ago($type = 'second', $some = 1, $time = null)
 }
 
 function get_time_unit($key = null){
-    $array = array('second' => '秒', 'minute' => '分', 'hour' => '小时', 'day' => '天', 'week' => '周', 'month' => '月', 'year' => '年');
+    $array = array('second' => L('_TIME_SECOND_'), 'minute' => L('_TIME_MINUTE_'), 'hour' => L('_HOUR_'), 'day' => L('_TIME_DAY_'), 'week' => L('_TIME_WEEK_'), 'month' => L('_TIME_MONTH_'), 'year' => L('_TIME_YEAR_'));
     return empty($key)?$array:$array[$key];
 }
 

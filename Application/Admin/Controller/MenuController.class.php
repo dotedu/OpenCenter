@@ -32,7 +32,7 @@ class MenuController extends AdminController {
         if($title)
             $map['title'] = array('like',"%{$title}%");
         $list       =   M("Menu")->where($map)->field(true)->order('sort asc,id asc')->select();
-        int_to_string($list,array('hide'=>array(1=>'是',0=>'否'),'is_dev'=>array(1=>'是',0=>'否')));
+        int_to_string($list,array('hide'=>array(1=>L('_YES_'),0=>L('_NOT_')),'is_dev'=>array(1=>L('_YES_'),0=>L('_NOT_'))));
         if($list) {
             foreach($list as &$key){
                 if($key['pid']){
@@ -44,7 +44,7 @@ class MenuController extends AdminController {
         // 记录当前列表页的cookie
         Cookie('__forward__',$_SERVER['REQUEST_URI']);
 
-        $this->meta_title = '菜单列表';
+        $this->meta_title = L('_MENU_LIST_');
         $this->display();
     }
 
@@ -62,9 +62,9 @@ class MenuController extends AdminController {
                     // S('DB_CONFIG_DATA',null);
                     //记录行为
                     action_log('update_menu', 'Menu', $id, UID);
-                    $this->success('新增成功', Cookie('__forward__'));
+                    $this->success(L('_SUCCESS_ADD_'), Cookie('__forward__'));
                 } else {
-                    $this->error('新增失败');
+                    $this->error(L('_FAIL_ADD_'));
                 }
             } else {
                 $this->error($Menu->getError());
@@ -73,9 +73,10 @@ class MenuController extends AdminController {
             $this->assign('info',array('pid'=>I('pid')));
             $menus = M('Menu')->field(true)->select();
             $menus = D('Common/Tree')->toFormatTree($menus);
-            $menus = array_merge(array(0=>array('id'=>0,'title_show'=>'顶级菜单')), $menus);
+            $menus = array_merge(array(0=>array('id'=>0,'title_show'=>L('_MENU_TOP_'))), $menus);
+            $this->assign('Modules',D('Module')->getAll());
             $this->assign('Menus', $menus);
-            $this->meta_title = '新增菜单';
+            $this->meta_title = L('_MENU_ADD_');
             $this->display('edit');
         }
     }
@@ -93,9 +94,9 @@ class MenuController extends AdminController {
                     // S('DB_CONFIG_DATA',null);
                     //记录行为
                     action_log('update_menu', 'Menu', $data['id'], UID);
-                    $this->success('更新成功', Cookie('__forward__'));
+                    $this->success(L('_SUCCESS_UPDATE_'), Cookie('__forward__'));
                 } else {
-                    $this->error('更新失败');
+                    $this->error(L('_FAIL_UPDATE_'));
                 }
             } else {
                 $this->error($Menu->getError());
@@ -107,13 +108,14 @@ class MenuController extends AdminController {
             $menus = M('Menu')->field(true)->select();
             $menus = D('Common/Tree')->toFormatTree($menus);
 
-            $menus = array_merge(array(0=>array('id'=>0,'title_show'=>'顶级菜单')), $menus);
+            $menus = array_merge(array(0=>array('id'=>0,'title_show'=>L('_MENU_TOP_'))), $menus);
             $this->assign('Menus', $menus);
+            $this->assign('Modules',D('Module')->getAll());
             if(false === $info){
-                $this->error('获取后台菜单信息错误');
+                $this->error(L('_ERROR_MENU_INFO_GET_'));
             }
             $this->assign('info', $info);
-            $this->meta_title = '编辑后台菜单';
+            $this->meta_title = L('_MENU_BG_EDIT_');
             $this->display();
         }
     }
@@ -126,7 +128,7 @@ class MenuController extends AdminController {
         $id = array_unique((array)I('id',0));
 
         if ( empty($id) ) {
-            $this->error('请选择要操作的数据!');
+            $this->error(L('_ERROR_DATA_SELECT_').L('_EXCLAMATION_'));
         }
 
         $map = array('id' => array('in', $id) );
@@ -134,9 +136,9 @@ class MenuController extends AdminController {
             // S('DB_CONFIG_DATA',null);
             //记录行为
             action_log('update_menu', 'Menu', $id, UID);
-            $this->success('删除成功');
+            $this->success(L('_SUCCESS_DELETE_'));
         } else {
-            $this->error('删除失败！');
+            $this->error(L('_FAIL_DELETE_'));
         }
     }
 
@@ -177,7 +179,7 @@ class MenuController extends AdminController {
             $lists = explode(PHP_EOL, $tree);
             $menuModel = M('Menu');
             if($lists == array()){
-                $this->error('请按格式填写批量导入的菜单，至少一个菜单');
+                $this->error(L('_PLEASE_FILL_IN_THE_FORM_OF_A_BATCH_IMPORT_MENU,_AT_LEAST_ONE_MENU_'));
             }else{
                 $pid = I('post.pid');
                 foreach ($lists as $key => $value) {
@@ -195,10 +197,10 @@ class MenuController extends AdminController {
                         ));
                     }
                 }
-                $this->success('导入成功',U('index?pid='.$pid));
+                $this->success(L('_IMPORT_SUCCESS_'),U('index?pid='.$pid));
             }
         }else{
-            $this->meta_title = '批量导入后台菜单';
+            $this->meta_title = L('_BATCH_IMPORT_BACKGROUND_MENU_');
             $pid = (int)I('get.pid');
             $this->assign('pid', $pid);
             $data = M('Menu')->where("id={$pid}")->field(true)->find();
@@ -218,6 +220,7 @@ class MenuController extends AdminController {
 
             //获取排序的数据
             $map = array('status'=>array('gt',-1));
+            $map['hide']=0;
             if(!empty($ids)){
                 $map['id'] = array('in',$ids);
             }else{
@@ -228,7 +231,7 @@ class MenuController extends AdminController {
             $list = M('Menu')->where($map)->field('id,title')->order('sort asc,id asc')->select();
 
             $this->assign('list', $list);
-            $this->meta_title = '菜单排序';
+            $this->meta_title = L('_MENU_SORT_');
             $this->display();
         }elseif (IS_POST){
             $ids = I('post.ids');
@@ -237,12 +240,12 @@ class MenuController extends AdminController {
                 $res = M('Menu')->where(array('id'=>$value))->setField('sort', $key+1);
             }
             if($res !== false){
-                $this->success('排序成功！');
+                $this->success(L('_SORT_OF_SUCCESS_'));
             }else{
-                $this->eorror('排序失败！');
+                $this->eorror(L('_SORT_OF_FAILURE_'));
             }
         }else{
-            $this->error('非法请求！');
+            $this->error(L('_ILLEGAL_REQUEST_'));
         }
     }
 }

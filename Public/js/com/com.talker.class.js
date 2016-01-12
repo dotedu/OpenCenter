@@ -3,26 +3,49 @@
  * 主要用于处理前台聊天事件
  */
 var talker = {
+
+    'container': function () {
+        return $('#talker');//talker DIV容器
+    },
+    show: function () {
+        var container = talker.container();
+        if (container.text().trim() == '') {
+            toast.success('聊天发起成功。');
+            toast.showLoading();
+            $.get(U('Ucenter/Session/panel'), {},
+                function (html) {
+                    container.html(html);
+                    talker.bind_ctrl_enter();
+                    toast.hideLoading()
+                }
+            );
+        } else {
+            container.toggle();
+        }
+    },
     /**
      * 发起聊天请求
      * @param uid
      */
-    start_talk: function (uid) {
-        if (confirm('确定要和该用户发起聊天？')) {
-            $.post(U('Ucenter/Session/createTalk'), {uids: uid}, function (msg) {
-                if (msg.status) {
-                    toast.success('聊天发起成功。', '聊天助手');
-                    $('#friend_panel_main').toggle();
-                    $('#session_panel_main').toggle();
-                    talker.open(msg.info.id);
-                    /*在面板中加入一个项目*/
-                    talker.prepend_session(msg.info);
-                } else {
-                    //TODO 创建失败
-                }
+    start_talk: function (id) {
 
-            }, 'json');
-        }
+        show_chat_frame(function(){
+            create_conv(id);
+        });
+
+
+
+/*
+        $.post(U('Ucenter/Session/createTalk'), {uids: uid}, function (msg) {
+            if (msg.status) {
+                talker.show();
+                talker.open(msg.info.id);
+                *//*在面板中加入一个项目*//*
+                talker.prepend_session(msg.info);
+            } else {
+                //TODO 创建失败
+            }
+        }, 'json');*/
     },
     /**
      * 向聊天窗添加一条消息
@@ -78,20 +101,17 @@ var talker = {
      * @param id
      */
     exit: function (id) {
-        if (confirm('确定退出该聊天？退出后无法再主动加入。')) {
             if (typeof (id) == 'undefined') {
                 id = $('#chat_id').val();
             } else {
             }
             $.post(U('Ucenter/Message/doDeleteTalk'), {talk_id: id}, function (msg) {
                 if (msg.status) {
-                    $('#chat_box').hide();
                     $('#chat_li_' + id).remove();
                     toast.success('成功退出聊天。', '聊天助手');
                 }
 
             }, 'json');
-        }
     },
     /**
      * 绑定快速回复，ctrl+enter组合键
@@ -135,7 +155,7 @@ var talker = {
     open: function (id) {
         $.get(U('Ucenter/Session/getSession'), {id: id}, function (data) {
             talker.clear_box();
-            $('li', '#session_panel_main').removeClass();
+            $('li', '#chat-list').removeClass();
             $('.badge_new', '#chat_li_' + id).remove();
 
             if (typeof ($('.friend_list').find('.badge_new').html()) == 'undefined') {
@@ -152,15 +172,29 @@ var talker = {
      * @param data
      */
     prepend_session: function (data) {
-        var tpl = '<li id="chat_li_' +
-            data.id + '"><div class="row"><div class="col-md-6"><a class="session_ico" title="' +
-            data.title + '" onclick="open_chat_box(' + data.id + ')"><img src="' +
-            data.ico + '" class="avatar-img" style="width: 45px;"><span class="badge_new">&nbsp;</span></a></div><div class="col-md-6"><div><a class="text-more" style="width: 100%" target="_blank" title="' +
-            data.title + '">' +
-            data.title + '</a></div><div><a onclick="' +
-            "talker.exit(" + data.id + ")" +
-            '"><i style="color: red" title="退出聊天" class="glyphicon glyphicon-off"></i></a></div></div></div></li>';
-        $('#session_panel_main .friend_list').prepend(tpl);
+        var tpl=' <li id="chat_li_'+data.id+'">\
+            <a target="_blank" onclick="talker.open('+data.id+')"\
+        title="'+data.title+'">\
+        <div class="row">\
+            <div class="col-md-4">\
+                <img src="'+data.icon+'"\
+                class="avatar-img"\
+                style="width: 40px;max-width: 200%">\
+                </div>\
+                <div class="col-md-8" style="padding-left: 0">\
+                    <div class="text-more talk-name" style="width: 90%">\
+                                               '+data.title+'\
+                    </div><span class="btn-close" onclick="talker.exit('+data.id+')"><i\
+                title="退出聊天"\
+                class="icon-remove"></i></span>\
+                </div>\
+            </div>\
+        </a>\
+        </li>';
+
+
+        $('#chat-list #chat_li_'+data.id).remove();
+        $('#chat-list').prepend(tpl);
         $('#friend_has_new').css('display', 'inline-block');
     },
 
@@ -204,3 +238,7 @@ var talker = {
 
 
 }
+
+$(function(){
+    talker.bind_ctrl_enter();//绑定
+})

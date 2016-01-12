@@ -16,10 +16,58 @@ class IndexController extends Controller
     {
         $tree = D('Issue')->getTree();
         $this->assign('tree', $tree);
+
+
+        $sub_menu =
+            array(
+                'left' =>
+                    array(
+                        array('tab' => 'home', 'title' =>L('_HOME_'), 'href' => U('Issue/index/index')),
+                    ),
+            );
+        if (check_auth('addIssueContent')) {
+            $sub_menu['right'] = array(
+                array('tab' => 'post', 'title' => L('_RELEASE_'), 'href' => '#frm-post-popup','a_class'=>'open-popup-link')
+            );
+        }
+        foreach ($tree as $cat) {
+            if ($cat['_']) {
+                $children = array();
+                $children[] = array('tab' => 'cat_' . $cat['id'], 'title' => L('_ALL_'), 'href' => U('Issue/index/index', array('issue_id' => $cat['id'])));
+                foreach ($cat['_'] as $child) {
+                    $children[] = array('tab' => 'cat_' . $cat['id'], 'title' => $child['title'], 'href' => U('Issue/index/index', array('issue_id' => $child['id'])));
+                }
+
+            }
+            $menu_item = array('children' => $children, 'tab' => 'cat_' . $cat['id'], 'title' => $cat['title'], 'href' => U('Issue/Index/index', array('issue_id' => $cat['id'])));
+            $sub_menu['left'][] = $menu_item;
+            unset($children);
+        }
+        $sub_menu['first']=array('title'=>L('_MODULE_'));
+        $this->assign('sub_menu', $sub_menu);
+
     }
 
     public function index($page = 1, $issue_id = 0)
     {
+        //设置展示方式 列表；瀑布流
+        $aDisplay_type=I('display_type','','text');
+        $cookie_type=cookie('issue_display_type');
+        if($aDisplay_type==''){
+            if($cookie_type){
+                $aDisplay_type=$cookie_type;
+            }else{
+                $aDisplay_type=modC('DISPLAY_TYPE','list','Issue');
+                cookie('issue_display_type',$aDisplay_type);
+            }
+        }else{
+            if($cookie_type!=$aDisplay_type){
+                cookie('issue_display_type',$aDisplay_type);
+            }
+        }
+        $this->assign('display_type',$aDisplay_type);
+        //设置展示方式 列表；瀑布流 end
+
         $issue_id = intval($issue_id);
         $issue = D('Issue')->find($issue_id);
         if (!$issue_id == 0) {
@@ -37,6 +85,16 @@ class IndexController extends Controller
         foreach ($content as &$v) {
             $v['user'] = query_user(array('id', 'nickname', 'space_url', 'space_link', 'avatar128', 'rank_html'), $v['uid']);
             $v['issue'] = D('Issue')->field('id,title')->find($v['issue_id']);
+            if($aDisplay_type=='masonry'){
+                $cover = M('Picture')->where(array('status' => 1))->getById($v['cover_id']);
+                $c_path=$cover['path'];
+                $tag='ttp:';
+                if(!strpos($c_path,$tag))
+                    $c_path='.'.$cover['path'];
+                $imageinfo = getimagesize($c_path);
+                $v['cover_height']=round($imageinfo[1]*255/$imageinfo[0]);
+                $v['cover_height']=$v['cover_height']?$v['cover_height']:253;
+            }
         }
         unset($v);
         $this->assign('contents', $content);
@@ -44,36 +102,36 @@ class IndexController extends Controller
         $this->assign('top_issue', $issue['pid'] == 0 ? $issue['id'] : $issue['pid']);
 
         $this->assign('issue_id', $issue_id);
-        $this->setTitle('专辑');
+        $this->setTitle(L('_MODULE_'));
         $this->display();
     }
 
     public function doPost($id = 0, $cover_id = 0, $title = '', $content = '', $issue_id = 0, $url = '')
     {
         if (!check_auth('addIssueContent')) {
-            $this->error('抱歉，您不具备投稿权限。');
+            $this->error(L('_AUTHORITY_LACK_'));
         }
         $issue_id = intval($issue_id);
         if (!is_login()) {
-            $this->error('请登陆后再投稿。');
+            $this->error(L('_FIRST_LOGIN_'));
         }
         if (!$cover_id) {
-            $this->error('请上传封面。');
+            $this->error(L('_NEED_COVER_'));
         }
         if (trim(op_t($title)) == '') {
-            $this->error('请输入标题。');
+            $this->error(L('_NEED_TITLE_'));
         }
         if (trim(op_h($content)) == '') {
-            $this->error('请输入内容。');
+            $this->error(L('_NEED_CONTENT_'));
         }
         if ($issue_id == 0) {
-            $this->error('请选择分类。');
+            $this->error(L('_NEED_CATEGORY_'));
         }
         if (trim(op_h($url)) == '') {
-            $this->error('请输入网址。');
+            $this->error(L('_NEED_WEBSITE_'));
         }
         $content = D('IssueContent')->create();
-        $content['content'] = op_h($content['content']);
+        $content['content'] = filter_content($content['content']);
         $content['title'] = op_t($content['title']);
         $content['url'] = op_t($content['url']); //新增链接框
         $content['issue_id'] = $issue_id;
@@ -82,32 +140,32 @@ class IndexController extends Controller
             $content_temp = D('IssueContent')->find($id);
             if (!check_auth('editIssueContent')) { //不是管理员则进行检测
                 if ($content_temp['uid'] != is_login()) {
-                    $this->error('不可操作他人的内容。');
+                    $this->error(L('_FORBID_TO_OTHER_'));
                 }
             }
             $content['uid'] = $content_temp['uid']; //权限矫正，防止被改为管理员
             $rs = D('IssueContent')->save($content);
             if ($rs) {
-                $this->success('编辑成功。', U('issueContentDetail', array('id' => $content['id'])));
+                $this->success(L('_SUCCESS_EDIT_'), U('issueContentDetail', array('id' => $content['id'])));
             } else {
-                $this->success('编辑失败。', '');
+                $this->success(L('_FAIL_EDIT_'), '');
             }
         } else {
             if (modC('NEED_VERIFY', 0) && !is_administrator()) //需要审核且不是管理员
             {
                 $content['status'] = 0;
-                $tip = '但需管理员审核通过后才会显示在列表中，请耐心等待。';
+                $tip = L('_TIP_AUDIT_');
                 $user = query_user(array('nickname'), is_login());
                 $admin_uids = explode(',', C('USER_ADMINISTRATOR'));
                 foreach ($admin_uids as $admin_uid) {
-                    D('Common/Message')->sendMessage($admin_uid, "{$user['nickname']}向专辑投了一份稿件，请到后台审核。", $title = '专辑投稿提醒', U('Admin/Issue/verify'), is_login(), 2);
+                    D('Common/Message')->sendMessage($admin_uid, $title = L('_WARN_CONTRIBUTE_'),"{$user['nickname']}".L('_PLEASE_AUDIT_'),  'Admin/Issue/verify', array(),is_login(), 2);
                 }
             }
             $rs = D('IssueContent')->add($content);
             if ($rs) {
-                $this->success('投稿成功。' . $tip, 'refresh');
+                $this->success(L('_SUCCESS_CONTRIBUTE_') . $tip, 'refresh');
             } else {
-                $this->success('投稿失败。', '');
+                $this->success(L('_FAIL_CONTRIBUTE_'), '');
             }
         }
 
@@ -129,7 +187,7 @@ class IndexController extends Controller
         $this->assign('issue_id', $issue['id']);
         $issue_content['user'] = query_user(array('id', 'nickname', 'space_url', 'space_link', 'avatar64', 'rank_html', 'signature'), $issue_content['uid']);
         $this->assign('content', $issue_content);
-        $this->setTitle('{$content.title|op_t}' . '——专辑');
+        $this->setTitle('{$content.title|op_t}' . '——'.L('_MODULE_'));
         $this->setKeywords($issue_content['title']);
         $this->display();
     }
@@ -145,7 +203,7 @@ class IndexController extends Controller
     public function edit($id)
     {
         if (!check_auth('addIssueContent') && !check_auth('editIssueContent')) {
-            $this->error('抱歉，您不具备投稿权限。');
+            $this->error(L('_ERROR_SORRY_'));
         }
         $issue_content = D('IssueContent')->find($id);
         if (!$issue_content) {

@@ -1,24 +1,35 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: caipeichao
- * Date: 14-3-10
- * Time: PM7:40
- */
 
-function getImageUrlByPath($path, $size)
+/**
+ * 获取文档封面图片
+ * @param int $cover_id
+ * @param string $field
+ * @return 完整的数据  或者  指定的$field字段值
+ * @author huajie <banhuajie@163.com>
+ */
+function get_cover($cover_id, $field = null)
 {
-    //TODO 重新开启缩略
-    $thumb = getThumbImage($path, $size, $size);
-    // $thumb['src']=$path;
-    $thumb = $thumb['src'];
-    if (!is_sae()) {
-        $thumb = getRootUrl() . $thumb;
+
+    if (empty($cover_id)) {
+        return false;
     }
-    return $thumb;
+    $tag = 'picture_' . $cover_id;
+    $picture = S($tag);
+    if ($picture === false) {
+        $picture = M('Picture')->where(array('status' => 1))->getById($cover_id);
+        S($tag, $picture);
+    }
+
+    $picture['path'] = get_pic_src($picture['path']);
+    return empty($field) ? $picture : $picture[$field];
 }
 
-/**兼容SAE
+function pic($cover_id)
+{
+    return get_cover($cover_id, 'path');
+}
+
+/** 不兼容sae 只兼容本地 --駿濤
  * @param        $filename
  * @param int $width
  * @param string $height
@@ -39,89 +50,26 @@ function getThumbImage($filename, $width = 100, $height = 'auto', $type = 0, $re
     $oldFile = str_replace('\\', '/', $oldFile);
     $thumbFile = str_replace('\\', '/', $thumbFile);
 
-
     $filename = ltrim($filename, '/');
     $oldFile = ltrim($oldFile, '/');
     $thumbFile = ltrim($thumbFile, '/');
 
-
-    //兼容SAE的中心裁剪缩略
-    if (strtolower(C('PICTURE_UPLOAD_DRIVER')) == 'sae') {
-        $storage = new SaeStorage();
-        $thumbFilePath = str_replace(C('UPLOAD_SAE_CONFIG.rootPath'), '', $thumbFile);
-        if(!$storage->fileExists(C('UPLOAD_SAE_CONFIG.domain'),$thumbFilePath)){
-            $f = new SaeFetchurl();
-            $img_data = $f->fetch($oldFile);
-            $img = new SaeImage();
-            $img->setData($img_data);
-            $info_img = $img->getImageAttr();
-            if ($height == "auto") $height = $info_img[1] * $height / $info_img[0];
-
-            $w = $info_img[0];
-            $h = $info_img[1];
-
-            /* 居中裁剪 */
-            //计算缩放比例
-            $w_scale = $width / $w;
-            if ($w_scale > 1) {
-                $w_scale = 1 / $w_scale;
-            }
-            $h_scale = $height / $h;
-
-            if ($h_scale > $w_scale) {
-                //按照高来放缩
-                $x1 = (1 - 1.0 * $width * $h / $w / $height) / 2;
-                $x2 = (1 - $x1);
-                $img->crop($x1, $x2, 0, 1);
-                $img_temp = $img->exec();
-                $img1 = new SaeImage();
-                $img1->setData($img_temp);
-                $img1->resizeRatio($h_scale);
-            } else {
-                $y1 = (1 - 1 * 1.0 / ($width * $h / $w / $height)) / 2;
-                $y2 = (1 - $y1);
-                $img->crop(0, 1, $y1, $y2);
-                $img_temp = $img->exec();
-                $img1 = new SaeImage();
-                $img1->setData($img_temp);
-                $img1->resizeRatio($w_scale);
-            }
-
-            $img1->improve();
-            $new_data = $img1->exec(); // 执行处理并返回处理后的二进制数据
-            if ($new_data === false)
-                return $oldFile;
-            // 或者可以直接输出
-            $thumbed = $storage->write(C('UPLOAD_SAE_CONFIG.domain'), $thumbFilePath, $new_data);
-            $info['width'] = $width;
-            $info['height'] = $height;
-            $info['src'] = $thumbed;
-            //图片处理失败时输出错误码和错误信息
-        }else{
-            $info['width'] = $width;
-            $info['height'] = $height;
-            $info['src'] =$storage->getUrl(C('UPLOAD_SAE_CONFIG.domain'),$thumbFilePath);
-        }
-        return $info;
-    }
-
-
-    //原图不存在直接返回
     if (!file_exists($UPLOAD_PATH . $oldFile)) {
+        //原图不存在直接返回
         @unlink($UPLOAD_PATH . $thumbFile);
         $info['src'] = $oldFile;
         $info['width'] = intval($width);
         $info['height'] = intval($height);
         return $info;
-        //缩图已存在并且  replace替换为false
     } elseif (file_exists($UPLOAD_PATH . $thumbFile) && !$replace) {
+        //缩图已存在并且  replace替换为false
         $imageinfo = getimagesize($UPLOAD_PATH . $thumbFile);
         $info['src'] = $thumbFile;
         $info['width'] = intval($imageinfo[0]);
         $info['height'] = intval($imageinfo[1]);
         return $info;
-        //执行缩图操作
     } else {
+        //执行缩图操作
         $oldimageinfo = getimagesize($UPLOAD_PATH . $oldFile);
         $old_image_width = intval($oldimageinfo[0]);
         $old_image_height = intval($oldimageinfo[1]);
@@ -146,27 +94,10 @@ function getThumbImage($filename, $width = 100, $height = 'auto', $type = 0, $re
                 $thumb->resize($width, $height);
             }
             $res = $thumb->save($UPLOAD_PATH . $thumbFile);
-
             $info['src'] = $UPLOAD_PATH . $thumbFile;
             $info['width'] = $old_image_width;
             $info['height'] = $old_image_height;
             return $info;
-
-            //内置库缩略
-            /*  $image = new \Think\Image();
-              $image->open($UPLOAD_PATH . $filename);
-              //dump($image);exit;
-              $image->thumb($width, $height, $type);
-              $image->save($UPLOAD_PATH . $thumbFile);
-              //缩图失败
-              if (!$image) {
-                  $thumbFile = $oldFile;
-              }
-              $info['width'] = $width;
-              $info['height'] = $height;
-              $info['src'] = $thumbFile;
-              return $info;*/
-
 
         }
     }
@@ -188,54 +119,87 @@ function getRootUrl()
 
 /**通过ID获取到图片的缩略图
  * @param        $cover_id 图片的ID
- * @param int    $width 需要取得的宽
+ * @param int $width 需要取得的宽
  * @param string $height 需要取得的高
- * @param int    $type 图片的类型，qiniu 七牛，local 本地, sae SAE
- * @param bool   $replace 是否强制替换
+ * @param int $type 图片的类型，qiniu 七牛，local 本地, sae SAE
+ * @param bool $replace 是否强制替换
  * @return string
  * @auth 陈一枭
  */
 function getThumbImageById($cover_id, $width = 100, $height = 'auto', $type = 0, $replace = false)
 {
-
-    $picture = M('Picture')->where(array('status' => 1))->getById($cover_id);
+    $picture = S('picture_' . $cover_id);
     if (empty($picture)) {
-        return getRootUrl() . 'Public/Core/images/nopic.png';
+        $picture = M('Picture')->where(array('status' => 1))->getById($cover_id);
+        S('picture_' . $cover_id, $picture);
     }
-    switch ($picture['type']) {
-        case 'qiniu':
-            $height=$height=='auto'?100:$height;
-            if(stripos($picture['path'],'imageMogr2') !== false){
-                $picture['path'] = $picture['path'] . '/thumbnail/' . $width . 'x' . $height;
-            }else{
-                $picture['path'] = $picture['path'] . '?imageView/1/w/' . $width . '/h/' . $height;
+
+    if (empty($picture)) {
+        return get_pic_src('Public/images/nopic.png');
+    }
+    if ($picture['type'] == 'local') {
+        $attach = getThumbImage($picture['path'], $width, $height, $type, $replace);
+        return get_pic_src($attach['src']);
+    } else {
+        $new_img = $picture['path'];
+        $name = get_addon_class($picture['type']);
+        if (class_exists($name)) {
+            $class = new $name();
+            if (method_exists($class, 'thumb')) {
+                $new_img = $class->thumb($picture['path'], $width, $height, $type, $replace);
             }
-            return $picture['path'];
-            break;
-        case 'local':
-            $attach = getThumbImage($picture['path'], $width, $height, $type, $replace);
-            $attach['src'] = getRootUrl() . $attach['src'];
-            return $attach['src'];
-        case 'sae':
-            $attach = getThumbImage($picture['path'], $width, $height, $type, $replace);
-            return $attach['src'];
-        default:
-            return $picture['path'];
+        }
+        return get_pic_src($new_img);
     }
 
 }
 
-/**对于附件来修正其url，兼容urlmodel2,sae
- * @param $url
+/**简写函数，等同于getThumbImageById（）
+ * @param $cover_id 图片id
+ * @param int $width 宽度
+ * @param string $height 高度
+ * @param int $type 裁剪类型，0居中裁剪
+ * @param bool $replace 裁剪
  * @return string
- * @auth 陈一枭
  */
-function fixAttachUrl($url)
+function thumb($cover_id, $width = 100, $height = 'auto', $type = 0, $replace = false)
 {
-    if (is_local()) {
-        return str_replace('//', '/', getRootUrl() . $url); //防止双斜杠的出现
-    } else {
-        return $url;
-    }
+    return getThumbImageById($cover_id, $width, $height, $type, $replace);
+}
 
+
+/**获取第一张图
+ * @param $str_img
+ * @return mixed
+ */
+function get_pic($str_img)
+{
+    preg_match_all("/<img.*\>/isU", $str_img, $ereg); //正则表达式把图片的整个都获取出来了
+    $img = $ereg[0][0]; //图片
+    $p = "#src=('|\")(.*)('|\")#isU"; //正则表达式
+    preg_match_all($p, $img, $img1);
+    $img_path = $img1[2][0]; //获取第一张图片路径
+    return $img_path;
+}
+
+
+/**
+ * get_pic_src   渲染图片链接
+ * @param $path
+ * @return mixed
+ * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+ */
+function get_pic_src($path)
+{
+    //不存在http://
+    $not_http_remote = (strpos($path, 'http://') === false);
+    //不存在https://
+    $not_https_remote = (strpos($path, 'https://') === false);
+    if ($not_http_remote && $not_https_remote) {
+        //本地url
+        return str_replace('//', '/', getRootUrl() . $path); //防止双斜杠的出现
+    } else {
+        //远端url
+        return $path;
+    }
 }

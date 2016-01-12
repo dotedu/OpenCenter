@@ -47,7 +47,7 @@ class InputRenderWidget extends Action
                 break;
             case 'radio':
                 $this->assign('field_name', $data['field_name']);
-                $checked = isset($data['field_content']['field_data']) ? $data['field_content']['field_data'] : "还未选择";
+                $checked = isset($data['field_content']['field_data']) ? $data['field_content']['field_data'] : L('_SELECT_NOT_');
                 if ($type == "personal") {
                     if ($data['form_default_value'] != '' && $data['form_default_value'] != null) {
                         $canCheck = explode('|', $data['form_default_value']);
@@ -146,7 +146,7 @@ class InputRenderWidget extends Action
                 break;
             case 'select':
                 $this->assign('field_name', $data['field_name']);
-                $selected = isset($data['field_content']['field_data']) ? $data['field_content']['field_data'] : "还未选择";
+                $selected = isset($data['field_content']['field_data']) ? $data['field_content']['field_data'] : L('_SELECT_NOT_');
                 if ($type == "personal") {
                     /*
                      * 添加用户扩展资料可添加关联字段功能（多选支持）
@@ -162,7 +162,6 @@ class InputRenderWidget extends Action
                             $items[$key]['id'] = $val['id'];
                             $items[$key]['selected'] = ($selected == $val['id']) ? 'selected' : '';
                         }
-                    
                     } else {  
                         if ($data['form_default_value'] != '' && $data['form_default_value'] != null) {
                             /*
@@ -200,7 +199,7 @@ class InputRenderWidget extends Action
                             
                             }
                         } else {
-                            $canSelected[0]['value'] = '无';
+                            $canSelected[0]['value'] = L('_NONE_');
                             $canSelected[0]['selected'] = 'selected';
                         }
                       }

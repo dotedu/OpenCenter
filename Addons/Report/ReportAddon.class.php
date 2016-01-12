@@ -24,6 +24,11 @@ class ReportAddon extends Addon
     {
         $prefix = C("DB_PREFIX");
         $model = D();
+        $model->execute("DELETE FROM `{$prefix}hooks`  WHERE `name` =\"report\";");
+        $model->execute("INSERT INTO `{$prefix}hooks` ( `name`, `description`, `type`, `update_time`, `addons`) VALUES
+(\"report\", \"举报钩子\", 1, 1429511732, \"Report\");");
+
+
         $model->execute("DROP TABLE IF EXISTS `{$prefix}report`");
         $model->execute("
 CREATE TABLE IF NOT EXISTS `{$prefix}report` (

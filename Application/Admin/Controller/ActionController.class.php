@@ -8,6 +8,7 @@
 // +----------------------------------------------------------------------
 
 namespace Admin\Controller;
+use Admin\Builder\AdminListBuilder;
 
 /**
  * 行为控制器
@@ -21,6 +22,8 @@ class ActionController extends AdminController {
      */
     public function actionLog(){
         //获取列表数据
+        $aUid=I('get.uid',0,'intval');
+        if($aUid) $map['user_id']=$aUid;
         $map['status']    =   array('gt', -1);
         $list   =   $this->lists('ActionLog', $map);
         int_to_string($list);
@@ -30,8 +33,47 @@ class ActionController extends AdminController {
         }
 
         $this->assign('_list', $list);
-        $this->meta_title = '行为日志';
+        $this->meta_title = L('_BEHAVIOR_LOG_');
         $this->display();
+    }
+    public function scoreLog($r=20,$p=1){
+
+        if(I('type')=='clear'){
+            D('ScoreLog')->where(array('id>0'))->delete();
+            $this->success('清空成功。',U('scoreLog'));
+            exit;
+        }else{
+            $aUid=I('uid',0,'');
+            if($aUid){
+                $map['uid']=$aUid;
+            }
+            $listBuilder=new AdminListBuilder();
+            $listBuilder->title('积分日志');
+            $map['status']    =   array('gt', -1);
+            $scoreLog=D('ScoreLog')->where($map)->order('create_time desc')->findPage($r);
+
+            $scoreTypes=D('Ucenter/Score')->getTypeListByIndex();
+            foreach ($scoreLog['data'] as &$v) {
+                $v['adjustType']=$v['action']=='inc'?'增加':'减少';
+                $v['scoreType']=$scoreTypes[$v['type']]['title'];
+                $class=$v['action']=='inc'?'text-success':'text-danger';
+                $v['value']='<span class="'.$class.'">' .  ($v['action']=='inc'?'+':'-'). $v['value']. $scoreTypes[$v['type']]['unit'].'</span>';
+                $v['finally_value']= $v['finally_value']. $scoreTypes[$v['type']]['unit'];
+            }
+
+
+            $listBuilder->data($scoreLog['data']);
+
+            $listBuilder->keyId()->keyUid('uid','用户')->keyText('scoreType','积分类型')->keyText('adjustType','调整类型')->keyHtml('value','积分变动')->keyText('finally_value','积分最终值')->keyText('remark','变动描述')->keyCreateTime();
+            $listBuilder->pagination($scoreLog['count'],$r);
+            $listBuilder->search(L('_SEARCH_'),'uid','text','输入UID');
+
+            $listBuilder->button('清空日志',array('url'=>U('scoreLog',array('type'=>'clear')),'class'=>'btn ajax-get confirm'));
+            $listBuilder->display();
+        }
+
+
+
     }
 
     /**
@@ -39,12 +81,12 @@ class ActionController extends AdminController {
      * @author huajie <banhuajie@163.com>
      */
     public function edit($id = 0){
-        empty($id) && $this->error('参数错误！');
+        empty($id) && $this->error(L('_PARAMETER_ERROR_'));
 
         $info = M('ActionLog')->field(true)->find($id);
 
         $this->assign('info', $info);
-        $this->meta_title = '查看行为日志';
+        $this->meta_title = L('_CHECK_THE_BEHAVIOR_LOG_');
         $this->display();
     }
 
@@ -54,7 +96,7 @@ class ActionController extends AdminController {
      * @author huajie <banhuajie@163.com>
      */
     public function remove($ids = 0){
-        empty($ids) && $this->error('参数错误！');
+        empty($ids) && $this->error(L('_PARAMETER_ERROR_'));
         if(is_array($ids)){
             $map['id'] = array('in', $ids);
         }elseif (is_numeric($ids)){
@@ -62,9 +104,9 @@ class ActionController extends AdminController {
         }
         $res = M('ActionLog')->where($map)->delete();
         if($res !== false){
-            $this->success('删除成功！');
+            $this->success(L('_DELETE_SUCCESS_'));
         }else {
-            $this->error('删除失败！');
+            $this->error(L('_DELETE_FAILED_'));
         }
     }
 
@@ -74,9 +116,9 @@ class ActionController extends AdminController {
     public function clear(){
         $res = M('ActionLog')->where('1=1')->delete();
         if($res !== false){
-            $this->success('日志清空成功！');
+            $this->success(L('_LOG_EMPTY_SUCCESSFULLY_'));
         }else {
-            $this->error('日志清空失败！');
+            $this->error(L('_LOG_EMPTY_'));
         }
     }
 

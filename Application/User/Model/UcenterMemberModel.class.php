@@ -11,8 +11,8 @@ namespace User\Model;
 use Think\Model;
 use Home\Model\MemberModel;
 
-require_once(APP_PATH . 'User/Conf/config.php');
-require_once(APP_PATH . 'User/Common/common.php');
+require_once(APP_PATH . '/User/Conf/config.php');
+require_once(APP_PATH. '/User/Common/common.php');
 
 /**
  * 会员模型
@@ -34,7 +34,7 @@ class UcenterMemberModel extends Model
     /* 用户模型自动验证 */
     protected $_validate = array(
         /* 验证用户名 */
-        array('username', '4,32', -1, self::EXISTS_VALIDATE, 'length'), //用户名长度不合法
+        array('username', 'checkUsernameLength', -1, self::EXISTS_VALIDATE,'callback'), //用户名长度不合法
         array('username', 'checkDenyMember', -2, self::EXISTS_VALIDATE, 'callback'), //用户名禁止注册
         array('username', 'checkUsername', -20, self::EXISTS_VALIDATE, 'callback'),
         array('username', '', -3, self::EXISTS_VALIDATE, 'unique'), //用户名被占用
@@ -99,7 +99,7 @@ class UcenterMemberModel extends Model
         if (strpos($username, ' ') !== false) {
             return false;
         }
-        preg_match("/^[a-zA-Z0-9_]{4,32}$/", $username, $result);
+        preg_match("/^[a-zA-Z0-9_]{0,64}$/", $username, $result);
 
         if (!$result) {
             return false;
@@ -107,6 +107,20 @@ class UcenterMemberModel extends Model
         return true;
     }
 
+    /**
+     * 验证用户名长度
+     * @param $username
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    protected function checkUsernameLength($username)
+    {
+        $length = mb_strlen($username, 'utf-8'); // 当前数据长度
+        if ($length < modC('USERNAME_MIN_LENGTH',2,'USERCONFIG') || $length > modC('USERNAME_MAX_LENGTH',32,'USERCONFIG')) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * 检测手机是不是被禁止注册
@@ -136,9 +150,8 @@ class UcenterMemberModel extends Model
      * @param  string $mobile 用户手机号码
      * @return integer          注册成功-用户信息，注册失败-错误编号
      */
-    public function register($username, $nickname, $password, $email, $mobile, $type=1)
+    public function register($username, $nickname, $password, $email='', $mobile='', $type=1)
     {
-
         $data = array(
             'username' => $username,
             'password' => $password,
@@ -183,9 +196,7 @@ class UcenterMemberModel extends Model
     public function login($username, $password, $type = 1)
     {
 
-        if (UC_SYNC && $username != get_username(1) && $type == 1) {
-            return $this->ucLogin($username, $password);
-        }
+
         $map = array();
         switch ($type) {
             case 1:
@@ -211,6 +222,11 @@ class UcenterMemberModel extends Model
             return $return['info'];
         }
 
+
+        if (UC_SYNC && $user['id'] != 1) {
+            return $this->ucLogin($username, $password);
+        }
+
         if (is_array($user) && $user['status']) {
             /* 验证用户密码 */
             if (think_ucenter_md5($password, UC_AUTH_KEY) === $user['password']) {
@@ -232,62 +248,113 @@ class UcenterMemberModel extends Model
         //Ucenter 内数据
         $uc_user = uc_user_login($username, $password, 0);
         //关联表内数据
-        $uc_user_ref = tox_get_ucenter_user_ref('', $uc_user['0'], '');
+        $uc_user_ref = get_ucenter_user_ref('', $uc_user['0'], '');
         //登录
         if ($uc_user_ref['uid'] && $uc_user_ref['uc_uid'] && $uc_user[0] > 0) {
             return $uc_user_ref['uid'];
         }
         //本地帐号信息
-        $tox_user = $this->model->getLocal($username, $password);
+        $tox_user = $this->getLocal($username, $password);
         // 关联表无、UC有、本地无的
         if ($uc_user[0] > 0 && !$tox_user['id']) {
             $uid = $this->register($uc_user[1], $uc_user[1], $uc_user[2], $uc_user[3], '', 1);
             if ($uid <= 0) {
-                return A('Home/User')->showRegError($uid);
+                return A('Ucenter/Member')->showRegError($uid);
             }
-            $result = tox_add_ucenter_user_ref($uid, $uc_user[0], $uc_user[1], $uc_user[3]);
+
+            $this->initRoleUser(1, $uid); //初始化角色用户
+
+            $result = add_ucenter_user_ref($uid, $uc_user[0], $uc_user[1], $uc_user[3]);
             if (!$result) {
-                return '用户不存在或密码错误';
+                return L('_USER_DOES_NOT_EXIST_OR_PASSWORD_ERROR_');
             }
             return $uid;
         }
         // 关联表无、UC有、本地有的
         if ($uc_user[0] > 0 && $tox_user['id'] > 0) {
-            $result = tox_add_ucenter_user_ref($tox_user['id'], $uc_user[0], $uc_user[1], $uc_user[3]);
+            $result = add_ucenter_user_ref($tox_user['id'], $uc_user[0], $uc_user[1], $uc_user[3]);
             if (!$result) {
-                return '用户不存在或密码错误';
+                return L('_USER_DOES_NOT_EXIST_OR_PASSWORD_ERROR_');
             }
             return $tox_user['id'];
         }
         // 关联表无、UC无、本地有
         if ($uc_user[0] < 0 && $tox_user['id'] > 0) {
+            $email = $tox_user['email']?$tox_user['email']:$this->rand_email();
             //写入UC
-            $uc_uid = uc_user_register($tox_user['username'], $password, $tox_user['email'], '', '', get_client_ip());
+            $uc_uid = uc_user_register($tox_user['username'], $password,$email , '', '', get_client_ip());
             if ($uc_uid <= 0) {
-                return 'UC帐号注册失败，请联系管理员';
+                return L('_UC_ACCOUNT_REGISTRATION_FAILED_PLEASE_CONTACT_THE_ADMINISTRATOR_');
             }
             //写入关联表
             if (M('ucenter_user_link')->where(array('uid' => $tox_user['id']))->find()) {
-                $result = tox_update_ucenter_user_ref($tox_user['id'], $uc_uid, $tox_user['username'], $tox_user['email']);
+                $result = update_ucenter_user_ref($tox_user['id'], $uc_uid, $tox_user['username'], $email);
             } else {
-                $result = tox_add_ucenter_user_ref($tox_user['id'], $uc_uid, $tox_user['username'], $tox_user['email']);
+                $result = add_ucenter_user_ref($tox_user['id'], $uc_uid, $tox_user['username'], $email);
             }
             if (!$result) {
-                return '用户不存在或密码错误';
+                return L('_USER_DOES_NOT_EXIST_OR_PASSWORD_ERROR_');
             }
             return $tox_user['id'];
         }
 
         //关联表无、UC无、本地无的
-        return '用户不存在';
+        return L('_USERS_DO_NOT_EXIST_');
 
+    }
+
+
+
+    /**
+     * 初始化角色用户信息
+     * @param $role_id
+     * @param $uid
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public  function initRoleUser($role_id = 0, $uid)
+    {
+        $memberModel = D('Member');
+        $role = D('Role')->where(array('id' => $role_id))->find();
+        $user_role = array('uid' => $uid, 'role_id' => $role_id, 'step' => "start");
+        if ($role['audit']) { //该角色需要审核
+            $user_role['status'] = 2; //未审核
+        } else {
+            $user_role['status'] = 1;
+        }
+        $result = D('UserRole')->add($user_role);
+        if (!$role['audit']) {
+            //该角色不需要审核
+            $memberModel->initUserRoleInfo($role_id, $uid);
+        }
+        $memberModel->initDefaultShowRole($role_id, $uid);
+
+        return $result;
     }
 
 
     public function getLocal($username, $password)
     {
+        $aUsername = $username;
+        check_username($aUsername, $email, $mobile, $type);
+
         $map = array();
-        $map['username'] = $username;
+        switch ($type) {
+            case 1:
+                $map['username'] = $username;
+                break;
+            case 2:
+                $map['email'] = $username;
+                break;
+            case 3:
+                $map['mobile'] = $username;
+                break;
+            case 4:
+                $map['id'] = $username;
+                break;
+            default:
+                return 0; //参数错误
+        }
 
         /* 获取用户数据 */
         $user = $this->where($map)->find();
@@ -444,13 +511,13 @@ class UcenterMemberModel extends Model
     public function updateUserFields($uid, $password, $data)
     {
         if (empty($uid) || empty($password) || empty($data)) {
-            $this->error = '参数错误！25';
+            $this->error = L('_PARAM_ERROR_25_');
             return false;
         }
 
         //更新前检查用户密码
         if (!$this->verifyUser($uid, $password)) {
-            $this->error = '验证出错：密码不正确！';
+            $this->error = L('_VERIFY_ERROR_PW_WRONG_');
             return false;
         }
 
@@ -473,7 +540,7 @@ class UcenterMemberModel extends Model
     public function updateUserFieldss($uid, $data)
     {
         if (empty($uid) || empty($data)) {
-            $this->error = '参数错误！26';
+            $this->error = L('_PARAM_ERROR_25_');
             return false;
         }
         //更新用户信息
@@ -501,47 +568,7 @@ class UcenterMemberModel extends Model
     }
 
 
-    public function addSyncData()
-    {
 
-        $data['username'] = $this->rand_username();
-        $data['email'] = $this->rand_email();
-        $data['password'] = $this->create_rand(10);
-        $data1 = $this->create($data);
-
-        $uid = $this->add($data1);
-        return $uid;
-    }
-
-    public function rand_email()
-    {
-        $email = $this->create_rand(10) . '@ocenter.com';
-        if ($this->where(array('email' => $email))->select()) {
-            $this->rand_email();
-        } else {
-            return $email;
-        }
-    }
-
-    public function rand_username()
-    {
-        $username = $this->create_rand(10);
-        if ($this->where(array('username' => $username))->select()) {
-            $this->rand_username();
-        } else {
-            return $username;
-        }
-    }
-
-    function create_rand($length = 8)
-    {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $password = '';
-        for ($i = 0; $i < $length; $i++) {
-            $password .= $chars[mt_rand(0, strlen($chars) - 1)];
-        }
-        return $password;
-    }
 
     /**修改密码
      * @param $old_password
@@ -577,60 +604,93 @@ class UcenterMemberModel extends Model
         $error = $error_code == null ? $this->error : $error_code;
         switch ($error) {
             case -1:
-                $error = '用户名长度必须在32个字符以内！';
+                $error = L('_USER_NAME_MUST_BE_IN_LENGTH_').modC('USERNAME_MIN_LENGTH',2,'USERCONFIG').'-'.modC('USERNAME_MAX_LENGTH',32,'USERCONFIG').L('_BETWEEN_CHARACTERS_WITH_EXCLAMATION_');
                 break;
             case -2:
-                $error = '用户名被禁止注册！';
+                $error = L('_USER_NAME_IS_FORBIDDEN_TO_REGISTER_WITH_EXCLAMATION_');
                 break;
             case -3:
-                $error = '用户名被占用！';
+                $error = L('_USER_NAME_IS_OCCUPIED_WITH_EXCLAMATION_');
                 break;
             case -4:
-                $error = '密码长度必须在6-30个字符之间！';
+                $error = L('_PW_LENGTH_6_30_');
                 break;
             case -41:
-                $error = '用户旧密码不正确';
+                $error = L('_USERS_OLD_PASSWORD_IS_INCORRECT_');
                 break;
             case -5:
-                $error = '邮箱格式不正确！';
+                $error = L('_MAILBOX_FORMAT_IS_NOT_CORRECT_WITH_EXCLAMATION_');
                 break;
             case -6:
-                $error = '邮箱长度必须在1-32个字符之间！';
+                $error = L('_EMAIL_LENGTH_4_32_');
                 break;
             case -7:
-                $error = '邮箱被禁止注册！';
+                $error = L('_MAILBOX_IS_PROHIBITED_TO_REGISTER_WITH_EXCLAMATION_');
                 break;
             case -8:
-                $error = '邮箱被占用！';
+                $error = L('_MAILBOX_IS_OCCUPIED_WITH_EXCLAMATION_');
                 break;
             case -9:
-                $error = '手机格式不正确！';
+                $error = L('_MOBILE_PHONE_FORMAT_IS_NOT_CORRECT_WITH_EXCLAMATION_');
                 break;
             case -10:
-                $error = '手机被禁止注册！';
+                $error = L('_MOBILE_PHONES_ARE_PROHIBITED_FROM_REGISTERING_WITH_EXCLAMATION_');
                 break;
             case -11:
-                $error = '手机号被占用！';
+                $error = L('_PHONE_NUMBER_IS_OCCUPIED_WITH_EXCLAMATION_');
                 break;
             case -12:
-                $error = '用户名必须以中文或字母开始，只能包含拼音数字，字母，汉字！';
+                $error = L('_UN_LIMIT_SOME_');
                 break;
             case -31:
-                $error = '昵称禁止注册';
+                $error = L('_THE_NICKNAME_IS_PROHIBITED_');
                 break;
             case -33:
-                $error = '昵称长度不合法';
+                $error = L('_NICKNAME_LENGTH_MUST_BE_IN_').modC('NICKNAME_MIN_LENGTH',2,'USERCONFIG').'-'.modC('NICKNAME_MAX_LENGTH',32,'USERCONFIG').L('_BETWEEN_CHARACTERS_WITH_EXCLAMATION_');
                 break;
             case -32:
-                $error = '昵称不合法';
+                $error = L('_THE_NICKNAME_IS_NOT_LEGAL_');
                 break;
             case -30:
-                $error = '昵称已被占用';
+                $error = L('_THE_NICKNAME_HAS_BEEN_OCCUPIED_');
                 break;
 
             default:
-                $error = '未知错误';
+                $error = L('_UNKNOWN_ERROR_');
         }
         return $error;
     }
+
+
+    /**
+     * addSyncData
+     * @return mixed
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function addSyncData()
+    {
+        $data['email'] = $this->rand_email();
+        $data['password'] = create_rand(10);
+        $data['type'] = 2;  // 视作用邮箱注册
+        $data = $this->create($data);
+        $uid = $this->add($data);
+        return $uid;
+    }
+
+    protected  function rand_email()
+    {
+        $email = create_rand(10) . '@ocenter.com';
+        if ($this->where(array('email' => $email))->select()) {
+            $this->rand_email();
+        } else {
+            return $email;
+        }
+    }
+
+
+
+
+
+
+
 }

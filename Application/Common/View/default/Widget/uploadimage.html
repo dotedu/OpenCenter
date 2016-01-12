@@ -1,7 +1,8 @@
-<script type="text/javascript" charset="utf-8" src="__PUBLIC__/Core/js/ext/webuploader/js/webuploader.js"></script>
-<link href="__PUBLIC__/Core/js/ext/webuploader/css/webuploader.css" type="text/css" rel="stylesheet">
+<php>if(!$isLoadScript){</php>
+<script type="text/javascript" charset="utf-8" src="__PUBLIC__/js/ext/webuploader/js/webuploader.js"></script>
+<link href="__PUBLIC__/js/ext/webuploader/css/webuploader.css" type="text/css" rel="stylesheet">
+<php>}</php>
 <span id="web_uploader_wrapper_{$id}">{$config['text']}</span>
-
 <input id="web_uploader_input_{$id}" name="{$name}" type="hidden" value="{$value}" event-args="{$args}" event-node="uploadinput">
 <div id="web_uploader_picture_list_{$id}" class="web_uploader_picture_list">
     {$img}
@@ -28,6 +29,7 @@
         uploader_{$id}.on('uploadSuccess', function (file, ret) {
             if (ret.status == 0) {
                 $("#web_uploader_file_name_{$id}").text(ret.info);
+                toast.error(ret.info);
             } else {
                 $('#web_uploader_input_{$id}').focus();
                 $('#web_uploader_input_{$id}').val(ret.data.file.id);

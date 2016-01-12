@@ -13,7 +13,7 @@ return array(
     //别名
     'alias' => '网站主页',
     //版本号
-    'version' => '1.0.0',
+    'version' => '2.0.0',
     //是否商业模块,1是，0，否
     'is_com' => 0,
     //是否显示在导航栏内？  1是，0否
@@ -27,10 +27,10 @@ return array(
     //前台入口，可用U函数
     'entry' => 'Home/index/index',
 
-    'admin_entry' => 'Admin/index/index',
+    'admin_entry' => 'Admin/Home/config',
 
     'icon'=>'home',
 
-    'can_uninstall' => 0
+    'can_uninstall' => 1
 
 );

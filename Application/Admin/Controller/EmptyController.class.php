@@ -58,7 +58,7 @@ class EmptyController extends Controller
             }
         }catch (\ReflectionException $e){
 
-            $this->error('404，您访问的页面不存在。');
+            $this->error(L('_ERROR_404_'));
 
         }
 

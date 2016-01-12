@@ -2,11 +2,11 @@
 
 <block name="body">
     <div class="main-title">
-        <h2>配置管理 [
+        <h2>{:L('_CONFIG_MANAGER_')} [
             <present name="Think.get.group">
-                <a href="{:U('index')}">全部</a>
+                <a href="{:U('index')}">{:L('_EVERYTHING_')}</a>
                 <else/>
-                <strong>全部</strong></present>
+                <strong>{:L('_EVERYTHING_')}</strong></present>
             &nbsp;
             <foreach name="group" item="vo">
                 <neq name="group_id" value="$key">
@@ -21,16 +21,16 @@
 
     <div class="clearfix with-padding row">
         <div class="col-xs-10">
-            <a class="btn" href="{:U('add')}">新 增</a>
-            <a class="btn ajax-post confirm" url="{:U('del')}" target-form="ids" >删 除</a>
-            <button class="btn list_sort" url="{:U('sort?group='.I('group'),'','')}">排序</button>
+            <a class="btn" href="{:U('add')}">{:L('_ADD_WITH_SPACE_')}</a>
+            <a class="btn ajax-post confirm" url="{:U('del')}" target-form="ids" >{:L('_DELETE_WITH_SPACE_')}</a>
+            <button class="btn list_sort" url="{:U('sort?group='.I('group'),'','')}">{:L('_SORT_')}</button>
             <!-- 高级搜索 -->
         </div>
         <div class="col-xs-2">
             <div class="search-form fr cf">
                 <div class="sleft">
                     <div class="input-group">
-                        <input type="text" name="name" class="form-control" value="{:I('name')}" placeholder="请输入配置名称">
+                        <input type="text" name="name" class="form-control" value="{:I('name')}" placeholder="{:L('_PLACEHOLDER_CONFIG_NAME_INPUT_')}">
                              <span class="input-group-btn">
                             <a class="btn btn-default" href="javascript:;" id="search" url="{:U('config/index')}"><i
                             class="icon-search"></i></a>
@@ -49,12 +49,12 @@
                 <th class="row-selected">
                     <input class="checkbox check-all" type="checkbox">
                 </th>
-                <th>ID</th>
-                <th>名称</th>
-                <th>标题</th>
-                <th>分组</th>
-                <th>类型</th>
-                <th>操作</th>
+                <th>{:L('_ID_')}</th>
+                <th>{:L('_NAME_')}</th>
+                <th>{:L('_TITLE_')}</th>
+                <th>{:L('_GROUP_')}</th>
+                <th>{:L('_TYPE_')}</th>
+                <th>{:L('_OPERATE_')}</th>
             </tr>
             </tr>
             </thead>
@@ -69,13 +69,13 @@
                         <td>{$config.group|get_config_group}</td>
                         <td>{$config.type|get_config_type}</td>
                         <td>
-                            <a title="编辑" href="{:U('edit?id='.$config['id'])}">编辑</a>
-                            <a class="confirm ajax-get" title="删除" href="{:U('del?id='.$config['id'])}">删除</a>
+                            <a title="{:L('_EDIT_')}" href="{:U('edit?id='.$config['id'])}">{:L('_EDIT_')}</a>
+                            <a class="confirm ajax-get" title="{:L('_DELETE_')}" href="{:U('del?id='.$config['id'])}">{:L('_DELETE_')}</a>
                         </td>
                     </tr>
                 </volist>
                 <else/>
-                <td colspan="7" class="text-center"> aOh! 暂时还没有内容!</td>
+                <td colspan="7" class="text-center"> {:L('_ADMIN_USER_EMPTY_')}</td>
             </notempty>
             </tbody>
         </table>

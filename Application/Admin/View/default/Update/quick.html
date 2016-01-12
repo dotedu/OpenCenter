@@ -18,30 +18,30 @@
     </style>
 </block>
 <block name="body">
-    <!-- 标题栏 -->
+    <!-- ������->
     <div class="main-title">
-        <h2>快捷操作</h2>
+        <h2>{:L("_FAST_OPERATION_")}</h2>
     </div>
-    <!-- /标题栏 -->
+    <!-- /������-->
 
     <div class="with-padding">
-        <a id="addpack" class="btn" href="{:U('addpack')}">新增补丁</a><!--
-        <a id="use" class="btn" href="" autocomplete="off">使用补丁</a>-->
+        <a id="addpack" class="btn" href="{:U('addpack')}">{:L("_NEW_PATCH_")}</a><!--
+        <a id="use" class="btn" href="" autocomplete="off">{:L("_USE_PATCHES_")}</a>-->
     </div>
 
-    <!-- 应用列表 -->
+    <!-- Ӧ���б�-->
     <div class="with-padding">
         <table class="table table-bordered table-striped">
             <thead>
             <tr>
-                <th width="200">名称</th>
-                <th>用途介绍</th>
-                <th width="200">作者</th>
-                <th width="80">数据大小</th>
-                <th width="300">补丁创建时间</th>
+                <th width="200">{:L("_NAME_")}</th>
+                <th>{:L("_INTRODUCTION_")}</th>
+                <th width="200">{:L("_AUTHOR_")}</th>
+                <th width="80">{:L("_DATA_SIZE_")}</th>
+                <th width="300">{:L("_PATCH_CREATION_TIME_")}</th>
 
-                <th width="300">最后修改时间</th>
-                <th width="150">操作</th>
+                <th width="300">{:L("_LAST_MODIFICATION_TIME_")}</th>
+                <th width="150">{:L("_OPERATION_")}</th>
             </tr>
             </thead>
             <tbody>
@@ -56,19 +56,19 @@
 
                     <td class="action">
 
-                        <a class="ajax-get confirm use db-import" style="cursor: pointer;color: red;font-weight: bold" href="{:U('use_pack?id='.$data['id'])}">使用</a>&nbsp;
-                        <a class=" use " href="{:U('addpack?id='.$data['id'])}">编辑</a>&nbsp;
+                        <a class="ajax-get confirm use db-import" style="cursor: pointer;color: red;font-weight: bold" href="{:U('use_pack?id='.$data['id'])}">{:L("_USE_")}</a>&nbsp;
+                        <a class=" use " href="{:U('addpack?id='.$data['id'])}">{:L("_EDIT_")}</a>&nbsp;
                         <a id="" class="db-import view" style="cursor: pointer" data="{$data.id}"
-                           type="button">查看</a>&nbsp;
+                           type="button">{:L("_SEE_")}</a>&nbsp;
                         <a class="ajax-get confirm" href="{:U('del_pack?id='.$data['id'])}"
-                                >删除</a>
+                                >{:L("_DELETE_")}</a>
                     </td>
                 </tr>
             </volist>
             </tbody>
         </table>
     </div>
-    <!-- /应用列表 -->
+    <!-- /Ӧ���б�-->
 </block>
 
 <block name="script">
@@ -108,7 +108,7 @@
                             $(window).resize();
                         },
 
-                        title: '查看内容',
+                        title: {:L('_VIEW_CONTENT_WITH_SINGLE_')},
                         unload: true,
                         actions: ['close'],
                         drag: true
@@ -138,22 +138,22 @@
 
             $export.click(function () {
                 $export.parent().children().addClass("disabled");
-                $export.html("正在发送备份请求...");
+                $export.html("{:L("_IS_SENDING_A_BACKUP_REQUEST_")}..");
                 $.post(
                         $form.attr("action"),
                         $form.serialize(),
                         function (data) {
                             if (data.status) {
                                 tables = data.tables;
-                                $export.html(data.info + "开始备份，请不要关闭本页面！");
+                                $export.html(data.info + {:L("_START_BACKUP_PLEASE_DONT_CLOSE_THIS_PAGE_WITH_DOUBLE_")});
                                 backup(data.tab);
                                 window.onbeforeunload = function () {
-                                    return "正在备份数据库，请不要关闭！"
+                                    return {:L("_IS_THE_BACKUP_DATABASE_PLEASE_DONT_TURN_OFF_WITH_DOUBLE_")}
                                 }
                             } else {
                                 updateAlert(data.info, 'alert-error');
                                 $export.parent().children().removeClass("disabled");
-                                $export.html("立即备份");
+                                $export.html({:L("_IMMEDIATE_BACKUP_WITH_DOUBLE_")});
                                 setTimeout(function () {
                                     $('#top-alert').find('button').click();
                                     $(that).removeClass('disabled').prop('disabled', false);
@@ -166,14 +166,14 @@
             });
 
             function backup(tab, status) {
-                status && showmsg(tab.id, "开始备份...(0%)");
+                status && showmsg(tab.id, "{:L("_START_BACK_UP_")}..(0%)");
                 $.get($form.attr("action"), tab, function (data) {
                     if (data.status) {
                         showmsg(tab.id, data.info);
 
                         if (!$.isPlainObject(data.tab)) {
                             $export.parent().children().removeClass("disabled");
-                            $export.html("备份完成，点击重新备份");
+                            $export.html({:L("_BACK_UP_CLICK_ON_THE_BACKUP_WITH_DOUBLE_")});
                             window.onbeforeunload = function () {
                                 return null
                             }
@@ -183,7 +183,7 @@
                     } else {
                         updateAlert(data.info, 'alert-error');
                         $export.parent().children().removeClass("disabled");
-                        $export.html("立即备份");
+                        $export.html({:L("_IMMEDIATE_BACKUP_WITH_DOUBLE_")});
                         setTimeout(function () {
                             $('#top-alert').find('button').click();
                             $(that).removeClass('disabled').prop('disabled', false);

@@ -22,6 +22,7 @@ class RegStepWidget extends Action
     public $mStep = array(
         'change_avatar'=>'修改头像',
         'expand_info'=>'填写扩展资料',
+        'set_tag'=>'选择个人标签',
     );
 
     public function  view()
@@ -34,23 +35,60 @@ class RegStepWidget extends Action
         $this->display(T('Ucenter@Step/'.$aStep));
     }
 
-    private function change_avatar(){
+    private function change_avatar()
+    {
         $aUid = session('temp_login_uid');
         if(empty($aUid)){
-            $this->error('参数错误');
+            $this->error(L('_ERROR_PARAM_'));
         }
         $this->assign('user',query_user(array('avatar128')));
         $this->assign('uid',$aUid);
     }
 
-    private function expand_info(){
+    private function expand_info()
+    {
         $aUid = session('temp_login_uid');
         if( empty($aUid)){
-            $this->error('参数错误');
+            $this->error(L('_ERROR_PARAM_'));
         }
-
         $this->getExpandInfo($aUid);
         $this->assign('uid',$aUid);
+    }
+
+    private function set_tag()
+    {
+        $userTagLinkModel=D('Ucenter/UserTagLink');
+        $aUid = session('temp_login_uid');
+        $aRole = session('temp_login_role_id');
+        $userTagModel=D('Ucenter/UserTag');
+        $map=getRoleConfigMap('user_tag',$aRole);
+        $ids=M('RoleConfig')->where($map)->getField('value');
+        if($ids){
+            $ids=explode(',',$ids);
+            $tag_list=$userTagModel->getTreeListByIds($ids);
+            $this->assign('tag_list',$tag_list);
+        }
+        if(!count($tag_list)){
+            redirect(U('Ucenter/member/step', array('step' => get_next_step('set_tag'))));
+        }
+        $myTags=$userTagLinkModel->getUserTag($aUid);
+        $this->assign('my_tag',$myTags);
+        $my_tag_ids=array_column($myTags,'id');
+        $my_tag_ids=implode(',',$my_tag_ids);
+        $this->assign('my_tag_ids',$my_tag_ids);
+    }
+    public function do_set_tag()
+    {
+        $userTagLinkModel=D('Ucenter/UserTagLink');
+        $aTagIds=I('post.tag_ids','','op_t');
+        $result=$userTagLinkModel->editData($aTagIds);
+        if($result){
+            $res['status']=1;
+        }else{
+            $res['status']=0;
+            $res['info']=L('_INFO_OPERATE_FAIL_').L('_EXCLAMATION_');
+        }
+        return $res;
     }
 
     /**获取用户扩展信息
@@ -133,7 +171,7 @@ class RegStepWidget extends Action
                     $validation['max'] = '';
                 }
                 $info['succ'] = 0;
-                $info['msg'] = $data['field_name'] . "长度必须在" . $validation['min'] . "-" . $validation['max'] . "之间";
+                $info['msg'] = $data['field_name'] . L('_MSG_LENGTH_1_') . $validation['min'] . "-" . $validation['max'] . L('_MSG_LENGTH_2_');
             }
         } else {
             switch ($data['child_form_type']) {
@@ -144,7 +182,7 @@ class RegStepWidget extends Action
                             $validation['max'] = '';
                         }
                         $info['succ'] = 0;
-                        $info['msg'] = $data['field_name'] . "长度必须在" . $validation['min'] . "-" . $validation['max'] . "之间";
+                        $info['msg'] = $data['field_name'] . L('_MSG_LENGTH_1_') . $validation['min'] . "-" . $validation['max'] . L('_MSG_LENGTH_2_');
                     }
                     break;
                 case 'number':
@@ -155,23 +193,23 @@ class RegStepWidget extends Action
                                 $validation['max'] = '';
                             }
                             $info['succ'] = 0;
-                            $info['msg'] = $data['field_name'] . "长度必须在" . $validation['min'] . "-" . $validation['max'] . "之间，且为数字";
+                            $info['msg'] = $data['field_name'] . L('_MSG_LENGTH_1_') . $validation['min'] . "-" . $validation['max'] . L('_MSG_LENGTH_2_').L('_COMMA_').L('_DIGITAL_AND_');
                         }
                     } else {
                         $info['succ'] = 0;
-                        $info['msg'] = $data['field_name'] . "必须是数字";
+                        $info['msg'] = $data['field_name'] . L('_DIGITAL_MUST_');
                     }
                     break;
                 case 'email':
                     if (!preg_match("/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i", $data['value'])) {
                         $info['succ'] = 0;
-                        $info['msg'] = $data['field_name'] . "格式不正确，必需为邮箱格式";
+                        $info['msg'] = $data['field_name'] . L('_COMMA_').L('_MSG_EMAIL_MUST_');
                     }
                     break;
                 case 'phone':
                     if (!preg_match("/^\d{11}$/", $data['value'])) {
                         $info['succ'] = 0;
-                        $info['msg'] = $data['field_name'] . "格式不正确，必须为手机号码格式";
+                        $info['msg'] = $data['field_name'] . L('_MSG_FORMAT_').L('_COMMA_').L('_MSG_PHONE_MUST_');
                     }
                     break;
             }
@@ -210,13 +248,13 @@ class RegStepWidget extends Action
         if($field_list){
             $map_field['id']=array('in',$field_list);
         }else{
-            $this->error('没有要保存的信息！');
+            $this->error(L('_ERROR_INFO_SAVE_NONE_').L('_EXCLAMATION_'));
         }
         $map_field['status']=1;
         $field_setting_list = D('field_setting')->where($map_field)->order('sort asc')->select();
 
         if (!$field_setting_list) {
-            $this->error('没有要修改的信息！');
+            $this->error(L('_ERROR_INFO_MODIFY_NONE_').L('_EXCLAMATION_'));
         }
 
         $data = null;
@@ -228,7 +266,7 @@ class RegStepWidget extends Action
                     $val['value'] = op_t($_POST['expand_' . $val['id']]);
                     if (!$val['value'] || $val['value'] == '') {
                         if ($val['required'] == 1) {
-                            $this->error($val['field_name'] . '内容不能为空！');
+                            $this->error($val['field_name'] . L('_ERROR_CONTENT_CANNOT_EMPTY_').L('_EXCLAMATION_'));
                         }
                     } else {
                         $val['submit'] = $this->_checkInput($val);
@@ -245,7 +283,7 @@ class RegStepWidget extends Action
                 case 'checkbox':
                     $val['value'] = $_POST['expand_' . $val['id']];
                     if (!is_array($val['value']) && $val['required'] == 1) {
-                        $this->error('请至少选择一个：' . $val['field_name']);
+                        $this->error(L('_ERROR_AT_LEAST_ONE_').L('_COLON_') . $val['field_name']);
                     }
                     $data[$key]['field_data'] = is_array($val['value']) ? implode('|', $val['value']) : '';
                     break;
@@ -262,7 +300,7 @@ class RegStepWidget extends Action
                     $val['value'] = op_t($_POST['expand_' . $val['id']]);
                     if (!$val['value'] || $val['value'] == '') {
                         if ($val['required'] == 1) {
-                            $this->error($val['field_name'] . '内容不能为空！');
+                            $this->error($val['field_name'] .L('_ERROR_CONTENT_CANNOT_EMPTY_').L('_EXCLAMATION_'));
                         }
                     } else {
                         $val['submit'] = $this->_checkInput($val);
@@ -290,14 +328,14 @@ class RegStepWidget extends Action
                 if ($dl['field_data'] != '' && $dl['field_data'] != null) {
                     $dl['createTime'] = $dl['changeTime'] = time();
                     if (!D('field')->add($dl)) {
-                        $result['info']='信息添加时出错！';
+                        $result['info']=L('_ERROR_INFO_ADD_').L('_EXCLAMATION_');
                         $result['status']=0;
                     }
                 }
             } else {
                 $dl['changeTime'] = time();
                 if (!D('field')->where('id=' . $res['id'])->save($dl)) {
-                    $result['info']='信息修改时出错！';
+                    $result['info']=L('_ERROR_INFO_MODIFY_').L('_EXCLAMATION_');
                     $result['status']=0;
                 }
             }

@@ -150,6 +150,25 @@ class Dispatcher {
             // 加载模块配置文件
             if(is_file(MODULE_PATH.'Conf/config'.CONF_EXT))
                 C(load_config(MODULE_PATH.'Conf/config'.CONF_EXT));
+
+            /**加载主题公共配置文件
+             * 2015-5-14 13:43
+             * 增加主题配置文件加载 start
+             * @author 郑钟良<zzl@ourstu.com>
+             */
+            if(is_file(OS_THEME_PATH.'config.php')){
+                $TMPL_PARSE_STRING=C('TMPL_PARSE_STRING');
+                C(load_config(OS_THEME_PATH.'config.php'));
+                $NEW_TMPL_PARSE_STRING=C('TMPL_PARSE_STRING');
+                $NEW_TMPL_PARSE_STRING=array_merge($NEW_TMPL_PARSE_STRING,$TMPL_PARSE_STRING);
+                C('TMPL_PARSE_STRING',$NEW_TMPL_PARSE_STRING);
+            }
+            /**
+             * 2015-5-14 13:43
+             * 增加主题配置文件加载 end
+             * @author 郑钟良<zzl@ourstu.com>
+             */
+
             // 加载应用模式对应的配置文件
             if('common' != APP_MODE && is_file(MODULE_PATH.'Conf/config_'.APP_MODE.CONF_EXT))
                 C(load_config(MODULE_PATH.'Conf/config_'.APP_MODE.CONF_EXT));
@@ -169,16 +188,15 @@ class Dispatcher {
             // 加载模块的扩展配置文件
             load_ext_file(MODULE_PATH);
         }else{
-            E(L('_MODULE_NOT_EXIST_').':'.MODULE_NAME);
+            E(L('_MODULE_NOT_EXIST_').':'.MODULE_NAME,815);
         }
 
         if(!defined('__APP__')){
-            if(is_file( '/Conf/user.php'))
+            if(is_file( './Conf/user.php'))
             {
                 C(api('Config/lists'));//合并入后台设置
             }
-	        $urlMode        =   C('URL_MODEL');
-            //dump($urlMode);exit;
+	        $urlMode        = MODULE_NAME=='Admin'?3:  C('URL_MODEL');
 	        if($urlMode == URL_COMPAT ){// 兼容模式判断
 	            define('PHP_FILE',_PHP_FILE_.'?'.$varPath.'=');
 	        }elseif($urlMode == URL_REWRITE ) {

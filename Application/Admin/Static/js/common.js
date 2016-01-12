@@ -68,6 +68,7 @@ $(function () {
         var nead_confirm = false;
         if (($(this).attr('type') == 'submit') || (target = $(this).attr('href')) || (target = $(this).attr('url'))) {
             form = $('.' + target_form);
+
             if ($(this).attr('hide-data') === 'true') {//无数据时也可以使用的功能
                 form = $('.hide-data');
                 query = form.serialize();
@@ -112,7 +113,7 @@ $(function () {
                 }
                 query = form.find('input,select,textarea').serialize();
             }
-            if(query==''){
+            if(query==''&&$(this).attr('hide-data') != 'true'){
                 updateAlert('请勾选操作对象。','danger');
                 return false;
             }
@@ -135,7 +136,7 @@ $(function () {
                         }
                     }, 1500);
                 } else {
-                    updateAlert(data.info);
+                    updateAlert(data.info,'error');
                     setTimeout(function () {
                         if (data.url) {
                             location.href = data.url;
@@ -160,11 +161,12 @@ $(function () {
 
     window.updateAlert = function (text, c) {
 
+
         if(typeof c !='undefined')
         {
-            var msg = $.messager.show(text, {placement: 'bottom',type:c});
+            var msg = $.zui.messager.show(text, {placement: 'bottom',type:c});
         }else {
-            var msg = $.messager.show(text, {placement: 'bottom'})
+            var msg =  $.zui.messager.show(text, {placement: 'bottom'})
         }
         msg.show();
     };

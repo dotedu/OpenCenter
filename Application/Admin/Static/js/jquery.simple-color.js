@@ -146,8 +146,8 @@
       'margin':           '0 0 0 5px',
       'width':            options.totalWidth+2,
       'height':           options.totalHeight,
-      'top':              25,
-      'left':             -117,
+      'top':              22,
+      'left':             -5,
       'position':         'absolute',
       'background-color': '#fff'
     }, options.chooserCSS || {});

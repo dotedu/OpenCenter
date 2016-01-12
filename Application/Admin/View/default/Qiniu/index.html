@@ -60,12 +60,12 @@
 	<div class="right-cnt">
 		<!-- ko ifnot: certainFile -->
 		<div class="right-head">
-			未选择文件
+			{:L("_NOT_SELECTED_FILE_")}
 		</div>
 		<div class="right-body">
 			<div class="right-body-block">
 				<div class="prev-block">
-					<span>点击左侧文件名以查看信息</span>
+					<span>{:L("_CLICK_THE_LEFT_FILE_NAME_TO_VIEW_THE_INFORMATION_")}</span>
 				</div>
 			</div>
 		</div>
@@ -76,16 +76,16 @@
 <block name="body">
 	<!-- 标题栏 -->
 	<div class="main-title">
-		<h2>blackwhite的七牛空间</h2>
+		<h2>blackwhit{:L("_E_SEVEN_CATTLE_SPACE_")}</h2>
 	</div>
 	<div>
 		<form action="__SELF__" method="post">
-			<input type="text" class="search-input" name="prefix" placeholder="输入资源名前缀匹配">
-			<button class="btn" type="submit">搜索</button>
+			<input type="text" class="search-input" name="prefix" placeholder={:L("_INPUT_RESOURCE_NAME_PREFIX_MATCHING_WITH_DOUBLE_")}>
+			<button class="btn" type="submit">{:L("_SEARCH_")}</button>
 
 			<input type="file" name="file" id="upload-file">
-			<button class="btn" target-form="ids" id="batchDelBtn" type="button">删 除</button>
-			<a href="javascript:location.reload(true);" class="btn">刷新</a>
+			<button class="btn" target-form="ids" id="batchDelBtn" type="button">{:L("_DELETE_WITH_SPACE_")}</button>
+			<a href="javascript:location.reload(true);" class="btn">{:L("_REFRESH_")}</a>
 		</form>
 	</div>
 
@@ -96,11 +96,11 @@
 				<thead>
 					<tr>
 						<th></th>
-						<th>文件名</th>
+						<th>{:L("_FILE_NAME_")}</th>
 						<th>mimeType</th>
-						<th >最后更新时间</th>
-						<th>文件大小</th>
-						<th>操作</th>
+						<th >{:L("_LAST_UPDATE_TIME_")}</th>
+						<th>{:L("_FILE_SIZE_")}</th>
+						<th>{:L("_OPERATION_")}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -112,10 +112,10 @@
 							<td>{$vo.putTime|strval|substr=###,0,11|bcmul="1000000000"|date="Y-m-d H:i:s",###}</td>
 							<td>{$vo.fsize|format_bytes}</td>
 							<td>
-								<a href="javascript:;" data-href="{:U('rename?file='.$vo['key'])}" class="rename" title="{$vo.key}">重命名</a>
-								<a href="{:$qiniu->downLink($vo['key'])}" target="_blank">下载</a>
-								<a href="{:U('del?file='.$vo['key'])}">删除</a>
-								<a href="javascript:adv('{$vo.mimeType}','{$vo.key}')">高级</a>
+								<a href="javascript:;" data-href="{:U('rename?file='.$vo['key'])}" class="rename" title="{$vo.key}">{:L("_RENAME_")}</a>
+								<a href="{:$qiniu->downLink($vo['key'])}" target="_blank">{:L("_DOWNLOAD_")}</a>
+								<a href="{:U('del?file='.$vo['key'])}">{:L("_DELETE_")}</a>
+								<a href="javascript:adv('{$vo.mimeType}','{$vo.key}')">{:L("_SENIOR_")}</a>
 							</td>
 						</tr>
 					</volist>
@@ -135,7 +135,7 @@
 
 	<script id="hooktpl" type="text/tpl">
 		<form action="" method="post" class="form-horizontal hooktpl" id="rename_form">
-			<label class="item-label">请输入文件名：</label>
+			<label class="item-label">{:L("_PLEASE_ENTER_A_FILE_NAME_")}{:L("_COLON_")}</label>
 			<div class="controls">
 				<label class="textarea">
 					<input type="text" name="new_name" class="input-large" />
@@ -153,7 +153,7 @@
 							<input type="radio" class="type" name="type" value=0 checked>
 						</td>
 						<td>
-							查看基本信息
+							{:L("_VIEW_BASIC_INFORMATION_")}
 						</td>
 					</tr>
 					<tr>
@@ -161,7 +161,7 @@
 							<input type="radio" class="type" name="type" value=1>
 						</td>
 						<td>
-							查看exif
+							{:L("_VIEW_EXIF_")}
 						</td>
 					</tr>
 					<tr>
@@ -170,34 +170,34 @@
 						</td>
 						<td>
 							<form action="{:U('Qiniu/dealImage')}" class="form-horizontal hooktpl" id="resize_form" target="_blank" method="post">
-								<label class="item-label">缩放类型：</label>
+								<label class="item-label">{:L("_SCALING_TYPE_")}{:L("_COLON_")}</label>
 								<div class="controls">
 									<label class="radio">
 										<input type="radio" name="mode" value="1">
-										非等比缩放
+										{:L("_ANISOMETRIC_ZOOM_")}
 									</label>
 									<label class="radio">
 										<input type="radio" name="mode" value="2" checked>
-										等比缩放
+										{:L("_GEOMETRIC_ZOOM_")}
 									</label>
 								</div>
 								<div class="controls">
 									<label class="text">
-										宽度
+										{:L("_WIDTH_")}
 										<input type="text" name="w">
 									</label>
 									<label class="text">
-										高度
+										{:L("_HEIGHT_")}
 										<input type="text" name="h">
 									</label>
 								</div>
 								<div class="controls">
 									<label class="text">
-										质量
+										{:L("_QUALITY_")}
 										<input type="text" name="q" value="100">(1~100)
 									</label>
 									<label class="select">
-										输出格式：
+										{:L("_OUTPUT_FORMAT_")}{:L("_COLON_")}
 										<select	name="format">
 											<option>jpg</option>
 											<option>gif</option>
@@ -218,7 +218,7 @@
 
 	<script id="videoAdv" type="text/tpl">
 		<form action="" method="post" class="form-horizontal hooktpl" id="rename_form">
-			<label class="item-label">请输入文件名：</label>
+			<label class="item-label">{:L("_PLEASE_ENTER_A_FILE_NAME_")}{:L("_COLON_")}</label>
 			<div class="controls">
 				<label class="textarea">
 					<input type="text" name="new_name" class="input-large" />
@@ -229,21 +229,21 @@
 
 	<script id="mdAdv" type="text/tpl">
 		<form action="{:U('Qiniu/dealDoc')}" class="form-horizontal hooktpl" id="translate_form" target="_blank" method="post">
-			<label class="item-label">请输入远程css路径：</label>
+			<label class="item-label">{:L("_PLEASE_ENTER_A_REMOTE_CSS_PATH_")}{:L("_COLON_")}</label>
 			<div class="controls">
 				<label class="textarea">
 					<input type="text" name="cssurl" class="input-large" />
 				</label>
 			</div>
-			<label class="item-label">请选择模式：</label>
+			<label class="item-label">{:L("_SELECT_MODE_")}{:L("_COLON_")}</label>
 			<div class="controls">
 				<label class="radio">
 					<input type="radio" name="mode" value=0 checked/>
-					完整的 HTML(head+body) 输出
+					{:L("_COMPLETE_")}HTML(head+body){:L("_OUTPUT_")}
 				</label>
 				<label class="radio">
 					<input type="radio" name="mode" value=1 />
-					只转为HTML Body
+					{:L("_ONLY_HTML_")} Body
 				</label>
 			</div>
 			<input type="hidden" name="key">
@@ -258,7 +258,7 @@
 				"height"          : 30,
 				"swf"             : "__STATIC__/uploadify/uploadify.swf",
 				"fileObjName"     : "qiniu_file",
-				"buttonText"      : "上传文件",
+				"buttonText"      : {:L("_UPLOAD_FILE_WITH_DOUBLE_")},
 				"uploader"        : "{:U('uploadOne',array('session_id'=>session_id(),'ajax'=>1))}",
 				"width"           : 120,
 				'removeTimeout'   : 1,
@@ -266,7 +266,7 @@
 				'multi'			  : false,
 				"onUploadSuccess" : uploadSuccess,
 				'onFallback' : function() {
-		            alert('未检测到兼容版本的Flash.');
+		            alert('{:L("_AN_INCOMPATIBLE_VERSION_OF_THE_FLASH_IS_NOT_DETECTED_")}.');
 		        }
 			});
 			function init(){
@@ -278,13 +278,13 @@
 				console.log(data);
 				var data = $.parseJSON(data);
 				if(data.status){
-					updateAlert('上传成功', 'alert-success');
+					updateAlert({:L('_UPLOAD_SUCCESS_WITH_SINGLE_')}, 'alert-success');
 					setTimeout(function(){
 						location.reload(true);
 					},1500);
 				} else {
 					console.log(data.data);
-					updateAlert('上传失败');
+					updateAlert({:L('_UPLOAD_FAILED_WITH_SINGLE_')});
 				}
 			}
 
@@ -302,38 +302,38 @@
 							if(data.status){
 								$('.sidebar .right-cnt').html(data.tpl);
 							}else{
-								updateAlert('获取文件信息失败');
+								updateAlert({:L('_GET_FILE_INFO_FAILED_WITH_SINGLE_')});
 							}
 						}
 					})
 				}
 			});
 
-			//批量删除
+			//批量{:L("_DELETE_")}
 			$('#batchDelBtn').click(function(){
 				var $checked = $('#file_list input[name="key"]:checked');
 				if($checked.length != 0){
-					if(confirm('您确认删除吗？')){
+					if(confirm({:L('_DO_YOU_CONFIRM_THE_DELETION?_WITH_SINGLE_')})){
 						$.ajax({
 							url : '{:U('batchDel')}',
 							data : { key : $checked.serializeArray()},
 							success: function(data){
 								if(data.status){
-									updateAlert('删除成功','alert-success');
+									updateAlert({:L('_DELETE_SUCCESS_WITH_SINGLE_')},'alert-success');
 									location.reload(true);
 								}else{
-									updateAlert('批量删除失败');
+									updateAlert({:L('_BATCH_DELETE_FAILED_WITH_SINGLE_')});
 								}
 							}
 						});
 					}
 				}else{
-					updateAlert('请先选择一项');
+					updateAlert({:L('_PLEASE_CHOOSE_ONE_WITH_SINGLE_')});
 				}
 				return false;
 			});
 
-			//重命名
+			//{:L("_RENAME_")}
 
 
 			$('.rename').click(function(){
@@ -341,7 +341,7 @@
 				var html = $($("#hooktpl").html());
 				html.find("input[name=new_name]").val(this.title);
 				html.find("input[name=new_name]").parents('form').attr('action', action);
-				//ajaxForm 公共函数
+				//ajaxForm{:L("_PUBLIC_FUNCTION_")}
 		        function ajaxForm(element,callback,dataType){
 		            var form = $(element).closest('form');
 		            var dataType = dataType || 'json';
@@ -360,11 +360,11 @@
 		        }
 
 				option = {
-					title:'文件名更改',
+					title:{:L('_FILE_NAME_CHANGE_WITH_SINGLE_')},
 					actions:['close'],
 					drag:true,
 					tools:true,
-					buttons:{"ok":['保存', 'blue',function(){
+					buttons:{"ok":[{:L('_SAVE_WITH_SINGLE_')}, 'blue',function(){
 						var _this = this;
 						ajaxForm(this.find('.input-large'),function(data){
 							if (data.status){
@@ -383,17 +383,17 @@
 			});
 
 		})(jQuery);
-		//高级处理
+		//{:L("_SENIOR_")}处理
 		function adv(mime, key){
 			if($.inArray(mime,['image/jpeg','image/png', 'image/gif']) != -1){
 				//图片
 				var html = $($("#imgAdv").html());
 				var option = {
-					title:'图片处理',
+					title:{:L('_IMAGE_PROCESSING_WITH_SINGLE_')},
 					actions:['close'],
 					drag:true,
 					tools:true,
-					buttons:{"ok":['提 交', 'blue',function(){
+					buttons:{"ok":[{:L('_MENTION_WITH_SINGLE_')}, 'blue',function(){
 						var _this = this;
 						var type = this.find('[name="type"]:checked').val();
 						if(type == 2){
@@ -411,11 +411,11 @@
 				//markdown
 				var html = $($("#mdAdv").html());
 				var option = {
-					title:'md2html转换',
+					title:'md2htm{:L("_L_CONVERSION_")}',
 					actions:['close'],
 					drag:true,
 					tools:true,
-					buttons:{"ok":['提交', 'blue',function(){
+					buttons:{"ok":[{:L('_SUBMIT_WITH_SINGLE_')}, 'blue',function(){
 						var _this = this;
 						this.find('[name=key]').val(key);
 						this.find('#translate_form').submit();
@@ -425,11 +425,11 @@
 				//视频
 				var html = $($("#videoAdv").html());
 				var option = {
-					title:'视频处理',
+					title:{:L('_VIDEO_PROCESSING_WITH_SINGLE_')},
 					actions:['close'],
 					drag:true,
 					tools:true,
-					buttons:{"ok":['保存', 'blue',function(){
+					buttons:{"ok":[{:L('_SAVE_WITH_SINGLE_')}, 'blue',function(){
 						var _this = this;
 						ajaxForm(this.find('.input-large'),function(data){
 							if (data.status){

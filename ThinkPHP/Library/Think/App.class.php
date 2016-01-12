@@ -70,7 +70,7 @@ class App {
                 // 空操作
                 $class   =  $namespace.'_empty';
             }else{
-                E(L('_ERROR_ACTION_').':'.ACTION_NAME);
+                E(L('_ERROR_ACTION_').':'.ACTION_NAME,815);
             }
             $module  =  new $class;
             // 操作绑定到类后 固定执行run入口
@@ -89,7 +89,7 @@ class App {
             // 是否定义Empty控制器
             $module = A('Empty');
             if(!$module){
-                E(L('_CONTROLLER_NOT_EXIST_').':'.CONTROLLER_NAME);
+                E(L('_CONTROLLER_NOT_EXIST_').':'.CONTROLLER_NAME,815);
             }
         }
 

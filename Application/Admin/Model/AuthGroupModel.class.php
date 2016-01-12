@@ -29,7 +29,7 @@ class AuthGroupModel extends Model {
         array('title','require', '必须设置用户组标题', Model::MUST_VALIDATE ,'regex',Model::MODEL_INSERT),
         //array('title','require', '必须设置用户组标题', Model::EXISTS_VALIDATE  ,'regex',Model::MODEL_INSERT),
         array('description','0,80', '描述最多80字符', Model::VALUE_VALIDATE , 'length'  ,Model::MODEL_BOTH ),
-       // array('rules','/^(\d,?)+(?<!,)$/', '规则数据不合法', Model::VALUE_VALIDATE , 'regex'  ,Model::MODEL_BOTH ),
+        // array('rules','/^(\d,?)+(?<!,)$/', '规则数据不合法', Model::VALUE_VALIDATE , 'regex'  ,Model::MODEL_BOTH ),
     );
 
     /**
@@ -77,7 +77,7 @@ class AuthGroupModel extends Model {
         if ($Access->getDbError()) {
             if( count($uid_arr)==1 && count($gid)==1 ){
                 //单个添加时定制错误提示
-                $this->error = "不能重复添加";
+                $this->error = L('_CANT_REPEAT_THE_ADD_');
             }
             return false;
         }else{
@@ -89,7 +89,7 @@ class AuthGroupModel extends Model {
      * 返回用户所属用户组信息
      * @param  int    $uid 用户id
      * @return array  用户所属的用户组 array(
-     *                                         array('uid'=>'用户id','group_id'=>'用户组id','title'=>'用户组名称','rules'=>'用户组拥有的规则id,多个,号隔开'),
+     *                                         array('uid'=>L('_USER_ID_'),'group_id'=>L('_USER_GROUP_ID_'),'title'=>L('_USER_GROUP_NAME_'),'rules'=>'用户组拥有的规则id,多个,号隔开'),
      *                                         ...)   
      */
     static public function getUserGroup($uid){

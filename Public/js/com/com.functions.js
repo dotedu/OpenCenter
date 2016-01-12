@@ -126,9 +126,9 @@ function handleAjax(a) {
 
     //弹出提示消息
     if (a.status) {
-        toast.success(a.info, '温馨提示');
+        toast.success(a.info, L('_KINDLY_REMINDER_'));
     } else {
-        toast.error(a.info, '温馨提示');
+        toast.error(a.info, L('_KINDLY_REMINDER_'));
     }
 
     //需要跳转的话就跳转

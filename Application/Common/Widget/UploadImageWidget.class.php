@@ -26,7 +26,7 @@ class UploadImageWidget extends Controller
         $config = $config['config'];
 
         $id = $attributes_id;
-        $attributes['config'] = array('text' => '选择文件'
+        $attributes['config'] = array('text' => L('_FILE_SELECT_')
         );
 
 

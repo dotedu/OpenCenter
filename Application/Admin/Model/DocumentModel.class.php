@@ -22,7 +22,7 @@ class DocumentModel extends Model{
         array('name', 'checkName', '标识已经存在', self::VALUE_VALIDATE, 'callback', self::MODEL_BOTH),
         array('title', 'require', '标题不能为空', self::MUST_VALIDATE, 'regex', self::MODEL_BOTH),
         array('title', '1,80', '标题长度不能超过80个字符', self::MUST_VALIDATE, 'length', self::MODEL_BOTH),
-    	array('level', '/^[\d]+$/', '优先级只能填正整数', self::VALUE_VALIDATE, 'regex', self::MODEL_BOTH),
+        array('level', '/^[\d]+$/', '优先级只能填正整数', self::VALUE_VALIDATE, 'regex', self::MODEL_BOTH),
         //TODO: 外链编辑验证
         //array('link_id', 'url', '外链格式不正确', self::VALUE_VALIDATE, 'regex', self::MODEL_BOTH),
         array('description', '1,140', '简介长度不能超过140个字符', self::VALUE_VALIDATE, 'length', self::MODEL_BOTH),
@@ -90,7 +90,7 @@ class DocumentModel extends Model{
         /* 获取基础数据 */
         $info = $this->field(true)->find($id);
         if(!(is_array($info) || 1 !== $info['status'])){
-            $this->error = '文档被禁用或已删除！';
+            $this->error = L('_DOCUMENT_IS_DISABLED_OR_DELETED_WITH_EXCLAMATION_');
             return false;
         }
 
@@ -162,13 +162,13 @@ class DocumentModel extends Model{
         if(empty($data['id'])){ //新增数据
             $id = $this->add(); //添加基础内容
             if(!$id){
-                $this->error = '新增基础内容出错！';
+                $this->error = L('_NEW_BASIC_CONTENT_IS_AN_ERROR_WITH_EXCLAMATION_');
                 return false;
             }
         } else { //更新数据
             $status = $this->save(); //更新基础内容
             if(false === $status){
-                $this->error = '更新基础内容出错！';
+                $this->error = L('_AN_ERROR_IN_UPDATING_THE_BASIC_CONTENT_WITH_EXCLAMATION_');
                 return false;
             }
         }
@@ -206,7 +206,7 @@ class DocumentModel extends Model{
         $map  = array('status' => 1, 'type' => 3, 'pid' => $id);
         $info = $this->field($field)->where($map)->page($page, 10)->order('id')->select();
         if(!$info) {
-            $this->error = '该文档没有段落！';
+            $this->error = L('_THERE_ARE_NO_PARAGRAPHS_IN_THIS_DOCUMENT_WITH_EXCLAMATION_');
             return false;
         }
 
@@ -504,19 +504,19 @@ class DocumentModel extends Model{
         }
 
         if(!$if_save){
-            $this->error = '您未填写任何内容';
+            $this->error = L('_YOU_DID_NOT_FILL_IN_ANYTHING_');
             return false;
         }
 
         //重置自动验证
         $this->_validate = array(
-            array('name', '/^[a-zA-Z]\w{0,39}$/', '文档标识不合法', self::VALUE_VALIDATE, 'regex', self::MODEL_BOTH),
-            array('name', '', '标识已经存在', self::VALUE_VALIDATE, 'unique', self::MODEL_BOTH),
-            array('title', '1,80', '标题长度不能超过80个字符', self::VALUE_VALIDATE, 'length', self::MODEL_BOTH),
-            array('description', '1,140', '简介长度不能超过140个字符', self::VALUE_VALIDATE, 'length', self::MODEL_BOTH),
-            array('category_id', 'require', '分类不能为空', self::MUST_VALIDATE , 'regex', self::MODEL_BOTH),
-            array('category_id', 'checkCategory', '该分类不允许发布内容', self::EXISTS_VALIDATE , 'callback', self::MODEL_UPDATE),
-            array('model_id,category_id', 'checkModel', '该分类没有绑定当前模型', self::MUST_VALIDATE , 'callback', self::MODEL_INSERT),
+            array('name', '/^[a-zA-Z]\w{0,39}$/', L('_DOCUMENT_IDENTIFICATION_IS_NOT_LEGAL_'), self::VALUE_VALIDATE, 'regex', self::MODEL_BOTH),
+            array('name', '', L('_LOGO_ALREADY_EXISTS_'), self::VALUE_VALIDATE, 'unique', self::MODEL_BOTH),
+            array('title', '1,80', L('_TITLE_LENGTH_CANT_EXCEED_80_CHARACTERS_'), self::VALUE_VALIDATE, 'length', self::MODEL_BOTH),
+            array('description', '1,140', L('_INTRODUCTION_LENGTH_CANNOT_EXCEED_140_CHARACTERS_'), self::VALUE_VALIDATE, 'length', self::MODEL_BOTH),
+            array('category_id', 'require', L('_CLASSIFICATION_CAN_NOT_BE_EMPTY_'), self::MUST_VALIDATE , 'regex', self::MODEL_BOTH),
+            array('category_id', 'checkCategory', L('_THE_CLASSIFICATION_IS_NOT_ALLOWED_TO_PUBLISH_CONTENT_'), self::EXISTS_VALIDATE , 'callback', self::MODEL_UPDATE),
+            array('model_id,category_id', 'checkModel', L('_THE_CLASSIFICATION_DOES_NOT_BIND_THE_CURRENT_MODEL_'), self::MUST_VALIDATE , 'callback', self::MODEL_INSERT),
             array('deadline', '/^\d{4,4}-\d{1,2}-\d{1,2}(\s\d{1,2}:\d{1,2}(:\d{1,2})?)?$/', '日期格式不合法,请使用"年-月-日 时:分"格式,全部为数字', self::VALUE_VALIDATE  , 'regex', self::MODEL_BOTH),
             array('create_time', '/^\d{4,4}-\d{1,2}-\d{1,2}(\s\d{1,2}:\d{1,2}(:\d{1,2})?)?$/', '日期格式不合法,请使用"年-月-日 时:分"格式,全部为数字', self::VALUE_VALIDATE  , 'regex', self::MODEL_BOTH),
         );
@@ -530,14 +530,14 @@ class DocumentModel extends Model{
         if(empty($data['id'])){ //新增数据
             $id = $this->add(); //添加基础内容
             if(!$id){
-    			$this->error = '新增基础内容出错！';
+    			$this->error = L('_NEW_BASIC_CONTENT_IS_AN_ERROR_WITH_EXCLAMATION_');
                 return false;
             }
             $data['id'] = $id;
         } else { //更新数据
             $status = $this->save(); //更新基础内容
             if(false === $status){
-    			$this->error = '更新基础内容出错！';
+    			$this->error = L('_AN_ERROR_IN_UPDATING_THE_BASIC_CONTENT_WITH_EXCLAMATION_');
                 return false;
             }
         }
@@ -608,7 +608,7 @@ class DocumentModel extends Model{
     public function checkDocumentType($type = null, $pid = null){
     	$res = array('status'=>1, 'info'=>'');
 		if(empty($type)){
-			return array('status'=>0, 'info'=>'文档类型不能为空');
+			return array('status'=>0, 'info'=>L('_DOCUMENT_TYPE_CANNOT_BE_EMPTY_'));
 		}
 		if(empty($pid)){
 			return $res;
@@ -626,16 +626,16 @@ class DocumentModel extends Model{
 		//父文档为主题时
 		if($ptype == 2){
 			if($type != 3){
-				return array('status'=>0, 'info'=>'主题下面只允许添加段落');
+				return array('status'=>0, 'info'=>L('_THE_THEME_IS_ONLY_ALLOWED_TO_ADD_PARAGRAPH_'));
 			}else{
 				return $res;
 			}
 		}
 		//父文档为段落时
 		if($ptype == 3){
-			return array('status'=>0, 'info'=>'段落下面不允许再添加子内容');
+			return array('status'=>0, 'info'=>L('_THE_PARAGRAPH_BELOW_IS_NOT_ALLOWED_TO_ADD_A_CHILD_'));
 		}
-		return array('status'=>0, 'info'=>'父文档类型不正确');
+		return array('status'=>0, 'info'=>L('_THE_PARENT_DOCUMENT_TYPE_IS_INCORRECT_'));
     }
 
 }

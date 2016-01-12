@@ -13,8 +13,10 @@ class ReportModel extends Model
 
     public function addData($data = array())
     {
+
         $data = $this->create($data);
-        return $this->add($data);
+        $abc= $this->add($data);
+        return $abc;
     }
 
 

@@ -3,13 +3,13 @@
 <block name="body">
     <div class="main-title cf">
         <h2>
-            配置排序
+           {:L("_CONFIGURATION_SORTING_")}
         </h2>
     </div>
     <div class="sort">
         <form action="{$savePostUrl}" method="post">
             <!-- <div class="sort_top">
-                查找：<input type="text"><button class="btn search" type="button">查 找</button>
+               {:L("_SEARCH:_")}<input type="text"><button class="btn search" type="button">{:L("_CHECK_WITH_SPACE_")}</button>
             </div> -->
 
             <div class="clearfix">
@@ -22,10 +22,10 @@
                     </select>
                 </div>
                 <div class="col-xs-1">
-                    <button class="top btn btn-block" type="button">第 一</button>
-                    <button class="up btn btn-block" type="button">上 移</button>
-                    <button class="down btn btn-block" type="button">下 移</button>
-                    <button class="bottom btn btn-block" type="button">最 后</button>
+                    <button class="top btn btn-block" type="button">{:L("_FIRST_WITH_SPACE_")}</button>
+                    <button class="up btn btn-block" type="button">{:L("_UPPER_SHIFT_WITH_SPACE_")}</button>
+                    <button class="down btn btn-block" type="button">{:L("_NEXT_MOVE_WITH_SPACE_")}</button>
+                    <button class="bottom btn btn-block" type="button">{:L("_AFTER_THE_MOST_WITH_SPACE_")}</button>
                 </div>
             </div>
             <div class="sort_bottom with-padding">
@@ -91,7 +91,7 @@
                         },
                         function(data){
                             if (data.status) {
-                                updateAlert(data.info + ' 页面即将自动跳转~','alert-success');
+                                updateAlert(data.info + {:L('_THE_PAGE_WILL_AUTOMATICALLY_JUMP_TO_WALK_THE_WALK_TODAY_WITH_SINGLE_')},'alert-success');
                             }else{
                                 updateAlert(data.info,'alert-error');
                             }

@@ -25,7 +25,7 @@ class InviteBuyLogModel extends Model
     {
         $invite_type=D('Ucenter/InviteType')->where(array('id'=>$type_id))->find();
         $user=query_user('nickname');
-        $data['content']="{$user} 在 ".time_format(time()).' 时购买了 '.$num.' 个 '.$invite_type['title'].' 的邀请名额';
+        $data['content']="{$user['nickname']} 在 ".time_format(time()).L('_TIME_TO_BUY_').$num.' 个 '.$invite_type['title'].L('_INVITATION_');
 
         $data['uid']=is_login();
         $data['invite_type']=$type_id;
@@ -74,7 +74,7 @@ class InviteBuyLogModel extends Model
         foreach($list as &$val){
             $inviteType=$inviteTypeModel->getSimpleData(array('id'=>$val['invite_type']));
             $val['invite_type_title']=$inviteType['title']?$inviteType['title']:'[已删除类型]';
-            $val['user']=query_user('nickname',$val['uid']);
+            $val['user']=get_nickname($val['uid']);
             $val['user']='['.$val['uid'].']'.$val['user'];
         }
         unset($val);

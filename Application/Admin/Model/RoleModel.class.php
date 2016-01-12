@@ -12,7 +12,7 @@ namespace Admin\Model;
 use Think\Model;
 
 /**
- * 角色模型
+ * 身份模型
  * Class RoleModel
  * @package Admin\Model
  * @郑钟良
@@ -22,11 +22,11 @@ class RoleModel extends Model
 
     protected $_validate = array(
         array('name', 'require', '标识不能为空。', self::EXISTS_VALIDATE, 'regex', self::MODEL_BOTH),
-        array('name', '', '角色标识已经存在。', self::VALUE_VALIDATE, 'unique', self::MODEL_BOTH),
-        array('name', 'checkName', '角色标识只能由字母和下滑线组成。', self::VALUE_VALIDATE, 'callback', self::MODEL_BOTH),
+        array('name', '', '身份标识已经存在。', self::VALUE_VALIDATE, 'unique', self::MODEL_BOTH),
+        array('name', 'checkName', '身份标识只能由字母和下滑线组成。', self::VALUE_VALIDATE, 'callback', self::MODEL_BOTH),
 
-        array('title', 'require', '角色名不能为空。', self::EXISTS_VALIDATE , 'regex', self::MODEL_BOTH),
-        array('title', '', '角色名已经存在。', self::VALUE_VALIDATE , 'unique', self::MODEL_BOTH),
+        array('title', 'require', '身份名不能为空。', self::EXISTS_VALIDATE , 'regex', self::MODEL_BOTH),
+        array('title', '', '身份名已经存在。', self::VALUE_VALIDATE , 'unique', self::MODEL_BOTH),
     );
 
     protected $_auto = array(
@@ -97,7 +97,7 @@ class RoleModel extends Model
      * @return mixed 结果列表
      * @author 郑钟良<zzl@ourstu.com>
      */
-    public function selectByMap($map=array(),$order,$fields=null){
+    public function selectByMap($map=array(),$order=null,$fields=null){
         $order=$order?$order:"id asc";
         if($fields==null){
             $list=$this->where($map)->order($order)->select();
@@ -126,7 +126,7 @@ class RoleModel extends Model
     }
 
     /**
-     * 验证角色名(只能有字母和下划线组成)
+     * 验证身份名(只能有字母和下划线组成)
      * @param $name
      * @return bool
      * @author 郑钟良<zzl@ourstu.com>

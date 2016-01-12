@@ -25,7 +25,7 @@ class PublicController extends \Think\Controller {
             /* 检测验证码 TODO: */
             if (APP_DEBUG==false){
                 if(!check_verify($verify)){
-                    $this->error('验证码输入错误！');
+                    $this->error(L('_VERIFICATION_CODE_INPUT_ERROR_'));
                 }
             }
 
@@ -39,16 +39,16 @@ class PublicController extends \Think\Controller {
                 $Member = D('Member');
                 if($Member->login($uid)){ //登录用户
                     //TODO:跳转到登录前页面
-                    $this->success('登录成功！', U('Index/index'));
+                    $this->success(L('_LOGIN_SUCCESS_'), U('Index/index'));
                 } else {
                     $this->error($Member->getError());
                 }
 
             } else { //登录失败
                 switch($uid) {
-                    case -1: $error = '用户不存在或被禁用！'; break; //系统级别禁用
-                    case -2: $error = '密码错误！'; break;
-                    default: $error = '未知错误！'; break; // 0-接口参数错误（调试阶段使用）
+                    case -1: $error = L('_USERS_DO_NOT_EXIST_OR_ARE_DISABLED_'); break; //系统级别禁用
+                    case -2: $error = L('_PASSWORD_ERROR_'); break;
+                    default: $error = L('_UNKNOWN_ERROR_'); break; // 0-接口参数错误（调试阶段使用）
                 }
                 $this->error($error);
             }
@@ -63,7 +63,7 @@ class PublicController extends \Think\Controller {
                     S('DB_CONFIG_DATA',$config);
                 }
                 C($config); //添加配置
-                
+
                 $this->display();
             }
         }
@@ -74,7 +74,7 @@ class PublicController extends \Think\Controller {
         if(is_login()){
             D('Member')->logout();
             session('[destroy]');
-            $this->success('退出成功！', U('login'));
+            $this->success(L('_EXIT_SUCCESS_'), U('login'));
         } else {
             $this->redirect('login');
         }
@@ -82,8 +82,8 @@ class PublicController extends \Think\Controller {
 
     public function verify(){
         verify();
-       // $verify = new \Think\Verify();
-       // $verify->entry(1);
+        // $verify = new \Think\Verify();
+        // $verify->entry(1);
     }
 
 }

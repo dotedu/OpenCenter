@@ -3,31 +3,45 @@
 <block name="body">
 
     <div class="main-title">
-        <h2>上传表情包</h2>
+        <h2>{:L("_UPLOAD_THE_EXPRESSION_PACKAGE_")}</h2>
     </div>
-    <form action="{:U('admin/expression/upload')}"enctype="multipart/form-data" method="post" >
-        <div class="controls">
-            <span class="pull-left" id="upload_button" style="width: 100px;height: 30px;background: #0000ff;color: #fff;line-height: 30px;text-align: center;cursor: pointer;margin: 10px 30px 20px 0;display: inline-block">上传文件</span>
-            <span class="pull-left" id="show_info"></span>
-            <input type="file" name="pkg" style="display: none" onchange="$('#show_info').html($(this).val())">
-        </div>
+    <form action="{:U('admin/expression/upload')}" enctype="multipart/form-data" method="post">
+        <div style="padding: 15px">
+            <div class="form-item">
+                <div class="controls">
+                   {:L("_NAME_")}<input type="text" name="title" class="" value="">
+                    <span class="check-tips">{:L("_THE_CHINESE_NAME_OF_THE_EXPRESSION_")}</span>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="controls">
+                <span class="pull-left" style="margin: 15px 5px 20px 0px;">{:L("_UPLOAD_THE_EXPRESSION_PACKAGE_")}{:L("_COLON_")}</span>
+                <span class="pull-left" id="upload_button"
+                      style="width: 100px;height: 30px;background: #6fa7ce;color: #fff;line-height: 30px;text-align: center;cursor: pointer;margin: 10px 30px 20px 0px;display: inline-block">{:L("_UPLOAD_FILE_")}</span>
+                <span class="pull-left" id="show_info" style="margin: 15px 30px 20px 0px;"></span>
+                <span class="pull-left text-danger" style="margin: 15px 30px 20px 0px;">{:L("_EXPRESSION_ONLY_SUPPORTS_")}<strong>*.zip</strong>{:L("_FORMAT_")}</span>
+                <input type="file" name="pkg" style="display: none" onchange="$('#show_info').html($(this).val())">
 
-        <div class="form-item">
-            <button class="btn submit-btn" id="submit" type="submit" target-form="form-horizontal">确 定</button>
-            <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-item">
+                <button class="btn submit-btn" id="submit" type="submit" target-form="form-horizontal">{:L("_SURE_WITH_SPACE_")}</button>
+                <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
+            </div>
         </div>
     </form>
 </block>
 
 <block name="script">
     <script>
-        $('#upload_button').click(function(){
+        $('#upload_button').click(function () {
             $('input[type=file]').click();
         })
     </script>
     <script type="text/javascript">
         Think.setValue("type", {$info.type|default=0});
-        Think.setValue("group", {$info.group|default=0});
+        Think.setValue("group",{$info.group|default=0});
         //导航高亮
         highlight_subnav('{:U('Config/index')}');
     </script>

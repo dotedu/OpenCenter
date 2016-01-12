@@ -77,13 +77,29 @@ class ocNode
             $user = $OCApi->ocGetUserInfo("id=" . $uid . " AND password='" . $password . "'");
             //验证用户
             if ($user) {
+
+                $audit = $this->db->getOne("SELECT * FROM `" . $this->tablePre . "user_role` WHERE uid=" . $uid.' and role_id='.$user['last_login_role']);
+
                 $auth = array(
                     'uid' => $user['uid'],
                     'username' => $user['username'],
                     'last_login_time' => $user['last_login_time'],
+                    'role_id' => $user['last_login_role'],
+                    'audit' => $audit,
                 );
-                $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth'] = $auth;
-                $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign'] = data_auth_sign($auth);
+/*                $auth = array(
+                    'uid' => $user['uid'],
+                    'username' => $user['username'],
+                    'last_login_time' => $user['last_login_time'],
+                );*/
+                if($this->thisConfig['SESSION_PREFIX']){
+                    $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth'] = $auth;
+                    $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign'] = data_auth_sign($auth);
+                }else{
+                    $_SESSION['user_auth'] = $auth;
+                    $_SESSION['user_auth_sign'] = data_auth_sign($auth);
+                }
+
             }
         }
     }
@@ -97,8 +113,15 @@ class ocNode
     {
         header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
         session_start();
-        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth'] = null;
-        $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign'] = null;
+
+        if($this->thisConfig['SESSION_PREFIX']){
+            $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth'] = null;
+            $_SESSION[$this->thisConfig['SESSION_PREFIX']]['user_auth_sign'] = null;
+        }else{
+            $_SESSION['user_auth'] = null;
+            $_SESSION['user_auth_sign'] = null;
+        }
+
     }
 }
 /**

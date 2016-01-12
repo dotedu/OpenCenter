@@ -83,12 +83,14 @@ class InviteTypeModel extends Model
     public function getSimpleData($map=array())
     {
         $data = $this->where($map)->find();
-        if($data['roles']!=''){
-            $data['roles']=str_replace('[','',$data['roles']);
-            $data['roles']=str_replace(']','',$data['roles']);
-            $data['roles']=explode(',',$data['roles']);
-        }else{
-            $data['roles']=array();
+        if($data){
+            if($data['roles']!=''){
+                $data['roles']=str_replace('[','',$data['roles']);
+                $data['roles']=str_replace(']','',$data['roles']);
+                $data['roles']=explode(',',$data['roles']);
+            }else{
+                $data['roles']=array();
+            }
         }
         return $data;
     }
@@ -201,7 +203,7 @@ class InviteTypeModel extends Model
             $scoreTypes = array_combine(array_column($scoreTypes, 'id'), $scoreTypes);
             $val['pay'] = $scoreTypes[$val['pay_score_type']]['title'] . ' ' . $val['pay_score'] . ' ' . $scoreTypes[$val['pay_score_type']]['unit'];
             $val['income'] = $scoreTypes[$val['income_score_type']]['title'] . ' ' . $val['income_score'] . ' ' . $scoreTypes[$val['income_score_type']]['unit'];
-            $val['cycle'] ='每 '. unitTime_to_showUnitTime($val['cycle_time']).'最多可购买 '.$val['cycle_num'].'个名额';
+            $val['cycle'] ='每 '. unitTime_to_showUnitTime($val['cycle_time']).L('_UP_TO_BUY_').$val['cycle_num'].L('_PLACES_');
             $userInfo=$inviteUserInfoModel->getInfo(array('uid'=>is_login(),'invite_type'=>$val['id']));
             if($userInfo){
                 $val['can_num']=$userInfo['num'];

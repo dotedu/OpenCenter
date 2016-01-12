@@ -1,11 +1,14 @@
 var Notify = {
     'readMessage': function (obj, message_id) {
         var url = $(obj).attr('data-url');
-        $.post(U('Ucenter/Public/readMessage'), {message_id: message_id}, function (msg) {
-            if (msg.status) {
+        if( url !=''){
+            toast.showLoading();
+            $.post(U('Ucenter/Public/readMessage'), {message_id: message_id}, function (msg) {
+                toast.hideLoading();
                 location.href = url;
-            }
-        }, 'json');
+            }, 'json');
+        }
+
     },
     /**
      * 将所有的消息设为已读

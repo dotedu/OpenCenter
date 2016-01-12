@@ -9,7 +9,7 @@
         <input type="hidden" name="role_id" value="{$role_id}">
         <div class="form-group clearfix">
             <label class="col-xs-4 control-label" style="text-align: right;">
-                邀请码：
+                {:L('_INV_CODE_')}{:L('_COLON_')}
             </label>
 
             <div class="col-xs-8">
@@ -18,8 +18,8 @@
             </div>
         </div>
         <div style="width: 100%;text-align: center;">
-            <a class="btn btn-primary" data-role="submit">提交</a>
-            <a onclick="$('.close').click();" class="btn btn-default">取消</a>
+            <a class="btn btn-primary" data-role="submit">{:L('_SUBMIT_')}</a>
+            <a onclick="$('.close').click();" class="btn btn-default">{:L('_CANCEL_')}</a>
         </div>
     </form>
 </div>
@@ -30,7 +30,7 @@
             var url = $('#set_code').attr('action');
             $.post(url, query, function (msg) {
                 if (msg.status) {
-                    toast.success('角色升级成功！');
+                    toast.success("{:L('_ROLE_UPGRADE_')}{:L('_EXCLAMATION_')}");
                     setTimeout(function () {
                         window.location.href=msg.url;
                     }, 1500);

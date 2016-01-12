@@ -2,7 +2,7 @@
 
 <block name="body">
     <div class="main-title">
-        <h2>网站设置</h2>
+        <h2>{:L("_WEB_SITE_SETTINGS_")}</h2>
     </div>
     <div class="tab-wrap with-padding">
         <ul class="nav nav-secondary">
@@ -10,7 +10,7 @@
 
                 <li
                 <eq name="id" value="$key">class="active"</eq>
-                ><a href="{:U('?id='.$key)}">{$group}配置</a></li>
+                ><a href="{:U('?id='.$key)}">{$group}{:L("_TO_CONFIGURE_")}</a></li>
 
             </volist>
         </ul>
@@ -65,17 +65,17 @@
                                 <script type="text/javascript" charset="utf-8" src="__PUBLIC__/js/ext/webuploader/js/webuploader.js"></script>
                                 <link href="__PUBLIC__/js/ext/webuploader/css/webuploader.css" type="text/css" rel="stylesheet">
                                 <div class="controls">
-                                    <div id="upload_single_image_{$config.name}" style="padding-bottom: 5px;">选择图片</div>
+                                    <div id="upload_single_image_{$config.name}" style="padding-bottom: 5px;">{:L("_SELECT_PICTURES_")}</div>
                                     <input class="attach" type="hidden" name="config[{$config.name}]" value="{$config['value']}"/>
                                     <div class="upload-img-box">
                                         <div class="upload-pre-item popup-gallery">
                                             <notempty name="config.value">
                                                 <div class="each">
-                                                    <a href="{$config.value|get_cover='path'}" title="点击查看大图">
+                                                    <a href="{$config.value|get_cover='path'}" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                                         <img src="{$config.value|get_cover='path'}">
                                                     </a>
                                                     <div class="text-center opacity del_btn" ></div>
-                                                    <div onclick="admin_image.removeImage($(this),'{$config.value}')"  class="text-center del_btn">删除</div>
+                                                    <div onclick="admin_image.removeImage($(this),'{$config.value}')"  class="text-center del_btn">{:L("_DELETE_")}</div>
                                                 </div>
                                             </notempty>
                                         </div>
@@ -86,14 +86,14 @@
                                         var uploader_{$config.name}= WebUploader.create({
                                             // 选完文件后，是否自动上传。
                                             auto: true,
-                                            // swf文件路径
+                                            // sw{:L("_F_FILE_PATH_")}
                                             swf: 'Uploader.swf',
                                             // 文件接收服务端。
                                             server: "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
                                             // 选择文件的按钮。可选。
-                                            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                                            // 内部根据当前运行是创建，可能是input元素，{:L("_AND_IT_COULD_BE_FLASH_")}.
                                             pick: '#upload_single_image_{$config.name}',
-                                            // 只允许选择图片文件。
+                                            // 只允许{:L("_SELECT_PICTURES_")}文件。
                                             accept: {
                                                 title: 'Images',
                                                 extensions: 'gif,jpg,jpeg,bmp,png',
@@ -103,13 +103,13 @@
                                         uploader_{$config.name}.on('fileQueued', function (file) {
                                             uploader_{$config.name}.upload();
                                         });
-                                        /*上传成功*/
+                                        /*{:L("_UPLOAD_SUCCESS_")}*/
                                         uploader_{$config.name}.on('uploadSuccess', function (file, data) {
                                             if (data.status) {
                                                 $("[name='config[{$config.name}]']").val(data.id);
                                                 $("[name='config[{$config.name}]']").parent().find('.upload-pre-item').html(
-                                                        ' <div class="each"><a href="'+ data.path+'" title="点击查看大图"><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
-                                                                '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">删除</div></div>'
+                                                        ' <div class="each"><a href="'+ data.path+'" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
+                                                                '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">{:L("_DELETE_")}</div></div>'
                                                 );
                                                 uploader_{$config.name}.reset();
                                             } else {
@@ -190,14 +190,14 @@
                 <div class="controls">
                     <empty name="list">
                         <button type="submit" disabled class="btn submit-btn disabled"
-                                target-form="form-horizontal">确 定
+                                target-form="form-horizontal">{:L("_SURE_WITH_SPACE_")}
                         </button>
                         <else/>
-                        <button type="submit" class="btn submit-btn ajax-post" target-form="form-horizontal">确 定
+                        <button type="submit" class="btn submit-btn ajax-post" target-form="form-horizontal">{:L("_SURE_WITH_SPACE_")}
                         </button>
                     </empty>
 
-                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
                 </div>
             </div>
         </form>

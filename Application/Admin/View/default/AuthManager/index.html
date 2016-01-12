@@ -2,18 +2,18 @@
 <block name="body">
 	<!-- 标题栏 -->
 	<div class="main-title">
-		<h2>权限管理</h2>
+		<h2>{:L('_AUTH_MANAGER_')}</h2>
 	</div>
 
     <div class="tools auth-botton with-padding">
-        <a id="add-group" class="btn" href="{:U('createGroup')}">新 增</a>
-        <a url="{:U('changestatus',array('method'=>'resumeGroup'))}" class="btn ajax-post" target-form="ids" >启 用</a>
-        <a url="{:U('changestatus',array('method'=>'forbidGroup'))}" class="btn ajax-post" target-form="ids" >禁 用</a>
-        <a url="{:U('changestatus',array('method'=>'deleteGroup'))}" class="btn ajax-post confirm" target-form="ids" >删 除</a>
+        <a id="add-group" class="btn" href="{:U('createGroup')}">{:L('_ADD_WITH_SPACE_')}</a>
+        <a url="{:U('changestatus',array('method'=>'resumeGroup'))}" class="btn ajax-post" target-form="ids" >{:L('_ENABLE_WITH_SPACE_')}</a>
+        <a url="{:U('changestatus',array('method'=>'forbidGroup'))}" class="btn ajax-post" target-form="ids" >{:L('_DISABLE_WITH_SPACE_')}</a>
+        <a  url="{:U('changestatus',array('method'=>'deleteGroup'))}" class="btn ajax-post confirm btn-danger" target-form="ids" >{:L('_DELETE_WITH_SPACE_')}</a>
         &nbsp; &nbsp; &nbsp; &nbsp;
-        <a class="btn" href="{:U('Admin/menu/index')}">后台菜单管理</a>
-        <a class="btn" href="{:U('Admin/menu/add')}">新增后台菜单（后台权限节点）</a>
-        <a class="btn" href="{:U('addNode')}">新增前台权限节点</a>
+        <a class="btn" href="{:U('Admin/menu/index')}">{:L('_MENU_BG_MANAGER_')}</a>
+        <a class="btn btn-success" href="{:U('Admin/menu/add')}">{:L('_MENU_NEW_')}</a>
+        <a class="btn" href="{:U('addNode')}">{:L('_AUTH_FG_NEW_')}</a>
     </div>
 	<!-- 数据列表 -->
 	<div class="data-table with-padding">
@@ -21,12 +21,12 @@
     <thead>
         <tr>
 		<th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
-		<th class="">用户组</th>
-		<th class="">描述</th>
+		<th class="">{:L('_USER_GROUP_')}</th>
+		<th class="">{:L('_DESC_')}</th>
 
-		<th class="">授权</th>
-		<th class="">状态</th>
-		<th class="">操作</th>
+		<th class="">{:L('_AUTH_')}</th>
+		<th class="">{:L('_STATUS_')}</th>
+		<th class="">{:L('_OPERATE_')}</th>
 		</tr>
     </thead>
     <tbody>
@@ -38,24 +38,24 @@
 			<td><span>{:mb_strimwidth($vo['description'],0,60,"...","utf-8")}</span></td>
 
 
-			<td><a href="{:U('AuthManager/access?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >后台管理授权</a>
-                <a href="{:U('AuthManager/accessuser?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >前台访问授权</a>
-			<a href="{:U('AuthManager/user?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >成员授权</a>
+			<td><a class=" btn btn-danger btn-xs" href="{:U('AuthManager/access?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >{:L('_AUTH_BG_MANAGER_')}</a>
+                <a class=" btn btn-success btn-xs" href="{:U('AuthManager/accessuser?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >{:L('_AUTH_FG_MANAGER_')}</a>
+			<a class=" btn btn-warning btn-xs" href="{:U('AuthManager/user?group_name='.$vo['title'].'&group_id='.$vo['id'])}" >{:L('_MEMBER_AUTH_')}</a>
 			</td>
 			<td>{$vo.status_text}</td>
 			<td><eq name="vo.status" value="1">
-				<a href="{:U('AuthManager/changeStatus?method=forbidGroup&id='.$vo['id'])}" class="ajax-get">禁用</a>
+				<a href="{:U('AuthManager/changeStatus?method=forbidGroup&id='.$vo['id'])}" class="ajax-get">{:L('_DISABLE_')}</a>
 				<else/>
-				<a href="{:U('AuthManager/changeStatus?method=resumeGroup&id='.$vo['id'])}" class="ajax-get">启用</a>
+				<a href="{:U('AuthManager/changeStatus?method=resumeGroup&id='.$vo['id'])}" class="ajax-get">{:L('_ENABLE_')}</a>
 				</eq>
 <!--修改内容开始-->
-				<a href="{:U('AuthManager/changeStatus?method=deleteGroup&id='.$vo['id'])}" class="confirm ajax-get">删除</a>
+				<a href="{:U('AuthManager/changeStatus?method=deleteGroup&id='.$vo['id'])}" class="confirm ajax-get">{:L('_DELETE_')}</a>
 <!--修改内容结束-->
                 </td>
 		</tr>
 		</volist>
 		<else/>
-		<td colspan="6" class="text-center"> aOh! 暂时还没有内容! </td>
+		<td colspan="6" class="text-center"> {:L('_ADMIN_USER_EMPTY_')} </td>
 		</notempty>
 	</tbody>
     </table>

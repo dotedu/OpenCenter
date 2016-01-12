@@ -5,23 +5,23 @@
 <div class="row">
     <div class="col-xs-12">
         <p>&nbsp;</p>
-        <h4>修改邮箱</h4>
+        <h4>{:L('_EMAIL_MODIFY_')}</h4>
         <hr class="oneuser-title-hr"/>
     </div>
 </div>
 
 <div class="row">
     <div class="col-xs-3">
-        <p class="pull-right">输入新邮箱：</p>
+        <p class="pull-right">{:L('_EMAIL_NEW_INPUT_')}{:L('_COLON_')}</p>
     </div>
     <div class="col-xs-6">
         <form action="{:U('Ucenter/Index/doChangeEmail')}" method="post" class="ajax-form">
             <p>
-                <input type="text" name="email" class="form-control" placeholder="输入邮箱" value="{$user.email}"/>
+                <input type="text" name="email" class="form-control" placeholder="{:L('_EMAIL_INPUT_')}" value="{$user.email}"/>
             </p>
 
             <p>
-                <input type="submit" class="btn btn-primary" value="提交"/>
+                <input type="submit" class="btn btn-primary" value="{:L('_SUBMIT_')}"/>
             </p>
         </form>
     </div>

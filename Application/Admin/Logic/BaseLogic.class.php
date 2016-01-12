@@ -37,7 +37,7 @@ abstract class BaseLogic extends Model{
 	public function detail($id){
 		$data = $this->field(true)->find($id);
 		if(!$data){
-			$this->error = '获取详细信息出错！';
+			$this->error = L('_TO_GET_MORE_INFORMATION_ABOUT_THE_ERROR_WITH_EXCLAMATION_');
 			return false;
 		}
 		return $data;

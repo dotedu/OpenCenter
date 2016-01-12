@@ -53,15 +53,16 @@ return array(
     'TMPL_PARSE_STRING' => array(
         '__STATIC__' => __ROOT__ . '/Public/static',
         '__ADDONS__' => __ROOT__ . '/Public/' . MODULE_NAME . '/Addons',
-        '__IMG__' =>  __ROOT__ . '/Application/' . MODULE_NAME . '/Static/images',
-        '__CSS__' =>  __ROOT__ . '/Application/' . MODULE_NAME . '/Static/css',
-        '__JS__' =>  __ROOT__ . '/Application/' . MODULE_NAME . '/Static/js',
-        '__ZUI__' =>  __ROOT__ . '/Application/' . MODULE_NAME . '/Static/zui'
+        '__IMG__' => __ROOT__ . '/Application/' . MODULE_NAME . '/Static/images',
+        '__CSS__' => __ROOT__ . '/Application/' . MODULE_NAME . '/Static/css',
+        '__JS__' => __ROOT__ . '/Application/' . MODULE_NAME . '/Static/js',
+        '__ZUI__' => __ROOT__ . '/Application/' . MODULE_NAME . '/Static/zui',
     ),
-
+    'UPDATE_PATH'=>'./Data/Update/',
+    'CLOUD_PATH'=>'./Data/Cloud/',
     /* SESSION 和 COOKIE 配置 */
-    'SESSION_PREFIX' => 'onethink_admin', //session前缀
-    'COOKIE_PREFIX' => 'onethink_admin_', // Cookie前缀 避免冲突
+    'SESSION_PREFIX' => 'opencenter_admin', //session前缀
+    'COOKIE_PREFIX' => 'opencenter_admin_', // Cookie前缀 避免冲突
     'VAR_SESSION_ID' => 'session_id',    //修复uploadify插件无法传递session_id的bug
 
     /* 后台错误页面模板 */

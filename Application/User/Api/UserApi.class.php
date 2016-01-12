@@ -39,11 +39,13 @@ class UserApi extends Api{
      * @return integer           登录成功-用户ID，登录失败-错误编号
      */
     public function login($username, $password, $type = 1){
+        $username=str_replace(array('"',"'",'`',',',')','(','='),'',$username);
         if(file_exists('./api/uc_login.lock')){
             include_once './api/uc_client/client.php';
             if(strtolower(UC_CHARSET) == 'gbk'){
                 $username =  iconv('UTF-8', 'GBK', $username);
             }
+
             $uc_user = uc_user_login($username,$password,0);
             if($uc_user[0]==-2){
                 return '密码错误';

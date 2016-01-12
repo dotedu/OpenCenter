@@ -1,6 +1,5 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
 {:hook('syncMeta')}
 
@@ -8,14 +7,18 @@
 
 <!-- zui -->
 <link href="__ZUI__/css/zui.css" rel="stylesheet">
-<link href="__PUBLIC__/css/core.css" rel="stylesheet"/>
+
 <link href="__ZUI__/css/zui-theme.css" rel="stylesheet">
+<link href="__PUBLIC__/css/core.css" rel="stylesheet"/>
 <link type="text/css" rel="stylesheet" href="__PUBLIC__/js/ext/magnific/magnific-popup.css"/>
 <!--<script src="__PUBLIC__/js/jquery-2.0.3.min.js"></script>
 <script type="text/javascript" src="__PUBLIC__/js/com/com.functions.js"></script>
 
 <script type="text/javascript" src="__PUBLIC__/js/core.js"></script>-->
-<script src="__PUBLIC__/js.php?f=js/jquery-2.0.3.min.js,js/com/com.functions.js,js/core.js"></script>
+<script src="__PUBLIC__/js.php?f=js/jquery-2.0.3.min.js,js/com/com.functions.js,js/core.js,js/com/com.toast.class.js,js/com/com.ucard.js"></script>
+
+
+
 <block name="style"><!--Style--></block>
 <!--合并前的js-->
 <include file="Public/var"/>
@@ -42,6 +45,12 @@
     var MID = "{:is_login()}";
     var MODULE_NAME="<php>echo MODULE_NAME;</php>";
     var ACTION_NAME="<php>echo ACTION_NAME;</php>";
+    var CONTROLLER_NAME ="<php>echo CONTROLLER_NAME;</php>";
+    var initNum = "{:modC('WEIBO_NUM',140,'WEIBO')}";
+    function adjust_navbar(){
+        $('#sub_nav').css('top',$('#nav_bar').height());
+        $('#main-container').css('padding-top',$('#nav_bar').height()+$('#sub_nav').height()+20)
+    }
 </script>
 
 <audio id="music" src="" autoplay="autoplay"></audio>

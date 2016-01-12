@@ -57,7 +57,7 @@ class requester {
      * @param String $charset
      *         请求URL.
      */
-    function __construct($url) {
+    function __construct($url ='') {
         $this->url = $url;
     }
 
@@ -81,6 +81,11 @@ class requester {
         curl_setopt ( $ch, CURLOPT_HTTPHEADER, $header );
         curl_setopt ( $ch, CURLOPT_HEADER, $this->enableHeaderOutput );
         curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+
+        //跳过ssl证书检测 --駿濤
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
 
         $cookieJar = null;
 

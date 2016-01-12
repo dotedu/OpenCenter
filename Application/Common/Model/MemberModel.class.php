@@ -27,8 +27,10 @@ class MemberModel extends Model
         array('last_login_time', 0, self::MODEL_INSERT),
         array('update_time', NOW_TIME),
         array('status', 1, self::MODEL_INSERT),
-        array('tox_money', 0, self::MODEL_INSERT),
-        array('score', 0, self::MODEL_INSERT),
+        array('score1', 0, self::MODEL_INSERT),
+        array('score2', 0, self::MODEL_INSERT),
+        array('score3', 0, self::MODEL_INSERT),
+        array('score4', 0, self::MODEL_INSERT),
         array('pos_province', 0, self::MODEL_INSERT),
         array('pos_city', 0, self::MODEL_INSERT),
         array('pos_district', 0, self::MODEL_INSERT),
@@ -37,10 +39,8 @@ class MemberModel extends Model
 
     protected $_validate = array(
         array('signature', '0,100', -1, self::EXISTS_VALIDATE, 'length'),
-
-
         /* 验证昵称 */
-        array('nickname', '4,32', -33, self::EXISTS_VALIDATE, 'length'), //昵称长度不合法
+        array('nickname', 'checkNickname', -33, self::EXISTS_VALIDATE, 'callback'), //昵称长度不合法
         array('nickname', 'checkDenyNickname', -31, self::EXISTS_VALIDATE, 'callback'), //昵称禁止注册
         array('nickname', 'checkNickname', -32, self::EXISTS_VALIDATE, 'callback'),
         array('nickname', '', -30, self::EXISTS_VALIDATE, 'unique'), //昵称被占用
@@ -57,11 +57,11 @@ class MemberModel extends Model
      */
     protected function checkDenyNickname($nickname)
     {
-        $denyName=M("Config")->where(array('name' => 'USER_NAME_BAOLIU'))->getField('value');
-        if($denyName!=''){
-            $denyName=explode(',',$denyName);
-            foreach($denyName as $val){
-                if(!is_bool(strpos($nickname,$val))){
+        $denyName = M("Config")->where(array('name' => 'USER_NAME_BAOLIU'))->getField('value');
+        if ($denyName != '') {
+            $denyName = explode(',', $denyName);
+            foreach ($denyName as $val) {
+                if (!is_bool(strpos($nickname, $val))) {
                     return false;
                 }
             }
@@ -83,13 +83,28 @@ class MemberModel extends Model
         return true;
     }
 
+    /**
+     * 验证昵称长度
+     * @param $nickname
+     * @return bool
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    protected function checkNicknameLength($nickname)
+    {
+        $length = mb_strlen($nickname, 'utf-8'); // 当前数据长度
+        if ($length < modC('NICKNAME_MIN_LENGTH',2,'USERCONFIG') || $length > modC('NICKNAME_MAX_LENGTH',32,'USERCONFIG')) {
+            return false;
+        }
+        return true;
+    }
+
     public function registerMember($nickname = '')
     {
         /* 在当前应用中注册用户 */
         if ($user = $this->create(array('nickname' => $nickname, 'status' => 1))) {
             $uid = $this->add($user);
             if (!$uid) {
-                $this->error = '前台用户信息注册失败，请重试！';
+                $this->error = L('_THE_FOREGROUND_USER_REGISTRATION_FAILED_PLEASE_TRY_AGAIN_WITH_EXCLAMATION_');
                 return false;
             }
             $this->initFollow($uid);
@@ -99,6 +114,7 @@ class MemberModel extends Model
         }
 
     }
+
 
     /**
      * 登录指定用户
@@ -114,9 +130,9 @@ class MemberModel extends Model
         if ($role_id != 0) {
             $user['last_login_role'] = $role_id;
         } else {
-            if (!intval($user['last_login_role'])) {
-                $user['last_login_role'] = $user['show_role'];
-            }
+                if (!intval($user['last_login_role'])) {
+                    $user['last_login_role'] = $user['show_role'];
+                }
         }
         session('temp_login_uid', $uid);
         session('temp_login_role_id', $user['last_login_role']);
@@ -125,11 +141,16 @@ class MemberModel extends Model
             header('Content-Type:application/json; charset=utf-8');
             $data['status'] = 1;
             $data['url'] = U('Ucenter/Member/activate');
-            exit(json_encode($data));
+
+            if (IS_AJAX) {
+                exit(json_encode($data));
+            } else {
+                redirect($data['url']);
+            }
         }
 
         if (1 != $user['status']) {
-            $this->error = '用户未激活或已禁用！'; //应用级别禁用
+            $this->error = L('_USERS_ARE_NOT_ACTIVATED_OR_DISABLED_WITH_EXCLAMATION_'); //应用级别禁用
             return false;
         }
 
@@ -140,8 +161,12 @@ class MemberModel extends Model
             //执行步骤在start的时候执行下一步，否则执行此步骤
             $go = $step == 'start' ? get_next_step($step) : check_step($step);
             $data['url'] = U('Ucenter/Member/step', array('step' => $go));
+            if (IS_AJAX) {
+                exit(json_encode($data));
+            } else {
+                redirect($data['url']);
+            }
 
-            exit(json_encode($data));
         }
         /* 登录用户 */
         $this->autoLogin($user, $remember);
@@ -159,8 +184,8 @@ class MemberModel extends Model
      */
     public function logout()
     {
-        session('_AUTH_LIST_'.get_uid().'1',null);
-        session('_AUTH_LIST_'.get_uid().'2',null);
+        session('_AUTH_LIST_' . get_uid() . '1', null);
+        session('_AUTH_LIST_' . get_uid() . '2', null);
         session('user_auth', null);
         session('user_auth_sign', null);
 
@@ -197,7 +222,6 @@ class MemberModel extends Model
             'role_id' => $user['last_login_role'],
             'audit' => $audit,
         );
-
         session('user_auth', $auth);
         session('user_auth_sign', data_auth_sign($auth));
         if ($remember) {
@@ -316,47 +340,6 @@ class MemberModel extends Model
         return $str1;
     }
 
-    /**
-     * 同步登陆时添加用户信息
-     * @param $uid
-     * @param $info
-     * @return mixed
-     * autor:xjw129xjt
-     */
-    public function addSyncData($uid, $info)
-    {
-
-        $data1['nickname'] = mb_substr($info['nick'], 0, 32, 'utf-8');
-        //去除特殊字符。
-        $data1['nickname'] = preg_replace('/[^A-Za-z0-9_\x80-\xff\s\']/', '', $data1['nickname']);
-        empty($data1['nickname']) && $data1['nickname'] = $this->rand_nickname();
-        $data1['nickname'] .= '_' . $this->rand_nickname();
-        $data1['sex'] = $info['sex'];
-        $data = $this->create($data1);
-        $data['uid'] = $uid;
-        $res = $this->add($data);
-        return $res;
-    }
-
-    public function rand_nickname()
-    {
-        $nickname = $this->create_rand(4);
-        if ($this->where(array('nickname' => $nickname))->select()) {
-            $this->rand_nickname();
-        } else {
-            return $nickname;
-        }
-    }
-
-    function create_rand($length = 8)
-    {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $password = '';
-        for ($i = 0; $i < $length; $i++) {
-            $password .= $chars[mt_rand(0, strlen($chars) - 1)];
-        }
-        return $password;
-    }
 
     /**
      * 设置角色用户默认基本信息
@@ -416,7 +399,6 @@ class MemberModel extends Model
             unset($val);
         }
         //默认积分设置 end
-
 
         //默认头衔设置
         if (isset($config['rank']['value']) && $config['rank']['value'] != '') {
@@ -501,37 +483,37 @@ class MemberModel extends Model
         return $change;
     }
 
-    private function initFollow($uid=0)
+    private function initFollow($uid = 0)
     {
-        if($uid!=0){
-            $followModel=D('Common/Follow');
-            $follow=modC('NEW_USER_FOLLOW','','USERCONFIG');
-            $fans=modC('NEW_USER_FANS','','USERCONFIG');
-            $friends=modC('NEW_USER_FRIENDS','','USERCONFIG');
-            if($follow!=''){
-                $follow=explode(',',$follow);
-                foreach($follow as $val){
-                    if(query_user('uid',$val)){
-                        $followModel->addFollow($uid,$val);
+        if ($uid != 0) {
+            $followModel = D('Common/Follow');
+            $follow = modC('NEW_USER_FOLLOW', '', 'USERCONFIG');
+            $fans = modC('NEW_USER_FANS', '', 'USERCONFIG');
+            $friends = modC('NEW_USER_FRIENDS', '', 'USERCONFIG');
+            if ($follow != '') {
+                $follow = explode(',', $follow);
+                foreach ($follow as $val) {
+                    if (query_user('uid', $val)) {
+                        $followModel->addFollow($uid, $val);
                     }
                 }
                 unset($val);
             }
-            if($fans!=''){
-                $fans=explode(',',$fans);
-                foreach($fans as $val){
-                    if(query_user('uid',$val)){
-                        $followModel->addFollow($val,$uid);
+            if ($fans != '') {
+                $fans = explode(',', $fans);
+                foreach ($fans as $val) {
+                    if (query_user('uid', $val)) {
+                        $followModel->addFollow($val, $uid);
                     }
                 }
                 unset($val);
             }
-            if($friends!=''){
-                $friends=explode(',',$friends);
-                foreach($friends as $val){
-                    if(query_user('uid',$val)){
-                        $followModel->addFollow($val,$uid);
-                        $followModel->addFollow($uid,$val);
+            if ($friends != '') {
+                $friends = explode(',', $friends);
+                foreach ($friends as $val) {
+                    if (query_user('uid', $val)) {
+                        $followModel->addFollow($val, $uid);
+                        $followModel->addFollow($uid, $val);
                     }
                 }
                 unset($val);
@@ -539,4 +521,50 @@ class MemberModel extends Model
         }
         return true;
     }
+
+
+    /**
+     * addSyncData
+     * @param $uid
+     * @param $info
+     * @return mixed
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function addSyncData($uid, $info)
+    {
+        //去除特殊字符。
+        $data['nickname'] = preg_replace('/[^A-Za-z0-9_\x80-\xff\s\']/', '', $info['nick']);
+        // 截取字数
+        $data['nickname'] = mb_substr($data['nickname'], 0, 32, 'utf-8');
+        // 为空则随机生成
+        if (empty($data['nickname'])) {
+            $data['nickname'] = $this->rand_nickname();
+        } else {
+            if ($this->where(array('nickname' => $data['nickname']))->select()) {
+                $data['nickname'] .= '_' . $uid;
+            }
+        }
+        $data['sex'] = $info['sex'];
+        $data = $this->validate(
+            array('signature', '0,100', -1, self::EXISTS_VALIDATE, 'length'),
+            /* 验证昵称 */
+            array('nickname', 'checkDenyNickname', -31, self::EXISTS_VALIDATE, 'callback'), //昵称禁止注册
+            array('nickname', 'checkNickname', -32, self::EXISTS_VALIDATE, 'callback'),
+            array('nickname', '', -30, self::EXISTS_VALIDATE, 'unique'))->create($data);
+        $data['uid'] = $uid;
+        $res = $this->add($data);
+        return $res;
+    }
+
+    private function rand_nickname()
+    {
+        $nickname = create_rand(4);
+        if ($this->where(array('nickname' => $nickname))->select()) {
+            $this->rand_nickname();
+        } else {
+            return $nickname;
+        }
+    }
+
+
 }

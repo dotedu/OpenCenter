@@ -16,7 +16,7 @@ use Think\Page;
  */
 class IssueContentModel extends Model{
     protected $_validate = array(
-        array('title', '1,100', '标题长度不合法', self::EXISTS_VALIDATE, 'length'),
+            array('title', '1,100', '标题长度不合法', self::EXISTS_VALIDATE, 'length'),
         array('content', '1,40000', '内容长度不合法', self::EXISTS_VALIDATE, 'length'),
     );
 

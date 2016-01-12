@@ -14,9 +14,9 @@ class BaseController extends Controller
 {
     public function _initialize()
     {
-       $uid = intval($_REQUEST['uid']) ? intval($_REQUEST['uid']) : is_login();
+        $uid = intval($_REQUEST['uid']) ? intval($_REQUEST['uid']) : is_login();
         if (!$uid) {
-            $this->error('需要登录');
+            $this->error(L('_ERROR_NEED_LOGIN_'));
         }
         $this->assign('uid', $uid);
         $this->mid = is_login();
@@ -31,10 +31,10 @@ class BaseController extends Controller
     protected function getCall($uid)
     {
         if ($uid == is_login()) {
-            return '我';
+            return L('_I_');
         } else {
             $apiProfile = callApi('User/getProfile', array($uid));
-            return $apiProfile['sex'] == 'm' ? '他' : '她';
+            return $apiProfile['sex'] == 'm' ? L('_HE_') : L('_SHE_');
         }
     }
 
@@ -48,7 +48,7 @@ class BaseController extends Controller
     protected function requireLogin()
     {
         if (!is_login()) {
-            $this->error('必须登录才能操作');
+            $this->error(L('_ERROR_MUST_LOGIN_'));
         }
     }
 }

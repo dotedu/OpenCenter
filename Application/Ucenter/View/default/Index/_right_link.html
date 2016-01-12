@@ -2,16 +2,16 @@
     <div class="uc_link_block clearfix col-xs-12">
         <div class="uc_link_top clearfix">
             <div class="uc_title">
-                <if condition="$uid eq is_login()">我<else/>TA</if>的关注({$follow_totalCount|default=0})
+                <if condition="$uid eq is_login()">{:L('_I_')}<else/>{:L('_TA_')}</if>{:L('_DE_FOLLOWER_')}({$follow_totalCount|default=0})
             </div>
-            <div class="uc_fl_right uc_more_link"><a href="{:U('following',array('uid'=>$uid))}">更多</a></div>
+            <div class="uc_fl_right uc_more_link"><a href="{:U('following',array('uid'=>$uid))}">{:L('_MORE_')}</a></div>
         </div>
-        <div class="col-md-12 uc_link_info">
+        <div class="col-xs-12 uc_link_info">
             <volist name="follow_default" id="fl">
-                <div class="col-sm-3 col-xs-4">
+                <div class="col-xs-3">
                     <dl>
                         <a href="{$fl.user.space_url}">
-                            <dt><img ucard="{$fl.user.uid}" src="{$fl.user.avatar64}" class="avatar-img img-responsive">
+                            <dt><img style="width: 64px;height: 64px" ucard="{$fl.user.uid}" src="{$fl.user.avatar64}" class="avatar-img img-responsive">
                             </dt>
                             <dd ucard="{$fl.user.uid}" class="text-more" style="width: 100%">{$fl.user.nickname}</dd>
                         </a>
@@ -20,7 +20,7 @@
             </volist>
             <if condition="count($follow_default) eq 0"><p style="text-align: center; font-size: 24px;">
                 <br><br>
-                暂无关注任何人哦～
+                {:L('_FOLLOWER_NOTHING_')}{:L('_WAVE_')}
                 <br><br><br>
             </p></if>
         </div>
@@ -29,16 +29,16 @@
     <div class="uc_link_block clearfix col-xs-12" style="margin-top: 10px;">
         <div class="uc_link_top clearfix">
             <div class="uc_title">
-                <if condition="$uid eq is_login()">我<else/>TA</if>的粉丝({$fans_totalCount|default=0})
+                <if condition="$uid eq is_login()">{:L('_I_')}<else/>{:L('_TA_')}</if>{:L('_DE_FANS_')}({$follow_totalCount|default=0})
             </div>
-            <div class="uc_fl_right uc_more_link"><a href="{:U('fans',array('uid'=>$uid))}">更多</a></div>
+            <div class="uc_fl_right uc_more_link"><a href="{:U('fans',array('uid'=>$uid))}">{:L('_MORE_')}</a></div>
         </div>
-        <div class="col-md-12 uc_link_info">
+        <div class="col-xs-12 uc_link_info">
             <volist name="fans_default" id="fs">
-                <div class="col-sm-3 col-xs-4">
+                <div class="col-xs-3">
                     <dl>
                         <a href="{$fs.user.space_url}">
-                            <dt><img ucard="{$fs.user.uid}" src="{$fs.user.avatar64}" class="avatar-img img-responsive">
+                            <dt><img style="width: 64px;height: 64px"  ucard="{$fs.user.uid}" src="{$fs.user.avatar64}" class="avatar-img img-responsive">
                             </dt>
                             <dd ucard="{$fs.user.uid}" class="text-more" style="width: 100%">{$fs.user.nickname}</dd>
                         </a>
@@ -47,7 +47,7 @@
             </volist>
             <if condition="count($fans_default) eq 0"><p style="text-align: center; font-size: 24px;">
                 <br><br>
-                暂无粉丝哦～
+                {:L('_FANS_NOTHING_')}{:L('_WAVE_')}
                 <br><br><br>
             </p></if>
         </div>

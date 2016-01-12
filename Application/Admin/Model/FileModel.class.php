@@ -59,8 +59,11 @@ class FileModel extends Model{
                 }
                 if(strtolower($driver) != 'local'){
                     $value['savepath'] =$value['url'];
+                }else{
+                    $value['savepath'] = str_replace('.','',$setting['rootPath']).$value['savepath'];
                 }
-                $value['driver'] = strtolower($driver);
+
+                $value['driver'] = $driver;
                 /* 记录文件信息 */
                 if($this->create($value) && ($id = $this->add())){
                     $value['id'] = $id;
@@ -87,23 +90,16 @@ class FileModel extends Model{
         /* 获取下载文件信息 */
         $file = $this->find($id);
         if(!$file){
-            $this->error = '不存在该文件！';
+            $this->error = L('_NO_THIS_FILE_IS_NOT_THERE_WITH_EXCLAMATION_');
             return false;
         }
 
         /* 下载文件 */
-        switch ($file['location']) {
-            case 0: //下载本地文件
-                $file['rootpath'] = $root;
-                return $this->downLocalFile($file, $callback, $args);
-			case 1: //下载FTP文件
-				$file['rootpath'] = $root;
-				return $this->downFtpFile($file, $callback, $args);
-                break;
-            default:
-                $this->error = '不支持的文件存储类型！';
-                return false;
-
+        if($file['driver'] == 'local'){
+            $file['rootpath'] = $root;
+            return $this->downLocalFile($file, $callback, $args);
+        }else{
+            redirect($file['savepath']);
         }
 
     }
@@ -130,7 +126,8 @@ class FileModel extends Model{
      * @return boolean            下载失败返回false
      */
     private function downLocalFile($file, $callback = null, $args = null){
-        if(is_file($file['rootpath'].$file['savepath'].$file['savename'])){
+        $path = $file['rootpath'].$file['savepath'].$file['savename'];
+        if(is_file($path)){
             /* 调用回调函数新增下载数 */
             is_callable($callback) && call_user_func($callback, $args);
 
@@ -143,10 +140,10 @@ class FileModel extends Model{
             } else {
                 header('Content-Disposition: attachment; filename="' . $file['name'] . '"');
             }
-            readfile($file['rootpath'].$file['savepath'].$file['savename']);
+            readfile($path);
             exit;
         } else {
-            $this->error = '文件已被删除！';
+            $this->error = L('_FILE_HAS_BEEN_DELETED_WITH_EXCLAMATION_');
             return false;
         }
     }

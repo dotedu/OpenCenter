@@ -1,7 +1,7 @@
 <extend name="Public/base" />
 <block name="body">
     <div class="main-title">
-        <h2>默认积分配置</h2>
+        <h2>{:L("_DEFAULT_INTEGRATION_")}</h2>
     </div>
     <div class="tab-wrap with-padding">
 
@@ -22,7 +22,7 @@
             <div class="tab-pane in">
                 <form action="__SELF__" enctype="application/x-www-form-urlencoded" method="POST" class="form-horizontal auth-form">
                     <volist name="score_keys" id="score">
-                        <label class="item-label">{$score.title|htmlspecialchars}<span>（单位：{$score.unit|htmlspecialchars}）</span></label>
+                        <label class="item-label">{$score.title|htmlspecialchars}<span>{:L("_UNIT_WITH_COLON_")}{$score.unit|htmlspecialchars}）</span></label>
                         <div class="controls ">
                             <input type="text" name="score{$score.id}" value="{$score.value}" class="text input-large form-control"style="width: 400px"/>
                         </div>
@@ -30,9 +30,9 @@
                     <input type="hidden" name="post_key" value="{$post_key}"/>
                     <input type="hidden" name="id" value="{$this_role.id}" />
                     <div style="margin-top: 20px;"></div>
-                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
-                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
-                    <span style="color: #BABABA;margin: 11px;">请先保存以上配置后再切换到其它界面</span>
+                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">{:L("_SURE_WITH_SPACE_")}</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
+                    <span style="color: #BABABA;margin: 11px;">{:L("_PLEASE_SAVE_THE_ABOVE_CONFIGURATION_AND_THEN_SWITCH_TO_ANOTHER_INTERFACE_")}</span>
                 </form>
             </div>
         </div>

@@ -83,8 +83,7 @@
   position: relative;
 }
 .item_core .cover {
-  width: 280px;
-  height: 210px;
+  width: 255px;
 }
 .item_type {
   background: rgba(0, 0, 0, 0.4);
@@ -104,7 +103,7 @@
 .uploadcover {
   color: #ffffff;
   background-color: rgba(3, 3, 3, 0.5);
-  border-color: #2f7a51;
+  border-color: #4f8ad0;
   display: inline-block;
   margin-bottom: 0;
   font-weight: normal;
@@ -188,21 +187,18 @@
   width: 350px;
   height: 252px;
 }
-hr {
-  border: 0;
-  height: 1px;
-  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-  background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-  background-image: -ms-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-  background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-  margin: 10px 0 10px 0;
-}
 /*详情页面END*/
 /*应用公共css*/
 .app_head {
   background: white;
   padding: 0;
   margin: 0;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #dddddd;
+  border-radius: 0.2em;
   margin-bottom: 1em;
 }
 .app_title {
@@ -258,4 +254,15 @@ hr {
 }
 .children_nav .nav_list li .cur {
   font-size: 1.0em;
+}
+.display_type {
+  position: absolute;
+  right: 19px;
+  width: 25px;
+}
+.display_type a i {
+  font-size: 25px;
+}
+.display_type .current {
+  color: #4f8ad0;
 }

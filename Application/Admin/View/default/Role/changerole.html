@@ -16,7 +16,7 @@
 
         <div class="select_box_this">
             <notempty name="role_list">
-                <span>所选用户迁移到角色：</span>
+                <span>{:L("_SELECTED_USERS_TO_MIGRATE_TO_THE_IDENTITY_")}{:L("_COLON_")}</span>
                 <span>
                     <select name="role" style="width: 200px;">
                         <volist name="role_list" id="role">
@@ -25,13 +25,13 @@
                     </select>
                 </span>
                 <else/>
-                没有可移动到的角色~
+               {:L("_NO_IDENTITY_CAN_BE_MOVED_")}
             </notempty>
 
         </div>
         <div style="width: 100%;text-align: center;">
-            <a class="btn btn-primary" data-role="submit">移动</a>
-            <a onclick="$('.close').click();" class="btn btn-default">取消</a>
+            <a class="btn btn-primary" data-role="submit">{:L("_MOBILE_")}</a>
+            <a onclick="$('.close').click();" class="btn btn-default">{:L("_CANCEL_")}</a>
         </div>
     </form>
 </div>
@@ -42,7 +42,7 @@
                    var url=$('#migration').attr('action');
                    $.post(url,query,function(msg){
                        if(msg.status){
-                           toast.success('迁移成功！');
+                           toast.success({:L('_MIGRATION_SUCCESS_WITH_SINGLE_')});
                            setTimeout(function(){
                                window.location.reload();
                            },1500);

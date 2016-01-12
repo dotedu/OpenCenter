@@ -2,16 +2,16 @@
 <extend name="Public/base" />
 <block name="body">
     <div class="main-title">
-    <h2>管理后台授权</h2>
+    <h2>{:L("_MANAGEMENT_BACKGROUND_AUTHORIZATION_")}</h2>
 </div>
 	<div class="tab-wrap with-padding">
 
         <div class="clearfix">
             <div class="col-xs-10">
                 <ul class="nav nav-secondary">
-                    <li class="active"><a href="javascript:;">管理后台授权</a></li>
-                    <li><a href="{:U('AuthManager/accessUser',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">前台访问授权</a></li>
-                    <li><a href="{:U('AuthManager/user',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">成员授权</a></li>
+                    <li class="active"><a href="javascript:;">{:L("_MANAGEMENT_BACKGROUND_AUTHORIZATION_")}</a></li>
+                    <li><a href="{:U('AuthManager/accessUser',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">{:L("_FRONT_DESK_ACCESS_AUTHORIZATION_")}</a></li>
+                    <li><a href="{:U('AuthManager/user',array('group_name'=>I('group_name') ,'group_id'=> I('group_id')))}">{:L("_MEMBER_DELEGATION_")}</a></li>
 
                 </ul>
             </div>
@@ -31,7 +31,7 @@
 					<volist name="node_list" id="node" >
 						<dl class="checkmod">
 							<dt class="hd">
-								<label class="checkbox"><input class="auth_rules rules_all" type="checkbox" name="rules[]" value="<?php echo $main_rules[$node['url']] ?>">{$node.title}管理</label>
+								<label class="checkbox"><input class="auth_rules rules_all" type="checkbox" name="rules[]" value="<?php echo $main_rules[$node['url']] ?>">{$node.title}{:L("_ADMINISTRATION_")}</label>
 							</dt>
 							<dd class="bd">
 								<present name="node['child']">
@@ -61,8 +61,8 @@
 					</volist>
 
 			        <input type="hidden" name="id" value="{$this_group.id}" />
-                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">确 定</button>
-                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+                    <button type="submit" class="btn submit-btn ajax-post" target-form="auth-form">{:L("_SURE_WITH_SPACE_")}</button>
+                    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
 			    </form>
 			</div>
 

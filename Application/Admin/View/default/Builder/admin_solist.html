@@ -72,14 +72,14 @@
 			 	{$search.title}：<input style="float: none;width:80px;display:inline;margin-bottom:5px;" type="text" name="{$search['name']}" class="form-control" value="{$_GET[$search['name']]}">
 			 </if>
     	 </volist>
-    	<input type="submit" class="btn" style="margin-bottom:5px" value="搜索"/>
+    	<input type="submit" class="btn" style="margin-bottom:5px" value={:L("_SEARCH_WITH_DOUBLE_")}/>
 		</form>
 		</div> 
 		</if>
         <div class="fl">
         	<!--
 <if condition="count($searches) gt 0">
-    <button class="btn submit-btn" url="?status=-1" target-form="ids" style="padding: 6px 16px;" onclick="toggle_search()">搜索</button>
+    <button class="btn submit-btn" url="?status=-1" target-form="ids" style="padding: 6px 16px;" onclick="toggle_search()">{:L("_SEARCH_")}</button>
 </if>.
 -->
 
@@ -122,8 +122,8 @@
         </table>
     </div>
 	<div class="with-padding">
-    选择的ID：<input type="text" name="txt" id="txt">
-	</form><input type="button" value="确定" onclick="foo();"> 
+   {:L("_SELECT_ID_")}：<input type="text" name="txt" id="txt">
+	</form><input type="button" value={:L("_DETERMINATION_WITH_DOUBLE_")} onclick="foo();"> 
 
     </div>
     <!-- 分页 -->
@@ -218,7 +218,7 @@
                 $(this).magnificPopup({
                     delegate: 'a',
                     type: 'image',
-                    tLoading: '正在载入 #%curr%...',
+                    tLoading: '{:L("_LOADING_")}#%curr%...',
                     mainClass: 'mfp-img-mobile',
                     gallery: {
                         enabled: true,
@@ -227,12 +227,12 @@
 
                     },
                     image: {
-                        tError: '<a href="%url%">图片 #%curr%</a> 无法被载入.',
+                        tError: '<a href="%url%">{:L("_PICTURE_")}#%curr%</a>{:L("_COULD_NOT_BE_LOADED_")}',
                         titleSrc: function (item) {
                             /*           return item.el.attr('title') + '<small>by Marsel Van Oosten</small>';*/
                             return '';
                         },
-                        verticalFit: false
+                        verticalFit: true
                     }
                 });
             });

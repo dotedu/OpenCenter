@@ -3,7 +3,7 @@
 <block name="body">
 	<script type="text/javascript" src="__STATIC__/uploadify/jquery.uploadify.min.js"></script>
 	<div class="main-title cf">
-		<h2>插件配置 [ {$data.title} ]</h2>
+		<h2>{:L("_PLUGIN_CONFIGURATION_")}[ {$data.title} ]</h2>
 	</div>
     <div class="with-padding">
     <form action="{:U('saveConfig')}" class="form-horizontal" method="post">
@@ -19,12 +19,12 @@
     <switch name="form.type">
     <case value="text">
         <div class="controls">
-            <input type="text" name="config[{$o_key}]" class="text input-large" value="{$form.value}">
+            <input type="text" name="config[{$o_key}]" class="form-control text form-input-width" value="{$form.value}">
         </div>
     </case>
     <case value="password">
         <div class="controls">
-            <input type="password" name="config[{$o_key}]" class="text input-large" value="{$form.value}">
+            <input type="password" name="config[{$o_key}]" class="form-control text input-large form-input-width" value="{$form.value}">
         </div>
     </case>
     <case value="hidden">
@@ -51,6 +51,7 @@
             </foreach>
         </div>
     </case>
+
     <case value="select">
         <div class="controls">
             <select name="config[{$o_key}]">
@@ -89,14 +90,14 @@
                 "height"          : 30,
                 "swf"             : "__STATIC__/uploadify/uploadify.swf",
                 "fileObjName"     : "download",
-                "buttonText"      : "上传图片",
+                "buttonText"      : {:L("_UPLOAD_PICTURES_WITH_DOUBLE_")},
                 "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
                 "width"           : 120,
                 'removeTimeout'   : 1,
                 'fileTypeExts'    : '*.jpg; *.png; *.gif;',
                 "onUploadSuccess" : uploadPicture{$o_key},
             'onFallback' : function() {
-                alert('未检测到兼容版本的Flash.');
+                alert('{:L("_AN_INCOMPATIBLE_VERSION_OF_THE_FLASH_IS_NOT_DETECTED_")}.');
             }
             });
 
@@ -212,14 +213,14 @@
                                         "height"          : 30,
                                         "swf"             : "__STATIC__/uploadify/uploadify.swf",
                                         "fileObjName"     : "download",
-                                        "buttonText"      : "上传图片",
+                                        "buttonText"      : {:L("_UPLOAD_PICTURES_WITH_DOUBLE_")},
                                         "uploader"        : "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
                                         "width"           : 120,
                                         'removeTimeout'   : 1,
                                         'fileTypeExts'    : '*.jpg; *.png; *.gif;',
                                         "onUploadSuccess" : uploadPicture{$o_tab_key},
                                     'onFallback' : function() {
-                                        alert('未检测到兼容版本的Flash.');
+                                        alert('{:L("_AN_INCOMPATIBLE_VERSION_OF_THE_FLASH_IS_NOT_DETECTED_")}.');
                                     }
                                     });
 
@@ -273,9 +274,15 @@
         {$custom_config}
     </present>
     </empty>
-    <input type="hidden" name="id" value="{:I('id')}" readonly>
-    <button type="submit" class="btn submit-btn ajax-post" target-form="form-horizontal">确 定</button>
-    <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+
+    <div style="margin-top: 10px">
+
+        <input type="hidden" name="id" value="{:I('id')}" readonly>
+        <button type="submit" class="btn submit-btn ajax-post" target-form="form-horizontal">{:L("_SURE_WITH_SPACE_")}</button>
+        <button class="btn btn-return" onclick="javascript:history.back(-1);return false;">{:L("_RETURN_WITH_SPACE_")}</button>
+        </div>
+    </div>
+
     </form>
     </div>
 

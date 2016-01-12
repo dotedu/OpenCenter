@@ -131,10 +131,10 @@ class InviteUserInfoModel extends Model
         foreach($list as &$val){
             $inviteType=$inviteTypeModel->getSimpleData(array('id'=>$val['invite_type']));
             $val['invite_type_title']=$inviteType['title'];
-            $val['user']=query_user('nickname',$val['uid']);
+            $val['user']=get_nickname($val['uid']);
             $val['user']='['.$val['uid'].']'.$val['user'];
         }
         unset($val);
         return $list;
     }
-} 
+}

@@ -27,6 +27,10 @@ return array(
         '__IMG__' => __ROOT__ . '/Application/' . MODULE_NAME . '/Static/images',
         '__CSS__' => __ROOT__ . '/Application/' . MODULE_NAME . '/Static/css',
         '__JS__' => __ROOT__ . '/Application/' . MODULE_NAME . '/Static/js',
-        '__ZUI__' => __ROOT__ . '/Public/zui'
+        '__ZUI__' => __ROOT__ . '/Public/zui',
+        '__CORE_IMAGE__'=>__ROOT__.'/Application/Core/Static/images',
+        '__CORE_CSS__'=>__ROOT__.'/Application/Core/Static/css',
+        '__CORE_JS__'=>__ROOT__.'/Application/Core/Static/js',
+        '__APPLICATION__'=>__ROOT__.'/Application/'
     ),
 );

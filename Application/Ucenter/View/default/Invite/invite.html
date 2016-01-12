@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-xs-12">
             <p>&nbsp;</p>
-            <h4>邀请码列表</h4>
+            <h4>{:L('_INV_LIST_')}</h4>
             <hr class="oneuser-title-hr"/>
 
             <include file="_top"/>
@@ -15,7 +15,7 @@
 
     <div class="invite_content" style="min-height: 400px;margin-top: 30px;">
         <if condition="!$type_list"><p class="text-muted" style="text-align: center; font-size: 18px;">
-            暂无可用邀请码，先去 <a href="{:U('Ucenter/Invite/index')}" style="text-decoration: underline;">生成邀请码</a> ～
+            {:L('_INV_NOT_')} <a href="{:U('Ucenter/Invite/index')}" style="text-decoration: underline;">{:L('_INV_CODE_GEN_')}</a> ～
         </p>
             <else/>
             <volist name="type_list" id="val">
@@ -24,12 +24,12 @@
                     <table>
                         <thead>
                         <tr>
-                            <td>邀请码</td>
-                            <td>邀请码链接</td>
-                            <td>剩余名额</td>
-                            <td>已成功</td>
-                            <td>有效期至</td>
-                            <td>操作</td>
+                            <td>{:L('_INV_CODE_')}</td>
+                            <td>{:L('_INV_LINK_')}</td>
+                            <td>{:L('_PLACES_REMIND_')}</td>
+                            <td>{:L('_SUCCESS_ED_')}</td>
+                            <td>{:L('_PERIOD_TO_')}</td>
+                            <td>{:L('_OPERATE_')}</td>
                         </tr>
                         </thead>
                         <tbody>
@@ -37,14 +37,14 @@
                             <tr>
                                 <td>{$vl.code}</td>
                                 <td class="text-more" style="width: 100%">{$vl.code_url}</td>
-                                <td>{$vl.num|default=0}个</td>
-                                <td>{$vl.already_num|default=0} 个</td>
+                                <td>{$vl.num|default=0}{:L('_GE_')}</td>
+                                <td>{$vl.already_num|default=0} {:L('_GE_')}</td>
                                 <td>{$vl.end_time|time_format}</td>
                                 <td>
                                     <div style="position: relative;">
-                                        <a data-role="copy_code" data-code="{$vl.code}">复制邀请码</a>
-                                        <a data-role="copy_code_url" data-code-url="{$vl.code_url}" style="margin-left: 10px;">复制邀请链接</a>
-                                        <a data-role="back_copy_code" data-id="{$vl.id}" style="margin-left: 10px;">退还</a>
+                                        <a data-role="copy_code" data-code="{$vl.code}">{:L('_INV_CODE_COPY_')}</a>
+                                        <a data-role="copy_code_url" data-code-url="{$vl.code_url}" style="margin-left: 10px;">{:L('_INV_LINK_COPY_')}</a>
+                                        <a data-role="back_copy_code" data-id="{$vl.id}" style="margin-left: 10px;">{:L('_RETURN_TO_')}</a>
                                     </div>
                                 </td>
                             </tr>
@@ -67,8 +67,8 @@
                     return $(this).attr('data-code');
                 },
                 afterCopy: function () {
-                    $(this).html('已复制');
-                    toast.success('复制成功');
+                    $(this).html("{:L('_COPIED_')}");
+                    toast.success("{:L('_SUCCESS_COPY_')}");
                 }
             });
             $('[data-role="copy_code_url"]').zclip({
@@ -76,8 +76,8 @@
                     return $(this).attr('data-code-url');
                 },
                 afterCopy: function () {
-                    $(this).html('链接已复制');
-                    toast.success('复制链接成功');
+                    $(this).html("{:L('_LINK_COPIED_')}");
+                    toast.success("{:L('_SUCCESS_LINK_COPY_')}");
                 }
             });
         });

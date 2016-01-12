@@ -1,10 +1,10 @@
 <label class="item-label">{$field.title|htmlspecialchars}
     <if condition="$field['subtitle']">
-        <span class="check-tips">（{$field.subtitle|htmlspecialchars}）</span>
+        <span class="check-tips">（{$field.subtitle}）</span>
     </if>
 </label>
 <if condition="$field['name'] == 'action'">
-    <p style="color: #f00;">开发人员注意：你使用了一个名称为action的字段，由于这个字段名称会与form[action]冲突，导致无法提交表单，请换用另外一个名字。</p>
+    <p style="color: #f00;">{:L("_DEVELOPMENT_STAFF_ATTENTION_")}{:L("_YOU_USE_A_FIELD_NAMED_ACTION_")}，{:L("_BECAUSE_THIS_FIELD_NAME_WILL_BE_WITH_FORM_")}[action]{:L("_CONFLICT_WHICH_CAUSES_THE_FORM_TO_BE_UNABLE_TO_COMMIT_PLEASE_USE_ANOTHER_NAME_")}</p>
 </if>
 <div class="controls ">
 <switch name="field.type">
@@ -22,8 +22,9 @@
         <input type="hidden" name="{$field.name}" value="{$field.value}" class="text input-large"/>
     </case>
     <case value="readonly">
-        <input type="text" name="{$field.name}" value="{$field.value}" class="text input-large form-control"
-               style="width: 400px" placeholder="无需填写" readonly/>
+        <input type="hidden" name="{$field.name}" value="{$field.value}" class="text input-large form-control"
+               style="width: 400px" placeholder={:L("_NO_NEED_TO_FILL_IN_WITH_DOUBLE_")} readonly/>
+        <p class="lead" >{$field.value}</p>
     </case>
     <case value="integer">
         <input type="text" name="{$field.name}" value="{$field.value}" class="text input-large form-control"
@@ -44,6 +45,14 @@
             </volist>
         </select>
     </case>
+    <case value="colorPicker">
+        <php>
+            $colorPicker = 1;
+        </php>
+        <div class="color-picker" style="width:100px;height: 30px;">
+            <input type="text" name="{$field.name}" class="simple_color_callback form-control" onchange="setColorPicker(this);" value="{$field.value|default=''}" style="width: 100px;"/>
+        </div>
+    </case>
     <case value="radio">
         <volist name="field.opt" id="option">
             <php>
@@ -52,24 +61,51 @@
             </php>
             <label for="{$inputId}"> <input id="{$inputId}" name="{$field.name}" value="{$key}" type="radio"
                 {$checked}/>
-                {$option|htmlspecialchars}</label>
+                {$option}</label> &nbsp;&nbsp;&nbsp;&nbsp;
         </volist>
     </case>
+    <case value="icon">
+        <div class='icon-chose' title={:L("_SELECT_ICON_WITH_DOUBLE_")} style="width: 400px;">
+            <select name="{$field.name}" title={:L("_SELECT_ICON_WITH_DOUBLE_")} class="chosen-icons" data-value="{$field.value|default='icon-star'}"></select>
+        </div>
+        <php>
+            if(!$have_icon){
+            $have_icon=1;
+        </php>
+        <script src="__ZUI__/lib/chosen/chosen.icons.min.js"></script>
+        <link href="__ZUI__/lib/chosen/chosen.icons.css" rel="stylesheet">
+        <php>}</php>
+        <script>
+            $(function(){
+                $('.chosen-container').remove()
+                $('form select.chosen-icons').attr('class','chosen-icons');
+                $('form select.chosen-icons').data('zui.chosenIcons',null);
+                $('form select.chosen-icons').data('chosen',null);
+                $('form select.chosen-icons').chosenIcons();
+            });
+        </script>
+    </case>
 
+    <case value="singleFile">
+        {:W('Common/UploadFile/render',array(array('name'=>$field['name'],'value'=>$field['value'])))}
+    </case>
+    <case value="multiFile">
+        {:W('Common/UploadMultiFile/render',array(array('name'=>$field['name'],'limit'=>9,'value'=>$field['value'])))}
+    </case>
     <case value="singleImage">
         <div class="controls">
-            <div id="upload_single_image_{$field.name}" style="padding-bottom: 5px;">选择图片</div>
+            <div id="upload_single_image_{$field.name}" style="padding-bottom: 5px;">{:L("_SELECT_PICTURES_")}</div>
             <input class="attach" type="hidden" name="{$field.name}" value="{$field['value']}"/>
             <div class="upload-img-box">
                 <div class="upload-pre-item popup-gallery">
 
                 <notempty name="field.value">
                     <div class="each">
-                    <a href="{$field.value|get_cover='path'}" title="点击查看大图">
+                    <a href="{$field.value|get_cover='path'}" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                         <img src="{$field.value|get_cover='path'}">
                     </a>
                         <div class="text-center opacity del_btn" ></div>
-                        <div onclick="admin_image.removeImage($(this),'{$field.value}')"  class="text-center del_btn">删除</div>
+                        <div onclick="admin_image.removeImage($(this),'{$field.value}')"  class="text-center del_btn">{:L("_DELETE_")}</div>
                     </div>
                 </notempty>
                 </div>
@@ -87,7 +123,7 @@
                     // 选择文件的按钮。可选。
                     // 内部根据当前运行是创建，可能是input元素，也可能是flash.
                     pick: '#upload_single_image_{$field.name}',
-                    // 只允许选择图片文件。
+                    // 只允许选择图片文件
                     accept: {
                         title: 'Images',
                         extensions: 'gif,jpg,jpeg,bmp,png',
@@ -97,13 +133,13 @@
                 uploader_{$field.name}.on('fileQueued', function (file) {
                     uploader_{$field.name}.upload();
                 });
-                /*上传成功*/
+                /*上传成功**/
                 uploader_{$field.name}.on('uploadSuccess', function (file, data) {
                     if (data.status) {
                         $("[name='{$field.name}']").val(data.id);
                         $("[name='{$field.name}']").parent().find('.upload-pre-item').html(
-                                ' <div class="each"><a href="'+ data.path+'" title="点击查看大图"><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
-                                        '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">删除</div></div>'
+                                ' <div class="each"><a href="'+ data.path+'" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
+                                        '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">{:L("_DELETE_")}</div></div>'
                         );
                         uploader_{$field.name}.reset();
                     } else {
@@ -121,7 +157,7 @@
 
     <case value="multiImage">
         <div class="controls multiImage">
-            <div id="upload_multi_image_{$field.name}" style="padding-bottom: 5px;">选择图片</div>
+            <div id="upload_multi_image_{$field.name}" style="padding-bottom: 5px;">{:L("_SELECT_PICTURES_")}</div>
             <input class="attach" type="hidden" name="{$field.name}" value="{$field['value']}"/>
             <div class="upload-img-box">
                 <div class="upload-pre-item popup-gallery">
@@ -130,11 +166,11 @@
                         <php>$aIds = explode(',',$field['value']);</php>
                         <volist name="aIds" id="aId">
                             <div class="each">
-                                <a href="{$aId|get_cover='path'}" title="点击查看大图">
+                                <a href="{$aId|get_cover='path'}" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}>
                                     <img src="{$aId|get_cover='path'}">
                                 </a>
                                 <div class="text-center opacity del_btn" ></div>
-                                <div onclick="admin_image.removeImage($(this),'{$aId}')"  class="text-center del_btn">删除</div>
+                                <div onclick="admin_image.removeImage($(this),'{$aId}')"  class="text-center del_btn">{:L("_DELETE_")}</div>
                             </div>
                         </volist>
 
@@ -149,16 +185,16 @@
                 var limit = parseInt('{$field.opt}');
                 var uploader_{$field.name}= WebUploader.create({
                     // 选完文件后，是否自动上传。
-                      // swf文件路径
+                      // sw{:L("_F_FILE_PATH_")}
                     swf: 'Uploader.swf',
                     // 文件接收服务端。
                     server: "{:U('File/uploadPicture',array('session_id'=>session_id()))}",
                     // 选择文件的按钮。可选。
-                    // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                    // 内部根据当前运行是创建，可能是input元素，{:L("_AND_IT_COULD_BE_FLASH_")}.
                     //pick: '#upload_multi_image_{$field.name}',
                     pick: {'id': id, 'multi': true},
                     fileNumLimit: limit,
-                    // 只允许选择图片文件。
+                    // 只允许{:L("_SELECT_PICTURES_")}文件。
                     accept: {
                         title: 'Images',
                         extensions: 'gif,jpg,jpeg,bmp,png',
@@ -171,7 +207,7 @@
                 uploader_{$field.name}.on('uploadFinished', function (file) {
                     uploader_{$field.name}.reset();
                 });
-                /*上传成功*/
+                /*上传成功**/
                 uploader_{$field.name}.on('uploadSuccess', function (file, data) {
                           if (data.status) {
                             var ids = $("[name='{$field.name}']").val();
@@ -179,15 +215,15 @@
                           if( ids.indexOf(data.id) == -1){
                                 var rids = admin_image.upAttachVal('add',data.id, $("[name='{$field.name}']"));
                               if(rids.length>limit){
-                                  updateAlert('超过图片限制');
+                                  updateAlert({:L('_EXCEED_THE_PICTURE_LIMIT_WITH_SINGLE_')});
                                   return;
                               }
                               $("[name='{$field.name}']").parent().find('.upload-pre-item').append(
-                                        ' <div class="each"><a href="'+ data.path+'" title="点击查看大图"><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
-                                                '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">删除</div></div>'
+                                        ' <div class="each"><a href="'+ data.path+'" title={:L("_CLICK_TO_SEE_THE_BIG_PICTURE_WITH_DOUBLE_")}><img src="'+ data.path+'"></a><div class="text-center opacity del_btn" ></div>' +
+                                                '<div onclick="admin_image.removeImage($(this),'+data.id+')"  class="text-center del_btn">{:L("_DELETE_")}</div></div>'
                                 );
                             }else{
-                                updateAlert('该图片已存在');
+                                updateAlert({:L('_THE_PICTURE_ALREADY_EXISTS_WITH_SINGLE_')});
                             }
                         } else {
                             updateAlert(data.info);
@@ -216,7 +252,7 @@
             </php>
             <label for="{$inputId}"> <input type="checkbox" value="{$key}" id="{$inputId}" class="oneplus-checkbox"
                                             data-field-name="{$field.name}" {$checked}/>
-                {$option|htmlspecialchars}</label>
+                {$option}</label>
 
         </volist>
         <input type="hidden" name="{$field.name}" class="oneplus-checkbox-hidden"
@@ -240,8 +276,32 @@
             }
         </php>
         <input type="hidden" name="{$field.name}" value="{$field.value}"/>
-        <input type="text" data-field-name="{$field.name}" class="text input-large time form-control"
-               style="width: 400px" value="{$field.value|time_format}" placeholder="请选择时间"/>
+        <input type="text" data-field-name="{$field.name}" class="text input-large form-time time form-control"
+               style="width: 400px" value="{$field.value|time_format='H:i'}" placeholder={:L("_PLEASE_CHOOSE_TIME_WITH_DOUBLE_")}/>
+    </case>
+    <case value="date">
+        <php>
+            $importDatetimePicker = true;
+            //默认为当前时间
+            if(!$field['value']){
+            $field['value'] = time();
+            }
+        </php>
+        <input type="hidden" name="{$field.name}" value="{$field.value}"/>
+        <input type="text" data-field-name="{$field.name}" class="text input-large form-date time form-control"
+               style="width: 400px" value="{$field.value|time_format='Y-m-d'}" placeholder={:L("_PLEASE_CHOOSE_TIME_WITH_DOUBLE_")}/>
+    </case>
+    <case value="datetime">
+        <php>
+            $importDatetimePicker = true;
+            //默认为当前时间
+            if(!$field['value']){
+            $field['value'] = time();
+            }
+        </php>
+        <input type="hidden" name="{$field.name}" value="{$field.value}"/>
+        <input type="text" data-field-name="{$field.name}" class="text input-large form-datetime time form-control"
+               style="width: 400px" value="{$field.value|time_format}" placeholder={:L("_PLEASE_CHOOSE_TIME_WITH_DOUBLE_")}/>
     </case>
 
     <!--添加城市选择（需安装城市联动插件,css样式不好处理排版有点怪）-->
@@ -256,10 +316,10 @@
             {:hook('J_China_City',array('province'=>$field['value']['0'],'city'=>$field['value']['1'],'district'=>$field['value']['2'],'community'=>$field['value']['3']))}
     </case>
 
-    <!--弹出窗口选择并返回值（目前只支持返回ID）开始-->
+    <!--弹出窗口选择并返回值（目前只支持返回ID）开始->
     <case value="dataselect">
         <input type="text" name="{$field.name}" id="{$field.name}" value="{$field.value|htmlspecialchars}"
-               class="text input-large form-control" style="width: 400px;display:inline-block;"/><input class="btn" style="margin-left:10px" type="button" value="选择" onclick="openwin('{$field.opt}','600','500')">
+               class="text input-large form-control" style="width: 400px;display:inline-block;"/><input class="btn" style="margin-left:10px" type="button" value={:L("_CHOICE_WITH_DOUBLE_")} onclick="openwin('{$field.opt}','600','500')">
 			     <script type="text/javascript">
 						//弹出窗口
 						function openwin(url,width,height){
@@ -267,7 +327,7 @@
 						    var w= window.screen.height;
 						    var al=(l-width)/2;
 						    var aw=(w-height)/2;
-						    var OpenWindow=window.open(url,"弹出窗口","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width="+width+",height="+height+",top="+aw+",left="+al+"");
+						    var OpenWindow=window.open(url,{:L("_POP_UP_WINDOW_WITH_DOUBLE_")},"toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,width="+width+",height="+height+",top="+aw+",left="+al+"");
 						    OpenWindow.focus();
 						if(OpenWindow!=null){ //弹出窗口关闭事件
 						//if(window.attachEvent) OpenWindow.attachEvent("onbeforeunload",   quickOut);
@@ -277,11 +337,11 @@
 						//关闭触发方法
 						function quickOut()
 						{
-						alert("窗口已关闭");
+						alert({:L("_THE_WINDOW_IS_CLOSED_WITH_DOUBLE_")});
 						}
 				 </script>
     </case>
-	<!--弹出窗口选择并返回值（目前只支持返回ID）结束-->
+	<!--弹出窗口选择并返回值（目前只支持返回ID）结束 -->
 
     <case value="kanban">
 
@@ -307,9 +367,10 @@
         <script>
             $(function () {
                 var flag = "{$field.name}"
-                $('#{$field.name}').kanbans({'drop': function () {
+                $('#{$field.name}').kanbans({'drop': function (re) {
                     var kanban =new Array();
-                    $('.kanbans .kanban').each(function (index, element) {
+
+                    re.element.closest('.kanbans').find('.kanban').each(function (index, element) {
                         if ($(element).data('id')) {
                             kanban[index] =  new Object();
                             kanban[index]['data-id'] =  $(element).data('id');
@@ -388,10 +449,12 @@
         </php>
         </div>
     </case>
-
+    <case value="userDefined">
+        {$field.definedHtml}
+    </case>
 
     <default/>
-    <span style="color: #f00;">错误：未知字段类型 {$field.type}</span>
+    <span style="color: #f00;">{:L("_ERROR_")}{:L("_COLON_")}{:L("_UNKNOWN_FIELD_TYPE_")}{$field.type}</span>
     <input type="hidden" name="{$field.name}" value="{$field.value|htmlspecialchars}"/>
 </switch>
 </div>

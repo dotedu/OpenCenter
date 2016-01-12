@@ -80,9 +80,9 @@ class AdminSortBuilder extends AdminBuilder {
             $res += M($table)->where(array('id'=>$value))->setField('sort', $key+1);
         }
         if(!$res) {
-            $this->error('未修改排序或排序错误。');
+            $this->error(L('_ERROR_SORT_').L('_PERIOD_'));
         } else {
-            $this->success('排序成功。', cookie('__SELF__'));
+            $this->success(L('_SUCCESS_SORT_').L('_PERIOD_'), cookie('__SELF__'));
         }
     }
 }

@@ -76,8 +76,21 @@ class InstallController extends Controller{
                 unset($DB['DB_NAME']);
 
                 $db  = Db::getInstance($DB);
+
                 $sql = "CREATE DATABASE IF NOT EXISTS `{$dbname}` DEFAULT CHARACTER SET utf8";
-                $db->execute($sql);
+
+                try{
+                    $db->execute($sql);
+                }catch (\Think\Exception $e){
+                    if(strpos($e->getMessage(),'getaddrinfo failed')!==false){
+                        $this->error( '数据库服务器（数据库服务器IP） 填写错误。','很遗憾，创建数据库失败，失败原因');// 提示信息
+                    }
+                   if(strpos($e->getMessage(),'Access denied for user')!==false){
+                       $this->error('数据库用户名或密码 填写错误。','很遗憾，创建数据库失败，失败原因');// 提示信息
+                   }else{
+                       $this->error( $e->getMessage());// 提示信息
+                   }
+                }
                 session('step',2);
                 // $this->error($db->getError());exit;
             }
@@ -124,11 +137,19 @@ class InstallController extends Controller{
 
 
         if(session('error')){
-            //show_msg();
+            show_msg(session('error'));
         } else {
             session('step', 3);
 
-            $this->redirect('Index/complete');
+            echo "<script type=\"text/javascript\">setTimeout(function(){location.href='".U('Index/complete')."'},5000)</script>";
+            ob_flush();
+            flush();
         }
+    }
+
+    public function error($info,$title='很遗憾，安装失败，失败原因'){
+        $this->assign('info',$info);// 提示信息
+        $this->assign('title',$title);
+        $this->display('error');exit;
     }
 }

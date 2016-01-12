@@ -36,7 +36,7 @@ if(!defined('IN_UC')) {
 	set_magic_quotes_runtime(0);
 
 	defined('MAGIC_QUOTES_GPC') || define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
-	require_once DISCUZ_ROOT.'./Application/Common/Conf/config_ucenter.php';
+	require_once DISCUZ_ROOT.'api/config.php';
 
 	$_DCACHE = $get = $post = array();
 
@@ -76,7 +76,7 @@ if(!defined('IN_UC')) {
 //note include 通知方式
 } else {
 
-	require_once DISCUZ_ROOT.'./Application/Common/Conf/config_ucenter.php';
+	require_once DISCUZ_ROOT.'api/config.php';
 	/*require_once DISCUZ_ROOT.'./include/db_mysql.class.php';
 	$GLOBALS['db'] = new dbstuff;
 	$GLOBALS['db']->connect($dbhost, $dbuser, $dbpw, $dbname, $pconnect, true, $dbcharset);
@@ -100,7 +100,7 @@ class uc_note {
 
 	function uc_note() {
 		$this->appdir = substr(dirname(__FILE__), 0, -3);
-		$this->dbconfig = $this->appdir.'./Application/Common/Conf/config_ucenter.php';
+		$this->dbconfig = $this->appdir.'api/config.php';
 		$this->db = $GLOBALS['db'];
 		$this->tablepre = $GLOBALS['tablepre'];
 	}
@@ -147,20 +147,31 @@ class uc_note {
         session_start();
 
         require_once DISCUZ_ROOT.'./api/uc_client/lib/db.class.php';
-        $toxconfig = require_once SITE_PATH.'/Application/Common/Conf/config.php';
+        $toxconfig = require_once SITE_PATH.'/Conf/common.php';
 
         $db = new ucclient_db;
         $db->connect($toxconfig['DB_HOST'], $toxconfig['DB_USER'], $toxconfig['DB_PWD'], $toxconfig['DB_NAME'], UC_DBCONNECT, true, 'utf8');
         define('TOX_DBTABLEPRE', $toxconfig['DB_PREFIX']);
         $ref =  $db->fetch_first("SELECT * FROM ".TOX_DBTABLEPRE."ucenter_user_link WHERE uc_uid={$uid}");
         $user =  $db->fetch_first("SELECT * FROM ".TOX_DBTABLEPRE."member WHERE uid={$ref['uid']}");
+
+        $audit =  $db->fetch_first("SELECT * FROM ".TOX_DBTABLEPRE."user_role WHERE uid={$ref['uid']} and role_id= {$user['last_login_role']}");
         $auth = array(
             'uid' => $ref['uid'],
             'username' => $ref['uc_username'],
             'last_login_time' => $user['last_login_time'],
+            'role_id' => $user['last_login_role'],
+            'audit' => $audit,
         );
-        $_SESSION['ocenter']['user_auth']=$auth;
-        $_SESSION['ocenter']['user_auth_sign']=data_auth_sign($auth);
+
+        if($toxconfig['SESSION_PREFIX']){
+            $_SESSION[$toxconfig['SESSION_PREFIX']]['user_auth']=$auth;
+            $_SESSION[$toxconfig['SESSION_PREFIX']]['user_auth_sign']=data_auth_sign($auth);
+        }else{
+            $_SESSION['user_auth']=$auth;
+            $_SESSION['user_auth_sign']=data_auth_sign($auth);
+        }
+
 
 	}
 
@@ -168,12 +179,18 @@ class uc_note {
 		if(!API_SYNLOGOUT) {
 			return API_RETURN_FORBIDDEN;
 		}
-
+        $toxconfig = require_once SITE_PATH.'/Conf/common.php';
 		//note 同步登出 API 接口
 		header('P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"');
         session_start();
-        $_SESSION['ocenter']['user_auth']=null;
-        $_SESSION['ocenter']['user_auth_sign']=null;
+        if($toxconfig['SESSION_PREFIX']){
+            $_SESSION[$toxconfig['SESSION_PREFIX']]['user_auth']=null;
+            $_SESSION[$toxconfig['SESSION_PREFIX']]['user_auth_sign']=null;
+        }else{
+            $_SESSION['user_auth']=null;
+            $_SESSION['user_auth_sign']=null;
+        }
+
         session_destroy();
 	}
 
@@ -234,11 +251,11 @@ class uc_note {
 		fclose($fp);
 
 		//note 写配置文件
-		if(is_writeable($this->appdir.'./Application/Common/Conf/config_ucenter.php')) {
-			$configfile = trim(file_get_contents($this->appdir.'./Application/Common/Conf/config_ucenter.php'));
+		if(is_writeable($this->appdir.'api/config.php')) {
+			$configfile = trim(file_get_contents($this->appdir.'api/config.php'));
 			$configfile = substr($configfile, -2) == '?>' ? substr($configfile, 0, -2) : $configfile;
 			$configfile = preg_replace("/define\('UC_API',\s*'.*?'\);/i", "define('UC_API', '$UC_API');", $configfile);
-			if($fp = @fopen($this->appdir.'./Application/Common/Conf/config_ucenter.php', 'w')) {
+			if($fp = @fopen($this->appdir.'api/config.php', 'w')) {
 				@fwrite($fp, trim($configfile));
 				@fclose($fp);
 			}
@@ -292,7 +309,7 @@ class uc_note {
 	}
 }
 
-//note 使用该函数前需要 require_once $this->appdir.'./Application/Common/Conf/config_ucenter.php';
+//note 使用该函数前需要 require_once $this->appdir.'api/config.php';
 function _setcookie($var, $value, $life = 0, $prefix = 1) {
 	global $cookiepre, $cookiedomain, $cookiepath, $timestamp, $_SERVER;
 	setcookie(($prefix ? $cookiepre : '').$var, $value,

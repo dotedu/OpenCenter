@@ -26,42 +26,65 @@ class IndexController extends BaseController
 
     }
 
-    public function index($uid = null, $page = 1, $count = 10)
+    public function index($uid = null,$page=1)
     {
-        $appArr = $this->_tab_menu();
-        if (!$appArr) {
+
+        $show_tab= get_kanban_config('UCENTER_KANBAN', 'enable','', 'USERCONFIG');
+        $menu=$this->_tab_menu();
+        foreach($show_tab as $v1) {
+            foreach($menu as $v2) {
+                if (array_search($v1,$v2)) {
+                    $arr3[$v1] = $v2;
+                }
+            }
+        }
+        unset($v1);unset($v2);
+        $appArr =$arr3;
+        $current_action=current($appArr);
+        $url_link=array(
+            'info'=>'Ucenter/Index/information',
+            'rank_title'=>'Ucenter/Index/rank',
+            'follow'=>'Ucenter/Index/following',
+        );
+        if(!$current_action){
             $this->redirect('Ucenter/Index/information', array('uid' => $uid));
         }
-        foreach ($appArr as $key => $val) {
-            $type = $key;
-            break;
+        if (in_array($current_action['data-id'],array('info','rank_title','follow'))) {
+            $this->redirect($url_link[$current_action['data-id']], array('uid' => $uid));
         }
-        if (!isset ($appArr [$type])) {
-            $this->error('参数出错！！');
+        $type=key($appArr);
+        if (!isset ($appArr [$type]))
+        {
+            $this->error(L('_ERROR_PARAM_').L('_EXCLAMATION_').L('_EXCLAMATION_'));
         }
+
         $this->assign('type', $type);
-        $className = ucfirst($type) . 'Protocol';
-        $content = D(ucfirst($type) . '/' . $className)->profileContent($uid, $page, $count);
-        if (empty($content)) {
-            $content = '暂无内容';
-        } else {
-            $totalCount = D(ucfirst($type) . '/' . $className)->getTotalCount($uid);
-            $this->assign('totalCount', $totalCount);
-        }
-        $this->assign('content', $content);
+        $this->assign('module',$appArr[$type]['data-id']);
+        $this->assign('page',$page);
+
         //四处一词 seo
-        $str = '{$user_info.nickname|op_t}';
-        $str_app = '{$appArr[$type]|op_t}';
-        $this->setTitle($str . "的个人主页");
-        $this->setKeywords($str . "，个人主页，Think OX，个人" . $str_app);
-        $this->setDescription($str . "的个人" . $str_app . "页");
+        $str = '{$user_info.nickname|text}';
+        $str_app = '{$appArr.'.$type.'.title|text}';
+        $this->setTitle($str . L('_INDEX_TITLE_'));
+        $this->setKeywords($str . L('_PAGE_PERSON_') . $str_app);
+        $this->setDescription($str . L('_DE_PERSON_') . $str_app . L('_PAGE_'));
         //四处一词 seo end
         $this->display();
     }
 
+
+
     private function userInfo($uid = null)
     {
-        $user_info = query_user(array('avatar128', 'nickname', 'uid', 'space_url', 'icons_html', 'score', 'title', 'fans', 'following', 'weibocount', 'rank_link', 'signature'), $uid);
+        $user_info = query_user(array('avatar128', 'nickname', 'uid', 'space_url', 'score', 'title', 'fans', 'following', 'weibocount', 'rank_link', 'signature'), $uid);
+        //获取用户封面id
+        $map=getUserConfigMap('user_cover','',$uid);
+        $map['role_id']=0;
+        $model=D('Ucenter/UserConfig');
+        $cover=$model->findData($map);
+        $user_info['cover_id']=$cover['value'];
+        $user_info['cover_path']=getThumbImageById($cover['value'],1140,230);
+        $user_info['tags']=D('Ucenter/UserTagLink')->getUserTag($uid);
         $this->assign('user_info', $user_info);
         return $user_info;
     }
@@ -81,10 +104,10 @@ class IndexController extends BaseController
         $this->assign('user', $user);
         $this->getExpandInfo($uid);
         //四处一词 seo
-        $str = '{$user_info.nickname|op_t}';
-        $this->setTitle($str . "的个人资料页");
-        $this->setKeywords($str . "，个人资料，Think OX");
-        $this->setDescription($str . "的个人资料页");
+        $str = '{$user_info.nickname|text}';
+        $this->setTitle($str . L('_INFO_TITLE_'));
+        $this->setKeywords($str . L('_INFO_KEYWORDS_'));
+        $this->setDescription($str . L('_INFO_DESC_'));
         //四处一词 seo end
 
         $this->display();
@@ -170,7 +193,7 @@ class IndexController extends BaseController
             $map['uid'] = is_login();
 
         } else {
-            $this->error('请先登录！');
+            $this->error(L('_ERROR_PLEASE_LOGIN_').L('_EXCLAMATION_'));
         }
         foreach ($field_setting_list as &$val) {
             $map['field_id'] = $val['id'];
@@ -208,7 +231,7 @@ class IndexController extends BaseController
     {
         $result = null;
         $result['field_name'] = $data['field_name'];
-        $result['field_data'] = "还未设置";
+        $result['field_data'] = L('');
         switch ($data['form_type']) {
             case 'input':
             case 'radio':
@@ -227,32 +250,39 @@ class IndexController extends BaseController
         return $result;
     }
 
-    public function appList($uid = null, $page = 1, $count = 10, $tab = null)
+    public function appList($uid = null, $page = 1, $tab = null)
     {
+        $show_tab= get_kanban_config('UCENTER_KANBAN', 'enable','', 'USERCONFIG');
+        $menu=$this->_tab_menu();
+        foreach($show_tab as $v1) {
+            foreach($menu as $v2) {
+                if (array_search($v1,$v2)) {
+                    $arr3[$v1] = $v2;
+                }
+            }
+        }
+        unset($v1);unset($v2);
+        $appArr =$arr3;
 
-        $appArr = $this->_tab_menu();
+        if (!$appArr) {
+            $this->redirect('Usercenter/Index/information', array('uid' => $uid));
+        }
 
         $type = op_t($_GET['type']);
         if (!isset ($appArr [$type])) {
-            $this->error('参数出错！！');
+            $this->error(L('_ERROR_PARAM_').L('_EXCLAMATION_').L('_EXCLAMATION_'));
         }
         $this->assign('type', $type);
-        $className = ucfirst($type) . 'Protocol';
-        $content = D(ucfirst($type) . '/' . $className)->profileContent($uid, $page, $count, $tab);
-        if (empty($content)) {
-            $content = '暂无内容';
-        } else {
-            $totalCount = D(ucfirst($type) . '/' . $className)->getTotalCount($uid, $tab);
-            $this->assign('totalCount', $totalCount);
-        }
-        $this->assign('content', $content);
+        $this->assign('module',$appArr[$type]['data-id']);
+        $this->assign('page',$page);
+        $this->assign('tab',$tab);
 
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
-        $str_app = '{$appArr[$type]|op_t}';
-        $this->setTitle($str . "的个人" . $str_app . "页");
-        $this->setKeywords($str . "，个人主页，Think OX，个人" . $str_app);
-        $this->setDescription($str . "的个人" . $str_app . "页");
+        $str_app = '{$appArr.'.$type.'.title|op_t}';
+        $this->setTitle($str . L('_DE_PERSON_') . $str_app . L('_PAGE_'));
+        $this->setKeywords($str . L('_PAGE_PERSON_') . $str_app);
+        $this->setDescription($str . L('_DE_PERSON_') . $str_app . L('_PAGE_'));
         //四处一词 seo end
 
         $this->display('index');
@@ -264,39 +294,32 @@ class IndexController extends BaseController
      */
     public function _tab_menu()
     {
-        // 根据应用目录取全部APP信息
-        $map['status'] = 1;
-        $dir = APP_PATH;
-        $appList = null;
-        if (is_dir($dir)) {
-            if ($dh = opendir($dir)) {
-                while (($file = readdir($dh)) !== false) {
-                    $appList[]['app_name'] = $file;
-                }
-                closedir($dh);
-            }
-        }
+        $modules = D('Common/Module')->getAll();
         $apps = array();
-        // 获取APP的HASH数组
-        foreach ($appList as $app) {
-
-            $appName = strtolower($app['app_name']);
-            if ($appName == '.' || $appName == '..') {
-                continue;
+        foreach ($modules as $m) {
+            if ($m['is_setup'] == 1 && $m['entry'] != '') {
+                if (file_exists(APP_PATH . $m['name'] . '/Widget/UcenterBlockWidget.class.php')) {
+                    $apps[] = array('data-id' => $m['name'], 'title' => $m['alias'],'sort'=>$m['sort'],'key'=>strtolower($m['name']));
+                }
             }
-
-            $module = D('Module')->getModule($appName);
-
-            $className = ucfirst($appName);
-            $dao = D($className . '/' . $className . 'Protocol');
-            if (method_exists($dao, 'profileContent') && $module['is_setup']) {
-                $apps [$appName] = D($className . '/' . $className . 'Protocol')->getModelInfo();
-            }
-            unset ($dao);
         }
-        $apps = $this->sortApps($apps);
-        $this->assign('appArr', $apps);
 
+        $show_tab= get_kanban_config('UCENTER_KANBAN', 'enable','', 'USERCONFIG');
+        $apps[] = array('data-id' => 'info', 'sort'=>'0', 'title' =>'资料','key'=>'info');
+        $apps[] = array('data-id' => 'rank_title', 'sort'=>'0', 'title' => L('_RANK_TITLE_'),'key'=>'rank_title');
+        $apps[] = array('data-id' => 'follow', 'sort'=>'0','title' =>L('_FOLLOWERS_NO_SPACE_').'/粉丝','key'=>'follow');
+
+        $apps = $this->sortApps($apps);
+        $apps=array_combine(array_column($apps,'key'),$apps);
+        foreach($show_tab as $v1) {
+            foreach($apps as $v2) {
+                if (array_search($v1,$v2)) {
+                    $arr3[$v1] = $v2;
+                }
+            }
+        }
+        unset($v1);unset($v2);
+        $this->assign('appArr', $arr3);
         return $apps;
     }
 
@@ -330,10 +353,6 @@ class IndexController extends BaseController
     public function fans($uid = null, $page = 1)
     {
         $uid = isset($uid) ? $uid : is_login();
-        //调用API获取基本信息
-        $this->userInfo($uid);
-        $this->_tab_menu();
-
 
         $this->assign('tab', 'fans');
         $fans = D('Follow')->getFans($uid, $page, array('avatar128', 'uid', 'nickname', 'fans', 'following', 'weibocount', 'space_url', 'title'), $totalCount);
@@ -342,9 +361,9 @@ class IndexController extends BaseController
 
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
-        $this->setTitle($str . "的个人粉丝页");
-        $this->setKeywords($str . "，个人粉丝，Think OX");
-        $this->setDescription($str . "的个人粉丝页");
+        $this->setTitle($str . L('_FANS_TITLE_'));
+        $this->setKeywords($str . L('_FANS_KEYWORDS_'));
+        $this->setDescription($str . L('_FANS_TITLE_'));
         //四处一词 seo end
 
         $this->display();
@@ -353,20 +372,18 @@ class IndexController extends BaseController
     public function following($uid = null, $page = 1)
     {
         $uid = isset($uid) ? $uid : is_login();
-        //调用API获取基本信息
-        $this->userInfo($uid);
-        $this->_tab_menu();
 
         $following = D('Follow')->getFollowing($uid, $page, array('avatar128', 'uid', 'nickname', 'fans', 'following', 'weibocount', 'space_url', 'title'), $totalCount);
+       // dump($following);exit;
         $this->assign('following', $following);
         $this->assign('totalCount', $totalCount);
         $this->assign('tab', 'following');
 
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
-        $this->setTitle($str . "的个人关注页");
-        $this->setKeywords($str . "，个人关注，Think OX");
-        $this->setDescription($str . "的个人关注页");
+        $this->setTitle($str . L('_FOLLOWING_TITLE_'));
+        $this->setKeywords($str . L('_FOLLOWING_KEYWORDS_'));
+        $this->setDescription($str . L('_FOLLOWING_DESC_'));
         //四处一词 seo end
 
         $this->display();
@@ -375,15 +392,15 @@ class IndexController extends BaseController
     public function rank($uid = null)
     {
         $uid = isset($uid) ? $uid : is_login();
-        //调用API获取基本信息
-        $this->userInfo($uid);
-        $this->_tab_menu();
 
         $rankList = D('rank_user')->where(array('uid' => $uid, 'status' => 1))->field('rank_id,reason,create_time')->select();
         foreach ($rankList as &$val) {
             $rank = D('rank')->where('id=' . $val['rank_id'])->find();
             $val['title'] = $rank['title'];
-            $val['logo'] = $rank['logo'];
+            $val['logo_url'] = get_pic_src(M('picture')->where('id=' . $rank['logo'])->field('path')->getField('path'));
+            $val['label_content']=$rank['label_content'];
+            $val['label_bg']=$rank['label_bg'];
+            $val['label_color']=$rank['label_color'];
         }
         unset($val);
         $this->assign('rankList', $rankList);
@@ -391,9 +408,9 @@ class IndexController extends BaseController
 
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
-        $this->setTitle($str . "的头衔列表页");
-        $this->setKeywords($str . "，个人头衔，Think OX");
-        $this->setDescription($str . "的头衔列表页");
+        $this->setTitle($str . L('_RANK__TITLE_'));
+        $this->setKeywords($str . L('_RANK__KEYWORDS_'));
+        $this->setDescription($str . L('_RANK__DESC_'));
         //四处一词 seo end
 
         $this->display('rank');
@@ -402,15 +419,15 @@ class IndexController extends BaseController
     public function rankVerifyFailure()
     {
         $uid = isset($uid) ? $uid : is_login();
-        //调用API获取基本信息
-        $this->userInfo($uid);
-        $this->_tab_menu();
 
         $rankList = D('rank_user')->where(array('uid' => $uid, 'status' => -1))->field('id,rank_id,reason,create_time')->select();
         foreach ($rankList as &$val) {
             $rank = D('rank')->where('id=' . $val['rank_id'])->find();
             $val['title'] = $rank['title'];
-            $val['logo'] = $rank['logo'];
+            $val['logo_url'] = get_pic_src(M('picture')->where('id=' . $rank['logo'])->field('path')->getField('path'));
+            $val['label_content']=$rank['label_content'];
+            $val['label_bg']=$rank['label_bg'];
+            $val['label_color']=$rank['label_color'];
         }
         unset($val);
         $this->assign('rankList', $rankList);
@@ -418,9 +435,9 @@ class IndexController extends BaseController
 
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
-        $this->setTitle($str . "的被驳回头衔申请列表页");
-        $this->setKeywords($str . "，个人头衔，Think OX");
-        $this->setDescription($str . "的被驳回头衔申请列表页");
+        $this->setTitle($str . L('_RANK_TITLE_'));
+        $this->setKeywords($str . L('_RANK__KEYWORDS_'));
+        $this->setDescription($str . L('_RANK_TITLE_'));
         //四处一词 seo end
 
         $this->display('rank');
@@ -429,15 +446,15 @@ class IndexController extends BaseController
     public function rankVerifyWait()
     {
         $uid = isset($uid) ? $uid : is_login();
-        //调用API获取基本信息
-        $this->userInfo($uid);
-        $this->_tab_menu();
 
         $rankList = D('rank_user')->where(array('uid' => $uid, 'status' => 0))->field('rank_id,reason,create_time')->select();
         foreach ($rankList as &$val) {
             $rank = D('rank')->where('id=' . $val['rank_id'])->find();
             $val['title'] = $rank['title'];
-            $val['logo'] = $rank['logo'];
+            $val['logo_url'] = get_pic_src(M('picture')->where('id=' . $rank['logo'])->field('path')->getField('path'));
+            $val['label_content']=$rank['label_content'];
+            $val['label_bg']=$rank['label_bg'];
+            $val['label_color']=$rank['label_color'];
         }
         unset($val);
         $this->assign('rankList', $rankList);
@@ -445,9 +462,9 @@ class IndexController extends BaseController
 
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
-        $this->setTitle($str . "的待审核头衔申请列表页");
-        $this->setKeywords($str . "，个人头衔，Think OX");
-        $this->setDescription($str . "的待审核头衔申请列表页");
+        $this->setTitle($str . L('_RANK_TITLE_'));
+        $this->setKeywords($str . L('_RANK__KEYWORDS_'));
+        $this->setDescription($str . L('_RANK_TITLE_'));
         //四处一词 seo end
 
         $this->display('rank');
@@ -462,10 +479,10 @@ class IndexController extends BaseController
             $map['status'] = 0;
             $result = D('rank_user')->where($map)->delete();
             if ($result) {
-                D('Message')->sendMessageWithoutCheckSelf(is_login(), '头衔申请取消成功', '取消头衔申请', U('Ucenter/Message/message', array('tab' => 'system')));
-                $this->success('取消成功', U('Ucenter/Index/rankVerifyWait'));
+                D('Message')->sendMessageWithoutCheckSelf(is_login(),L('_MESSAGE_RANK_CANCEL_1_'),  L('_MESSAGE_RANK_CANCEL_2_'), 'Ucenter/Message/message', array('tab' => 'system'));
+                $this->success(L('_SUCCESS_CANCEL_'), U('Ucenter/Index/rankVerifyWait'));
             } else {
-                $this->error('取消失败');
+                $this->error(L('_FAIL_CANCEL_'));
             }
         }
     }
@@ -473,9 +490,6 @@ class IndexController extends BaseController
     public function rankVerify($rank_user_id = null)
     {
         $uid = isset($uid) ? $uid : is_login();
-        //调用API获取基本信息
-        $this->userInfo($uid);
-        $this->_tab_menu();
 
         $rank_user_id = intval($rank_user_id);
         $map_already['uid'] = $uid;
@@ -484,11 +498,11 @@ class IndexController extends BaseController
             $model = D('rank_user')->where(array('id' => $rank_user_id));
             $old_rank_user = $model->field('id,rank_id,reason')->find();
             if (!$old_rank_user) {
-                $this->error('请正确选择要重新申请的头衔');
+                $this->error(L('_ERROR_RANK_RE_SELECT_'));
             }
             $this->assign('old_rank_user', $old_rank_user);
             $map_already['id'] = array('neq', $rank_user_id);
-            D('Message')->sendMessageWithoutCheckSelf(is_login(), '你将进行头衔的重新申请', '头衔重新申请', U('Ucenter/Message/message', array('tab' => 'system')));
+            D('Message')->sendMessageWithoutCheckSelf(is_login(), L(''),L(''),  'Ucenter/Message/message', array('tab' => 'system'));
         }
         $alreadyRank = D('rank_user')->where($map_already)->field('rank_id')->select();
         $alreadyRank = array_column($alreadyRank, 'rank_id');
@@ -497,14 +511,18 @@ class IndexController extends BaseController
         }
         $map['types'] = 1;
         $rankList = D('rank')->where($map)->select();
+        foreach($rankList as &$rank){
+            $rank['logo_url'] = get_pic_src(M('picture')->where('id=' . $rank['logo'])->field('path')->getField('path'));
+        }
+        unset($rank);
         $this->assign('rankList', $rankList);
         $this->assign('tab', 'rankVerify');
 
         //四处一词 seo
         $str = '{$user_info.nickname|op_t}';
-        $this->setTitle($str . "的头衔申请页");
-        $this->setKeywords($str . "，个人头衔，头衔申请，Think OX");
-        $this->setDescription($str . "的头衔申请页");
+        $this->setTitle($str . L('_RANK_APPLY_TITLE_'));
+        $this->setKeywords($str . L('_RANK_APPLY_KEYWORDS_'));
+        $this->setDescription($str . L('_RANK_APPLY_TITLE_'));
         //四处一词 seo end
 
         $this->display('rank_verify');
@@ -516,10 +534,10 @@ class IndexController extends BaseController
         $reason = op_t($reason);
         $rank_user_id = intval($rank_user_id);
         if (!$rank_id) {
-            $this->error('请选择要申请的头衔');
+            $this->error(L('_ERROR_RANK_SELECT_'));
         }
         if ($reason == null || $reason == '') {
-            $this->error('请填写申请理由');
+            $this->error(L('_ERROR_RANK_REASON_'));
         }
         $data['rank_id'] = $rank_id;
         $data['reason'] = $reason;
@@ -530,17 +548,17 @@ class IndexController extends BaseController
         if ($rank_user_id) {
             $model = D('rank_user')->where(array('id' => $rank_user_id));
             if (!$model->select()) {
-                $this->error('请正确选择要重新申请的头衔');
+                $this->error(L('_ERROR_RANK_RE_SELECT_'));
             }
             $result = D('rank_user')->where(array('id' => $rank_user_id))->save($data);
         } else {
             $result = D('rank_user')->add($data);
         }
         if ($result) {
-            D('Message')->sendMessageWithoutCheckSelf(is_login(), '头衔申请成功,等待管理员审核', '头衔申请', U('Ucenter/Message/message', array('tab' => 'system')));
-            $this->success('申请成功,等待管理员审核', U('Ucenter/Index/rankVerify'));
+            D('Message')->sendMessageWithoutCheckSelf(is_login(),L('_MESSAGE_RANK_APPLY_1_'),L('_MESSAGE_RANK_APPLY_2_'),  'Ucenter/Message/message', array('tab' => 'system'));
+            $this->success(L('_SUCCESS_RANK_APPLY_'), U('Ucenter/Index/rankVerify'));
         } else {
-            $this->error('申请失败');
+            $this->error(L('_FAIL_RANK_APPLY_'));
         }
     }
 
@@ -571,4 +589,5 @@ class IndexController extends BaseController
         array_multisort($key_array, $sort, $multi_array);
         return $multi_array;
     }
+
 }

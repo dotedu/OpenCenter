@@ -31,7 +31,7 @@ function get_city_by_ip($ip)
     $ip = $ipinfo->data->ip; //IP地址
     $ips = $ipinfo->data->isp; //运营商
     $guo = $ipinfo->data->country; //国家
-    if ($guo == '中国') {
+    if ($guo == L('_CHINA_')) {
         $guo = '';
     }
     return $guo . $city . $ips . '[' . $ip . ']';
@@ -53,7 +53,7 @@ function send_mail($to = '', $subject = '', $body = '', $name = '', $attachment 
     $user = C('MAIL_SMTP_USER');
     $pass = C('MAIL_SMTP_PASS');
     if (empty($host) || empty($user) || empty($pass)) {
-        return '管理员还未配置邮件信息，请联系管理员配置';
+        return L('_THE_ADMINISTRATOR_HAS_NOT_YET_CONFIGURED_THE_MESSAGE_INFORMATION_PLEASE_CONTACT_THE_ADMINISTRATOR_CONFIGURATION_');
     }
 
     if (is_sae()) {
@@ -74,17 +74,18 @@ function send_mail($to = '', $subject = '', $body = '', $name = '', $attachment 
  */
 function sae_mail($to = '', $subject = '', $body = '', $name = '')
 {
+    $site_name = modC('WEB_SITE_NAME', L('_OPENSNS_OPEN_SOURCE_SOCIAL_SYSTEM_'), 'Config');
     if ($to == '') {
         $to = C('MAIL_SMTP_CE'); //邮件地址为空时，默认使用后台默认邮件测试地址
     }
     if ($name == '') {
-        $name = C('WEB_SITE'); //发送者名称为空时，默认使用网站名称
+        $name = $site_name; //发送者名称为空时，默认使用网站名称
     }
     if ($subject == '') {
-        $subject = C('WEB_SITE'); //邮件主题为空时，默认使用网站标题
+        $subject = $site_name; //邮件主题为空时，默认使用网站标题
     }
     if ($body == '') {
-        $body = C('WEB_SITE'); //邮件内容为空时，默认使用网站描述
+        $body = $site_name; //邮件内容为空时，默认使用网站描述
     }
     $mail = new SaeMail();
     $mail->setOpt(array(
@@ -118,7 +119,7 @@ function is_local()
 function send_mail_local($to = '', $subject = '', $body = '', $name = '', $attachment = null)
 {
     $from_email = C('MAIL_SMTP_USER');
-    $from_name = C('WEB_SITE');
+    $from_name = modC('WEB_SITE_NAME', L('_OPENSNS_OPEN_SOURCE_SOCIAL_SYSTEM_'), 'Config');
     $reply_email = '';
     $reply_name = '';
 
@@ -143,13 +144,13 @@ function send_mail_local($to = '', $subject = '', $body = '', $name = '', $attac
         $to = C('MAIL_SMTP_CE'); //邮件地址为空时，默认使用后台默认邮件测试地址
     }
     if ($name == '') {
-        $name = C('WEB_SITE'); //发送者名称为空时，默认使用网站名称
+        $name = modC('WEB_SITE_NAME', L('_OPENSNS_OPEN_SOURCE_SOCIAL_SYSTEM_'), 'Config'); //发送者名称为空时，默认使用网站名称
     }
     if ($subject == '') {
-        $subject = C('WEB_SITE'); //邮件主题为空时，默认使用网站标题
+        $subject = modC('WEB_SITE_NAME', L('_OPENSNS_OPEN_SOURCE_SOCIAL_SYSTEM_'), 'Config'); //邮件主题为空时，默认使用网站标题
     }
     if ($body == '') {
-        $body = C('WEB_SITE'); //邮件内容为空时，默认使用网站描述
+        $body = modC('WEB_SITE_NAME', L('_OPENSNS_OPEN_SOURCE_SOCIAL_SYSTEM_'), 'Config'); //邮件内容为空时，默认使用网站描述
     }
     $mail->AddReplyTo($replyEmail, $replyName);
     $mail->Subject = $subject;
@@ -164,7 +165,7 @@ function send_mail_local($to = '', $subject = '', $body = '', $name = '', $attac
     return $mail->Send() ? true : $mail->ErrorInfo; //返回错误信息
 }
 
-function thinkox_hash($message, $salt = "ThinkOX")
+function thinkox_hash($message, $salt = "OpenSNS")
 {
     $s01 = $message . $salt;
     $s02 = md5($s01) . $salt;
@@ -184,88 +185,92 @@ function thinkox_hash($message, $salt = "ThinkOX")
 function modC($key, $default = '', $module = '')
 {
     $mod = $module ? $module : MODULE_NAME;
-
-    $result = S('conf_' . strtoupper($mod) . '_' . strtoupper($key));
-    if (empty($result)) {
-        $config = D('Config')->where(array('name' => '_' . strtoupper($mod) . '_' . strtoupper($key)))->find();
+    if (MODULE_NAME == "Install" && $key == "NOW_THEME") {
+        return $default;
+    }
+    $tag = 'conf_' . strtoupper($mod) . '_' . strtoupper($key);
+    $result = S($tag);
+    if ($result === false) {
+        $config = M('Config')->field('value')->where(array('name' => '_' . strtoupper($mod) . '_' . strtoupper($key)))->find();
         if (!$config) {
             $result = $default;
         } else {
             $result = $config['value'];
         }
-        S('conf_' . strtoupper($mod) . '_' . strtoupper($key), $result);
+        S($tag, $result);
     }
+    return $result;
+}
+
+/**获取用户设置
+ * @param $key 键名
+ * @param string $default 默认值
+ * @param string $module 模块名，默认为当前模块名
+ * @param int $role_id 角色名，-1或不填为全部角色，0为当前角色
+ * @param int $uid 用户ID，不填为当前用户
+ * @return mixed|string
+ */
+function userC($key, $default = '', $module = '', $role_id = -1, $uid = 0)
+{
+    $mod = $module ? $module : MODULE_NAME;
+    if (MODULE_NAME == "Install" && $key == "NOW_THEME") {
+        return $default;
+    }
+    $tag = 'user_conf_' . strtoupper($mod) . '_' . strtoupper($key) . '_' . $role_id . '_' . $uid;
+    $result = S($tag);
+    if (empty($result)) {
+        $userConfigModel = D('Ucenter/UserConfig');
+        $config = $userConfigModel->findData(getUserConfigMap($key, $module, $uid));
+        if (!$config) {
+            $result = $default;
+        } else {
+            $result = $config['value'];
+        }
+        S($tag,$result);
+    }
+    return $result;
+}
+
+/**设置用户配置
+ * @param $key 键名
+ * @param string $value 值
+ * @param string $module 模块名，默认为当前模块名
+ * @param int $role_id 角色名，-1或不填为全部角色，0为当前角色
+ * @param int $uid 用户ID，不填为当前用户
+ * @return mixed
+ */
+function set_user_config($key, $value = '', $module = '', $role_id = -1, $uid = 0)
+{
+    $mod = $module ? $module : MODULE_NAME;
+    $tag = 'user_conf_' . strtoupper($mod) . '_' . strtoupper($key) . '_' . $role_id . '_' . $uid;
+    $userConfigModel = D('Ucenter/UserConfig');
+    $config = $userConfigModel->saveValue(getUserConfigMap($key, $module, $uid), $value);
+    $result = $config['value'];
+    S($tag, null);
     return $result;
 }
 
 /**发送短消息
  * @param        $mobile 手机号码
  * @param        $content 内容
- * @param string $time 定时发送
- * @param string $mid 子扩展号
  * @return string
  * @auth 肖骏涛
  */
-function sendSMS($mobile, $content, $time = '', $mid = '')
+function sendSMS($mobile, $content)
 {
-    $uid = modC('SMS_UID', '', 'USERCONFIG');
-    $pwd = modC('SMS_PWD', '', 'USERCONFIG');
-    $http = modC('SMS_HTTP', '', 'USERCONFIG');
 
-    if (empty($http) || empty($uid) || empty($pwd)) {
-        return '管理员还未配置短信信息，请联系管理员配置';
+    $sms_hook = modC('SMS_HOOK', 'none', 'USERCONFIG');
+    $sms_hook = check_sms_hook_is_exist($sms_hook);
+
+    if ($sms_hook == 'none') {
+        return L('_THE_ADMINISTRATOR_HAS_NOT_CONFIGURED_THE_SMS_SERVICE_PROVIDER_INFORMATION_PLEASE_CONTACT_THE_ADMINISTRATOR_');
     }
-    $data = array
-    (
-        'uid' => $uid, //用户账号
-        'pwd' => strtolower(md5($pwd)), //MD5位32密码
-        'mobile' => $mobile, //号码
-        'content' => $content, //内容 如果对方是utf-8编码，则需转码iconv('gbk','utf-8',$content); 如果是gbk则无需转码
-        'time' => $time, //定时发送
-        'mid' => $mid, //子扩展号
-        'encode' => 'utf8',
-    );
-    $re = postSMS($http, $data); //POST方式提交
-    if (trim($re) == '100') {
-        return "发送成功!";
-    } else {
-        return "发送失败! 状态：" . $re;
-    }
+    $name = get_addon_class($sms_hook);
+    $class = new $name();
+    return $class->sendSms($mobile, $content);
+
 }
 
-function postSMS($url, $data = '')
-{
-    $row = parse_url($url);
-    $host = $row['host'];
-    $port = $row['port'] ? $row['port'] : 80;
-    $file = $row['path'];
-    $post = '';
-    while (list($k, $v) = each($data)) {
-        $post .= rawurlencode($k) . "=" . rawurlencode($v) . "&"; //转URL标准码
-    }
-    $post = substr($post, 0, -1);
-    $len = strlen($post);
-    $fp = @fsockopen($host, $port, $errno, $errstr, 10);
-    if (!$fp) {
-        return "$errstr ($errno)\n";
-    } else {
-        $receive = '';
-        $out = "POST $file HTTP/1.1\r\n";
-        $out .= "Host: $host\r\n";
-        $out .= "Content-type: application/x-www-form-urlencoded\r\n";
-        $out .= "Connection: Close\r\n";
-        $out .= "Content-Length: $len\r\n\r\n";
-        $out .= $post;
-        fwrite($fp, $out);
-        while (!feof($fp)) {
-            $receive .= fgets($fp, 128);
-        }
-        fclose($fp);
-        $receive = explode("\r\n\r\n", $receive);
-        unset($receive[0]);
-        return implode("", $receive);
-    }
-}
 
 /**
  * get_kanban_config  获取看板配置
@@ -279,13 +284,94 @@ function postSMS($url, $data = '')
 function get_kanban_config($key, $kanban, $default = '', $module = '')
 {
     $config = modC($key, $default, $module);
-    $config = json_decode($config, true);
-    foreach ($config as $v) {
-        if ($v['data-id'] == $kanban) {
+    if (is_array($config)) {
+        return $config;
+    } else {
+        $config = json_decode($config, true);
+        foreach ($config as $v) {
+            if ($v['data-id'] == $kanban) {
                 $res = $v['items'];
                 break;
+            }
+        }
+        return getSubByKey($res, 'data-id');
+    }
+
+
+}
+
+
+/**
+ *
+ * function qrcode(){
+ *     $filename='qrcode.png';
+ *     $logo=SITE_PATH."\\Public\\Home\\images\\logo_80.png";
+ *     qrcode('http://www.dellidc.com',$filename,false,$logo,8,'L',2,true);
+ * }
+ *
+ * @param $data 二维码包含的文字内容
+ * @param $filename 保存二维码输出的文件名称，*.png
+ * @param bool $picPath 二维码输出的路径
+ * @param bool $logo 二维码中包含的LOGO图片路径
+ * @param string $size 二维码的大小
+ * @param string $level 二维码编码纠错级别：L、M、Q、H
+ * @param int $padding 二维码边框的间距
+ * @param bool $saveandprint 是否保存到文件并在浏览器直接输出，true:同时保存和输出，false:只保存文件
+ * return string
+ */
+function qrcode($data, $filename, $picPath = false, $logo = false, $size = '4', $level = 'L', $padding = 2, $saveandprint = false)
+{
+    vendor("phpqrcode.phpqrcode");//引入工具包
+    // 下面注释了把二维码图片保存到本地的代码,如果要保存图片,用$fileName替换第二个参数false
+    $path = $picPath ? $picPath : __ROOT__ . "\\Uploads\\Picture\\QRcode"; //图片输出路径
+    mkdir($path);//dump($path);exit;
+    //在二维码上面添加LOGO
+    if (empty($logo) || $logo === false) { //不包含LOGO
+        if ($filename == false) {
+            QRcode::png($data, false, $level, $size, $padding, $saveandprint); //直接输出到浏览器，不含LOGO
+        } else {
+            $filename = $path . '/' . $filename; //合成路径
+            QRcode::png($data, $filename, $level, $size, $padding, $saveandprint); //直接输出到浏览器，不含LOGO
+        }
+    } else { //包含LOGO
+        if ($filename == false) {
+            //$filename=tempnam('','').'.png';//生成临时文件
+            die(L('_PARAMETER_ERROR_'));
+        } else {
+            //生成二维码,保存到文件
+            $filename = $path . '\\' . $filename; //合成路径
+        }
+        QRcode::png($data, $filename, $level, $size, $padding);
+        $QR = imagecreatefromstring(file_get_contents($filename));
+        $logo = imagecreatefromstring(file_get_contents($logo));
+        $QR_width = imagesx($QR);
+        $QR_height = imagesy($QR);
+        $logo_width = imagesx($logo);
+        $logo_height = imagesy($logo);
+        $logo_qr_width = $QR_width / 5;
+        $scale = $logo_width / $logo_qr_width;
+        $logo_qr_height = $logo_height / $scale;
+        $from_width = ($QR_width - $logo_qr_width) / 2;
+        imagecopyresampled($QR, $logo, $from_width, $from_width, 0, 0, $logo_qr_width, $logo_qr_height, $logo_width, $logo_height);
+        if ($filename === false) {
+            Header("Content-type: image/png");
+            imagepng($QR);
+        } else {
+            if ($saveandprint === true) {
+                imagepng($QR, $filename);
+                header("Content-type: image/png");//输出到浏览器
+                imagepng($QR);
+            } else {
+                imagepng($QR, $filename);
+            }
         }
     }
-    return getSubByKey($res,'data-id');
+    return $filename;
+}
 
+function import_lang($module_name)
+{
+    $file = APP_PATH . '/' . $module_name . '/Lang/' . LANG_SET . '.php';
+    if (is_file($file))
+        L(include $file);
 }

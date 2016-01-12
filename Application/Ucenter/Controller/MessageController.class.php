@@ -19,7 +19,6 @@ class MessageController extends BaseController
     {
         parent::_initialize();
         $this->mTalkModel = D('Talk');
-        $this->setTitle('个人中心');
     }
 
     public function index()
@@ -28,20 +27,20 @@ class MessageController extends BaseController
     }
 
     /**消息页面
-     * @param int    $page
+     * @param int $page
      * @param string $tab 当前tab
      */
     public function message($page = 1, $tab = 'unread')
     {
         //从条件里面获取Tab
-        $map = $this->getMapByTab($tab, $map);
-
+        $map = $this->getMapByTab($tab);
         $map['to_uid'] = is_login();
 
         $messages = D('Message')->where($map)->order('create_time desc')->page($page, 10)->select();
         $totalCount = D('Message')->where($map)->order('create_time desc')->count(); //用于分页
-
+//dump($messages);exit;
         foreach ($messages as &$v) {
+            $v['content'] = D('Common/Message')->getContent($v['content_id']);
             if ($v['from_uid'] != 0) {
                 $v['from_user'] = query_user(array('username', 'space_url', 'avatar64', 'space_link'), $v['from_uid']);
             }
@@ -50,31 +49,13 @@ class MessageController extends BaseController
         $this->assign('totalCount', $totalCount);
         $this->assign('messages', $messages);
 
+
         //设置Tab
         $this->defaultTabHash('message');
         $this->assign('tab', $tab);
         $this->display();
     }
 
-    /**
-     * 聊天列表页面
-     */
-    public function session()
-    {
-        $this->defaultTabHash('session');
-        $talks = D('Talk')->where('uids like' . '"%[' . is_login() . ']%"' . ' and status=1')->order('update_time desc,create_time desc')->select();
-        foreach ($talks as $key => $v) {
-            $users = array();
-            $uids_array = $this->mTalkModel->getUids($v['uids']);
-            foreach ($uids_array as $uid) {
-                $users[] = query_user(array('avatar64', 'username', 'space_link', 'id'), $uid);
-            }
-            $talks[$key]['users'] = $users;
-            $talks[$key]['last_message'] = D('Talk')->getLastMessage($talks[$key]['id']);
-        }
-        $this->assign('talks', $talks);
-        $this->display();
-    }
 
     /**对话页面
      * 创建聊天或显示现有聊天。
@@ -89,7 +70,7 @@ class MessageController extends BaseController
         $messages = D('TalkMessage')->where($map)->order('create_time desc')->limit(20)->select();
         $messages = array_reverse($messages);
         foreach ($messages as &$mes) {
-            $mes['user'] = query_user(array('avatar128', 'uid', 'username','nickname'), $mes['uid']);
+            $mes['user'] = query_user(array('avatar128', 'uid', 'username', 'nickname'), $mes['uid']);
         }
         unset($mes);
         $this->assign('messages', $messages);
@@ -113,7 +94,7 @@ class MessageController extends BaseController
         $talk = D('Talk')->find($talk_id);
         $uid = get_uid();
         if (false === strpos($talk['uids'], "[$uid]")) {
-            $this->error('您没有权限删除该聊天');
+            $this->error(L('_ERROR_AUTHORITY_CHAT_DELETE_'));
         }
 
         //如果删除前聊天中只有两个人，就将聊天标记为已删除。
@@ -130,7 +111,7 @@ class MessageController extends BaseController
         }
 
         //返回成功结果
-        $this->success('删除成功', 'refresh');
+        $this->success(L('_SUCCESS_DELETE_'), 'refresh');
     }
 
     /**回复的时候调用，通过该函数，会回调应用对应的postMessage函数实现对原始内容的数据添加。
@@ -142,7 +123,7 @@ class MessageController extends BaseController
         $content = op_t($content);
         //空的内容不能发送
         if (!trim($content)) {
-            $this->error('聊天内容不能为空');
+            $this->error(L('_ERROR_CHAT_CONTENT_EMPTY_'));
         }
 
         D('TalkMessage')->addMessage($content, is_login(), $talk_id);
@@ -152,10 +133,10 @@ class MessageController extends BaseController
         if ($talk['appname'] != '') {
             $messageModel = $this->getMessageModel($message);
 
-             $messageModel->postMessage($message, $talk, $content, is_login());
+            $messageModel->postMessage($message, $talk, $content, is_login());
         }
         exit(json_encode(array('status' => 1, 'content' => parse_expression($content))));
-        $this->success("发送成功");
+        $this->success(L('_SUCCESS_SEND_'));
     }
 
     /**
@@ -184,7 +165,7 @@ class MessageController extends BaseController
 
             //权限检测，防止越权创建聊天
             if (($message['to_uid'] != $this->mid && $message['from_uid'] != $this->mid) || !$message) {
-                $this->error('非法操作。');
+                $this->error(L('_ERROR_ILLEGAL_OPERATE_'));
             }
 
             //如果已经创建过聊天了，就不再创建
@@ -226,7 +207,7 @@ class MessageController extends BaseController
             $talkMessage['id'] = $talkMessageModel->add($talkMessage);
 
 
-            D('Message')->sendMessage($message['from_uid'], '聊天名称：' . $talk['title'], '您有新的主题聊天', U('Ucenter/Message/talk', array('talk_id' => $talk['id'])), is_login(), 0);
+            D('Message')->sendMessage($message['from_uid'], L('_MESSAGE_CHAT_1_'), L('_MESSAGE_CHAT_2_') . $talk['title'], 'Ucenter/Message/talk', array('talk_id' => $talk['id']));
 
             return $talk;
 
@@ -234,7 +215,7 @@ class MessageController extends BaseController
             $talk = D('Talk')->find($talk_id);
             $uids_array = $this->mTalkModel->getUids($talk['uids']);
             if (!count($uids_array)) {
-                $this->error('越权操作。');
+                $this->error(L('_ERROR_POWER_EXCEED_'));
                 return $talk;
             }
             return $talk;
@@ -242,18 +223,14 @@ class MessageController extends BaseController
     }
 
 
-
-
-
-
-
     /**
      * @param $tab
      * @param $map
      * @return mixed
      */
-    private function getMapByTab($tab, $map)
+    private function getMapByTab($tab)
     {
+        $map = array();
         switch ($tab) {
             case 'system':
                 $map['type'] = 0;

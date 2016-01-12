@@ -18,10 +18,11 @@ class AdminConfigBuilder extends AdminBuilder
     private $_savePostUrl = array();
     private $_group = array();
     private $_callback = null;
+
     public function title($title)
     {
         $this->_title = $title;
-        $this->meta_title=$title;
+        $this->meta_title = $title;
         return $this;
     }
 
@@ -31,17 +32,19 @@ class AdminConfigBuilder extends AdminBuilder
      * @return $this
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    public function suggest($suggest){
+    public function suggest($suggest)
+    {
         $this->_suggest = $suggest;
         return $this;
     }
 
-    public function callback($callback){
+    public function callback($callback)
+    {
         $this->_callback = $callback;
         return $this;
     }
 
-   /**键，一般用于内部调用
+    /**键，一般用于内部调用
      * @param      $name
      * @param      $title
      * @param null $subtitle
@@ -93,6 +96,23 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->key($name, $title, $subtitle, 'text');
     }
 
+    /**颜色选择器
+     * @param $name
+     * @param $title
+     * @param null $subtitle
+     * @return $this
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function keyColor($name, $title, $subtitle = null)
+    {
+        return $this->key($name, $title, $subtitle, 'colorPicker');
+    }
+
+    public function keyIcon($name, $title, $subtitle = null)
+    {
+        return $this->key($name, $title, $subtitle, 'icon');
+    }
+
     public function keyLabel($name, $title, $subtitle = null)
     {
         return $this->key($name, $title, $subtitle, 'label');
@@ -115,7 +135,7 @@ class AdminConfigBuilder extends AdminBuilder
 
     public function keyStatus($name = 'status', $title = '状态', $subtitle = null)
     {
-        $map = array(-1 => '删除', 0 => '禁用', 1 => '启用', 2 => '未审核');
+        $map = array(-1 => L('_DELETE_'), 0 => L('_DISABLE_'), 1 => L('_ENABLE_'), 2 => L('_UNAUDITED_'));
         return $this->keySelect($name, $title, $subtitle, $map);
     }
 
@@ -134,23 +154,32 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->key($name, $title, $subtitle, 'checkbox', $options);
     }
 
-    public function keyEditor($name, $title, $subtitle = null,$config='',$style = array('width'=>'500px','height'=>'400px'))
+    public function keyEditor($name, $title, $subtitle = null, $config = '', $style = array('width' => '500px', 'height' => '400px'))
     {
-        $toolbars ="toolbars:[[".$config."]]";
-        if(empty($config)){
-            $toolbars ="toolbars:[['source','|','bold','italic','underline','fontsize','forecolor','justifyleft','fontfamily','|','map','emotion','insertimage','insertcode']]";
+        $toolbars = "toolbars:[[" . $config . "]]";
+        if (empty($config)) {
+            $toolbars = "toolbars:[['source','|','bold','italic','underline','fontsize','forecolor','justifyleft','fontfamily','|','map','emotion','insertimage','insertcode']]";
         }
-        if($config =='all'){
-            $toolbars='all';
+        if ($config == 'all') {
+            $toolbars = 'all';
         }
-        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'editor', 'config' => $toolbars,'style'=>$style);
+        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'editor', 'config' => $toolbars, 'style' => $style);
         $this->_keyList[] = $key;
         return $this;
     }
 
-    public function keyTime($name, $title, $subtitle = null)
+    /**
+     * 日期选择器：支持三种类型
+     * @param $name
+     * @param $title
+     * @param null $subtitle
+     * @param string $type 类型：支持（time）（datetime，默认）(date)
+     * @return $this
+     * @author 郑钟良<zzl@ourstu.com>
+     */
+    public function keyTime($name, $title, $subtitle = null,$type='datetime')
     {
-        return $this->key($name, $title, $subtitle, 'time');
+        return $this->key($name, $title, $subtitle, $type);
     }
 
     public function keyCreateTime($name = 'create_time', $title = '创建时间', $subtitle = null)
@@ -160,7 +189,13 @@ class AdminConfigBuilder extends AdminBuilder
 
     public function keyBool($name, $title, $subtitle = null)
     {
-        $map = array(1 => '是', 0 => '否');
+        $map = array(1 => L('_YES_'), 0 => L('_NO_'));
+        return $this->keyRadio($name, $title, $subtitle, $map);
+    }
+
+    public function keySwitch($name, $title, $subtitle = null)
+    {
+        $map = array(1 => L('_OPEN_'), 0 => L('_CLOSE_'));
         return $this->keyRadio($name, $title, $subtitle, $map);
     }
 
@@ -169,7 +204,8 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->keyTime($name, $title, $subtitle);
     }
 
-    public function keyKanban($name, $title, $subtitle=null){
+    public function keyKanban($name, $title, $subtitle = null)
+    {
 
         return $this->key($name, $title, $subtitle, 'kanban');
     }
@@ -190,14 +226,34 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->keyCheckBox($name, $title, $subtitle, $options);
     }
 
+    /**单文件上传
+     * @param $name
+     * @param $title
+     * @param null $subtitle
+     */
+    public function keySingleFile($name, $title, $subtitle = null){
+        return  $this->key($name,$title,$subtitle,'singleFile');
+    }
+
+    /**多文件上传
+     * @param $name
+     * @param $title
+     * @param null $subtitle
+     */
+    public function keyMultiFile($name, $title, $subtitle = null){
+        return   $this->key($name,$title,$subtitle,'multiFile');
+    }
+
+
+
     public function keySingleImage($name, $title, $subtitle = null)
     {
         return $this->key($name, $title, $subtitle, 'singleImage');
     }
 
-    public function keyMultiImage($name, $title, $subtitle = null,$limit='')
+    public function keyMultiImage($name, $title, $subtitle = null, $limit = '')
     {
-         return $this->key($name, $title, $subtitle, 'multiImage',$limit);
+        return $this->key($name, $title, $subtitle, 'multiImage', $limit);
     }
 
     public function keySingleUserGroup($name, $title, $subtitle = null)
@@ -206,33 +262,33 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->keySelect($name, $title, $subtitle, $options);
     }
 
-    /**
-     * 添加城市选择（需安装城市联动插件）
-     * @param  $title
-     * @param  $subtitle
-     * @return hook ChinaCity
+    /** 添加城市选择（需安装城市联动插件）
+     * @param array $name
+     * @param $title
+     * @param $subtitle
+     * @return AdminConfigBuilder
      * @author LaoYang
      * @author @MingYangliu <xint5288@126.com>
      */
-    public function keyCity($title,$subtitle)
+    public function keyCity($name=array('province','city','district'),$title, $subtitle)
     {
         //修正在编辑信息时无法正常显示已经保存的地区信息
-        return $this->key(array('province','city','district'), $title, $subtitle, 'city');
+        return $this->key($name, $title, $subtitle, 'city');
     }
 
 
     /**
      * 增加数据时通过列表页选择相应的关联数据ID  -_-。sorry！表述不清楚..
-     * @param  unknown $name     字段名
-     * @param  unknown $title    标题
-     * @param  string  $subtitle 副标题（说明）
-     * @param  unknown $url      选择数据的列表页地址，U方法地址'index/index'
+     * @param  unknown $name 字段名
+     * @param  unknown $title 标题
+     * @param  string $subtitle 副标题（说明）
+     * @param  unknown $url 选择数据的列表页地址，U方法地址'index/index'
      * @return $this
      * @author @MingYangliu <xint5288@126.com>
      */
     public function keyDataSelect($name, $title, $subtitle = null, $url)
     {
-        $urls = U($url,array('inputid'=>$name));
+        $urls = U($url, array('inputid' => $name));
         return $this->key($name, $title, $subtitle, 'dataselect', $urls);
     }
 
@@ -245,12 +301,12 @@ class AdminConfigBuilder extends AdminBuilder
     public function buttonSubmit($url = '', $title = '确定')
     {
         if ($url == '') {
-            $url = __SELF__;
+            $url = U(ACTION_NAME,$_GET);
         }
         $this->savePostUrl($url);
 
         $attr = array();
-        $attr['class'] = "btn submit-btn ajax-post";
+        $attr['class'] = "btn submit-btn ajax-post btn-success";
         $attr['id'] = 'submit';
         $attr['type'] = 'submit';
         $attr['target-form'] = 'form-horizontal';
@@ -265,6 +321,10 @@ class AdminConfigBuilder extends AdminBuilder
         return $this->button($title, $attr);
     }
 
+    public function buttonLink($title='按钮',$attr){
+        $attr['onclick'] = 'javascript:location.href=\''.$attr['href'].'\';return false;';
+        return $this->button($title, $attr);
+    }
     public function data($list)
     {
         $this->_data = $list;
@@ -283,15 +343,15 @@ class AdminConfigBuilder extends AdminBuilder
 
         //将数据融入到key中
         foreach ($this->_keyList as &$e) {
-            if($e['type'] == 'multiInput'){
-                $e['name'] = explode('|',$e['name']);
+            if ($e['type'] == 'multiInput') {
+                $e['name'] = explode('|', $e['name']);
             }
 
             //修正在编辑信息时无法正常显示已经保存的地区信息/***修改的代码****/
-            if(is_array($e['name'])){
-                $i=0;
+            if (is_array($e['name'])) {
+                $i = 0;
                 $n = count($e['name']);
-                while ($n>0) {
+                while ($n > 0) {
                     $e['value'][$i] = $this->_data[$e['name'][$i]];
                     $i++;
                     $n--;
@@ -338,10 +398,10 @@ class AdminConfigBuilder extends AdminBuilder
                 }
                 unset($key, $val);
             }
-        }else{
-            foreach($options as $key=>&$val){
-                foreach($val as $k=>&$v){
-                    if(!is_array($v)){
+        } else {
+            foreach ($options as $key => &$val) {
+                foreach ($val as $k => &$v) {
+                    if (!is_array($v)) {
                         $v = array($v, $v);
                     }
                 }
@@ -363,9 +423,10 @@ class AdminConfigBuilder extends AdminBuilder
      * @return $this
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    public function keyMultiInput($name,$title,$subtitle,$config,$style = null){
+    public function keyMultiInput($name, $title, $subtitle, $config, $style = null)
+    {
         empty($style) && $style = 'width:400px;';
-        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'multiInput', 'config' => $config,'style'=>$style);
+        $key = array('name' => $name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'multiInput', 'config' => $config, 'style' => $style);
         $this->_keyList[] = $key;
         return $this;
     }
@@ -376,15 +437,17 @@ class AdminConfigBuilder extends AdminBuilder
      * @return $this
      * @auth 肖骏涛
      */
-    public function group($name,$list = array()){
-        !is_array($list) && $list = explode(',',$list);
+    public function group($name, $list = array())
+    {
+        !is_array($list) && $list = explode(',', $list);
         $this->_group[$name] = $list;
         return $this;
     }
 
-    public function groups($list = array()){
-        foreach($list as $key =>$v){
-            $this->_group[$key] =  is_array($v) ? $v :explode(',',$v);
+    public function groups($list = array())
+    {
+        foreach ($list as $key => $v) {
+            $this->_group[$key] = is_array($v) ? $v : explode(',', $v);
         }
         return $this;
     }
@@ -408,24 +471,24 @@ class AdminConfigBuilder extends AdminBuilder
                 $config['create_time'] = time();
                 $config['update_time'] = time();
                 $config['status'] = 1;
-                $config['value'] = is_array($v)?implode(',',$v): $v;
+                $config['value'] = is_array($v) ? implode(',', $v) : $v;
                 $config['sort'] = 0;
                 if ($configModel->add($config, null, true)) {
-                        $success = 1;
+                    $success = 1;
                 }
                 $tag = 'conf_' . strtoupper(CONTROLLER_NAME) . '_' . strtoupper($k);
                 S($tag, null);
             }
             if ($success) {
-                if($this->_callback){
+                if ($this->_callback) {
                     $str = $this->_callback;
                     A(CONTROLLER_NAME)->$str(I(''));
                 }
                 header('Content-type: application/json');
-                exit(json_encode(array('info' => '保存配置成功。', 'status' => 1, 'url' => __SELF__)));
+                exit(json_encode(array('info' => L('_SUCCESS_CONF_SAVE_').L('_PERIOD_'), 'status' => 1, 'url' => __SELF__)));
             } else {
                 header('Content-type: application/json');
-                exit(json_encode(array('info' => '保存配置失败。', 'status' => 0, 'url' => __SELF__)));
+                exit(json_encode(array('info' => L('_FAIL_CONF_SAVE_').L('_PERIOD_'), 'status' => 0, 'url' => __SELF__)));
             }
 
 
@@ -458,46 +521,123 @@ class AdminConfigBuilder extends AdminBuilder
      * @return array|mixed
      * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
      */
-    public function parseKanbanArray($data,$item=array(),$default=array()){
-
+    public function parseKanbanArray($data, $item = array(), $default = array())
+    {
         if (empty($data)) {
             $head = reset($default);
-            if(!array_key_exists("items",$head)){
-                $temp=array();
-                foreach($default as $k=>$v){
-                    $temp[] = array('data-id'=>$k,'title'=>$k,'items'=>$v);
+            if (!array_key_exists("items", $head)) {
+                $temp = array();
+                foreach ($default as $k => $v) {
+                    $temp[] = array('data-id' => $k, 'title' => $k, 'items' => $v);
                 }
                 $default = $temp;
             }
-            $data =$default;
+            $result = $default;
         } else {
             $data = json_decode($data, true);
+            $item_d = getSubByKey($item, 'data-id');
             $all = array();
-            foreach ($data as $v) {
-                $all = array_merge($all, $v['items']);
+            foreach ($data as $key => $v) {
+                $data_id = getSubByKey($v['items'], 'data-id');
+                $data_d[$key] = $v;
+                unset($data_d[$key]['items']);
+                $data_d[$key]['items'] = $data_id ? $data_id : array();
+                $all = array_merge($all, $data_id);
             }
-
             unset($v);
-            foreach ($item as $val) {
+            foreach ($item_d as $val) {
                 if (!in_array($val, $all)) {
-                    $data[0]['items'][] = $val;
+                    $data_d[0]['items'][] = $val;
                 }
             }
+            unset($val);
             foreach ($all as $v) {
-                if (!in_array($v, $item)) {
-                    foreach ($data as $key => $val) {
+                if (!in_array($v, $item_d)) {
+                    foreach ($data_d as $key => $val) {
                         $key_search = array_search($v, $val['items']);
                         if (!is_bool($key_search)) {
-                            unset($data[$key]['items'][$key_search]);
+                            unset($data_d[$key]['items'][$key_search]);
                         }
                     }
+                    unset($val);
                 }
             }
-        }
+            unset($v);
+            $item_t = array();
+            foreach ($item as $val) {
+                $item_t[$val['data-id']] = $val['title'];
+            }
+            unset($v);
+            foreach ($data_d as &$v) {
+                foreach ($v['items'] as &$val) {
+                    $t = $val;
+                    $val = array();
+                    $val['data-id'] = $t;
+                    $val['title'] = $item_t[$t];
+                }
+                unset($val);
+            }
+            unset($v);
 
-        return $data;
+            $result = $data_d;
+        }
+        return $result;
 
     }
+
+    public function setDefault($data, $key, $value)
+    {
+        $data[$key] = $data[$key]!=null ? $data[$key] : $value;
+        return $data;
+    }
+
+    public function keyDefault($key, $value)
+    {
+        $data = $this->_data;
+        $data[$key] = $data[$key]!==null ? $data[$key] : $value;
+        $this->_data = $data;
+        return $this;
+    }
+
+    /**
+     * groupLocalComment
+     * @param $group_name    组名
+     * @param $mod    mod名。path的第二个参数。
+     * @return $this
+     * @author:xjw129xjt(肖骏涛) xjt@ourstu.com
+     */
+    public function groupLocalComment($group_name,$mod){
+        $mod = strtoupper($mod);
+        $this->keyDefault($mod.'_LOCAL_COMMENT_CAN_GUEST',1);
+        $this->keyDefault($mod.'_LOCAL_COMMENT_ORDER',0);
+        $this->keyDefault($mod.'_LOCAL_COMMENT_COUNT',10);
+        $this->keyRadio($mod.'_LOCAL_COMMENT_CAN_GUEST', L('_COMMENTS_ALLOW_VISITOR_IF_'), L('_ALLOW_DEFAULT_'),array(0=>L('_DISALLOW_'),1=>L('_ALLOW_')))
+            ->keyRadio($mod.'_LOCAL_COMMENT_ORDER',L('_COMMENTS_SORT_'),L('_DESC_DEFAULT_'),array(0=>L('_DESC_'),1=>L('_ASC_')))
+            ->keyText($mod.'_LOCAL_COMMENT_COUNT',L('_COMMENTS_PAGE_DISPLAY_COUNT_'),L('_COMMENTS_PAGE_DISPLAY_COUNT_DESC'));
+        $this->group($group_name, $mod.'_LOCAL_COMMENT_CAN_GUEST,'.$mod.'_LOCAL_COMMENT_ORDER,'.$mod.'_LOCAL_COMMENT_COUNT');
+        return $this;
+    }
+
+
+
+    public function keyUserDefined($name,$title,$subtitle,$display='',$param=''){
+        $this->assign('param',$param);
+        $this->assign('name',$name);
+        $html = $this->fetch($display);
+
+        $key = array('name'=>$name, 'title' => $title, 'subtitle' => $subtitle, 'type' => 'userDefined', 'definedHtml' => $html);
+        $this->_keyList[] = $key;
+        return $this;
+    }
+    public function addCustomJs($script){
+        $this->assign('myJs',$script);
+    }
+
+
+
+
+
+
 
 
 }

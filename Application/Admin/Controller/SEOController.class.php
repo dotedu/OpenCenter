@@ -17,18 +17,31 @@ class SEOController extends AdminController
     public function index($page = 1, $r = 20)
     {
         //读取规则列表
+        $aApp=I('get.app','','text');
         $map = array('status' => array('EGT', 0));
+        if($aApp!=''){
+            $map['app']=$aApp;
+        }
         $model = M('SeoRule');
         $ruleList = $model->where($map)->page($page, $r)->order('sort asc')->select();
         $totalCount = $model->where($map)->count();
 
+        $module = D('Common/Module')->getAll();
+        $app = array();
+        foreach ($module as $m) {
+            if ($m['is_setup'])
+                $app[] =array('id'=>$m['name'],'value'=>$m['alias']) ;
+        }
+
         //显示页面
         $builder = new AdminListBuilder();
-        $builder->title('SEO规则配置')
+        $builder->setSelectPostUrl(U('index'));
+        $builder->title(L('_SEO_RULE_CONFIGURATION_'))
             ->setStatusUrl(U('setRuleStatus'))->buttonEnable()->buttonDisable()->buttonDelete()
             ->buttonNew(U('editRule'))->buttonSort(U('sortRule'))
-            ->keyId()->keyTitle()->keyText('app', '模块')->keyText('controller', '控制器')->keyText('action', '方法')
-            ->keyText('seo_title', 'SEO标题')->keyText('seo_keywords', 'SEO关键字')->keyText('seo_description', 'SEO描述')
+            ->keyId()->keyTitle()->keyText('app', L('_MODULE_PLAIN_'))->keyText('controller', L('_CONTROLLER_'))->keyText('action', L('_METHOD_'))
+            ->keyText('seo_title', L('_SEO_TITLE_'))->keyText('seo_keywords', L('_SEO_KEYWORD_'))->keyText('seo_description', L('_SEO_DESCRIPTION_'))
+            ->select(L('_MODULE_BELONGED_').L('_COLON_'), 'app', 'select', '', '', '', array_merge(array(array('id' => '', 'value' => L('_ALL_'))), $app))
             ->keyStatus()->keyDoActionEdit('editRule?id=###')
             ->data($ruleList)
             ->pagination($totalCount, $r)
@@ -43,12 +56,13 @@ class SEOController extends AdminController
         $ruleList = $model->where($map)->page($page, $r)->order('sort asc')->select();
         $totalCount = $model->where($map)->count();
 
+
         //显示页面
         $builder = new AdminListBuilder();
-        $builder->title('SEO规则回收站')
-            ->setStatusUrl(U('setRuleStatus'))->setClearUrl(U('doClear'))->buttonRestore()->buttonClear()
-            ->keyId()->keyTitle()->keyText('app', '模块')->keyText('controller', '控制器')->keyText('action', '方法')
-            ->keyText('seo_title', 'SEO标题')->keyText('seo_keywords', 'SEO关键字')->keyText('seo_description', 'SEO描述')
+        $builder->title(L('_SEO_RULE_RECYCLING_STATION_'))
+            ->setStatusUrl(U('setRuleStatus'))->setDeleteTrueUrl(U('doClear'))->buttonRestore()->buttonDeleteTrue()
+            ->keyId()->keyTitle()->keyText('app', L('_MODULE_PLAIN_'))->keyText('controller', L('_CONTROLLER_'))->keyText('action', L('_METHOD_'))
+            ->keyText('seo_title', L('_SEO_TITLE_'))->keyText('seo_keywords', L('_SEO_KEYWORD_'))->keyText('seo_description', L('_SEO_DESCRIPTION_'))
             ->data($ruleList)
             ->pagination($totalCount, $r)
             ->display();
@@ -60,9 +74,10 @@ class SEOController extends AdminController
         $builder->doSetStatus('SeoRule', $ids, $status);
     }
 
-    public function doClear($ids){
+    public function doClear($ids)
+    {
         $builder = new AdminListBuilder();
-        $builder->doClear('SeoRule', $ids);
+        $builder->doDeleteTrue('SeoRule', $ids);
     }
 
     public function sortRule()
@@ -72,7 +87,7 @@ class SEOController extends AdminController
 
         //显示页面
         $builder = new AdminSortBuilder();
-        $builder->title('排序SEO规则')
+        $builder->title(L('_SORT_SEO_RULE_'))
             ->data($list)
             ->buttonSubmit(U('doSortRule'))
             ->buttonBack()
@@ -107,17 +122,19 @@ class SEOController extends AdminController
         $modules = D('Module')->getAll();
 
 
-        $app=array(''=>'-所有模块-');
+        $app = array('' => L('_MODULE_ALL_'));
         foreach ($modules as $m) {
-            if($m['is_setup']){
-                $app[$m['name']]=$m['alias'];
+            if ($m['is_setup']) {
+                $app[$m['name']] = $m['alias'];
             }
         }
 
-        $builder->title($isEdit ? '编辑规则' : '添加规则')
-            ->keyId()->keyText('title', '名称', '规则名称，方便记忆')->keySelect('app', '模块名称', '不填表示所有模块',$app)->keyText('controller', '控制器', '不填表示所有控制器')
-            ->keyText('action2', '方法', '不填表示所有方法')->keyText('seo_title', 'SEO标题', '不填表示使用下一条规则，支持变量')
-            ->keyText('seo_keywords', 'SEO关键字', '不填表示使用下一条规则，支持变量')->keyTextArea('seo_description', 'SEO描述', '不填表示使用下一条规则，支持变量')
+        $rule['summary']=nl2br($rule['summary']);
+        $builder->title($isEdit ? L('_EDIT_RULES_') : L('_ADD_RULE_'))
+            ->keyId()->keyText('title', L('_NAME_'), L('_RULE_NAME,_CONVENIENT_MEMORY_'))->keySelect('app', L('_MODULE_NAME_'), L('_NOT_FILLED_IN_ALL_MODULES_'), $app)->keyText('controller', L('_CONTROLLER_'), L('_DO_NOT_FILL_IN_ALL_CONTROLLERS_'))
+            ->keyText('action2', L('_METHOD_'), L('_DO_NOT_FILL_OUT_ALL_THE_METHODS_'))->keyText('seo_title', L('_SEO_TITLE_'), L('_DO_NOT_FILL_IN_THE_USE_OF_THE_NEXT_RULE,_SUPPORT_VARIABLE_'))
+            ->keyText('seo_keywords', L('_SEO_KEYWORD_'), L('_DO_NOT_FILL_IN_THE_USE_OF_THE_NEXT_RULE,_SUPPORT_VARIABLE_'))->keyTextArea('seo_description', L('_SEO_DESCRIPTION_'), L('_DO_NOT_FILL_IN_THE_USE_OF_THE_NEXT_RULE,_SUPPORT_VARIABLE_'))
+            ->keyReadOnly('summary',L('_VARIABLE_DESCRIPTION_'),L('_VARIABLE_DESCRIPTION_VICE_'))
             ->keyStatus()
             ->data($rule)
             ->buttonSubmit(U('doEditRule'))->buttonBack()
@@ -142,10 +159,10 @@ class SEOController extends AdminController
         clean_all_cache();
         //如果失败的话，显示失败消息
         if (!$result) {
-            $this->error($isEdit ? '编辑失败' : '创建失败');
+            $this->error($isEdit ? L('_EDIT_FAILED_') : L('_CREATE_FAILURE_'));
         }
 
         //显示成功信息，并返回规则列表
-        $this->success($isEdit ? '编辑成功' : '创建成功', U('index'));
+        $this->success($isEdit ? L('_EDIT_SUCCESS_') : L('_CREATE_SUCCESS_'), U('index'));
     }
 }

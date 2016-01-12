@@ -7,47 +7,51 @@
 // | Author: 麦当苗儿 <zuojiazi@vip.qq.com> <http://www.zjzit.cn>
 // +----------------------------------------------------------------------
 
-namespace Home\Controller;
+namespace Admin\Controller;
 
-use Think\Controller;
+use Admin\Builder\AdminConfigBuilder;
 
-/**
- * 前台公共控制器
- * 为防止多分组Controller名称冲突，公共Controller名称统一使用分组名称
- */
-class HomeController extends Controller
+
+class HomeController extends AdminController
 {
 
-    /* 空操作，用于输出404页面 */
-    public function _empty()
+
+    public function config()
     {
-        $this->redirect('Index/index');
-    }
+        $builder = new AdminConfigBuilder();
+        $data = $builder->handleConfig();
+
+        $data['OPEN_LOGIN_PANEL'] = $data['OPEN_LOGIN_PANEL'] ? $data['OPEN_LOGIN_PANEL'] : 1;
 
 
-    protected function _initialize()
-    {
+        $builder->title(L('_HOME_SETTING_'));
 
-        /*读取站点配置*/
-        $config = api('Config/lists');
-        C($config); //添加配置
-
-        if (!C('WEB_SITE_CLOSE')) {
-            $this->error('站点已经关闭，请稍后访问~');
+        $modules = D('Common/Module')->getAll();
+        foreach ($modules as $m) {
+            if ($m['is_setup'] == 1 && $m['entry'] != '') {
+                if (file_exists(APP_PATH . $m['name'] . '/Widget/HomeBlockWidget.class.php')) {
+                    $module[] = array('data-id' => $m['name'], 'title' => $m['alias']);
+                }
+            }
         }
+        $module[] = array('data-id' => 'slider', 'title' => L('_CAROUSEL_'));
+
+        $default = array(array('data-id' => 'disable', 'title' => L('_DISABLED_'), 'items' => $module), array('data-id' => 'enable', 'title' =>L('_ENABLED_'), 'items' => array()));
+        $builder->keyKanban('BLOCK', L('_DISPLAY_BLOCK_'),L('_TIP_DISPLAY_BLOCK_'));
+        $data['BLOCK'] = $builder->parseKanbanArray($data['BLOCK'], $module, $default);
+        $builder->group(L('_DISPLAY_BLOCK_'), 'BLOCK');
+
+        $show_blocks = get_kanban_config('BLOCK_SORT', 'enable', array(), 'Home');
+
+
+        $builder->buttonSubmit();
+
+
+        $builder->data($data);
+
+
+        $builder->display();
     }
 
-    /* 用户登录检测 */
-    protected function login()
-    {
-        /* 用户登录检测 */
-        is_login() || $this->error('您还没有登录，请先登录！', U('User/login'));
-    }
 
-    protected function ensureApiSuccess($result)
-    {
-        if (!$result['success']) {
-            $this->error($result['message'], $result['url']);
-        }
-    }
 }

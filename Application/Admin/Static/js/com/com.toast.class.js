@@ -9,7 +9,7 @@ var toast = {
      * @param title 标题
      */
     success: function (text) {
-       $.messager.show(text, {placement: 'bottom',type:'success'});
+        toast.show(text, {placement: 'bottom', type: 'success'});
     },
     /**
      * 失败提示
@@ -17,7 +17,7 @@ var toast = {
      * @param title 标题
      */
     error: function (text) {
-       $.messager.show(text, {placement: 'bottom',type:'error'});
+        toast.show(text, {placement: 'bottom', type: 'error'});
     },
     /**
      * 信息提示
@@ -25,7 +25,7 @@ var toast = {
      * @param title 标题
      */
     info: function (text) {
-        $.messager.show(text, {placement: 'bottom',type:'info'});
+        toast.show(text, {placement: 'bottom', type: 'info'});
     },
     /**
      * 警告提示
@@ -33,15 +33,23 @@ var toast = {
      * @param title 标题
      */
     warning: function (text, title) {
-        $.messager.show(text, {placement: 'bottom',type:'warning'});
+        toast.show(text, {placement: 'bottom',type:'warning'});
     },
 
+    show: function (text, option) {
+        var zui = $.zui;
+        if (zui) {
+            $.zui.messager.show(text, option);
+        }else{
+            $.messager.show(text, option);
+        }
+    },
     /**
      *  显示loading
      * @param text
      */
     showLoading: function () {
-        $('body').append('<div class="big_loading"><img src="'+ThinkPHP.PUBLIC+'/images/big_loading.gif"/></div>');
+        $('body').append('<div class="big_loading"><img src="' + ThinkPHP.PUBLIC + '/images/big_loading.gif"/></div>');
     },
     /**
      * 隐藏loading

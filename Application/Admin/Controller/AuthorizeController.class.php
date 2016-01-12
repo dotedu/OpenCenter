@@ -22,18 +22,18 @@ class AuthorizeController extends AdminController
         $admin_config->callback("ssoCallback");
         $data = $admin_config->handleConfig();
 
-        $admin_config->title('单点登录配置')
+        $admin_config->title(L('_SINGLE_POINT_LOGIN_CONFIGURATION_'))
 
 
-            ->keyRadio('SSO_SWITCH_USER_CENTER', '单点登录开关', '作为用户中心的单点登录开关，其他开关在登录配置里面设置', array(0 => '关闭单点登录', 1 => '作为用户中心开启单点登录'))
-            ->keyTextArea('SSO_CONFIG', '单点登录配置', '单点登录配置文件中的配置（当开关为开启单点登录时有效，不包括作为用户中心开启单点登录）')
-            ->keyLabel('SSO_UC_AUTH_KEY', '用户中心加密密钥', '系统已自动写入配置文件，如写入失败请手动复制。')
-            ->keyLabel('SSO_UC_DB_DSN', '用户中心数据连接', '系统已自动写入配置文件，如写入失败请手动复制。')
-            ->keyLabel('SSO_UC_TABLE_PREFIX', '用户中心表前缀', '系统已自动写入配置文件，如写入失败请手动复制。')
+            ->keyRadio('SSO_SWITCH_USER_CENTER', L('_SINGLE_SIGN_ON_SWITCH_'), L('_AS_THE_USER_CENTER_OF_THE_SINGLE_SIGN_ON_SWITCH_'), array(0 => L('_CLOSE_SINGLE_POINT_LOGIN_'), 1 => L('_AS_USER_CENTER_OPEN_SINGLE_SIGN_ON_')))
+            ->keyTextArea('SSO_CONFIG', L('_SINGLE_POINT_LOGIN_CONFIGURATION_'), L('_SINGLE_POINT_LOGIN_CONFIGURATION_VICE_'))
+            ->keyLabel('SSO_UC_AUTH_KEY', L('_USER_CENTER_ENCRYPTION_KEY_'), L('_THE_SYSTEM_HAS_BEEN_AUTOMATICALLY_WRITTEN_TO_THE_CONFIGURATION_FILE_'))
+            ->keyLabel('SSO_UC_DB_DSN', L('_USER_CENTER_DATA_CONNECTION_'), L('_THE_SYSTEM_HAS_BEEN_AUTOMATICALLY_WRITTEN_TO_THE_CONFIGURATION_FILE_'))
+            ->keyLabel('SSO_UC_TABLE_PREFIX', L('_USER_CENTER_TABLE_PREFIX_'), L('_THE_SYSTEM_HAS_BEEN_AUTOMATICALLY_WRITTEN_TO_THE_CONFIGURATION_FILE_'))
 
-        ->group('作为用户中心配置','SSO_SWITCH_USER_CENTER')
-        ->group('作为应用配置','SSO_CONFIG,SSO_UC_AUTH_KEY,SSO_UC_DB_DSN,SSO_UC_TABLE_PREFIX')
-            ->buttonSubmit('', '保存')->data($data);
+            ->group(L('_CONFIGURATION_AS_USER_CENTER_'),'SSO_SWITCH_USER_CENTER')
+            ->group(L('_AS_AN_APPLICATION_CONFIGURATION_'),'SSO_CONFIG,SSO_UC_AUTH_KEY,SSO_UC_DB_DSN,SSO_UC_TABLE_PREFIX')
+            ->buttonSubmit('', L('_SAVE_'))->data($data);
         $admin_config->display();
     }
 
@@ -46,9 +46,9 @@ class AuthorizeController extends AdminController
 
         $add = array();
         $oc_config = include_once './OcApi/oc_config.php';
-            $add['SSO_UC_AUTH_KEY'] = $config['SSO_UC_AUTH_KEY'] = $oc_config['SSO_DATA_AUTH_KEY'];
-            $add['SSO_UC_DB_DSN'] = $config['SSO_UC_DB_DSN'] = 'mysqli://' . $oc_config['SSO_DB_USER'] . ':' . $oc_config['SSO_DB_PWD'] . '@' . $oc_config['SSO_DB_HOST'] . ':' . $oc_config['SSO_DB_PORT'] . '/' . $oc_config['SSO_DB_NAME'];
-            $add['SSO_UC_TABLE_PREFIX'] = $config['SSO_UC_TABLE_PREFIX'] = $oc_config['SSO_DB_PREFIX'];
+        $add['SSO_UC_AUTH_KEY'] = $config['SSO_UC_AUTH_KEY'] = $oc_config['SSO_DATA_AUTH_KEY'];
+        $add['SSO_UC_DB_DSN'] = $config['SSO_UC_DB_DSN'] = 'mysqli://' . $oc_config['SSO_DB_USER'] . ':' . $oc_config['SSO_DB_PWD'] . '@' . $oc_config['SSO_DB_HOST'] . ':' . $oc_config['SSO_DB_PORT'] . '/' . $oc_config['SSO_DB_NAME'];
+        $add['SSO_UC_TABLE_PREFIX'] = $config['SSO_UC_TABLE_PREFIX'] = $oc_config['SSO_DB_PREFIX'];
 
         if (!$config['SSO_CONFIG']) {
 
@@ -110,20 +110,20 @@ class AuthorizeController extends AdminController
         foreach ($appList as &$v) {
             $url = $v['url'] . '/' . $v['path'] . '?code=' . urlencode(think_encrypt('action=test&time='.time()));
             $arr = $this->check_link($url);
-            $v['link_status'] = $v['status'] == 1 ? ($arr === 'success' ? '<span style="color:green">连接成功</span>' : '<span style="color:red">连接失败</span>') : '<span style="color:red">连接失败-已被禁用</span>';
+            $v['link_status'] = $v['status'] == 1 ? ($arr === 'success' ? '<span style="color:green">'.L('_SUCCESS__LINK_').'</span>' : '<span style="color:red">'.L('_FAIL__LINK_').'</span>') : '<span style="color:red">'.L('_FAIL__LINK_LIMITED_').'</span>';
         }
         unset($v);
         //显示页面
         $builder = new AdminListBuilder();
-        $builder->title('单点登录应用列表')
+        $builder->title(L('_SINGLE_POINT_LOGIN_APPLICATION_LIST_'))
             ->buttonNew(U('editSsoApp'))
             ->setStatusUrl(U('setSsoAppStatus'))->buttonEnable()->buttonDisable()->buttonDelete()
             ->keyId()
             ->keyTitle()
-            ->keyText('url', '网站路径')
-            ->keyText('path', 'api目录')
+            ->keyText('url', L('_WEBSITE_PATH_'))
+            ->keyText('path', L('_CATEGORY_API_'))
             ->keyStatus()
-            ->keyText('link_status', '连接状态')
+            ->keyText('link_status', L('_CONNECTED_STATE_'))
             ->keyDoActionEdit('editSsoApp?id=###')
             ->data($appList)
             ->display();
@@ -148,11 +148,11 @@ class AuthorizeController extends AdminController
                 $config['APP_ID'] = $res;
             }
             D('sso_app')->where(array('id' => $config['APP_ID']))->setField('config', serialize($config));
-            $this->success(($aId == 0 ? '添加' : '编辑') . '成功', $aId == 0 ? U('', array('id' => $res)) : '');
+            $this->success(($aId == 0 ? L('_ADD_') : L('_EDIT_')) . L('_SUCCESS_'), $aId == 0 ? U('', array('id' => $res)) : '');
             /*            if ($res) {
-                            $this->success(($aId == 0 ? '添加' : '编辑') . '成功');
+                            $this->success(($aId == 0 ? L('_ADD_') : L('_EDIT_')) . L('_SUCCESS_'));
                         } else {
-                            $this->error(($aId == 0 ? '添加' : '编辑') . '失败');
+                            $this->error(($aId == 0 ? L('_ADD_') : L('_EDIT_')) . L('_FAILURE_'));
                         }*/
         } else {
             $builder = new AdminConfigBuilder();
@@ -162,11 +162,11 @@ class AuthorizeController extends AdminController
                 $app = array('status' => 1, 'path' => 'OcApi/oc.php');
             }
             $app['config'] = $this->parseConfigToString(unserialize($app['config']));
-            $builder->title(($aId == 0 ? '新增' : '编辑') . '应用')->keyId()->keyText('title', '名称')
-                ->keyText('url', '根目录', '需要填写http://，末尾不要加"/"')
-                ->keyText('path', '路径')
+            $builder->title(($aId == 0 ? L('_NEW_') : L('_EDIT_')) . L('_APPLICATION_'))->keyId()->keyText('title', L('_NAME_'))
+                ->keyText('url', L('_ROOT_DIRECTORY_'), L('_WRITE_NEED_TIP_'))
+                ->keyText('path', L('_PATH_'))
                 ->keyStatus()
-                ->keyLabel('config', '配置信息', '保存后将以下内容复制到应用下的配置文件中。')
+                ->keyLabel('config', L('_CONFIGURATION_INFORMATION_'), L('_SAVE_THE_FOLLOWING_CONTENTS_TO_THE_APPLICATION_S_CONFIGURATION_FILE_'))
                 ->data($app)
                 ->buttonSubmit(U('editSsoApp'))->buttonBack()->display();
         }
@@ -182,15 +182,15 @@ class AuthorizeController extends AdminController
     private function parseConfigToString($config = array())
     {
 
-        $note['SSO_SWITCH'] = '单点登录开关';
-        $note['SSO_DB_HOST'] = '用户中心主机';
-        $note['SSO_DB_NAME'] = '用户中心数据库名';
-        $note['SSO_DB_USER'] = '用户中心数据库用户名';
-        $note['SSO_DB_PWD'] = '用户中心数据库密码';
-        $note['SSO_DB_PORT'] = '用户中心数据库端口';
-        $note['SSO_DB_PREFIX'] = '用户中心数据库前缀';
-        $note['SSO_DATA_AUTH_KEY'] = '用户中心数据库密钥';
-        $note['OC_HOST'] = 'Ocenter主机地址';
+        $note['SSO_SWITCH'] = L('_SINGLE_SIGN_ON_SWITCH_');
+        $note['SSO_DB_HOST'] = L('_USER_CENTER_HOST_');
+        $note['SSO_DB_NAME'] = L('_USER_CENTER_DATABASE_NAME_');
+        $note['SSO_DB_USER'] = L('_USER_CENTER_DATABASE_USER_NAME_');
+        $note['SSO_DB_PWD'] = L('_USER_CENTER_DATABASE_PASSWORD_');
+        $note['SSO_DB_PORT'] = L('_USER_CENTER_DATABASE_PORT_');
+        $note['SSO_DB_PREFIX'] = L('_USER_CENTER_DATABASE_PREFIX_');
+        $note['SSO_DATA_AUTH_KEY'] = L('_USER_CENTER_DATABASE_KEY_');
+        $note['OC_HOST'] = L('_ADDRESS_HOST_');
         $note['APP_ID'] = '应用ID';
         $note['OC_SESSION_PRE'] = 'session前缀';
 

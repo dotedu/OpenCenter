@@ -1,6 +1,5 @@
 <php> $config = api('Config/lists');
     C($config); //添加配置
-    $icp=C('WEB_SITE_ICP');
     $count_code=C('COUNT_CODE');
 </php>
 <script type="text/javascript">
@@ -14,4 +13,16 @@
         'URL_MODEL': "{:C('URL_MODEL')}",
         'WEIBO_ID': "{:C('SHARE_WEIBO_ID')}"
     }
+    var cookie_config={
+        "prefix":"{:C('COOKIE_PREFIX')}"
+    }
+    var Config={
+        'GET_INFORMATION':{:modC('GET_INFORMATION',1,'Config')},
+        'GET_INFORMATION_INTERNAL':{:modC('GET_INFORMATION_INTERNAL',10,'Config')}*1000
+    }
+    var weibo_comment_order = "{:modC('COMMENT_ORDER',0,'WEIBO')}";
 </script>
+
+<script src="__PUBLIC__/lang.php?module={:strtolower(MODULE_NAME)}&lang={:LANG_SET}"></script>
+
+<script src="__PUBLIC__/expression.php"></script>

@@ -35,15 +35,14 @@ class SessionController extends BaseController
             }
         }
         $map['talk_id'] = $talk['id'];
-        D('TalkPush')->where(array('uid'=>get_uid(),'source_id'=>$id))->setField('status',-1);
-        D('TalkMessagePush')->where(array('uid'=>get_uid(),'talk_id'=>$id))->setField('status',-1);
+        D('Common/TalkPush')->clearAll();
         $messages = D('TalkMessage')->where($map)->order('create_time desc')->limit(20)->select();
         $messages = array_reverse($messages);
         foreach ($messages as &$mes) {
             $mes['user'] = query_user(array('avatar64', 'uid', 'username'), $mes['uid']);
             $mes['ctime'] = date('m-d h:i', $mes['create_time']);
             $mes['avatar64'] = $mes['user']['avatar64'];
-            $mes['content'] = parse_expression( $mes['content']);
+            $mes['content'] = parse_expression($mes['content']);
         }
         unset($mes);
         $talk['messages'] = $messages;
@@ -53,7 +52,7 @@ class SessionController extends BaseController
     }
 
     /**消息页面
-     * @param int    $page
+     * @param int $page
      * @param string $tab 当前tab
      */
     public function message($page = 1, $tab = 'unread')
@@ -87,7 +86,7 @@ class SessionController extends BaseController
     public function session()
     {
         $this->defaultTabHash('session');
-        $talks = D('Talk')->where('uids like' . '"%[' . is_login() . ']%"' . ' and status=1')->order('update_time desc')->select();
+        $talks = $this->mTalkModel->where('uids like' . '"%[' . is_login() . ']%"' . ' and status=1')->order('update_time desc')->select();
         foreach ($talks as $key => $v) {
             $users = array();
             $uids_array = $this->mTalkModel->getUids($v['uids']);
@@ -136,7 +135,7 @@ class SessionController extends BaseController
         $this->requireLogin();
 
         //确认当前用户属于聊天。
-        $talk = D('Talk')->find($talk_id);
+        $talk = $this->mTalkModel->find($talk_id);
         $uid = get_uid();
         if (false === strpos($talk['uids'], "[$uid]")) {
             $this->error('您没有权限删除该聊天');
@@ -145,14 +144,16 @@ class SessionController extends BaseController
         //如果删除前聊天中只有两个人，就将聊天标记为已删除。
         $uids = explode(',', $talk['uids']);
         if (count($uids) <= 2) {
-            D('Talk')->where(array('id' => $talk_id))->setField('status', -1);
-            D('Message')->where(array('talk_id' => $talk_id))->setField('talk_id', 0);
+            $this->mTalkModel->where(array('id' => $talk_id))->setField('status', -1);
+            M('talk_message_push')->where(array('talk_id' => $talk_id))->delete();
+            M('talk_push')->where(array('source_id' => $talk_id))->delete();
+            /*D('Message')->where(array('talk_id' => $talk_id))->setField('talk_id', 0);*/
         } //如果删除前聊天中有多个人，就退出聊天。
         else {
             $uids = array_diff($uids, array("[$uid]"));
             $uids = implode(',', $uids);
-            D('Talk')->where(array('id' => $talk_id))->save(array('uids' => $uids));
-            D('Message')->where(array('talk_id' => $talk_id, 'uid' => get_uid()))->setField('talk_id', 0);
+            $this->mTalkModel->where(array('id' => $talk_id))->save(array('uids' => $uids));
+            /*D('Message')->where(array('talk_id' => $talk_id, 'uid' => get_uid()))->setField('talk_id', 0);*/
         }
 
         //返回成功结果
@@ -167,21 +168,21 @@ class SessionController extends BaseController
     {
         //空的内容不能发送
         if (!trim($content)) {
-            $this->error('内容不能为空');
+            $this->error(L('_ERROR_CHAT_CONTENT_EMPTY_'));
         }
 
         D('TalkMessage')->addMessage($content, is_login(), $talk_id);
-        $talk = D('Talk')->find($talk_id);
+        $talk = $this->mTalkModel->find($talk_id);
         $message = D('Message')->find($talk['message_id']);
         $messageModel = $this->getMessageModel($message);
         $rs = $messageModel->postMessage($message, $talk, $content, is_login());
 
         D('TalkMessage')->sendMessage($content, $this->mTalkModel->getUids($talk['uids']), $talk_id);
         if (!$rs) {
-            $this->error('写入数据库错误');
+            $this->error(L('_ERROR_DB_WRITE_'));
         }
 
-        $this->success("发送成功");
+        $this->success(L('_SUCCESS_SEND_'));
     }
 
     /**
@@ -204,58 +205,13 @@ class SessionController extends BaseController
      */
     private function getTalk($message_id, $talk_id)
     {
-        if ($message_id != 0) {
-            /*如果是传递了message_id，就是创建对话*/
-            $message = D('Message')->find($message_id);
-
-            //权限检测，防止越权创建聊天
-            if (($message['to_uid'] != $this->mid && $message['from_uid'] != $this->mid) || !$message) {
-                $this->error('非法操作。');
-            }
-
-            //如果已经创建过聊天了，就不再创建
-            $map['message_id'] = $message_id;
-            $map['status'] = 1;
-            $talk = D('Talk')->where($map)->find();
-            if ($talk) {
-                redirect(U('Ucenter/Message/talk', array('talk_id' => $talk['id'])));
-            }
-
-
-            $memeber = $message['from_uid'];
-
-
-            //TODO 调用模型创建聊天
-            D('Common/Talk')->createTalk($memeber, $message);
-            $messageModel = $this->getMessageModel($message);
-
-
-            //关联聊天到当前消息
-            $message['talk_id'] = $talk['id'];
-            D('Message')->save($message);
-
-            //插入第一条消息
-            $talkMessage['uid'] = $message['from_uid'];
-            $talkMessage['talk_id'] = $talk['id'];
-            $talkMessage['content'] = $messageModel->getFindContent($message);
-            $talkMessageModel = D('TalkMessage');
-            $talkMessage = $talkMessageModel->create($talkMessage);
-            $talkMessage['id'] = $talkMessageModel->add($talkMessage);
-
-
-            D('Message')->sendMessage($message['from_uid'], '聊天名称：' . $talk['title'], '您有新的主题聊天', U('Ucenter/Message/talk', array('talk_id' => $talk['id'])), is_login(), 0);
-
-            return $talk;
-
-        } else {
-            $talk = D('Talk')->find($talk_id);
-            $uids_array = $this->mTalkModel->getUids($talk['uids']);
-            if (!count($uids_array)) {
-                $this->error('越权操作。');
-                return $talk;
-            }
+        $talk = $this->mTalkModel->find($talk_id);
+        $uids_array = $this->mTalkModel->getUids($talk['uids']);
+        if (!count($uids_array)) {
+            $this->error(L('_ERROR_POWER_EXCEED_'));
             return $talk;
         }
+        return $talk;
     }
 
     /**
@@ -287,14 +243,16 @@ class SessionController extends BaseController
     /**创建聊天，
      * @auth 陈一枭
      */
-    public function createTalk($uids='')
+    public function createTalk()
     {
-        if($uids==''){
+        $aUids = I('post.uids', '', 'op_t');
+        if ($aUids == '') {
             exit;
         }
-        $memebers = explode(',', $uids);
-        $talk = D('Common/Talk')->createTalk($memebers);
+        $memebers = explode(',', $aUids);
+        $talk = $this->mTalkModel->createTalk($memebers);
         $this->success($talk);
+
     }
 
 }
