@@ -133,11 +133,17 @@ function check_dirfile()
 function check_func()
 {
     $items = array(
-        array('mysql_connect', '支持', 'ok'),
         array('file_get_contents', '支持', 'ok'),
         array('mb_strlen', '支持', 'ok'),
         array('curl_init', '支持', 'ok'),
     );
+
+    if(function_exists('mysqli_connect')){
+        $items[] =  array('mysqli_connect', '支持', 'ok');
+    }else{
+        $items[] = array('mysql_connect', '支持', 'ok');
+    }
+
 
     foreach ($items as &$val) {
         if (!function_exists($val[0])) {
