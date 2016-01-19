@@ -44,7 +44,11 @@ class UserModel
 
     private function popGotFields($fiels, $gotFields)
     {
-        return array_diff($fiels, $gotFields);
+        if(count($gotFields)!=0){
+            return array_diff($fiels, $gotFields);
+        }
+        return $fiels;
+
     }
 
     private function combineUserData($user_data, $values)
@@ -62,7 +66,8 @@ class UserModel
         $need_query = array_intersect($this->table_fields, $fields);
         //如果有需要检索的数据
         if (!empty($need_query)) {
-            $query_results = D('')->query('select ' . implode(',', $need_query) . ' from ocenter_member,ocenter_ucenter_member where ocenter_member.uid=ocenter_ucenter_member.id and uid=' . $uid . ' limit 1');
+            $db_prefix=C('DB_PREFIX');
+            $query_results = D('')->query('select ' . implode(',', $need_query) . " from `{$db_prefix}member`,`{$db_prefix}ucenter_member` where uid=id and uid={$uid} limit 1");
             $query_result = $query_results[0];
             $user_data = $this->combineUserData($user_data, $query_result);
             $fields = $this->popGotFields($fields, $need_query);
@@ -247,7 +252,10 @@ class UserModel
             }
         }
         //去除已经缓存的字段
-        $fields = array_diff($fields, $cachedFields);
+        if(count($cachedFields)!=0){
+            $fields = array_diff($fields, $cachedFields);
+        }
+
         return array($cacheResult, $fields);
     }
 
